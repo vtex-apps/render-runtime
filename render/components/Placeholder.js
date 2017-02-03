@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react'
 import treePath from 'react-tree-path'
-import {connect} from 'react-redux'
 import {canUseDOM} from 'exenv'
 import {placeholders, components} from '../state'
 
@@ -16,7 +15,7 @@ const stopPerf = function () {
   console.log(`Placeholder.render\tduration=${global.Perf.getLastMeasurements()[0].duration.toFixed(2)}ms\ttreePath=${this.props.treePath}`)
 }
 
-export default treePath(class Placeholder extends Component {
+class Placeholder extends Component {
   constructor () {
     super()
     if (canUseDOM && global.Perf) {
@@ -36,7 +35,7 @@ export default treePath(class Placeholder extends Component {
       ? <Component {...settings} />
       : this.props.children || empty
   }
-})
+}
 
 Placeholder.propTypes = {
   id: PropTypes.string.isRequired,
@@ -45,3 +44,5 @@ Placeholder.propTypes = {
   settings: PropTypes.object,
   treePath: PropTypes.string,
 }
+
+export default treePath(Placeholder)
