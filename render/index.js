@@ -10,8 +10,7 @@ import 'intl/locale-data/jsonp/pt.js'
 import 'intl/locale-data/jsonp/en.js'
 import 'intl/locale-data/jsonp/es.js'
 import Helmet from 'react-helmet'
-import {ApolloProvider} from 'react-apollo'
-import {renderToStringWithData} from 'react-apollo/server'
+import {ApolloProvider, renderToStringWithData} from 'react-apollo/lib'
 
 import './routes'
 import state from './state'
@@ -20,10 +19,10 @@ import Placeholder from './components/Placeholder'
 global.Intl = Intl
 addLocaleData([...pt, ...en, ...es])
 
-const Root = ({client, route, account, locale, messages, settings}) => (
+const Root = ({client, route, account, locale, messages, settings, components, placeholders}) => (
   <ApolloProvider client={client}>
     <IntlProvider locale={locale} messages={messages}>
-      <Helmet title={settings ? settings.title || account : account} />
+      <Helmet title={settings ? settings.title || account: account} />
       <Placeholder id={route} />
     </IntlProvider>
   </ApolloProvider>
@@ -50,10 +49,10 @@ if (canUseDOM) {
   global.rendered = renderToStringWithData(<Root {...state} />).then(markup => ({
     head: Helmet.rewind(),
     markup,
-    state: state.client.store.getState(),
+    state: state.client.store.getState()[state.client.reduxRootKey].data
   }))
 }
 
 if (canUseDOM && process.env.NODE_ENV !== 'production') {
-  global.Perf = require('react/lib/ReactPerf')
+  global.Perf = require('react-dom/lib/ReactPerf')
 }
