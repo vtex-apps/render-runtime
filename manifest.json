@@ -8,7 +8,7 @@
   "categories": [],
   "settingsSchema": {},
   "dependencies": {
-    "vtex:render-server": "0.x",
+    "vtex.render-server": "0.x",
     "npm:apollo-client": "0.6.0",
     "npm:graphql-tag": "0.1.16",
     "npm:react-apollo": "0.6.0",
