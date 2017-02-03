@@ -1,4 +1,4 @@
-import style from './style.css'
+import style from './Img.css'
 import classnames from 'classnames/bind'
 import React, {Component, PropTypes} from 'react'
 import {account} from '../state'
