@@ -16,10 +16,12 @@ const {
 
 const client = new ApolloClient({
   networkInterface: createBatchingNetworkInterface({
-    uri: `http://masterdata-graphql.vtex.aws-us-east-1.vtex.io/${account}/${workspace}/graphql`,
+    uri: canUseDOM ?
+      '?vtex.render-resource=graphql' :
+      `http://masterdata-graphql.vtex.aws-us-east-1.vtex.io/${account}/${workspace}/graphql`,
     batchInterval: 80,
     opts: {
-      credentials: 'include',
+      credentials: 'same-origin',
     },
   }),
   ssrMode: !canUseDOM,
