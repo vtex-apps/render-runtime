@@ -22,8 +22,10 @@ addLocaleData([...pt, ...en, ...es])
 const Root = ({client, route, account, locale, messages, settings, components, placeholders}) => (
   <ApolloProvider client={client}>
     <IntlProvider locale={locale} messages={messages}>
-      <Helmet title={settings ? settings.title || account: account} />
-      <Placeholder id={route} />
+      <div>
+        <Helmet title={settings ? settings.title || account: account} />
+        <Placeholder id={route} />
+      </div>
     </IntlProvider>
   </ApolloProvider>
 )
