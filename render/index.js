@@ -51,7 +51,7 @@ if (canUseDOM) {
   global.rendered = renderToStringWithData(<Root {...state} />).then(markup => ({
     head: Helmet.rewind(),
     markup,
-    state: state.client.store.getState()[state.client.reduxRootKey].data
+    state: state.client.getInitialState()
   }))
 }
 

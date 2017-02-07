@@ -24,7 +24,7 @@ const client = new ApolloClient({
   }),
   ssrMode: !canUseDOM,
   addTypename: true,
-  initialState: canUseDOM && {apollo: {data: global.__STATE__}},
+  initialState: canUseDOM && {apollo: global.__STATE__},
   dataIdFromObject: function getDataIdFromObject (result) {
     const id = (result.slug || result.orderFormId)
     if (result.__typename === 'Facet') {
