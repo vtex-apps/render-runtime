@@ -8,7 +8,8 @@ const createLocationDescriptor = (to, {query}) => query ? { pathname: to, search
 
 //eslint-disable-next-line
 export default class Link extends React.Component {
-  constructor () {
+  constructor (props) {
+    super(props)
     this.handleClick = this.handleClick.bind(this)
   }
 
