@@ -3,6 +3,7 @@ import treePath from 'react-tree-path'
 import {canUseDOM} from 'exenv'
 import state from '../state'
 
+const {placeholders, components} = state
 const EMPTY_OBJECT = {}
 const empty = <span className="Placeholder--empty"></span>
 
@@ -28,8 +29,8 @@ class Placeholder extends Component {
 
   render () {
     const {treePath} = this.props
-    const {component, settings} = state.placeholders[treePath] || EMPTY_OBJECT
-    const {default: Component} = state.components[component] || EMPTY_OBJECT
+    const {component, settings} = placeholders[treePath] || EMPTY_OBJECT
+    const {default: Component} = components[component] || EMPTY_OBJECT
 
     return Component
       ? <Component {...settings} />

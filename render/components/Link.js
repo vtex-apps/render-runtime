@@ -4,7 +4,7 @@ const isLeftClickEvent = (event) => event.button === 0
 
 const isModifiedEvent = (event) => !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey)
 
-const createLocationDescriptor = (to, {query}) => query ? { pathname: to, search: query} : to
+const createLocationDescriptor = (to, {query}) => query ? {pathname: to, search: query} : to
 
 //eslint-disable-next-line
 export default class Link extends React.Component {

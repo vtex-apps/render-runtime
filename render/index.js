@@ -3,29 +3,25 @@ import {canUseDOM} from 'exenv'
 import React, {PropTypes} from 'react'
 import ReactDOM from 'react-dom'
 import {addLocaleData, IntlProvider} from 'react-intl'
+import Helmet from 'react-helmet'
 import pt from 'react-intl/locale-data/pt'
 import en from 'react-intl/locale-data/en'
 import es from 'react-intl/locale-data/es'
 import 'intl/locale-data/jsonp/pt.js'
 import 'intl/locale-data/jsonp/en.js'
 import 'intl/locale-data/jsonp/es.js'
-import Helmet from 'react-helmet'
 import {ApolloProvider, renderToStringWithData} from 'react-apollo/lib'
 
-import './routes'
+import {Route} from './routes'
 import state from './state'
-import Placeholder from './components/Placeholder'
 
 global.Intl = Intl
 addLocaleData([...pt, ...en, ...es])
 
-const Root = ({client, route, account, locale, messages, settings, components, placeholders}) => (
+const Root = ({client, route, account, locale, messages}) => (
   <ApolloProvider client={client}>
     <IntlProvider locale={locale} messages={messages}>
-      <div>
-        <Helmet title={settings ? settings.title || account: account} />
-        <Placeholder id={route} />
-      </div>
+      <Route route={route} account={account} />
     </IntlProvider>
   </ApolloProvider>
 )
@@ -51,7 +47,7 @@ if (canUseDOM) {
   global.rendered = renderToStringWithData(<Root {...state} />).then(markup => ({
     head: Helmet.rewind(),
     markup,
-    state: state.client.getInitialState()
+    state: state.client.getInitialState(),
   }))
 }
 

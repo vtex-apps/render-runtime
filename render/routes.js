@@ -1,120 +1,116 @@
-import Route from 'route-parser'
+import React, {Component, PropTypes} from 'react'
+import RouteParser from 'route-parser'
 import {canUseDOM} from 'exenv'
+import Helmet from 'react-helmet'
 import createHistory from 'history/createBrowserHistory'
+import Placeholder from './components/Placeholder'
+import state from './state'
 
-const noop = function () {}
-const updatePlaceholderSettings = noop
-const changeLocation = noop
+const {placeholders, hash} = state
 
-const scrollTo = (element, to, duration) => {
-  if (duration <= 0) {
-    return
-  }
-
-  const difference = to - element.scrollTop
-  const perTick = difference / duration * 10
-
-  setTimeout(() => {
-    element.scrollTop = element.scrollTop + perTick
-    if (element.scrollTop === to) {
-      return
-    }
-
-    scrollTo(element, to, duration - 10)
-  }, 10)
-}
-
-const getScore = path => {
-  const catchAll = (path.match(/\*/g) || []).length
-  const catchOne = (path.match(/:/g) || []).length
-  const fixed = (path.match(/\/[\w_-]+/g) || []).length
-  return ~((catchAll << 12) + (catchOne << 6) + ((1 << 6) - fixed - 1))
-}
-
-const updateStoreForRoute = (store, routeName, params, path, action) => {
-  if (action !== 'POP') {
-    scrollTo(document.body, 0, 200)
-  }
-  if (Object.keys(params).length > 0) {
-    store.dispatch(updatePlaceholderSettings(routeName, params))
-  }
-  store.dispatch(changeLocation(routeName, params, path))
-}
-
-const resolveRoute = (path, store) => {
-  const placeholders = store.getState().placeholders
-  let params, routeName, score, highScore
-  for (const name in placeholders) {
-    const placeholder = placeholders[name]
-    if (placeholder.path) {
-      const tempParams = new Route(placeholder.path).match(path)
-      if (!tempParams) {
-        continue
-      }
-
-      score = getScore(placeholder.path)
-      if (highScore > score) {
-        continue
-      }
-
-      highScore = score
-      routeName = name
-      params = tempParams
-    }
-  }
-  return {params, routeName}
-}
-
-export function fetchRoute (routeName, hash, onload) {
+function fetchRoute (routeName) {
   // Check if route bundle is already loaded in page
   if (document.getElementById(routeName) && document.getElementById(`${routeName}CSS`)) {
-    return false
+    return Promise.resolve()
   }
+  return new Promise((resolve, reject) => {
+    const bundlePath = `/assets/${routeName}.js${hash ? `?hash=${hash}` : ''}`
+    const cssPath = `/assets/${routeName}.css${hash ? `?hash=${hash}` : ''}`
 
-  const bundlePath = hash
-    ? `/assets/${routeName}.js?hash=${hash}`
-    : `/assets/${routeName}.js`
-  const cssPath = hash
-    ? `/assets/${routeName}.css?hash=${hash}`
-    : `/assets/${routeName}.css`
+    const link = document.createElement('link')
+    link.href = cssPath
+    link.id = `${routeName}CSS`
+    link.type = 'text/css'
+    link.rel = 'stylesheet'
+    document.head.appendChild(link)
 
-  const link = document.createElement('link')
-  link.href = cssPath
-  link.id = `${routeName}CSS`
-  link.type = 'text/css'
-  link.rel = 'stylesheet'
-  document.head.appendChild(link)
-
-  const script = document.createElement('script')
-  script.src = bundlePath
-  script.id = routeName
-  script.onload = onload
-  return document.head.appendChild(script)
+    const script = document.createElement('script')
+    script.src = bundlePath
+    script.id = routeName
+    script.onload = resolve
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
 }
 
-export function changeRoute (location, action, store) {
-  const {params, routeName} = resolveRoute(location.pathname, store)
-  const {hash} = store.getState().context
-  if (!params) {
-    throw new Error('No routes matched the requested path')
-  }
-  const fullLocation = location.pathname + location.search
-  const onload = () => updateStoreForRoute(store, routeName, params, fullLocation, action)
-  const isForwardAction = action === 'PUSH' || action === 'REPLACE'
-  const isBundleLoaded = fetchRoute(routeName, hash, onload)
-  const isBackAction = action === 'POP'
-  if ((isForwardAction && !isBundleLoaded) || isBackAction) {
-    onload()
-  }
-}
-
-export function prefetchRoute (routeName, onload = noop) {
+export function prefetchRoute (routeName) {
   if (canUseDOM) {
-    fetchRoute(routeName, window.render.context.hash, onload) || onload()
+    fetchRoute(routeName)
   }
 }
 
-if (canUseDOM) {
-  global.browserHistory = createHistory()
-  global.browserHistory.listen((location, action) => changeRoute(location, action))
+// eslint-disable-next-line
+export class Route extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {route: props.route}
+    this.changeRoute = this.changeRoute.bind(this)
+    this.resolveRoute = this.resolveRoute.bind(this)
+  }
+
+  componentDidMount () {
+    global.browserHistory = createHistory()
+    global.browserHistory.listen(this.changeRoute)
+  }
+
+  getScore (path) {
+    const catchAll = (path.match(/\*/g) || []).length
+    const catchOne = (path.match(/:/g) || []).length
+    const fixed = (path.match(/\/[\w_-]+/g) || []).length
+    return ~((catchAll << 12) + (catchOne << 6) + ((1 << 6) - fixed - 1))
+  }
+
+  resolveRoute (path) {
+    let params, route, score, highScore
+    for (const name in placeholders) {
+      const placeholder = placeholders[name]
+      if (placeholder.path) {
+        const tempParams = new RouteParser(placeholder.path).match(path)
+        if (!tempParams) {
+          continue
+        }
+
+        score = this.getScore(placeholder.path)
+        if (highScore > score) {
+          continue
+        }
+
+        highScore = score
+        route = name
+        params = tempParams
+      }
+    }
+    return {params, route}
+  }
+
+  changeRoute (location) {
+    const {params, route} = this.resolveRoute(location.pathname)
+    if (!params) {
+      throw new Error('No routes matched the requested path')
+    }
+    // Add found URL params to placeholder settings (e.g. :slug).
+    placeholders[route].settings = {
+      ...placeholders[route].settings,
+      ...params,
+    }
+    document.body.scrollTop = 0
+    fetchRoute(route).then(() => this.setState({route}))
+  }
+
+  render () {
+    const {account} = this.props
+    const {route} = this.state
+    const {settings} = placeholders[route]
+    return (
+      <div>
+        <Helmet title={settings ? (settings.title || account) : account} />
+        <Placeholder id={route} />
+      </div>
+    )
+  }
+}
+
+Route.propTypes = {
+  route: PropTypes.string,
+  account: PropTypes.string,
 }

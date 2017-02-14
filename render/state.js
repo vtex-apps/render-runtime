@@ -8,17 +8,17 @@ const {
   route,
   version,
   culture: {
-    locale
+    locale,
   },
   placeholders,
-  components
+  components,
 } = global.__RUNTIME__
 
 const client = new ApolloClient({
   networkInterface: createBatchingNetworkInterface({
-    uri: canUseDOM ?
-      '?vtex.render-resource=graphql' :
-      `http://masterdata-graphql.vtex.aws-us-east-1.vtex.io/${account}/${workspace}/graphql`,
+    uri: canUseDOM
+      ? '?vtex.render-resource=graphql'
+      : `http://masterdata-graphql.vtex.aws-us-east-1.vtex.io/${account}/${workspace}/graphql`,
     batchInterval: 80,
     opts: {
       credentials: 'same-origin',
@@ -43,9 +43,10 @@ export default {
   client,
   route,
   account,
+  hash,
   locale,
   messages: {},
-  settings: placeholders[route].settings,
   components,
   placeholders,
+  version,
 }
