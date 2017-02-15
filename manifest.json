@@ -24,5 +24,8 @@
     "npm:history": "4.5.1",
     "npm:react-helmet": "4.0.0",
     "npm:classnames": "2.2.5"
+  },
+  "scripts": {
+    "postreleasy": "vtex publish"
   }
 }
