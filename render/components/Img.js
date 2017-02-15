@@ -1,8 +1,9 @@
 import style from './Img.css'
 import classnames from 'classnames/bind'
 import React, {Component, PropTypes} from 'react'
-import {account} from '../state'
+import state from '../state'
 
+const {account} = state
 const EMPTY_OBJECT = {}
 const divStyle = {position: 'relative'}
 const cx = classnames.bind(style)
