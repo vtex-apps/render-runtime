@@ -10,7 +10,7 @@
   "dependencies": {
     "vtex.render-server": "0.x",
     "vtex.render-builder": "0.x",
-    "npm:apollo-client": "0.8.1",
+    "npm:apollo-client": "0.8.3",
     "npm:graphql-tag": "1.2.4",
     "npm:react-apollo": "0.9.0",
     "npm:react": "15.4.2",
