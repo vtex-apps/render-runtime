@@ -14,8 +14,8 @@ const loadedMap = {}
 export default class Img extends Component {
   constructor (props) {
     super(props)
-    const {src, width = 1, height = 1} = this.props
-    this.state = this.buildState(src, width, height)
+    const {src, relative, width = 1, height = 1} = this.props
+    this.state = this.buildState(src, width, height, relative)
     this.handleLoad = this.handleLoad.bind(this)
     this.handleRef = this.handleRef.bind(this)
     this.getPath = this.getPath.bind(this)
@@ -34,9 +34,9 @@ export default class Img extends Component {
     }
   }
 
-  buildState (src, width, height) {
+  buildState (src, width, height, relative) {
     const {height: loadedHeight = 0, width: loadedWidth = 0, path: loadedPath} = loadedMap[src] || EMPTY_OBJECT
-    const bestPath = (loadedHeight * loadedWidth > height * width) ? loadedPath : this.getPath(src, width, height)
+    const bestPath = (loadedHeight * loadedWidth > height * width) ? loadedPath : this.getPath(src, width, height, relative)
     return {
       loaded: loadedPath === bestPath,
       loadedPath,
@@ -44,14 +44,14 @@ export default class Img extends Component {
     }
   }
 
-  getBaseUrl () {
-    return `//${account}.vteximg.com.br`
+  getBaseUrl (relative) {
+    return relative ? '' : `//${account}.vteximg.com.br`
   }
 
   handleLoad () {
-    const {src, width = 1, height = 1} = this.props
+    const {src, relative, width = 1, height = 1} = this.props
     const {height: loadedHeight = 0, width: loadedWidth = 0} = loadedMap[src] || EMPTY_OBJECT
-    const path = this.getPath(src, width, height)
+    const path = this.getPath(src, width, height, relative)
     // Only cache loaded image if dimensions are larger than existing ones.
     if (loadedHeight * loadedWidth < height * width) {
       loadedMap[src] = {
@@ -78,11 +78,11 @@ export default class Img extends Component {
     return src.replace('#width#', width).replace('#height#', height)
   }
 
-  getPath (src, width, height) {
+  getPath (src, width, height, relative) {
     if (src.indexOf('http') !== -1) {
       return src
     }
-    return `${this.getBaseUrl()}${this.replaceWidthAndHeight(src, width, height)}`
+    return `${this.getBaseUrl(relative)}${this.replaceWidthAndHeight(src, width, height)}`
   }
 
   render () {
@@ -148,6 +148,7 @@ Img.propTypes = {
   src: PropTypes.string.isRequired,
   width: PropTypes.number.isRequired,
   account: PropTypes.string,
+  relative: PropTypes.bool,
   alt: PropTypes.string,
   backgroundColor: PropTypes.string,
   className: PropTypes.string,
