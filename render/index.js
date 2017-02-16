@@ -21,7 +21,7 @@ addLocaleData([...pt, ...en, ...es])
 const Root = ({client, route, account, locale, messages}) => (
   <ApolloProvider client={client}>
     <IntlProvider locale={locale} messages={messages}>
-      <Route route={route} account={account} />
+      <Route account={account} />
     </IntlProvider>
   </ApolloProvider>
 )

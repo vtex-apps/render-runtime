@@ -43,7 +43,7 @@ export function prefetchRoute (routeName) {
 export class Route extends Component {
   constructor (props) {
     super(props)
-    this.state = {route: props.route}
+    this.state = {route: state.route}
     this.changeRoute = this.changeRoute.bind(this)
     this.resolveRoute = this.resolveRoute.bind(this)
   }
@@ -88,6 +88,10 @@ export class Route extends Component {
     if (!params) {
       throw new Error('No routes matched the requested path')
     }
+
+    // Change route info in context
+    global.__RUNTIME__.route = route
+
     // Add found URL params to placeholder settings (e.g. :slug).
     placeholders[route].settings = {
       ...placeholders[route].settings,
