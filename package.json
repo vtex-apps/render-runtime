@@ -21,6 +21,8 @@
     "route-parser": "0.0.5",
     "history": "4.5.1",
     "react-helmet": "4.0.0",
-    "classnames": "2.2.5"
+    "classnames": "2.2.5",
+    "preact": "^7.2.0",
+    "preact-compat": "^3.13.1"
   }
 }
