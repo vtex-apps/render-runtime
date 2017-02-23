@@ -6,7 +6,8 @@ import createHistory from 'history/createBrowserHistory'
 import Placeholder from './components/Placeholder'
 import state from './state'
 
-const {placeholders, hash} = state
+const {hash} = state
+const {placeholders} = global.__RUNTIME__
 
 function fetchRoute (routeName) {
   // Check if route bundle is already loaded in page

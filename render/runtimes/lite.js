@@ -2,41 +2,37 @@ import {canUseDOM} from 'exenv'
 import React from 'react'
 import {render} from 'preact-compat'
 import {renderToString} from 'preact-compat/server'
-import state from '../state'
+import PlaceholderProvider from '../components/PlaceholderProvider'
 import Placeholder from '../components/Placeholder'
 
-const {placeholders, route} = state
-const containerId = (name) => `render-${name.replace(/\//g, '-')}`
-// Render only self and children, and only if they have a component.
-const shouldRender = (k, placeholders) => RegExp(`^${route}($|/.+)`).test(k) && placeholders[k].component
+export default function ({placeholders}) {
+  const parentId = Object.keys(placeholders)[0].split('/')[0]
 
-if (canUseDOM) {
-  window.global = window
-  try {
-    Object.keys(placeholders).forEach(function (k) {
-      if (shouldRender(k, placeholders)) {
-        render(<Placeholder id={k} />, document.getElementById(containerId(k)))
-      }
-    })
-    console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
-  } catch (e) {
-    console.log('Oops!')
-    console.error(e)
-  }
-} else {
-  const markup = Object.keys(placeholders).reduce(function (acc, k) {
-    if (shouldRender(k, placeholders)) {
-      acc[k] = `<div id="${containerId(k)}">${renderToString(<Placeholder id={k} />)}</div>`
+  // Render only Placeholders with no parent. e.g. "test/render" might be declared in "test"
+  const shouldRender = (name) => !Object.keys(placeholders).find((p) => name.indexOf(p) === 0 && p !== name)
+
+  const createPlaceholder = ({name}) => shouldRender(name) && <Placeholder id={name} />
+
+  const createPlaceholderProvider = () =>
+    <PlaceholderProvider placeholders={placeholders}>
+      <div>
+        {Object.values(placeholders).map(createPlaceholder)}
+      </div>
+    </PlaceholderProvider>
+
+  if (canUseDOM) {
+    try {
+      render(createPlaceholderProvider(), document.getElementById(parentId))
+      console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
+    } catch (e) {
+      console.log('Oops!')
+      console.error(e)
     }
-    return acc
-  }, {})
+  } else {
+    const markup = `<div id="${parentId}">${renderToString(createPlaceholderProvider())}</div>`
 
-  global.rendered = {
-    head: {
-      title: '',
-      meta: '',
-      link: '',
-    },
-    markup,
+    global.rendered = {
+      markup,
+    }
   }
 }

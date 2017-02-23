@@ -12,6 +12,7 @@ import 'intl/locale-data/jsonp/en.js'
 import 'intl/locale-data/jsonp/es.js'
 import {ApolloProvider, renderToStringWithData} from 'react-apollo/lib'
 
+import PlaceholderProvider from '../components/PlaceholderProvider'
 import {Route} from '../routes'
 import state from '../state'
 import client from '../client'
@@ -20,30 +21,34 @@ const {account, locale, messages} = state
 global.Intl = Intl
 addLocaleData([...pt, ...en, ...es])
 
-const Root = () => (
-  <ApolloProvider client={client}>
-    <IntlProvider locale={locale} messages={messages}>
-      <Route account={account} />
-    </IntlProvider>
-  </ApolloProvider>
-)
+export default function ({placeholders}) {
+  const Root = () => (
+    <ApolloProvider client={client}>
+      <IntlProvider locale={locale} messages={messages}>
+        <PlaceholderProvider placeholders={placeholders}>
+          <Route account={account} />
+        </PlaceholderProvider>
+      </IntlProvider>
+    </ApolloProvider>
+  )
 
-if (canUseDOM) {
-  try {
-    ReactDOM.render(<Root />, document.getElementById('render-container'))
-    console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
-  } catch (e) {
-    console.log('Oops!')
-    console.error(e)
+  if (canUseDOM) {
+    try {
+      ReactDOM.render(<Root />, document.getElementById('render-container'))
+      console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
+    } catch (e) {
+      console.log('Oops!')
+      console.error(e)
+    }
+  } else {
+    global.rendered = renderToStringWithData(<Root />).then(markup => ({
+      head: Helmet.rewind(),
+      markup,
+      state: client.getInitialState(),
+    }))
   }
-} else {
-  global.rendered = renderToStringWithData(<Root />).then(markup => ({
-    head: Helmet.rewind(),
-    markup,
-    state: client.getInitialState(),
-  }))
-}
 
-if (canUseDOM && process.env.NODE_ENV !== 'production') {
-  global.Perf = require('react-dom/lib/ReactPerf')
+  if (canUseDOM && process.env.NODE_ENV !== 'production') {
+    global.Perf = require('react-dom/lib/ReactPerf')
+  }
 }

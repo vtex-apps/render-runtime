@@ -7,8 +7,6 @@ const {
   culture: {
     locale,
   },
-  placeholders,
-  components,
 } = global.__RUNTIME__
 
 const messages = {}
@@ -21,6 +19,4 @@ export default {
   version,
   locale,
   messages,
-  placeholders,
-  components,
 }
