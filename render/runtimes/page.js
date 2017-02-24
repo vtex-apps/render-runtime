@@ -17,11 +17,15 @@ import {Route} from '../routes'
 import state from '../state'
 import client from '../client'
 
+let rendered = false
 const {account, locale, messages} = state
 global.Intl = Intl
 addLocaleData([...pt, ...en, ...es])
 
 export default function ({placeholders}) {
+  if (rendered) { return false }
+  rendered = true
+
   const Root = () => (
     <ApolloProvider client={client}>
       <IntlProvider locale={locale} messages={messages}>
