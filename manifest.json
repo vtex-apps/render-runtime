@@ -1,7 +1,7 @@
 {
   "name": "render-runtime",
   "vendor": "vtex",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "title": "Render Framework Runtime",
   "description": "",
   "mustUpdateAt": "2018-01-04",
