@@ -2,6 +2,7 @@ import Intl from 'intl'
 import {canUseDOM} from 'exenv'
 import React from 'react'
 import {render as renderToDOM} from 'react-dom'
+import {AppContainer} from 'react-hot-loader'
 import {addLocaleData, IntlProvider} from 'react-intl'
 import Helmet from 'react-helmet'
 import pt from 'react-intl/locale-data/pt'
@@ -41,13 +42,15 @@ const render = (placeholders, route, name) => {
   const id = isPage ? 'render-container' : containerId(name)
   const component = isPage ? <Route /> : <Placeholder id={name} />
   const root = (
-    <ApolloProvider client={client}>
-      <IntlProvider locale={locale} messages={messages}>
-        <RenderProvider account={account} placeholders={placeholders} route={route}>
-          { component }
-        </RenderProvider>
-      </IntlProvider>
-    </ApolloProvider>
+    <AppContainer>
+      <ApolloProvider client={client}>
+        <IntlProvider locale={locale} messages={messages}>
+          <RenderProvider account={account} placeholders={placeholders} route={route}>
+            { component }
+          </RenderProvider>
+        </IntlProvider>
+      </ApolloProvider>
+    </AppContainer>
   )
   return canUseDOM
     ? renderToDOM(root, document.getElementById(id))
@@ -55,7 +58,7 @@ const render = (placeholders, route, name) => {
 }
 
 export default function (placeholders, route) {
-  const isApplyingHotUpdate = module.hot && module.hot.status() === 'ready'
+  const isApplyingHotUpdate = module.hot && module.hot.status() === 'apply'
   if (rendered && !isApplyingHotUpdate) {
     return false
   }
@@ -68,7 +71,7 @@ export default function (placeholders, route) {
   try {
     // If there are multiple renderable placeholders, render them in parallel.
     const renderPromises = parentWithComponentNames.map(name => render(placeholders, route, name))
-    console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
+    !rendered && console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     if (!canUseDOM) { // Expose render promises to global context.
       global.rendered = Promise.all(renderPromises).then(results => ({
         head: Helmet.rewind(),
