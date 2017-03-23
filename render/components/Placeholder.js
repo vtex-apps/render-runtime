@@ -1,30 +1,11 @@
 import React, {Component, PropTypes} from 'react'
 import treePath from 'react-tree-path'
-import {canUseDOM} from 'exenv'
 
 const EMPTY_OBJECT = {}
 const empty = <span className="Placeholder--empty"></span>
 
-const startPerf = function () {
-  global.Perf.start()
-}
-
-const stopPerf = function () {
-  global.Perf.stop()
-  console.log(`Placeholder.render\tduration=${global.Perf.getLastMeasurements()[0].duration.toFixed(2)}ms\ttreePath=${this.props.treePath}`)
-}
-
+// eslint-disable-next-line
 class Placeholder extends Component {
-  constructor () {
-    super()
-    if (canUseDOM && global.Perf) {
-      this.componentWillMount = startPerf
-      this.componentWillUpdate = startPerf
-      this.componentDidMount = stopPerf
-      this.componentDidUpdate = stopPerf
-    }
-  }
-
   render () {
     const {placeholders} = this.context
     const {treePath} = this.props
@@ -32,7 +13,7 @@ class Placeholder extends Component {
 
     return Component
       ? <Component {...settings} />
-      : this.props.children || empty
+      : <div>{this.props.children}</div> || empty
   }
 }
 
