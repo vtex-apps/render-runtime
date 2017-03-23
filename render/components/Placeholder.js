@@ -7,12 +7,19 @@ const empty = <span className="Placeholder--empty"></span>
 // eslint-disable-next-line
 class Placeholder extends Component {
   render () {
-    const {placeholders} = this.context
+    // TODO: must find a better way to add found placeholders to RenderProvider
+    const {placeholders} = global.__RUNTIME__
     const {treePath} = this.props
-    const {Component, settings} = placeholders[treePath] || EMPTY_OBJECT
-
+    const {Component} = placeholders[treePath] || EMPTY_OBJECT
+    const {params, settings} = global.__RUNTIME__.placeholders[treePath]
+    const {query} = global.__RUNTIME__
+    const props = {
+      params,
+      query,
+      settings,
+    }
     return Component
-      ? <Component {...settings} />
+      ? <Component {...props} />
       : <div>{this.props.children}</div> || empty
   }
 }

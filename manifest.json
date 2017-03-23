@@ -26,7 +26,8 @@
     "npm:react-helmet": "4.0.0",
     "npm:classnames": "2.2.5",
     "npm:preact": "^7.2.0",
-    "npm:preact-compat": "^3.13.1"
+    "npm:preact-compat": "^3.13.1",
+    "npm:qs": "^6.4.0"
   },
   "scripts": {
     "postreleasy": "vtex publish"

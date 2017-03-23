@@ -22,7 +22,6 @@ import Placeholder from './components/Placeholder'
 global.Intl = Intl
 addLocaleData([...pt, ...en, ...es])
 
-let rendered = false
 const {keys} = Object
 const {account, locale, messages} = state
 
@@ -58,11 +57,6 @@ const render = (placeholders, route, name) => {
 }
 
 export default function (placeholders, route) {
-  const isApplyingHotUpdate = module.hot && module.hot.status() === 'apply'
-  if (rendered && !isApplyingHotUpdate) {
-    return false
-  }
-
   // Names of all placeholders with a component
   const withComponentNames = keys(placeholders).filter(hasComponent(placeholders))
   // Names of all top-level placeholders with a component
@@ -71,7 +65,7 @@ export default function (placeholders, route) {
   try {
     // If there are multiple renderable placeholders, render them in parallel.
     const renderPromises = parentWithComponentNames.map(name => render(placeholders, route, name))
-    !rendered && console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
+    console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     if (!canUseDOM) { // Expose render promises to global context.
       global.rendered = Promise.all(renderPromises).then(results => ({
         head: Helmet.rewind(),
@@ -79,7 +73,6 @@ export default function (placeholders, route) {
         state: client.getInitialState(),
       }))
     }
-    rendered = true
   } catch (error) {
     console.error('Unexpected error rendering:', error)
     if (!canUseDOM) {

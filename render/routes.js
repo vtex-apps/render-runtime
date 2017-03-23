@@ -3,11 +3,11 @@ import RouteParser from 'route-parser'
 import {canUseDOM} from 'exenv'
 import Helmet from 'react-helmet'
 import createHistory from 'history/createBrowserHistory'
+import {parse} from 'qs'
 import Placeholder from './components/Placeholder'
 import state from './state'
 
 const {hash} = state
-const {placeholders} = global.__RUNTIME__
 
 function fetchRoute (routeName) {
   // Check if route bundle is already loaded in page
@@ -18,12 +18,14 @@ function fetchRoute (routeName) {
     const bundlePath = `/assets/${routeName}.js${hash ? `?hash=${hash}` : ''}`
     const cssPath = `/assets/${routeName}.css${hash ? `?hash=${hash}` : ''}`
 
-    const link = document.createElement('link')
-    link.href = cssPath
-    link.id = `${routeName}CSS`
-    link.type = 'text/css'
-    link.rel = 'stylesheet'
-    document.head.appendChild(link)
+    if (!module.hot) {
+      const link = document.createElement('link')
+      link.href = cssPath
+      link.id = `${routeName}CSS`
+      link.type = 'text/css'
+      link.rel = 'stylesheet'
+      document.head.appendChild(link)
+    }
 
     const script = document.createElement('script')
     script.src = bundlePath
@@ -63,10 +65,10 @@ export class Route extends Component {
 
   resolveRoute (path) {
     let params, route, score, highScore
-    for (const name in placeholders) {
-      const placeholder = placeholders[name]
+    for (const name in global.__RUNTIME__.placeholders) {
+      const placeholder = global.__RUNTIME__.placeholders[name]
       if (placeholder.path) {
-        const tempParams = new RouteParser(placeholder.path).match(path)
+        const tempParams = new RouteParser(placeholder.path.replace(/\/$/, '')).match(path.replace(/\/$/, ''))
         if (!tempParams) {
           continue
         }
@@ -92,12 +94,11 @@ export class Route extends Component {
 
     // Change route info in context
     global.__RUNTIME__.route = route
+    global.__RUNTIME__.query = parse(location.search.substr(1))
 
     // Add found URL params to placeholder settings (e.g. :slug).
-    placeholders[route].settings = {
-      ...placeholders[route].settings,
-      ...params,
-    }
+    global.__RUNTIME__.placeholders[route].params = params
+
     document.body.scrollTop = 0
     fetchRoute(route).then(() => this.setState({route}))
   }
@@ -105,7 +106,7 @@ export class Route extends Component {
   render () {
     const {account} = this.context
     const {route} = this.state
-    const {settings} = placeholders[route]
+    const {settings} = global.__RUNTIME__.placeholders[route]
     return (
       <div>
         <Helmet title={settings ? (settings.title || account) : account} />

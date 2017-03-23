@@ -24,6 +24,7 @@
     "react-helmet": "4.0.0",
     "classnames": "2.2.5",
     "preact": "^7.2.0",
-    "preact-compat": "^3.13.1"
+    "preact-compat": "^3.13.1",
+    "qs": "^6.4.0"
   }
 }
