@@ -42,9 +42,9 @@ export function prefetchRoute (routeName) {
 
 // eslint-disable-next-line
 export class Route extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {route: state.route}
+  constructor (props, context) {
+    super(props, context)
+    this.state = {route: context.route}
     this.changeRoute = this.changeRoute.bind(this)
     this.resolveRoute = this.resolveRoute.bind(this)
   }
@@ -103,7 +103,7 @@ export class Route extends Component {
   }
 
   render () {
-    const {account} = this.props
+    const {account} = this.context
     const {route} = this.state
     const {settings} = placeholders[route]
     return (
@@ -115,7 +115,7 @@ export class Route extends Component {
   }
 }
 
-Route.propTypes = {
-  route: PropTypes.string,
+Route.contextTypes = {
   account: PropTypes.string,
+  route: PropTypes.string,
 }
