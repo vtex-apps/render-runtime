@@ -2,13 +2,11 @@ import {canUseDOM} from 'exenv'
 import ApolloClient, {createBatchingNetworkInterface} from 'apollo-client'
 import state from './state'
 
-const {account, workspace} = state
+const {graphQlUri} = state
 
 export default new ApolloClient({
   networkInterface: createBatchingNetworkInterface({
-    uri: canUseDOM
-      ? '?vtex.render-resource=graphql'
-      : `http://masterdata-graphql.vtex.aws-us-east-1.vtex.io/${account}/${workspace}/graphql`,
+    uri: canUseDOM ? graphQlUri.browser : graphQlUri.ssr,
     batchInterval: 80,
     opts: {
       credentials: 'same-origin',
