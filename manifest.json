@@ -6,6 +6,7 @@
   "description": "",
   "mustUpdateAt": "2018-01-04",
   "categories": [],
+  "registries": ["smartcheckout"],
   "settingsSchema": {},
   "dependencies": {
     "vtex.render-server": "0.x",
