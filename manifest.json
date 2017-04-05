@@ -1,12 +1,14 @@
 {
   "name": "render-runtime",
   "vendor": "vtex",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "title": "Render Framework Runtime",
   "description": "",
   "mustUpdateAt": "2018-01-04",
   "categories": [],
-  "registries": ["smartcheckout"],
+  "registries": [
+    "smartcheckout"
+  ],
   "settingsSchema": {},
   "dependencies": {
     "vtex.render-server": "0.x",
