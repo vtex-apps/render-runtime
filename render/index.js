@@ -15,7 +15,7 @@ import {ApolloProvider, renderToStringWithData} from 'react-apollo/lib'
 
 import {Route} from './routes'
 import state from './state'
-import client from './client'
+import getClient from './client'
 import RenderProvider from './components/RenderProvider'
 import Placeholder from './components/Placeholder'
 
@@ -42,7 +42,7 @@ const render = (placeholders, route, name) => {
   const component = isPage ? <Route /> : <Placeholder id={name} />
   const root = (
     <AppContainer>
-      <ApolloProvider client={client}>
+      <ApolloProvider client={getClient()}>
         <IntlProvider locale={locale} messages={messages}>
           <RenderProvider account={account} placeholders={placeholders} route={route}>
             { component }
@@ -70,7 +70,7 @@ export default function (placeholders, route) {
       global.rendered = Promise.all(renderPromises).then(results => ({
         head: Helmet.rewind(),
         placeholders: results.reduce((acc, {name, markup}) => (acc[name] = markup) && acc, {}),
-        state: client.getInitialState(),
+        state: getClient().getInitialState(),
       }))
     }
   } catch (error) {
