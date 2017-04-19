@@ -11,7 +11,7 @@ import es from 'react-intl/locale-data/es'
 import 'intl/locale-data/jsonp/pt.js'
 import 'intl/locale-data/jsonp/en.js'
 import 'intl/locale-data/jsonp/es.js'
-import {ApolloProvider, renderToStringWithData} from 'react-apollo/lib'
+import {ApolloProvider} from 'react-apollo'
 
 import {Route} from './routes'
 import state from './state'
@@ -21,6 +21,8 @@ import Placeholder from './components/Placeholder'
 
 global.Intl = Intl
 addLocaleData([...pt, ...en, ...es])
+
+const renderToStringWithData = !canUseDOM && require('react-apollo/lib').renderToStringWithData
 
 const {keys} = Object
 const {account, locale, messages} = state
