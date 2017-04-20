@@ -11,7 +11,7 @@ class Placeholder extends Component {
     const {placeholders} = global.__RUNTIME__
     const {treePath} = this.props
     const {Component} = placeholders[treePath] || EMPTY_OBJECT
-    const {params, settings} = global.__RUNTIME__.placeholders[treePath]
+    const {params, settings} = global.__RUNTIME__.placeholders[treePath] || EMPTY_OBJECT
     const {query} = global.__RUNTIME__
     const props = {
       params,
@@ -20,7 +20,9 @@ class Placeholder extends Component {
     }
     return Component
       ? <Component {...props} />
-      : <div>{this.props.children}</div> || empty
+      : this.props.children
+        ? <div>{this.props.children}</div>
+        : empty
   }
 }
 
