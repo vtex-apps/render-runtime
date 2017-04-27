@@ -6,6 +6,10 @@ const isModifiedEvent = (event) => !!(event.metaKey || event.altKey || event.ctr
 
 const createLocationDescriptor = (to, {query}) => query ? {pathname: to, search: query} : to
 
+const absoluteRegex = /^https?:\/\/|^\/\//i
+
+const isAbsoluteUrl = url => absoluteRegex.test(url)
+
 //eslint-disable-next-line
 export default class Link extends React.Component {
   constructor (props) {
@@ -14,12 +18,12 @@ export default class Link extends React.Component {
   }
 
   handleClick (event) {
-    if (isModifiedEvent(event) || !isLeftClickEvent(event)) {
+    const {to, query} = this.props
+    if (isModifiedEvent(event) || !isLeftClickEvent(event) || isAbsoluteUrl(to)) {
       return
     }
 
     event.preventDefault()
-    const {to, query} = this.props
     const location = createLocationDescriptor(to, {query})
     global.browserHistory.push(location)
   }
