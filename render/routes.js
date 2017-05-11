@@ -42,16 +42,10 @@ export function prefetchRoute (routeName) {
   }
 }
 
-let pendingListeners = []
-export function listen (listener) {
-  if (global.browserHistory) {
-    global.browserHistory.listen(listener)
-  } else {
-    pendingListeners.push(listener)
-  }
+if (canUseDOM) {
+  global.browserHistory = createHistory()
 }
 
-// eslint-disable-next-line
 export class Route extends Component {
   constructor (props, context) {
     super(props, context)
@@ -61,10 +55,11 @@ export class Route extends Component {
   }
 
   componentDidMount () {
-    global.browserHistory = createHistory()
-    global.browserHistory.listen(this.changeRoute)
-    pendingListeners.forEach(global.browserHistory.listen)
-    pendingListeners = []
+    this.unlisten = global.browserHistory.listen(this.changeRoute)
+  }
+
+  componentWillUnmount () {
+    this.unlisten()
   }
 
   getScore (path) {
