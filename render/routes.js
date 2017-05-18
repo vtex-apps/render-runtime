@@ -6,6 +6,7 @@ import createHistory from 'history/createBrowserHistory'
 import {parse} from 'qs'
 import Placeholder from './components/Placeholder'
 import state from './state'
+import IntrospectionFetcher from './components/IntrospectionFetcher'
 
 const {hash} = state
 
@@ -117,6 +118,7 @@ export class Route extends Component {
       <div>
         <Helmet title={settings ? (settings.title || account) : account} />
         <Placeholder id={route} />
+        <IntrospectionFetcher />
       </div>
     )
   }
