@@ -7,10 +7,9 @@ const {
   culture: {
     locale,
   },
+  messages,
   graphQlUri,
 } = global.__RUNTIME__
-
-const messages = {}
 
 export default {
   account,
