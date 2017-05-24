@@ -1,6 +1,72 @@
 import React, {Component, PropTypes} from 'react'
+import {IntlProvider} from 'react-intl'
+
+const fetchLocale = (locale, hash) =>
+  fetch(`/assets/locales/${locale}.json?hash=${hash}`)
+  .then(res => res.json())
 
 class RenderProvider extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      locale: props.locale,
+      messages: props.messages,
+    }
+  }
+
+  componentDidMount () {
+    window.addEventListener('message', e => {
+      const event = e.data
+      if (!event.key && !event.body) {
+        return
+      }
+      const {key, body} = event
+      switch (key) {
+        case 'workspace.locales':
+          this.onLocalesUpdated(body)
+          break
+        case 'render.locale':
+          this.onLocaleSelected(body)
+          break
+      }
+    })
+  }
+
+  onLocalesUpdated ({locales}) {
+    // Current locale is one of the updated ones
+    if (locales.indexOf(this.state.locale) !== -1) {
+      // Force cache busting by appending date to hash
+      fetchLocale(this.state.locale, this.props.hash + Date.now())
+      .then(messages => {
+        this.setState({
+          locale: this.state.locale,
+          messages,
+        })
+      })
+      .catch(e => {
+        console.log('Failed to fetch new locale file.')
+        console.error(e)
+      })
+    }
+  }
+
+  onLocaleSelected ({locale}) {
+    // Current locale is one of the updated ones
+    if (locale !== this.state.locale) {
+      fetchLocale(locale, this.props.hash)
+      .then(messages => {
+        this.setState({
+          locale,
+          messages,
+        })
+      })
+      .catch(e => {
+        console.log('Failed to fetch new locale file.')
+        console.error(e)
+      })
+    }
+  }
+
   getChildContext () {
     return {
       account: this.props.account,
@@ -10,7 +76,12 @@ class RenderProvider extends Component {
   }
 
   render () {
-    return React.Children.only(this.props.children)
+    const {locale, messages} = this.state
+    return (
+      <IntlProvider locale={locale} messages={messages}>
+        {React.Children.only(this.props.children)}
+      </IntlProvider>
+    )
   }
 }
 
@@ -19,6 +90,9 @@ RenderProvider.propTypes = {
   account: PropTypes.string,
   placeholders: PropTypes.object,
   route: PropTypes.string,
+  messages: PropTypes.object,
+  locale: PropTypes.string,
+  hash: PropTypes.string,
 }
 
 RenderProvider.childContextTypes = {

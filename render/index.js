@@ -3,7 +3,7 @@ import {canUseDOM} from 'exenv'
 import React from 'react'
 import {render as renderToDOM} from 'react-dom'
 import {AppContainer} from 'react-hot-loader'
-import {addLocaleData, IntlProvider} from 'react-intl'
+import {addLocaleData} from 'react-intl'
 import Helmet from 'react-helmet'
 import pt from 'react-intl/locale-data/pt'
 import en from 'react-intl/locale-data/en'
@@ -25,7 +25,7 @@ addLocaleData([...pt, ...en, ...es])
 const renderToStringWithData = !canUseDOM && require('react-apollo/lib').renderToStringWithData
 
 const {keys} = Object
-const {account, locale, messages} = state
+const {account, locale, messages, hash} = state
 
 // Map `placeholder/with/slashes` to `render-placeholder-with-slashes`.
 const containerId = name => `render-${name.replace(/\//g, '-')}`
@@ -45,11 +45,9 @@ const render = (placeholders, route, name) => {
   const root = (
     <AppContainer>
       <ApolloProvider client={getClient()}>
-        <IntlProvider locale={locale} messages={messages}>
-          <RenderProvider account={account} placeholders={placeholders} route={route}>
-            { component }
-          </RenderProvider>
-        </IntlProvider>
+        <RenderProvider account={account} placeholders={placeholders} route={route} locale={locale} messages={messages} hash={hash}>
+          { component }
+        </RenderProvider>
       </ApolloProvider>
     </AppContainer>
   )
