@@ -72,6 +72,7 @@ class RenderProvider extends Component {
       account: this.props.account,
       placeholders: this.props.placeholders,
       route: this.props.route,
+      getSettings: (locator) => this.props.settings[locator]
     }
   }
 
@@ -89,6 +90,7 @@ RenderProvider.propTypes = {
   children: PropTypes.element.isRequired,
   account: PropTypes.string,
   placeholders: PropTypes.object,
+  settings: PropTypes.object,
   route: PropTypes.string,
   messages: PropTypes.object,
   locale: PropTypes.string,
@@ -99,6 +101,7 @@ RenderProvider.childContextTypes = {
   account: PropTypes.string,
   placeholders: PropTypes.object,
   route: PropTypes.string,
+  getSettings: PropTypes.func,
 }
 
 export default RenderProvider

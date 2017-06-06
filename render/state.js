@@ -4,6 +4,7 @@ const {
   hash,
   route,
   version,
+  settings,
   culture: {
     locale,
   },
@@ -14,6 +15,7 @@ const {
 export default {
   account,
   workspace,
+  settings,
   hash,
   route,
   version,
