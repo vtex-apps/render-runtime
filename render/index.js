@@ -25,7 +25,7 @@ addLocaleData([...pt, ...en, ...es])
 const renderToStringWithData = !canUseDOM && require('react-apollo/lib').renderToStringWithData
 
 const {keys} = Object
-const {account, locale, messages, hash} = state
+const {account, locale, messages, hash, settings} = state
 
 // Map `placeholder/with/slashes` to `render-placeholder-with-slashes`.
 const containerId = name => `render-${name.replace(/\//g, '-')}`
@@ -45,7 +45,7 @@ const render = (placeholders, route, name) => {
   const root = (
     <AppContainer>
       <ApolloProvider client={getClient()}>
-        <RenderProvider account={account} placeholders={placeholders} route={route} locale={locale} messages={messages} hash={hash}>
+        <RenderProvider account={account} placeholders={placeholders} route={route} settings={settings} locale={locale} messages={messages} hash={hash}>
           { component }
         </RenderProvider>
       </ApolloProvider>
