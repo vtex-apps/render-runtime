@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import RouteParser from 'route-parser'
 import {canUseDOM} from 'exenv'
-import Helmet from 'react-helmet'
+import {Helmet} from 'react-helmet'
 import createHistory from 'history/createBrowserHistory'
 import {parse} from 'qs'
 import Placeholder from './components/Placeholder'
