@@ -12,7 +12,7 @@
   "settingsSchema": {},
   "dependencies": {
     "vtex.render-server": "0.x",
-    "vtex.render-builder": "0.x",
+    "vtex.render-builder": "1.x",
     "npm:apollo-client": "1.4.0",
     "npm:graphql-tag": "2.2.1",
     "npm:react-apollo": "1.4.2",
