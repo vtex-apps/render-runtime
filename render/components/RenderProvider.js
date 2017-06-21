@@ -1,9 +1,18 @@
 import React, {Component, PropTypes} from 'react'
 import {IntlProvider} from 'react-intl'
 
+const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
+
 const fetchLocale = (locale, hash) =>
   fetch(`/assets/locales/${locale}.json?hash=${hash}`)
-  .then(res => res.json())
+    .then(res => res.json())
+
+const createLocaleCookie = locale => {
+  const yearFromNow = Date.now() + YEAR_IN_MS
+  const expires = new Date(yearFromNow).toUTCString()
+  const localeCookie = `locale=${locale};expires=${expires}`
+  window.document.cookie = localeCookie
+}
 
 class RenderProvider extends Component {
   constructor (props) {
@@ -37,16 +46,16 @@ class RenderProvider extends Component {
     if (locales.indexOf(this.state.locale) !== -1) {
       // Force cache busting by appending date to hash
       fetchLocale(this.state.locale, this.props.hash + Date.now())
-      .then(messages => {
-        this.setState({
-          locale: this.state.locale,
-          messages,
+        .then(messages => {
+          this.setState({
+            locale: this.state.locale,
+            messages,
+          })
         })
-      })
-      .catch(e => {
-        console.log('Failed to fetch new locale file.')
-        console.error(e)
-      })
+        .catch(e => {
+          console.log('Failed to fetch new locale file.')
+          console.error(e)
+        })
     }
   }
 
@@ -54,16 +63,15 @@ class RenderProvider extends Component {
     // Current locale is one of the updated ones
     if (locale !== this.state.locale) {
       fetchLocale(locale, this.props.hash)
-      .then(messages => {
-        this.setState({
-          locale,
-          messages,
+        .then(messages => {
+          global.__RUNTIME__.culture.locale = locale
+          this.setState({locale, messages})
         })
-      })
-      .catch(e => {
-        console.log('Failed to fetch new locale file.')
-        console.error(e)
-      })
+        .then(() => createLocaleCookie(locale))
+        .catch(e => {
+          console.log('Failed to fetch new locale file.')
+          console.error(e)
+        })
     }
   }
 
