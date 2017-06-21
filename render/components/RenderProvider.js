@@ -10,7 +10,7 @@ const fetchLocale = (locale, hash) =>
 const createLocaleCookie = locale => {
   const yearFromNow = Date.now() + YEAR_IN_MS
   const expires = new Date(yearFromNow).toUTCString()
-  const localeCookie = `locale=${locale};expires=${expires}`
+  const localeCookie = `locale=${locale};path=/;expires=${expires}`
   window.document.cookie = localeCookie
 }
 
