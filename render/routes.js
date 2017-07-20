@@ -57,7 +57,7 @@ function getExistingStyleHrefs () {
   const hrefs = []
   for (let i = 0; i < document.styleSheets.length; i++) {
     const href = document.styleSheets.item(i).href
-    href && paths.push(href)
+    href && hrefs.push(href)
   }
   return hrefs
 }
