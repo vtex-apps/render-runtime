@@ -28,8 +28,6 @@
     "npm:history": "4.6.1",
     "npm:react-helmet": "5.1.3",
     "npm:classnames": "2.2.5",
-    "npm:preact": "^8.1.0",
-    "npm:preact-compat": "^3.13.1",
     "npm:qs": "^6.4.0"
   },
   "scripts": {
