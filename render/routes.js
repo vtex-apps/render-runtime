@@ -10,31 +10,94 @@ import IntrospectionFetcher from './components/IntrospectionFetcher'
 
 const {hash} = state
 
-function fetchRoute (routeName) {
-  // Check if route bundle is already loaded in page
-  if (document.getElementById(routeName) && document.getElementById(`${routeName}CSS`)) {
-    return Promise.resolve()
-  }
-  return new Promise((resolve, reject) => {
-    const bundlePath = `/assets/${routeName}.js${hash ? `?hash=${hash}` : ''}`
-    const cssPath = `/assets/${routeName}.css${hash ? `?hash=${hash}` : ''}`
+function addHashQueryString (path) {
+  return `${path}?hash=${hash}`
+}
 
-    if (!module.hot) {
-      const link = document.createElement('link')
-      link.href = cssPath
-      link.id = `${routeName}CSS`
-      link.type = 'text/css'
-      link.rel = 'stylesheet'
-      document.head.appendChild(link)
-    }
+function isRelative (path) {
+  return path[0] !== '/'
+}
 
+function prefix (path) {
+  const prefix = isRelative(path) ? '/assets/' : ''
+  return `${prefix}${path}`
+}
+
+function getExtension (path) {
+  return /\.\w+$/.exec(path)[0]
+}
+
+function addScriptToPage (src) {
+  return new Promise ((resolve, reject) => {
     const script = document.createElement('script')
-    script.src = bundlePath
-    script.id = routeName
+    script.src = prefix(addHashQueryString(src))
     script.onload = resolve
     script.onerror = reject
     document.head.appendChild(script)
   })
+}
+
+function addStyleToPage (href) {
+  const link = document.createElement('link')
+  link.href = prefix(addHashQueryString(href))
+  link.type = 'text/css'
+  link.rel = 'stylesheet'
+  document.head.appendChild(link)
+}
+
+function getExistingScriptSrcs () {
+  const paths = []
+  for (let i = 0; i < document.scripts.length; i++) {
+    paths.push(document.scripts.item(i).src)
+  }
+  return paths
+}
+
+function getExistingStyleHrefs () {
+  const hrefs = []
+  for (let i = 0; i < document.styleSheets.length; i++) {
+    const href = document.styleSheets.item(i).href
+    href && paths.push(href)
+  }
+  return hrefs
+}
+
+function scriptOnPage (path) {
+  return getExistingScriptSrcs()
+    .some(src => src.indexOf(path) !== -1)
+}
+
+function styleOnPage (path) {
+  return getExistingStyleHrefs()
+    .some(href => href.indexOf(path) !== -1)
+}
+
+function isScript (path) {
+  return getExtension(path) === '.js'
+}
+
+function isStyle (path) {
+  return getExtension(path) === '.css'
+}
+
+function shouldAddScriptToPage ({ path, serverOnly }) {
+  return !serverOnly && isScript(path) && !scriptOnPage(path)
+}
+
+function shouldAddStyleToPage ({ path, serverOnly }) {
+  return !serverOnly && isStyle(path) && !styleOnPage(path)
+}
+
+function fetchRoute (routeName) {
+  const placeholder = __RUNTIME__.placeholders[routeName]
+  const scriptsToBeAdded = placeholder.assets.filter(shouldAddScriptToPage)
+    .map(({path}) => path)
+  const stylesToBeAdded = placeholder.assets.filter(shouldAddStyleToPage)
+    .map(({path}) => path)
+  stylesToBeAdded.forEach(addStyleToPage)
+  return Promise.all(
+    scriptsToBeAdded.map(addScriptToPage)
+  )
 }
 
 export function prefetchRoute (routeName) {
