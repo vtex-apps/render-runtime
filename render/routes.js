@@ -33,6 +33,7 @@ function addScriptToPage (src) {
     script.src = prefix(addHashQueryString(src))
     script.onload = resolve
     script.onerror = reject
+    script.async = false
     document.head.appendChild(script)
   })
 }
