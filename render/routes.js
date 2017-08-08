@@ -120,10 +120,12 @@ export class Route extends Component {
   }
 
   componentDidMount () {
+    this._isMounted = true
     this.unlisten = global.browserHistory.listen(this.changeRoute)
   }
 
   componentWillUnmount () {
+    this._isMounted = false
     this.unlisten()
   }
 
@@ -171,7 +173,7 @@ export class Route extends Component {
     global.__RUNTIME__.placeholders[route].params = params
 
     document.body.scrollTop = 0
-    fetchRoute(route).then(() => this.setState({route}))
+    fetchRoute(route).then(() => this._isMounted && this.setState({route}))
   }
 
   render () {
