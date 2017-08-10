@@ -36,6 +36,10 @@ export default class Link extends React.Component {
   }
 }
 
+Link.defaultProps = {
+  onClick: () => {}
+}
+
 Link.propTypes = {
   query: PropTypes.string,
   to: PropTypes.string,
