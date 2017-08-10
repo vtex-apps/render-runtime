@@ -25,6 +25,7 @@ export default class Link extends React.Component {
 
     event.preventDefault()
     const location = createLocationDescriptor(to, {query})
+    this.props.onClick()
     global.browserHistory.push(location)
   }
 
