@@ -13,9 +13,9 @@
   "dependencies": {
     "vtex.render-server": "2.x",
     "vtex.render-builder": "2.x",
-    "npm:apollo-client": "1.4.0",
-    "npm:graphql-tag": "2.2.1",
-    "npm:react-apollo": "1.4.2",
+    "npm:apollo-client": "1.9.0",
+    "npm:graphql-tag": "2.4.2",
+    "npm:react-apollo": "1.4.11",
     "npm:redux": "^3.6.0",
     "npm:react": "15.5.4",
     "npm:react-dom": "15.5.4",
