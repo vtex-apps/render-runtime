@@ -1,6 +1,7 @@
 import style from './Img.css'
 import classnames from 'classnames/bind'
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import state from '../state'
 
 const {account} = state

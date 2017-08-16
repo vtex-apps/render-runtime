@@ -28,7 +28,8 @@
     "npm:history": "4.6.1",
     "npm:react-helmet": "5.1.3",
     "npm:classnames": "2.2.5",
-    "npm:qs": "^6.4.0"
+    "npm:qs": "^6.4.0",
+    "npm:prop-types": "^15.5.10"
   },
   "scripts": {
     "postreleasy": "vtex publish"

@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import RouteParser from 'route-parser'
 import {canUseDOM} from 'exenv'
 import {Helmet} from 'react-helmet'
@@ -90,7 +91,7 @@ function shouldAddStyleToPage ({ path, serverOnly }) {
 }
 
 function fetchRoute (routeName) {
-  const placeholder = __RUNTIME__.placeholders[routeName]
+  const placeholder = global.__RUNTIME__.placeholders[routeName]
   const scriptsToBeAdded = placeholder.assets.filter(shouldAddScriptToPage)
     .map(({path}) => path)
   const stylesToBeAdded = placeholder.assets.filter(shouldAddStyleToPage)

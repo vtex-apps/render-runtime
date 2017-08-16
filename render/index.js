@@ -24,8 +24,7 @@ addLocaleData([...pt, ...en, ...es])
 
 const renderToStringWithData = !canUseDOM && require('react-apollo/lib').renderToStringWithData
 
-const {keys} = Object
-const {account, locale, messages, hash, settings} = state
+const {account, locale, messages, hash, settings, placeholders, route} = state
 
 // Map `placeholder/with/slashes` to `render-placeholder-with-slashes`.
 const containerId = name => `render-${name.replace(/\//g, '-')}`
@@ -33,19 +32,27 @@ const containerId = name => `render-${name.replace(/\//g, '-')}`
 // Whether this placeholder has a component.
 const hasComponent = placeholders => name => !!placeholders[name].component
 
-// A placeholder "is parent" if no parents to itself exist.
-const isParent = (name, index, names) =>
+// The placeholder "foo/bar" is root if there is no placeholder "foo" (inside names)
+const isRoot = (name, index, names) =>
   names.find(parent => name !== parent && name.startsWith(parent)) === undefined
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
-const render = (placeholders, route, name) => {
-  const isPage = !!placeholders[route].component
+const render = (name) => {
+  const isPage = !!placeholders[name].path && !!placeholders[name].component
   const id = isPage ? 'render-container' : containerId(name)
   const component = isPage ? <Route /> : <Placeholder id={name} />
   const root = (
     <AppContainer>
       <ApolloProvider client={getClient()}>
-        <RenderProvider account={account} placeholders={placeholders} route={route} settings={settings} locale={locale} messages={messages} hash={hash}>
+        <RenderProvider
+          account={account}
+          placeholders={placeholders}
+          route={route}
+          settings={settings}
+          locale={locale}
+          messages={messages}
+          hash={hash}
+        >
           { component }
         </RenderProvider>
       </ApolloProvider>
@@ -56,15 +63,22 @@ const render = (placeholders, route, name) => {
     : renderToStringWithData(root).then(markup => ({name, markup: `<div id="${id}">${markup}</div>`}))
 }
 
-export default function (placeholders, route) {
+export default function (rootName) {
+  const childPlaceholders = Object.keys(placeholders)
+    .reduce((acc, value) => {
+      if (value.startsWith(rootName)) {
+        acc[value] = placeholders[value]
+      }
+      return acc
+    }, {})
   // Names of all placeholders with a component
-  const withComponentNames = keys(placeholders).filter(hasComponent(placeholders))
+  const withComponentNames = Object.keys(childPlaceholders).filter(hasComponent(childPlaceholders))
   // Names of all top-level placeholders with a component
-  const parentWithComponentNames = withComponentNames.filter(isParent)
+  const rootWithComponentNames = withComponentNames.filter(isRoot)
 
   try {
     // If there are multiple renderable placeholders, render them in parallel.
-    const renderPromises = parentWithComponentNames.map(name => render(placeholders, route, name))
+    const renderPromises = rootWithComponentNames.map(name => render(name))
     console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     if (!canUseDOM) { // Expose render promises to global context.
       global.rendered = Promise.all(renderPromises).then(results => ({

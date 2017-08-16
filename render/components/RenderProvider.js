@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {IntlProvider} from 'react-intl'
 
 const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
@@ -80,7 +81,7 @@ class RenderProvider extends Component {
       account: this.props.account,
       placeholders: this.props.placeholders,
       route: this.props.route,
-      getSettings: (locator) => this.props.settings[locator]
+      getSettings: (locator) => this.props.settings[locator],
     }
   }
 
