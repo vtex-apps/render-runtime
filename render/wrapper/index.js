@@ -1,5 +1,3 @@
-import {map} from 'ramda'
-
 const webpackAssetsPath = (app) => `if (__RUNTIME__.account && __RUNTIME__.workspace) {
   __webpack_public_path__ = '//' + __RUNTIME__.workspace + '--' + __RUNTIME__.account + '.myvtex.com/resources/smartcheckout/${app}/dist/'
 }`
@@ -63,7 +61,7 @@ const render = (placeholder) =>
 }`
 
 const ES6Requires =
-`${map(req, [
+`${[
   'core-js/fn/object/values',
   'core-js/fn/object/assign',
   'core-js/fn/array/find-index',
@@ -72,7 +70,7 @@ const ES6Requires =
   'core-js/fn/string/starts-with.js',
   'core-js/es6/symbol.js',
   'whatwg-fetch',
-].map(require.resolve)).join('\n')}`
+].map(require.resolve).map(req).join('\n')}`
 
 export function createPageEntrypoint (app, placeholder, production) {
   return `${ES6Requires}
