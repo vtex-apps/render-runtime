@@ -72,9 +72,9 @@ const ES6Requires =
   'whatwg-fetch',
 ].map(require.resolve).map(req).join('\n')}`
 
-export function createPageEntrypoint (app, placeholder, production) {
+module.exports.createPageEntrypoint = function createPageEntrypoint (app, placeholder, production) {
   return `${ES6Requires}
-  ${createComponentEntrypoint(app, placeholder, production)}
+  ${module.exports.createComponentEntrypoint(app, placeholder, production)}
 var EventEmitter = ${req('events')};
 __RUNTIME__.eventEmitter = new EventEmitter();
 if (module.hot) { module.hot.accept('vtex.render-runtime', function () {
@@ -84,7 +84,7 @@ if (module.hot) { module.hot.accept('vtex.render-runtime', function () {
 ${render(placeholder)}`
 }
 
-export function createComponentEntrypoint (app, placeholder, production) {
+module.exports.createComponentEntrypoint = function createComponentEntrypoint (app, placeholder, production) {
   return `${dep};
 ${global};
 ${webpackAssetsPath(app)};
