@@ -10,6 +10,7 @@ const {
   },
   messages,
   graphQlUri,
+  placeholders,
 } = global.__RUNTIME__
 
 export default {
@@ -22,4 +23,5 @@ export default {
   locale,
   messages,
   graphQlUri,
+  placeholders,
 }

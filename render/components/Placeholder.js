@@ -1,28 +1,78 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import treePath from 'react-tree-path'
 
-const EMPTY_OBJECT = {}
 const empty = <span className="Placeholder--empty"></span>
 
-// eslint-disable-next-line
 class Placeholder extends Component {
+  constructor (props, context) {
+    super()
+
+    const {treePath} = props
+
+    const {placeholders} = context
+
+    this._handlePlaceholderUpdate = this._handlePlaceholderUpdate.bind(this)
+
+    this.state = {
+      placeholder: placeholders[treePath],
+    }
+  }
+
   render () {
-    // TODO: must find a better way to add found placeholders to RenderProvider
-    const {placeholders} = global.__RUNTIME__
-    const {treePath} = this.props
-    const {Component} = placeholders[treePath] || EMPTY_OBJECT
-    const {params, settings} = global.__RUNTIME__.placeholders[treePath] || EMPTY_OBJECT
+    const {placeholder} = this.state
+
+    if (!placeholder) {
+      return (
+        this.props.children
+        ? <div>{this.props.children}</div>
+        : empty
+      )
+    }
+
     const {query} = global.__RUNTIME__
+
+    const {Component, params, settings} = placeholder
+
     const props = {
       params,
       query,
       settings,
     }
-    return Component
+
+    return (
+      Component
       ? <Component {...props} />
-      : this.props.children
-        ? <div>{this.props.children}</div>
-        : empty
+      : empty
+    )
+  }
+
+  _handlePlaceholderUpdate () {
+    const {treePath} = this.props
+    const {placeholders} = this.context
+    this.setState({
+      placeholder: placeholders[treePath],
+    })
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.treePath !== this.props.treePath) {
+      const {treePath} = nextProps
+      const {placeholders} = this.context
+      this.setState({
+        placeholder: placeholders[treePath],
+      })
+    }
+  }
+
+  componentDidMount () {
+    const {placeholder} = this.state
+    placeholder && global.__RUNTIME__.eventEmitter.addListener(`placeholder:${placeholder.name}:update`, this._handlePlaceholderUpdate)
+  }
+
+  componentWillUnmount () {
+    const {placeholder} = this.state
+    placeholder && global.__RUNTIME__.eventEmitter.removeListener(`placeholder:${placeholder.name}:update`, this._handlePlaceholderUpdate)
   }
 }
 
