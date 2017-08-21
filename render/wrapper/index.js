@@ -19,25 +19,26 @@ const hot = app =>
   var workspace = __RUNTIME__.workspace;
   var ssePath = 'vtex.render-builder:${app}:browser';
   __RUNTIME__.sseAdded = __RUNTIME__.sseAdded || {}
-  if (__RUNTIME__.sseAdded['${app}']) { return }
-  myvtexSSE(account, workspace, ssePath, {verbose: true}, function(event) {
-    switch (event.body.type) {
-      case 'hmr':
-        console.log('[HMR]: App (${app}) hot update ', event.body.hash);
-        hotEmitter.emit('webpackHotUpdate', event.body.hash);
-        window.postMessage('webpackHotUpdate' + event.body.hash, '*');
-        break;
-      case 'reload':
-        console.log('[HMR]: App (${app}) reload');
-        location.reload(true);
-        break;
-      case 'locales':
-        console.log('[HMR]: App (${app}) locale update', event.body.locales);
-        window.postMessage(event, '*');
-        break;
-    }
-  });
-  __RUNTIME__.sseAdded['${app}'] = true
+  if (!__RUNTIME__.sseAdded['${app}']) {
+    myvtexSSE(account, workspace, ssePath, {verbose: true}, function(event) {
+      switch (event.body.type) {
+        case 'hmr':
+          console.log('[HMR]: App (${app}) hot update ', event.body.hash);
+          hotEmitter.emit('webpackHotUpdate', event.body.hash);
+          window.postMessage('webpackHotUpdate' + event.body.hash, '*');
+          break;
+        case 'reload':
+          console.log('[HMR]: App (${app}) reload');
+          location.reload(true);
+          break;
+        case 'locales':
+          console.log('[HMR]: App (${app}) locale update', event.body.locales);
+          window.postMessage(event, '*');
+          break;
+      }
+    });
+    __RUNTIME__.sseAdded['${app}'] = true
+  }
 }`
 
 const req = module => module && `dep(require('${module}'));`
