@@ -34,7 +34,6 @@
   },
   "vtexVersion": "0.2.13",
   "vtexDependencies": {
-    "vtex.render-builder": "1.x",
     "vtex.render-server": "0.x"
   }
 }
