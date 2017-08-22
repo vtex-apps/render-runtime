@@ -10,6 +10,7 @@ const global = `if (${isBrowser} && !window.global) { window.global = window }`
 
 const hot = app =>
 `if (${isBrowser} && module.hot) {
+  require('${require.resolve('react-hot-loader/patch')}');
   require('${require.resolve('eventsource-polyfill')}');
   require('${require.resolve('webpack/hot/dev-server')}');
   var hotEmitter = require('${require.resolve('webpack/hot/emitter')}');
