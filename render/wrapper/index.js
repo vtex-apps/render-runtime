@@ -90,6 +90,6 @@ ${webpackAssetsPath(app)};
 ${placeholder.theme ? req(placeholder.theme) : ''}
 ${registerComponent(placeholder)};
 ${!production ? hot(app) : ''}
-var runtime = ${req(require.resolve('vtex.render-runtime'))};
+var runtime = ${req(`'${require.resolve('vtex.render-runtime')}'`)};
 ${hotAccept(placeholder)}`
 }
