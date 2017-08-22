@@ -56,7 +56,6 @@ const hotAccept = ({component, name}) =>
 
 const render = (placeholder) =>
 `if (!__RUNTIME__.initialBrowserRender) {
-  var runtime = ${req('vtex.render-runtime')};
   runtime('${placeholder.name}');
   __RUNTIME__.initialBrowserRender = ${isBrowser};
 }`
@@ -75,11 +74,10 @@ const ES6Requires =
 
 module.exports.createPageEntrypoint = function createPageEntrypoint (app, placeholder, production) {
   return `${ES6Requires}
-  ${module.exports.createComponentEntrypoint(app, placeholder, production)}
+${module.exports.createComponentEntrypoint(app, placeholder, production)}
 var EventEmitter = ${req('events')};
 __RUNTIME__.eventEmitter = new EventEmitter();
 if (module.hot) { module.hot.accept('vtex.render-runtime', function () {
-  runtime = ${req('vtex.render-runtime')}
   runtime('${placeholder.name}')
 })}
 ${render(placeholder)}`
@@ -92,5 +90,6 @@ ${webpackAssetsPath(app)};
 ${placeholder.theme ? req(placeholder.theme) : ''}
 ${registerComponent(placeholder)};
 ${!production ? hot(app) : ''}
+var runtime = ${req(require.resolve('vtex.render-runtime'))};
 ${hotAccept(placeholder)}`
 }
