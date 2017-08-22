@@ -90,6 +90,6 @@ ${webpackAssetsPath(app)};
 ${placeholder.theme ? req(placeholder.theme) : ''}
 ${registerComponent(placeholder)}
 ${!production ? hot(app) : ''}
-var runtime = ${req('../')};
+var runtime = ${req(`${require.resolve('../')}`)};
 ${hotAccept(placeholder)}`
 }
