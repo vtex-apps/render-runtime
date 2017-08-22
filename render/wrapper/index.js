@@ -10,7 +10,6 @@ const global = `if (${isBrowser} && !window.global) { window.global = window }`
 
 const hot = app =>
 `if (${isBrowser} && module.hot) {
-  require('${require.resolve('react-hot-loader/patch')}');
   require('${require.resolve('eventsource-polyfill')}');
   require('${require.resolve('webpack/hot/dev-server')}');
   var hotEmitter = require('${require.resolve('webpack/hot/emitter')}');
@@ -44,7 +43,7 @@ const hot = app =>
 const req = module => module && `dep(require('${module}'));`
 
 const registerComponent = ({component, name}) =>
-  component ? `__RUNTIME__.placeholders['${name}'].Component = ${req(component)};` : ''
+  component ? `__RUNTIME__.placeholders['${name}'].Component = ${req(component)}` : ''
 
 const emitComponentUpdate = ({component, name}) => component ? `__RUNTIME__.eventEmitter.emit('placeholder:${name}:update');` : ''
 
@@ -88,7 +87,7 @@ module.exports.createComponentEntrypoint = function createComponentEntrypoint (a
 ${global};
 ${webpackAssetsPath(app)};
 ${placeholder.theme ? req(placeholder.theme) : ''}
-${registerComponent(placeholder)};
+${registerComponent(placeholder)}
 ${!production ? hot(app) : ''}
 var runtime = ${req(`${require.resolve('vtex.render-runtime')}`)};
 ${hotAccept(placeholder)}`
