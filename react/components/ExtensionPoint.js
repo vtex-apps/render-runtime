@@ -10,32 +10,33 @@ class ExtensionPoint extends Component {
 
     const {treePath} = props
 
-    const {placeholders} = context
+    const {extensions} = context
 
     this._handleExtensionPointUpdate = this._handleExtensionPointUpdate.bind(this)
 
     this.state = {
-      placeholder: placeholders[treePath],
+      extension: extensions[treePath],
     }
   }
 
   render() {
-    const {placeholder} = this.state
+    const {extension} = this.state
 
-    const {children, fallbackComponent, ...other} = this.props
+    const {children, ...other} = this.props
 
-    if (!placeholder) {
-      return fallbackComponent ? <div>{fallbackComponent}</div> : empty
+    if (!extension) {
+      return empty
     }
 
     const {query} = global.__RUNTIME__
 
-    const {Component, params, settings} = placeholder
+    const {component, params, props: extensionProps} = extension
+    const Component = global.__RENDER_6_COMPONENTS__[component]
 
     const props = {
       params,
       query,
-      settings,
+      ...extensionProps,
       ...other,
     }
 
@@ -92,7 +93,7 @@ ExtensionPoint.propTypes = {
 }
 
 ExtensionPoint.contextTypes = {
-  placeholders: PropTypes.object,
+  extensions: PropTypes.object,
 }
 
 export default treePath(ExtensionPoint)

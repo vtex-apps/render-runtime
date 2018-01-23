@@ -1,5 +1,5 @@
 {
-  "name": "render-runtime",
+  "name": "vtex.render-runtime",
   "version": "6.0.0",
   "license": "UNLICENSED",
   "dependencies": {

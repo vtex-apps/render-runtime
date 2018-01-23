@@ -5,9 +5,9 @@ import ExtensionPoint from './ExtensionPoint'
 // eslint-disable-next-line
 class ExtensionContainer extends Component {
   render() {
-    const {placeholders, treePath} = this.context
+    const {extensions, treePath} = this.context
     const relative = name => name.replace(`${treePath}/`, '')
-    const children = Object.values(placeholders).filter(
+    const children = Object.values(extensions).filter(
       p => p.component && p.name !== treePath && p.name.startsWith(treePath),
     )
     const renderChildren = ({name}) => (
@@ -20,7 +20,7 @@ class ExtensionContainer extends Component {
 
 ExtensionContainer.contextTypes = {
   treePath: PropTypes.string,
-  placeholders: PropTypes.object,
+  extensions: PropTypes.object,
 }
 
 export default ExtensionContainer

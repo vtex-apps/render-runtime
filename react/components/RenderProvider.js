@@ -91,21 +91,21 @@ class RenderProvider extends Component {
   }
 
   getChildContext() {
-    const {account, placeholders, route, settings, locale} = this.props
+    const {account, extensions, route, settings, locale} = this.props
     return {
       account,
-      placeholders,
+      extensions,
       route,
       getSettings: locator => settings[locator],
       updateRuntime: () => {
         return Promise.all([
           fetch(`/_v/messages/${locale}`).then(res => res.json()),
-          fetch('/_v/placeholders.json').then(res => res.json()),
-        ]).then(([messages, placeholders]) => {
+          fetch('/_v/extensions.json').then(res => res.json()),
+        ]).then(([messages, extensions]) => {
           Object.assign(global.__RUNTIME__.messages, messages)
-          global.__RUNTIME__.placeholders = mergePlaceholders(
-            global.__RUNTIME__.placeholders,
-            placeholders,
+          global.__RUNTIME__.extensions = mergePlaceholders(
+            global.__RUNTIME__.extensions,
+            extensions,
           )
         })
       },
@@ -125,7 +125,7 @@ class RenderProvider extends Component {
 RenderProvider.propTypes = {
   children: PropTypes.element.isRequired,
   account: PropTypes.string,
-  placeholders: PropTypes.object,
+  extensions: PropTypes.object,
   settings: PropTypes.object,
   route: PropTypes.string,
   messages: PropTypes.object,
@@ -134,7 +134,7 @@ RenderProvider.propTypes = {
 
 RenderProvider.childContextTypes = {
   account: PropTypes.string,
-  placeholders: PropTypes.object,
+  extensions: PropTypes.object,
   route: PropTypes.string,
   getSettings: PropTypes.func,
   updateRuntime: PropTypes.func,

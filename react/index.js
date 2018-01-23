@@ -45,13 +45,13 @@ function _renderToStringWithData(component) {
 const renderToStringWithData =
   !canUseDOM && _renderToStringWithData
 
-const {account, culture: {locale}, messages, settings, placeholders, route} = global.__RUNTIME__
+const {account, culture: {locale}, messages, settings, extensions, route} = global.__RUNTIME__
 
 // Map `placeholder/with/slashes` to `render-placeholder-with-slashes`.
 const containerId = name => `render-${name.replace(/\//g, '-')}`
 
 // Whether this placeholder has a component.
-const hasComponent = placeholders => name => !!placeholders[name].component
+const hasComponent = extensions => name => !!extensions[name].component
 
 // The placeholder "foo/bar" is root if there is no placeholder "foo" (inside names)
 const isRoot = (name, index, names) =>
@@ -62,7 +62,7 @@ const ssrEnabled = canUseDOM ? window.location.search.indexOf("__disableSSR") ==
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = name => {
-  const isPage = !!placeholders[name].path && !!placeholders[name].component
+  const isPage = !!extensions[name].path && !!extensions[name].component
   const id = isPage ? 'render-container' : containerId(name)
   const component = isPage ? <Router /> : <ExtensionPoint id={name} />
   const root = (
@@ -70,7 +70,7 @@ const render = name => {
       <ApolloProvider client={getClient()}>
         <RenderProvider
           account={account}
-          placeholders={placeholders}
+          extensions={extensions}
           route={route}
           settings={settings}
           locale={locale}
@@ -91,17 +91,17 @@ const render = name => {
 }
 
 function getRenderableExtensionPointNames(rootName) {
-  const childExtensionPoints = Object.keys(placeholders).reduce((acc, value) => {
+  const childExtensionPoints = Object.keys(extensions).reduce((acc, value) => {
     if (value.startsWith(rootName)) {
-      acc[value] = placeholders[value]
+      acc[value] = extensions[value]
     }
     return acc
   }, {})
-  // Names of all placeholders with a component
+  // Names of all extensions with a component
   const withComponentNames = Object.keys(childExtensionPoints).filter(
     hasComponent(childExtensionPoints),
   )
-  // Names of all top-level placeholders with a component
+  // Names of all top-level extensions with a component
   const rootWithComponentNames = withComponentNames.filter(isRoot)
   return rootWithComponentNames
 }
@@ -109,14 +109,14 @@ function getRenderableExtensionPointNames(rootName) {
 function start(rootName) {
   const renderableExtensionPointNames = getRenderableExtensionPointNames(rootName)
   try {
-    // If there are multiple renderable placeholders, render them in parallel.
+    // If there are multiple renderable extensions, render them in parallel.
     const renderPromises = renderableExtensionPointNames.map(render)
     console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     if (!canUseDOM) {
       // Expose render promises to global context.
       global.rendered = Promise.all(renderPromises).then(results => ({
         head: Helmet.rewind(),
-        placeholders: results.reduce(
+        extensions: results.reduce(
           (acc, {name, markup}) => (acc[name] = markup) && acc,
           {},
         ),
@@ -135,7 +135,7 @@ function start(rootName) {
   }
 }
 
-global.__VTEX_render_6_runtime__ = {
+global.__RENDER_6_RUNTIME__ = {
   start,
   ExtensionContainer,
   ExtensionPoint,
