@@ -1,0 +1,19 @@
+query QueryTypeFields {
+  __type(name: "Query") {
+    name
+    fields {
+      name
+      args {
+        name
+      }
+      type {
+        kind
+        name
+        ofType {
+          kind
+          name
+        }
+      }
+    }
+  }
+}

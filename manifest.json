@@ -1,0 +1,20 @@
+{
+  "vendor": "vtex",
+  "name": "render-runtime",
+  "version": "6.0.0",
+  "title": "VTEX Render runtime",
+  "description": "The VTEX Render framework runtime",
+  "defaultLocale": "pt-BR",
+  "builders": {
+    "react": "1.x"
+  },
+  "mustUpdateAt": "2018-09-05",
+  "categories": [],
+  "registries": [
+    "smartcheckout"
+  ],
+  "settingsSchema": {},
+  "scripts": {
+    "postreleasy": "vtex publish --public"
+  }
+}
