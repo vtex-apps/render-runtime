@@ -45,7 +45,7 @@ function _renderToStringWithData(component) {
 const renderToStringWithData =
   !canUseDOM && _renderToStringWithData
 
-const {account, culture: {locale}, messages, settings, extensions, route} = global.__RUNTIME__
+const {account, culture: {locale}, messages, settings, extensions, pages, route} = global.__RUNTIME__
 
 // Map `placeholder/with/slashes` to `render-placeholder-with-slashes`.
 const containerId = name => `render-${name.replace(/\//g, '-')}`
@@ -62,7 +62,7 @@ const ssrEnabled = canUseDOM ? window.location.search.indexOf("__disableSSR") ==
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = name => {
-  const isPage = !!extensions[name].path && !!extensions[name].component
+  const isPage = !!pages[name].path && !!extensions[name].component
   const id = isPage ? 'render-container' : containerId(name)
   const component = isPage ? <Router /> : <ExtensionPoint id={name} />
   const root = (
@@ -141,4 +141,10 @@ global.__RENDER_6_RUNTIME__ = {
   ExtensionPoint,
   Img,
   Link,
+}
+
+if (canUseDOM && global.__RUNTIME__.start) {
+  document.addEventListener('DOMContentLoaded', function() {
+    start(global.__RUNTIME__.page)
+  })
 }
