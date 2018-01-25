@@ -128,7 +128,7 @@ function start() {
   }
 }
 
-global.__RENDER_6_RUNTIME__ = {
+global.__RENDER_7_RUNTIME__ = {
   start,
   render,
   ExtensionContainer,

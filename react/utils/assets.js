@@ -63,7 +63,7 @@ function shouldAddStyleToPage(path, idx, arr) {
 }
 
 export function getImplementation(component) {
-  return global.__RENDER_6_COMPONENTS__[component]
+  return global.__RENDER_7_COMPONENTS__[component]
 }
 
 export function fetchAssets(assets) {
