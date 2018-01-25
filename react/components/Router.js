@@ -78,23 +78,20 @@ function isStyle(path) {
   return getExtension(path) === '.css'
 }
 
-function shouldAddScriptToPage({path, serverOnly}) {
-  return !serverOnly && isScript(path) && !scriptOnPage(path)
+function shouldAddScriptToPage(path) {
+  return isScript(path) && !scriptOnPage(path)
 }
 
-function shouldAddStyleToPage(asset, idx, arr) {
-  const {path, serverOnly} = asset
-  return !serverOnly && isStyle(path) && !styleOnPage(path) && arr.map(({path: pt}) => pt).indexOf(path) === idx
+function shouldAddStyleToPage(path, idx, arr) {
+  return isStyle(path) && !styleOnPage(path) && arr.map(({path: pt}) => pt).indexOf(path) === idx
 }
 
 function fetchPage(pageName) {
   const extension = global.__RUNTIME__.extensions[pageName]
   const scriptsToBeAdded = extension.assets
     .filter(shouldAddScriptToPage)
-    .map(({path}) => path)
   const stylesToBeAdded = extension.assets
     .filter(shouldAddStyleToPage)
-    .map(({path}) => path)
   stylesToBeAdded.forEach(addStyleToPage)
   return Promise.all(scriptsToBeAdded.map(addScriptToPage))
 }
