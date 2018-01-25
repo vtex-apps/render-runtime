@@ -1,6 +1,6 @@
 import {canUseDOM} from 'exenv'
 import {ApolloClient} from 'apollo-client'
-import {createHttpLink} from 'apollo-link-http'
+import {createHttpLink} from './httpLink'
 import {InMemoryCache} from 'apollo-cache-inmemory'
 
 let client
