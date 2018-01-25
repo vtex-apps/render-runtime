@@ -145,9 +145,3 @@ global.__RENDER_6_RUNTIME__ = {
   Img,
   Link,
 }
-
-if (canUseDOM && global.__RUNTIME__.start) {
-  document.addEventListener('DOMContentLoaded', function() {
-    start(global.__RUNTIME__.page)
-  })
-}
