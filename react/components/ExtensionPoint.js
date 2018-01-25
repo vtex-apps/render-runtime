@@ -20,8 +20,8 @@ class ExtensionPoint extends Component {
   }
 
   render() {
+    const {pages, page} = this.context
     const {extension} = this.state
-
     const {children, ...other} = this.props
 
     if (!extension) {
@@ -30,7 +30,8 @@ class ExtensionPoint extends Component {
 
     const {query} = global.__RUNTIME__
 
-    const {component, params, props: extensionProps} = extension
+    const {params} = pages[page]
+    const {component, props: extensionProps} = extension
     const Component = global.__RENDER_6_COMPONENTS__[component]
 
     const props = {
@@ -45,40 +46,40 @@ class ExtensionPoint extends Component {
 
   _handleExtensionPointUpdate() {
     const {treePath} = this.props
-    const {placeholders} = this.context
+    const {extensions} = this.context
     this.setState({
-      placeholder: placeholders[treePath],
+      extension: extensions[treePath],
     })
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.treePath !== this.props.treePath) {
       const {treePath} = nextProps
-      const {placeholders} = this.context
+      const {extensions} = this.context
       this.setState({
-        placeholder: placeholders[treePath],
+        extension: extensions[treePath],
       })
     }
   }
 
   componentDidMount() {
-    const {placeholder} = this.state
+    const {extension} = this.state
     const {production, eventEmitter} = global.__RUNTIME__
     !production &&
-      placeholder &&
+      extension &&
       eventEmitter.addListener(
-        `placeholder:${placeholder.name}:update`,
+        `component:${extension.component}:update`,
         this._handleExtensionPointUpdate,
       )
   }
 
   componentWillUnmount() {
-    const {placeholder} = this.state
+    const {extension} = this.state
     const {production, eventEmitter} = global.__RUNTIME__
     !production &&
-      placeholder &&
+      extension &&
       eventEmitter.removeListener(
-        `placeholder:${placeholder.name}:update`,
+        `component:${extension.component}:update`,
         this._handleExtensionPointUpdate,
       )
   }
@@ -94,6 +95,8 @@ ExtensionPoint.propTypes = {
 
 ExtensionPoint.contextTypes = {
   extensions: PropTypes.object,
+  pages: PropTypes.object,
+  page: PropTypes.string,
 }
 
 export default treePath(ExtensionPoint)

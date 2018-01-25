@@ -16,7 +16,7 @@ const createLocaleCookie = locale => {
 
 function mergePlaceholders(local, server) {
   const merged = {}
-  for (name in server) {
+  for (const name in server) {
     if (local[name] && server[name]) {
       merged[name] = local[name]
     } else if (server[name]) {
@@ -91,13 +91,15 @@ class RenderProvider extends Component {
   }
 
   getChildContext() {
-    const {account, extensions, route, settings, locale} = this.props
+    const {account, extensions, pages, page, settings, locale} = this.props
     return {
       account,
       extensions,
-      route,
+      pages,
+      page,
       getSettings: locator => settings[locator],
       updateRuntime: () => {
+        console.log('TODO: get this information from ?page')
         return Promise.all([
           fetch(`/_v/messages/${locale}`).then(res => res.json()),
           fetch('/_v/extensions.json').then(res => res.json()),
@@ -126,8 +128,9 @@ RenderProvider.propTypes = {
   children: PropTypes.element.isRequired,
   account: PropTypes.string,
   extensions: PropTypes.object,
+  pages: PropTypes.object,
   settings: PropTypes.object,
-  route: PropTypes.string,
+  page: PropTypes.string,
   messages: PropTypes.object,
   locale: PropTypes.string,
 }
@@ -135,7 +138,8 @@ RenderProvider.propTypes = {
 RenderProvider.childContextTypes = {
   account: PropTypes.string,
   extensions: PropTypes.object,
-  route: PropTypes.string,
+  pages: PropTypes.object,
+  page: PropTypes.string,
   getSettings: PropTypes.func,
   updateRuntime: PropTypes.func,
 }

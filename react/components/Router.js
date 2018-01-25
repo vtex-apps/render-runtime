@@ -87,21 +87,21 @@ function shouldAddStyleToPage(asset, idx, arr) {
   return !serverOnly && isStyle(path) && !styleOnPage(path) && arr.map(({path: pt}) => pt).indexOf(path) === idx
 }
 
-function fetchRoute(routeName) {
-  const placeholder = global.__RUNTIME__.placeholders[routeName]
-  const scriptsToBeAdded = placeholder.assets
+function fetchPage(pageName) {
+  const extension = global.__RUNTIME__.extensions[pageName]
+  const scriptsToBeAdded = extension.assets
     .filter(shouldAddScriptToPage)
     .map(({path}) => path)
-  const stylesToBeAdded = placeholder.assets
+  const stylesToBeAdded = extension.assets
     .filter(shouldAddStyleToPage)
     .map(({path}) => path)
   stylesToBeAdded.forEach(addStyleToPage)
   return Promise.all(scriptsToBeAdded.map(addScriptToPage))
 }
 
-export function prefetchRoute(routeName) {
+export function prefetchPage(pageName) {
   if (canUseDOM) {
-    fetchRoute(routeName)
+    fetchPage(pageName)
   }
 }
 
@@ -119,17 +119,17 @@ export class Router extends Component {
   constructor(props, context) {
     super(props, context)
 
-    this.state = {route: context.route}
-    this.changeRoute = this.changeRoute.bind(this)
-    this.fillRouteParams = this.fillRouteParams.bind(this)
-    this.placeholderNameFromPath = this.placeholderNameFromPath.bind(this)
+    this.state = {page: context.page}
+    this.changePage = this.changePage.bind(this)
+    this.fillPageParams = this.fillPageParams.bind(this)
+    this.pageNameFromPath = this.pageNameFromPath.bind(this)
 
-    this.fillRouteParams()
+    this.fillPageParams()
   }
 
   componentDidMount() {
     this._isMounted = true
-    this.unlisten = global.browserHistory.listen(this.changeRoute)
+    this.unlisten = global.browserHistory.listen(this.changePage)
   }
 
   componentWillUnmount() {
@@ -144,91 +144,91 @@ export class Router extends Component {
     return ~((catchAll << 12) + (catchOne << 6) + ((1 << 6) - fixed - 1))
   }
 
-  placeholderNameFromPath(path) {
-    let route, score, highScore
-    for (const name in global.__RUNTIME__.placeholders) {
-      const placeholder = global.__RUNTIME__.placeholders[name]
-      if (placeholder.path) {
-        const matches = !!getParams(placeholder.path, path)
+  pageNameFromPath(path) {
+    let pageName, score, highScore
+    for (const name in global.__RUNTIME__.pages) {
+      const page = global.__RUNTIME__.pages[name]
+      if (page.path) {
+        const matches = !!getParams(page.path, path)
         if (!matches) {
           // We have to admit `/admin/*slug` matches `/admin`
-          if (!/\/\*.*$/.test(placeholder.path)) {
+          if (!/\/\*.*$/.test(page.path)) {
             continue
           }
-          const withoutLastSegment = removeSegment(placeholder.path)
+          const withoutLastSegment = removeSegment(page.path)
           const matchesWithoutSlug = !!getParams(withoutLastSegment, path)
           if (!matchesWithoutSlug) {
             continue
           }
         }
 
-        score = this.getScore(placeholder.path)
+        score = this.getScore(page.path)
         if (highScore > score) {
           continue
         }
 
         highScore = score
-        route = name
+        pageName = name
       }
     }
-    return route
+    return pageName
   }
 
-  fillRouteParams() {
+  fillPageParams() {
     const path = canUseDOM ? window.location.pathname : global.__pathname__
-    let route = this.placeholderNameFromPath(path)
+    let pageName = this.pageNameFromPath(path)
 
-    while (route && route !== '') {
-      const placeholder = global.__RUNTIME__.placeholders[route]
-      const allParams = getParams(placeholder.path, path)
+    while (pageName && pageName !== '') {
+      const page = global.__RUNTIME__.pages[pageName]
+      const allParams = getParams(page.path, path)
 
-      // Filter out params not owned by this route
+      // Filter out params not owned by this page
       const paramNames = Object.keys(
-        getParams(placeholder.relativePath, placeholder.relativePath)
+        getParams(page.path, page.path)
       )
       const params = {}
       paramNames.forEach(name => {
         params[name] = allParams[name]
       })
 
-      placeholder.params = params
-      route = removeSegment(route)
+      page.params = params
+      pageName = removeSegment(pageName)
     }
   }
 
-  changeRoute(location) {
+  changePage(location) {
     const path = location.pathname
-    const route = this.placeholderNameFromPath(path)
-    if (!route) {
-      throw new Error(`No routes matched the requested path: ${path}`)
+    const page = this.pageNameFromPath(path)
+    if (!page) {
+      throw new Error(`No pages matched the requested path: ${path}`)
     }
 
-    // Change route info in context
-    global.__RUNTIME__.route = route
+    // Change page info in context
+    global.__RUNTIME__.page = page
     global.__RUNTIME__.query = parse(location.search.substr(1))
 
-    // Add found URL params to placeholder settings (e.g. :slug).
-    this.fillRouteParams()
+    // Add found URL params to extension settings (e.g. :slug).
+    this.fillPageParams()
 
     document.body.scrollTop = 0
-    fetchRoute(route).then(() => this._isMounted && this.setState({route}))
+    fetchPage(page).then(() => this._isMounted && this.setState({page}))
   }
 
   render() {
     const {account} = this.context
-    const {route} = this.state
-    const {settings} = global.__RUNTIME__.placeholders[route]
+    const {page} = this.state
+    const {settings} = global.__RUNTIME__.extensions[page]
     return (
       <div>
         <Helmet title={settings ? settings.title || account : account} />
-        {nestRoutes(route.split('/'))}
+        {nestPages(page.split('/'))}
         <IntrospectionFetcher />
       </div>
     )
   }
 }
 
-const nestRoutes = treePathSegments => {
+const nestPages = treePathSegments => {
   return treePathSegments.reverse().reduce((acc, value) => {
     return <ExtensionPoint id={value}>{acc}</ExtensionPoint>
   }, null)
@@ -236,5 +236,5 @@ const nestRoutes = treePathSegments => {
 
 Router.contextTypes = {
   account: PropTypes.string,
-  route: PropTypes.string,
+  page: PropTypes.string,
 }
