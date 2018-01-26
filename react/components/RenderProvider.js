@@ -1,11 +1,18 @@
+import {canUseDOM} from 'exenv'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {IntlProvider} from 'react-intl'
 
 const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
 
-const fetchLocale = (locale, version) =>
-  fetch(`/_v/messages/${locale}${version ? '?v=' + version : ''}`).then(res => res.json())
+const acceptJson = canUseDOM && new Headers({
+  'Accept': 'application/json',
+})
+
+const fetchMessages = () =>
+  fetch('?vtex.render-resource=messages', {
+    headers: acceptJson,
+  }).then(res => res.json())
 
 const createLocaleCookie = locale => {
   const yearFromNow = Date.now() + YEAR_IN_MS
@@ -14,7 +21,7 @@ const createLocaleCookie = locale => {
   window.document.cookie = localeCookie
 }
 
-function mergePlaceholders(local, server) {
+function merge(local, server) {
   const merged = {}
   for (const name in server) {
     if (local[name] && server[name]) {
@@ -59,7 +66,7 @@ class RenderProvider extends Component {
     // Current locale is one of the updated ones
     if (locales.indexOf(this.state.locale) !== -1) {
       // Force cache busting by appending date to url
-      fetchLocale(this.state.locale, Date.now())
+      fetchMessages()
         .then(messages => {
           this.setState({
             locale: this.state.locale,
@@ -76,7 +83,7 @@ class RenderProvider extends Component {
   onLocaleSelected({locale}) {
     // Current locale is one of the updated ones
     if (locale !== this.state.locale) {
-      fetchLocale(locale)
+      fetchMessages()
         .then(messages => {
           global.__RUNTIME__.culture.locale = locale
           this.setState({locale, messages})
@@ -91,7 +98,7 @@ class RenderProvider extends Component {
   }
 
   getChildContext() {
-    const {account, extensions, pages, page, settings, locale} = this.props
+    const {account, extensions, pages, page, settings} = this.props
     return {
       account,
       extensions,
@@ -101,13 +108,21 @@ class RenderProvider extends Component {
       updateRuntime: () => {
         console.log('TODO: get this information from ?page')
         return Promise.all([
-          fetch(`/_v/messages/${locale}`).then(res => res.json()),
-          fetch('/_v/extensions.json').then(res => res.json()),
-        ]).then(([messages, extensions]) => {
+          fetch('?vtex.render-resource=messages', {
+            headers: acceptJson,
+          }).then(res => res.json()),
+          fetch('?vtex.render-resource=runtime', {
+            headers: acceptJson,
+          }).then(res => res.json()),
+        ]).then(([messages, {extensions, pages}]) => {
           Object.assign(global.__RUNTIME__.messages, messages)
-          global.__RUNTIME__.extensions = mergePlaceholders(
+          global.__RUNTIME__.extensions = merge(
             global.__RUNTIME__.extensions,
             extensions,
+          )
+          global.__RUNTIME__.pages = merge(
+            global.__RUNTIME__.pages,
+            pages,
           )
         })
       },
