@@ -20,9 +20,9 @@ class ExtensionPoint extends Component {
   }
 
   render() {
-    const {pages, page} = this.context
+    const {pages} = this.context
     const {extension} = this.state
-    const {children, ...other} = this.props
+    const {children, treePath, ...other} = this.props
 
     if (!extension) {
       return empty
@@ -30,7 +30,7 @@ class ExtensionPoint extends Component {
 
     const {query} = global.__RUNTIME__
 
-    const {params} = pages[page]
+    const params = pages[treePath] && pages[treePath].params
     const {component, props: extensionProps} = extension
     const Component = global.__RENDER_6_COMPONENTS__[component]
 
