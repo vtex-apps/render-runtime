@@ -87,13 +87,17 @@ function shouldAddStyleToPage(path, idx, arr) {
 }
 
 function fetchPage(pageName) {
-  const extension = global.__RUNTIME__.extensions[pageName]
-  const scriptsToBeAdded = extension.assets
-    .filter(shouldAddScriptToPage)
-  const stylesToBeAdded = extension.assets
-    .filter(shouldAddStyleToPage)
-  stylesToBeAdded.forEach(addStyleToPage)
-  return Promise.all(scriptsToBeAdded.map(addScriptToPage))
+  const keys = Object.keys(global.__RUNTIME__.extensions)
+  const pageExtensions = keys.filter(key => key === pageName || key.startsWith(`${pageName}/`))
+  const {scripts, styles} = pageExtensions.reduce((acc, extName) => {
+    const extension = global.__RUNTIME__.extensions[extName]
+    acc.scripts.push(...extension.assets.filter(shouldAddScriptToPage))
+    acc.styles.push(...extension.assets.filter(shouldAddStyleToPage))
+    return acc
+  }, {scripts: [], styles: []})
+
+  styles.forEach(addStyleToPage)
+  return Promise.all(scripts.map(addScriptToPage))
 }
 
 export function prefetchPage(pageName) {
