@@ -34,7 +34,7 @@ class IntrospectionFetcher extends Component {
     this.tryGenerateCacheResolvers()
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     this.tryGenerateCacheResolvers()
   }
 

@@ -48,4 +48,5 @@ Link.defaultProps = {
 Link.propTypes = {
   query: PropTypes.string,
   to: PropTypes.string,
+  onClick: PropTypes.func,
 }
