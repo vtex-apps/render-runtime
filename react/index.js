@@ -24,7 +24,9 @@ import Link from './components/Link'
 
 global.Intl = Intl
 addLocaleData([...pt, ...en, ...es])
-global.__RUNTIME__.eventEmitter = new EventEmitter()
+if (canUseDOM) {
+  global.__RUNTIME__.eventEmitter = global.__RUNTIME__.eventEmitter || new EventEmitter()
+}
 
 function _renderToStringWithData(component) {
   var startGetDataFromTree = hrtime()
