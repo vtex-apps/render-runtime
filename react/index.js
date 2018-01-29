@@ -12,8 +12,8 @@ import 'intl/locale-data/jsonp/pt.js'
 import 'intl/locale-data/jsonp/en.js'
 import 'intl/locale-data/jsonp/es.js'
 import {ApolloProvider} from 'react-apollo'
-import EventEmitter from 'events'
 
+import './internal/events'
 import {Router} from './components/Router'
 import getClient from './internal/client'
 import RenderProvider from './components/RenderProvider'
@@ -24,9 +24,6 @@ import Link from './components/Link'
 
 global.Intl = Intl
 addLocaleData([...pt, ...en, ...es])
-if (canUseDOM) {
-  global.__RUNTIME__.eventEmitter = global.__RUNTIME__.eventEmitter || new EventEmitter()
-}
 
 function _renderToStringWithData(component) {
   var startGetDataFromTree = hrtime()

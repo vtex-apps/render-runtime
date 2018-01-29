@@ -64,22 +64,30 @@ class ExtensionPoint extends Component {
 
   componentDidMount() {
     const {extension} = this.state
+    const {treePath} = this.props
     const {production, eventEmitter} = global.__RUNTIME__
     !production &&
       extension &&
       eventEmitter.addListener(
         `component:${extension.component}:update`,
         this._handleExtensionPointUpdate,
+      ).addListener(
+        `extension:${treePath}:update`,
+        this._handleExtensionPointUpdate,
       )
   }
 
   componentWillUnmount() {
     const {extension} = this.state
+    const {treePath} = this.props
     const {production, eventEmitter} = global.__RUNTIME__
     !production &&
       extension &&
       eventEmitter.removeListener(
         `component:${extension.component}:update`,
+        this._handleExtensionPointUpdate,
+      ).removeListener(
+        `extension:${treePath}:update`,
         this._handleExtensionPointUpdate,
       )
   }

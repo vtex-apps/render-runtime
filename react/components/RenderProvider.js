@@ -2,6 +2,7 @@ import {canUseDOM} from 'exenv'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {IntlProvider} from 'react-intl'
+import * as deep from 'deep-diff'
 
 const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
 
@@ -14,23 +15,65 @@ const fetchMessages = () =>
     headers: acceptJson,
   }).then(res => res.json())
 
+const fetchRuntime = () =>
+  fetch('?vtex.render-resource=runtime', {
+    headers: acceptJson,
+  }).then(res => res.json())
+
+const changedKeys = (localExtensions, serverExtensions) => {
+  const diff = deep.default.diff(localExtensions, serverExtensions)
+  if (!diff) {
+    return []
+  }
+
+  const changed = diff.reduce((hashset, diffItem) => {
+    const extensionPath = diffItem.path[0]
+    hashset[extensionPath] = true
+    return hashset
+  }, {})
+
+  return Object.keys(changed)
+}
+
+const updateInPlace = (old, current) => {
+  Object.keys(old).forEach((oldKey) => {
+    if (!current[oldKey]) {
+      delete old[oldKey]
+    }
+  })
+
+  Object.keys(current).forEach((key) => {
+    old[key] = current[key]
+  })
+}
+
+const updateRuntime = (computeDiff) => {
+  console.log('TODO: get this information from ?page')
+  return Promise.all([
+    fetchMessages(), fetchRuntime()
+  ]).then(([messages, {extensions, pages}]) => {
+    const diff = computeDiff
+      ? changedKeys(global.__RUNTIME__.extensions, extensions)
+      : []
+
+    // keep client-side params
+    Object.keys(pages).forEach(page => {
+      pages[page].params = global.__RUNTIME__.pages[page].params
+    })
+
+    updateInPlace(global.__RUNTIME__.messages, messages)
+    updateInPlace(global.__RUNTIME__.extensions, extensions)
+    updateInPlace(global.__RUNTIME__.pages, pages)
+
+    return diff
+  })
+}
+
 const createLocaleCookie = locale => {
   const yearFromNow = Date.now() + YEAR_IN_MS
   const expires = new Date(yearFromNow).toUTCString()
   const localeCookie = `locale=${locale};path=/;expires=${expires}`
   window.document.cookie = localeCookie
-}
-
-function merge(local, server) {
-  const merged = {}
-  for (const name in server) {
-    if (local[name] && server[name]) {
-      merged[name] = local[name]
-    } else if (server[name]) {
-      merged[name] = server[name]
-    }
-  }
-  return merged
 }
 
 class RenderProvider extends Component {
@@ -43,26 +86,28 @@ class RenderProvider extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('message', e => {
-      const event = e.data
-      if (!event.key && !event.body) {
-        return
-      }
-      const {key, body} = event
-      switch (key) {
-        case 'browser':
-          if (body.type === 'locales') {
-            this.onLocalesUpdated(body)
-          }
-          break
-        case 'render.locale':
-          this.onLocaleSelected(body)
-          break
+    const {production, eventEmitter} = __RUNTIME__
+    eventEmitter.addListener('localesChanged', this.onLocaleSelected)
+
+    if (!production) {
+      eventEmitter.addListener('localesUpdated', this.onLocalesUpdated)
+      eventEmitter.addListener('extensionsUpdated', this.onExtensionsUpdated)
+    }
+  }
+
+  onExtensionsUpdated(changedExtensionPath) {
+    const {eventEmitter} = __RUNTIME__
+    const computeDiff = !changedExtensionPath
+    updateRuntime(computeDiff).then(diff => {
+      if (changedExtensionPath) {
+        eventEmmiter.emit(`extension:${changedExtensionPath}:update`)
+      } else {
+        diff.forEach(extensionPath => eventEmitter.emit(`extension:${extensionPath}:update`))
       }
     })
   }
 
-  onLocalesUpdated({locales}) {
+  onLocalesUpdated(locales) {
     // Current locale is one of the updated ones
     if (locales.indexOf(this.state.locale) !== -1) {
       // Force cache busting by appending date to url
@@ -80,7 +125,7 @@ class RenderProvider extends Component {
     }
   }
 
-  onLocaleSelected({locale}) {
+  onLocaleSelected(locale) {
     // Current locale is one of the updated ones
     if (locale !== this.state.locale) {
       fetchMessages()
@@ -98,34 +143,14 @@ class RenderProvider extends Component {
   }
 
   getChildContext() {
-    const {account, extensions, pages, page, settings} = this.props
+    const {account, extensions, page, pages, settings} = global.__RUNTIME__
     return {
       account,
       extensions,
       pages,
       page,
       getSettings: locator => settings[locator],
-      updateRuntime: () => {
-        console.log('TODO: get this information from ?page')
-        return Promise.all([
-          fetch('?vtex.render-resource=messages', {
-            headers: acceptJson,
-          }).then(res => res.json()),
-          fetch('?vtex.render-resource=runtime', {
-            headers: acceptJson,
-          }).then(res => res.json()),
-        ]).then(([messages, {extensions, pages}]) => {
-          Object.assign(global.__RUNTIME__.messages, messages)
-          global.__RUNTIME__.extensions = merge(
-            global.__RUNTIME__.extensions,
-            extensions,
-          )
-          global.__RUNTIME__.pages = merge(
-            global.__RUNTIME__.pages,
-            pages,
-          )
-        })
-      },
+      updateRuntime,
     }
   }
 
