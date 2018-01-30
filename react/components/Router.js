@@ -5,7 +5,7 @@ import {canUseDOM} from 'exenv'
 import {Helmet} from 'react-helmet'
 import createHistory from 'history/createBrowserHistory'
 import {parse} from 'qs'
-import ExtensionPoint from './ExtensionPoint'
+import ExtensionPoint from '../ExtensionPoint'
 import IntrospectionFetcher from './IntrospectionFetcher'
 
 function isRelative(path) {

@@ -17,10 +17,10 @@ import './internal/events'
 import {Router} from './components/Router'
 import getClient from './internal/client'
 import RenderProvider from './components/RenderProvider'
-import ExtensionContainer from './components/ExtensionContainer'
-import ExtensionPoint from './components/ExtensionPoint'
 import Img from './components/Img'
 import Link from './components/Link'
+import ExtensionContainer from './ExtensionContainer'
+import ExtensionPoint from './ExtensionPoint'
 
 global.Intl = Intl
 addLocaleData([...pt, ...en, ...es])
