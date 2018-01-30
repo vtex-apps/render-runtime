@@ -2,7 +2,6 @@ import {canUseDOM} from 'exenv'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {IntlProvider} from 'react-intl'
-import * as deep from 'deep-diff'
 
 const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
 
@@ -20,21 +19,6 @@ const fetchRuntime = () =>
     headers: acceptJson,
   }).then(res => res.json())
 
-const changedKeys = (localExtensions, serverExtensions) => {
-  const diff = deep.default.diff(localExtensions, serverExtensions)
-  if (!diff) {
-    return []
-  }
-
-  const changed = diff.reduce((hashset, diffItem) => {
-    const extensionPath = diffItem.path[0]
-    hashset[extensionPath] = true
-    return hashset
-  }, {})
-
-  return Object.keys(changed)
-}
-
 const updateInPlace = (old, current) => {
   Object.keys(old).forEach((oldKey) => {
     if (!current[oldKey]) {
@@ -44,28 +28,6 @@ const updateInPlace = (old, current) => {
 
   Object.keys(current).forEach((key) => {
     old[key] = current[key]
-  })
-}
-
-const updateRuntime = (computeDiff) => {
-  return Promise.all([
-    fetchMessages(),
-    fetchRuntime(),
-  ]).then(([messages, {extensions, pages}]) => {
-    const diff = computeDiff
-      ? changedKeys(global.__RUNTIME__.extensions, extensions)
-      : []
-
-    // keep client-side params
-    Object.keys(pages).forEach(page => {
-      pages[page].params = global.__RUNTIME__.pages[page].params
-    })
-
-    updateInPlace(global.__RUNTIME__.messages, messages)
-    updateInPlace(global.__RUNTIME__.extensions, extensions)
-    updateInPlace(global.__RUNTIME__.pages, pages)
-
-    return diff
   })
 }
 
@@ -91,20 +53,8 @@ class RenderProvider extends Component {
 
     if (!production) {
       eventEmitter.addListener('localesUpdated', this.onLocalesUpdated)
-      eventEmitter.addListener('extensionsUpdated', this.onExtensionsUpdated)
+      eventEmitter.addListener('extensionsUpdated', this.updateRuntime)
     }
-  }
-
-  onExtensionsUpdated(changedExtensionPath) {
-    const {eventEmitter} = global.__RUNTIME__
-    const computeDiff = !changedExtensionPath
-    updateRuntime(computeDiff).then(diff => {
-      if (changedExtensionPath) {
-        eventEmitter.emit(`extension:${changedExtensionPath}:update`)
-      } else {
-        diff.forEach(extensionPath => eventEmitter.emit(`extension:${extensionPath}:update`))
-      }
-    })
   }
 
   onLocalesUpdated(locales) {
@@ -150,9 +100,28 @@ class RenderProvider extends Component {
       pages,
       page,
       getSettings: locator => settings[locator],
-      updateRuntime,
+      updateRuntime: this.updateRuntime,
     }
   }
+
+  updateRuntime = () =>
+    Promise.all([
+      fetchMessages(),
+      fetchRuntime(),
+    ]).then(([messages, {extensions, pages}]) => {
+      // keep client-side params
+      Object.keys(pages).forEach(page => {
+        pages[page].params = global.__RUNTIME__.pages[page].params
+      })
+
+      updateInPlace(global.__RUNTIME__.messages, messages)
+      updateInPlace(global.__RUNTIME__.extensions, extensions)
+      updateInPlace(global.__RUNTIME__.pages, pages)
+
+      global.__RUNTIME__.eventEmitter.emit('extension:*:update')
+
+      return global.__RUNTIME__
+    })
 
   render() {
     const {locale, messages} = this.state

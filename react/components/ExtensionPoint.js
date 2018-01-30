@@ -74,6 +74,9 @@ class ExtensionPoint extends Component {
       ).addListener(
         `extension:${treePath}:update`,
         this._handleExtensionPointUpdate,
+      ).addListener(
+        'extension:*:update',
+        this._handleExtensionPointUpdate,
       )
   }
 
@@ -88,6 +91,9 @@ class ExtensionPoint extends Component {
         this._handleExtensionPointUpdate,
       ).removeListener(
         `extension:${treePath}:update`,
+        this._handleExtensionPointUpdate,
+      ).removeListener(
+        'extension:*:update',
         this._handleExtensionPointUpdate,
       )
   }

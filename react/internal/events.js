@@ -32,11 +32,11 @@ if (module.hot && canUseDOM) {
   })
 
   myvtexSSE(account, workspace, ssePages0Path, {verbose: true}, function(event) {
-    const {body: {type, extensionPath}} = event
+    const {body: {type}} = event
     switch (type) {
       case 'changed':
-        console.log(`[pages0] Extensions changed. extension=${extensionPath}`)
-        eventEmitter.emit('extensionsUpdated', extensionPath)
+        console.log('[pages0] Extensions changed.')
+        eventEmitter.emit('extensionsUpdated')
         break
     }
   })
