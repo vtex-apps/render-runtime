@@ -42,8 +42,6 @@ export const createHttpSwitchLink = (uri) => {
       targetUri = baseUrl.concat(`?${stringify(fullQueryObj)}`)
     }
 
-    console.log(targetUri)
-
     operation.setContext({uri: targetUri, fetchOptions})
     return forward(operation)
   })
