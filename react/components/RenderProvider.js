@@ -48,9 +48,9 @@ const updateInPlace = (old, current) => {
 }
 
 const updateRuntime = (computeDiff) => {
-  console.log('TODO: get this information from ?page')
   return Promise.all([
-    fetchMessages(), fetchRuntime()
+    fetchMessages(),
+    fetchRuntime(),
   ]).then(([messages, {extensions, pages}]) => {
     const diff = computeDiff
       ? changedKeys(global.__RUNTIME__.extensions, extensions)
@@ -86,7 +86,7 @@ class RenderProvider extends Component {
   }
 
   componentDidMount() {
-    const {production, eventEmitter} = __RUNTIME__
+    const {production, eventEmitter} = global.__RUNTIME__
     eventEmitter.addListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {
@@ -96,11 +96,11 @@ class RenderProvider extends Component {
   }
 
   onExtensionsUpdated(changedExtensionPath) {
-    const {eventEmitter} = __RUNTIME__
+    const {eventEmitter} = global.__RUNTIME__
     const computeDiff = !changedExtensionPath
     updateRuntime(computeDiff).then(diff => {
       if (changedExtensionPath) {
-        eventEmmiter.emit(`extension:${changedExtensionPath}:update`)
+        eventEmitter.emit(`extension:${changedExtensionPath}:update`)
       } else {
         diff.forEach(extensionPath => eventEmitter.emit(`extension:${extensionPath}:update`))
       }
