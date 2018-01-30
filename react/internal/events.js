@@ -17,15 +17,15 @@ if (module.hot && canUseDOM) {
     const {body: {type, appId, hash, locales}} = event
     switch (type) {
       case 'hmr':
-        console.log(`[HMR]: App (${appId}) hot update `, hash)
+        console.log(`[react1] Received update. app=${appId} hash=${hash}`)
         global.__RENDER_6_HOT__[appId].emit('webpackHotUpdate', hash)
         break
       case 'reload':
-        console.log(`[HMR]: App (${appId}) reload`)
+        console.log(`[react1] Received reload. app=${appId}`)
         location.reload(true)
         break
       case 'locales':
-        console.log(`[HMR]: App (${appId}) locale update`, locales)
+        console.log(`[react1] Received locale update. appId=${appId} locales=${locales}`)
         eventEmitter.emit('localesUpdated', '*')
         break
     }
@@ -35,7 +35,7 @@ if (module.hot && canUseDOM) {
     const {body: {type, extensionPath}} = event
     switch (type) {
       case 'changed':
-        console.log('[HMR]: Extensions changed')
+        console.log(`[pages0] Extensions changed. extension=${extensionPath}`)
         eventEmitter.emit('extensionsUpdated', extensionPath)
         break
     }
