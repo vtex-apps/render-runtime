@@ -59,7 +59,7 @@ class RenderProvider extends Component {
     }
   }
 
-  onLocalesUpdated(locales) {
+  onLocalesUpdated = (locales) => {
     // Current locale is one of the updated ones
     if (locales.indexOf(this.state.locale) !== -1) {
       // Force cache busting by appending date to url
@@ -77,7 +77,7 @@ class RenderProvider extends Component {
     }
   }
 
-  onLocaleSelected(locale) {
+  onLocaleSelected = (locale) => {
     // Current locale is one of the updated ones
     if (locale !== this.state.locale) {
       fetchMessages()
