@@ -26,7 +26,7 @@ if (module.hot && canUseDOM) {
         break
       case 'locales':
         console.log(`[react1] Received locale update. appId=${appId} locales=${locales}`)
-        eventEmitter.emit('localesUpdated', '*')
+        eventEmitter.emit('localesUpdated', locales)
         break
     }
   })
