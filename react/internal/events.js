@@ -5,7 +5,7 @@ if (canUseDOM) {
   global.__RUNTIME__.eventEmitter = global.__RUNTIME__.eventEmitter || new EventEmitter()
 }
 
-if (module.hot && canUseDOM && !__RUNTIME__.production) {
+if (module.hot && canUseDOM) {
   require('eventsource-polyfill')
   const myvtexSSE = require('myvtex-sse')
 
@@ -35,7 +35,7 @@ if (module.hot && canUseDOM && !__RUNTIME__.production) {
     const {body: {type, extensionPath}} = event
     switch (type) {
       case 'changed':
-        console.log(`[HMR]: Extensions changed`)
+        console.log('[HMR]: Extensions changed')
         eventEmitter.emit('extensionsUpdated', extensionPath)
         break
     }
