@@ -1,7 +1,8 @@
 import {canUseDOM} from 'exenv'
 import {ApolloClient} from 'apollo-client'
-import {createHttpLink} from './httpLink'
+import {createHttpLink} from 'apollo-link-http'
 import {InMemoryCache} from 'apollo-cache-inmemory'
+import {createHttpSwitchLink, httpSwitchFetcher} from './http-switch-link'
 
 let client
 const {graphQlUri} = global.__RUNTIME__
@@ -17,12 +18,17 @@ export default () => {
       addTypename: true,
     })
 
+    const httpLink = createHttpLink({
+      batchInterval: 80,
+      credentials: 'same-origin',
+      fetch: httpSwitchFetcher
+    })
+
+    const uri = canUseDOM ? graphQlUri.browser : graphQlUri.ssr
+    const httpSwitchLink = createHttpSwitchLink(uri)
+
     client = new ApolloClient({
-      link: createHttpLink({
-        uri: canUseDOM ? graphQlUri.browser : graphQlUri.ssr,
-        batchInterval: 80,
-        credentials: 'same-origin',
-      }),
+      link: httpSwitchLink.concat(httpLink),
       ssrMode: !canUseDOM,
       cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
     })
