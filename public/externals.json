@@ -20,6 +20,9 @@
       "import": "react-dom/server",
       "path": "https://unpkg.com/react-dom@16.1.1/umd/react-dom-server.browser.development.js",
       "serverOnly": true
+    },
+    {
+      "path": "https://unpkg.com/vtex-tachyons@1.0.2/tachyons.css"
     }
   ],
   "prod": [
@@ -43,6 +46,9 @@
       "import": "react-dom/server",
       "path": "https://unpkg.com/react-dom@16.1.1/umd/react-dom-server.browser.production.min.js",
       "serverOnly": true
+    },
+    {
+      "path": "https://unpkg.com/vtex-tachyons@1.0.2/tachyons.min.css"
     }
   ]
 }
