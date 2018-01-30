@@ -11,11 +11,13 @@ const acceptJson = canUseDOM && new Headers({
 
 const fetchMessages = () =>
   fetch('?vtex.render-resource=messages', {
+    credentials: 'same-origin',
     headers: acceptJson,
   }).then(res => res.json())
 
 const fetchRuntime = () =>
   fetch('?vtex.render-resource=runtime', {
+    credentials: 'same-origin',
     headers: acceptJson,
   }).then(res => res.json())
 
