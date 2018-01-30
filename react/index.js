@@ -63,7 +63,7 @@ const ssrEnabled = canUseDOM ? window.location.search.indexOf("__disableSSR") ==
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = name => {
-  const isPage = !!pages[name].path && !!extensions[name].component
+  const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
   const id = isPage ? 'render-container' : containerId(name)
   const component = isPage ? <Router /> : <ExtensionPoint id={name} />
   const root = (
