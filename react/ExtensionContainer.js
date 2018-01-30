@@ -7,11 +7,15 @@ class ExtensionContainer extends Component {
   render() {
     const {extensions, treePath} = this.context
     const relative = name => name.replace(`${treePath}/`, '')
-    const children = Object.values(extensions).filter(
-      p => p.component && p.name !== treePath && p.name.startsWith(treePath),
+    const children = Object.keys(extensions).filter(
+      extension => {
+        return extensions[extension].component &&
+          extension !== treePath &&
+          (new RegExp(`^${treePath}/[a-zA-Z0-9-]+$`)).test(extension)
+      }
     )
-    const renderChildren = ({name}) => (
-      <ExtensionPoint key={relative(name)} id={relative(name)} />
+    const renderChildren = (extension) => (
+      <ExtensionPoint key={relative(extension)} id={relative(extension)} />
     )
 
     return <div>{children.map(renderChildren)}</div>
