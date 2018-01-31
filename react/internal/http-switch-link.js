@@ -12,12 +12,6 @@ import {print} from 'graphql'
 
 const isEmpty = (val) => (val == undefined || Object.keys(val).length === 0)
 
-function removeUnusedFields(obj) {
-  Object.keys(obj).forEach(key => (isEmpty(obj[key])) && delete obj[key])
-
-  return obj
-}
-
 const hasMutationField = (queryTree) => {
   for (let query of queryTree.definitions) {
     if (query.operation === 'mutation') {
@@ -42,12 +36,12 @@ export const createHttpSwitchLink = (uri) => {
     if(method === 'GET') {
       fetchOptions['method'] = method
 
-      targetUri.query = removeUnusedFields({
+      targetUri.query = {
         ...targetUri.query,
         'query': print(query).replace(/\s\s+/g, ' '),
         variables,
         operationName
-      })
+      }
     }
 
     operation.setContext({uri: format(targetUri), fetchOptions})
