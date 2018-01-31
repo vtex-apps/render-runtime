@@ -29,8 +29,9 @@ const hasMutationField = (queryTree) => {
 
 export const createHttpSwitchLink = (uri) => {
   const parsedUri = parse(uri, true)
-  // delete search in order to format to work as expected
-  parsedUri.search && delete parsedUri.search
+  // Delete search in order to format to use query, instead of search, field while
+  // formatting the new URI
+  delete parsedUri.search
 
   return new ApolloLink((operation, forward) => {
     const targetUri = Object.assign({}, parsedUri)
