@@ -10,11 +10,10 @@ import {ApolloLink} from 'apollo-link'
 import {parse, format} from 'url'
 import {print} from 'graphql'
 
-const isEmpty = (val) => (val === undefined || val === "" || val === {} || val === [])
-const isNil = (val) => (val === undefined || val === null)
+const isEmpty = (val) => (val == undefined || Object.keys(val).length === 0)
 
 function removeUnusedFields(obj) {
-  Object.keys(obj).forEach(key => (isNil(obj[key]) || isEmpty(obj[key])) && delete obj[key])
+  Object.keys(obj).forEach(key => (isEmpty(obj[key])) && delete obj[key])
 
   return obj
 }
@@ -30,11 +29,13 @@ const hasMutationField = (queryTree) => {
 
 export const createHttpSwitchLink = (uri) => {
   const parsedUri = parse(uri, true)
+  // delete search in order to format to work as expected
+  parsedUri.search && delete parsedUri.search
 
   return new ApolloLink((operation, forward) => {
     const targetUri = Object.assign({}, parsedUri)
     const {query, variables, operationName} = operation
-    const {fetchOptions = {}, http: httpOptions = {}} = operation.getContext()
+    const {fetchOptions = {}} = operation.getContext()
     const method = hasMutationField(query) ? 'POST' : 'GET'
 
     if(method === 'GET') {
@@ -46,9 +47,6 @@ export const createHttpSwitchLink = (uri) => {
         variables,
         operationName
       })
-
-      // need to delete in order to format function to work parsing the query instead of search field
-      delete targetUri.search
     }
 
     operation.setContext({uri: format(targetUri), fetchOptions})
