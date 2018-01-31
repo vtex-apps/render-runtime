@@ -7,9 +7,11 @@
  *
  */
 import {ApolloLink} from 'apollo-link'
-import { prop, map, contains, isEmpty, isNil } from 'ramda'
-import { parse, stringify } from 'querystring'
-import { print } from 'graphql'
+import {parse, format} from 'url'
+import {print} from 'graphql'
+
+const isEmpty = (val) => (val === undefined || val === "" || val === {} || val === [])
+const isNil = (val) => (val === undefined || val === null)
 
 function removeUnusedFields(obj) {
   Object.keys(obj).forEach(key => (isNil(obj[key]) || isEmpty(obj[key])) && delete obj[key])
@@ -17,32 +19,39 @@ function removeUnusedFields(obj) {
   return obj
 }
 
+const hasMutationField = (queryTree) => {
+  for (let query of queryTree.definitions) {
+    if (query.operation === 'mutation') {
+      return true
+    }
+  }
+  return false
+}
+
 export const createHttpSwitchLink = (uri) => {
-  const [baseUrl, querystring] = uri.split('?')
-  let queryObj = (querystring) ? parse(querystring) : {}
+  const parsedUri = parse(uri, true)
 
   return new ApolloLink((operation, forward) => {
-    let targetUri = uri
+    const targetUri = Object.assign({}, parsedUri)
     const {query, variables, operationName} = operation
     const {fetchOptions = {}, http: httpOptions = {}} = operation.getContext()
-    const method = contains('mutation',map(prop('operation'), prop('definitions')(query))) ?
-      'POST' :
-      'GET'
+    const method = hasMutationField(query) ? 'POST' : 'GET'
 
     if(method === 'GET') {
       fetchOptions['method'] = method
 
-      const fullQueryObj = removeUnusedFields({
-        ...queryObj,
+      targetUri.query = removeUnusedFields({
+        ...targetUri.query,
         'query': print(query).replace(/\s\s+/g, ' '),
         variables,
         operationName
       })
 
-      targetUri = baseUrl.concat(`?${stringify(fullQueryObj)}`)
+      // need to delete in order to format function to work parsing the query instead of search field
+      delete targetUri.search
     }
 
-    operation.setContext({uri: targetUri, fetchOptions})
+    operation.setContext({uri: format(targetUri), fetchOptions})
     return forward(operation)
   })
 }
