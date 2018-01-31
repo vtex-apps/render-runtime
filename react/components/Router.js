@@ -86,13 +86,34 @@ function shouldAddStyleToPage(path, idx, arr) {
   return isStyle(path) && !styleOnPage(path) && arr.map(({path: pt}) => pt).indexOf(path) === idx
 }
 
+function shouldRender (name, page) {
+  const {pages} = global.__RUNTIME__
+  const segments = name.split('/')
+  for (let i = 0; i < segments.length; i++) {
+    const pageName = segments.slice(0, segments.length - i).join('/')
+    if (pages[pageName]) {
+      return page.startsWith(pageName)
+    }
+  }
+  return false
+}
+
+function updateRenderables(page) {
+  const {extensions} = global.__RUNTIME__
+  Object.keys(extensions).forEach(name => {
+    extensions[name].shouldRender = shouldRender(name, page)
+  })
+}
+
 function fetchPage(pageName) {
-  const keys = Object.keys(global.__RUNTIME__.extensions)
-  const pageExtensions = keys.filter(key => key === pageName || key.startsWith(`${pageName}/`))
-  const {scripts, styles} = pageExtensions.reduce((acc, extName) => {
-    const extension = global.__RUNTIME__.extensions[extName]
-    acc.scripts.push(...extension.assets.filter(shouldAddScriptToPage))
-    acc.styles.push(...extension.assets.filter(shouldAddStyleToPage))
+  updateRenderables(pageName)
+  const {extensions} = global.__RUNTIME__
+  const {scripts, styles} = Object.keys(extensions).reduce((acc, extName) => {
+    const extension = extensions[extName]
+    if (extension.shouldRender) {
+      acc.scripts.push(...extension.assets.filter(shouldAddScriptToPage))
+      acc.styles.push(...extension.assets.filter(shouldAddStyleToPage))
+    }
     return acc
   }, {scripts: [], styles: []})
 
