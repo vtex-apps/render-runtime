@@ -1,6 +1,9 @@
 {
   "dev": [
     {
+      "path": "https://unpkg.com/regenerator-runtime@0.11.1/runtime.js"
+    },
+    {
       "global": "PropTypes",
       "import": "prop-types",
       "path": "https://unpkg.com/prop-types@15.6.0/prop-types.js"
@@ -26,6 +29,9 @@
     }
   ],
   "prod": [
+    {
+      "path": "https://unpkg.com/regenerator-runtime@0.11.1/runtime.js"
+    },
     {
       "global": "PropTypes",
       "import": "prop-types",
