@@ -80,12 +80,12 @@ class RenderProvider extends Component {
   onLocaleSelected = (locale) => {
     // Current locale is one of the updated ones
     if (locale !== this.state.locale) {
+      global.__RUNTIME__.culture.locale = locale
+      createLocaleCookie(locale)
       fetchMessages()
         .then(messages => {
-          global.__RUNTIME__.culture.locale = locale
           this.setState({locale, messages})
         })
-        .then(() => createLocaleCookie(locale))
         .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))
         .catch(e => {
           console.log('Failed to fetch new locale file.')
