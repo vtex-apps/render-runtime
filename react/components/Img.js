@@ -3,7 +3,6 @@ import classnames from 'classnames/bind'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-const {account} = global.__RUNTIME__
 const EMPTY_OBJECT = {}
 const divStyle = {position: 'relative'}
 const cx = classnames.bind(style)
@@ -12,6 +11,21 @@ const cx = classnames.bind(style)
 const loadedMap = {}
 
 export default class Img extends Component {
+  static contextTypes = {
+    account: PropTypes.string,
+  }
+
+  static propTypes = {
+    height: PropTypes.number.isRequired,
+    src: PropTypes.string.isRequired,
+    width: PropTypes.number.isRequired,
+    account: PropTypes.string,
+    relative: PropTypes.bool,
+    alt: PropTypes.string,
+    backgroundColor: PropTypes.string,
+    className: PropTypes.string,
+  }
+
   constructor(props) {
     super(props)
     const {src, relative, width = 1, height = 1} = this.props
@@ -49,7 +63,7 @@ export default class Img extends Component {
   }
 
   getBaseUrl(relative) {
-    return relative ? '' : `//${account}.vteximg.com.br`
+    return relative ? '' : `//${this.context.account}.vteximg.com.br`
   }
 
   handleLoad() {
@@ -153,15 +167,4 @@ export default class Img extends Component {
       </div>
     )
   }
-}
-
-Img.propTypes = {
-  height: PropTypes.number.isRequired,
-  src: PropTypes.string.isRequired,
-  width: PropTypes.number.isRequired,
-  account: PropTypes.string,
-  relative: PropTypes.bool,
-  alt: PropTypes.string,
-  backgroundColor: PropTypes.string,
-  className: PropTypes.string,
 }

@@ -1,15 +1,17 @@
-import EventEmitter from 'events'
+import EventEmitter from 'eventemitter3'
 import {canUseDOM} from 'exenv'
 
 if (canUseDOM) {
-  global.__RUNTIME__.eventEmitter = global.__RUNTIME__.eventEmitter || new EventEmitter()
+  global.__RUNTIME__.emitter = global.__RUNTIME__.emitter || new EventEmitter()
+  // Backwards compatibility with old builder entrypoint code
+  global.__RUNTIME__.eventEmitter = global.__RUNTIME__.emitter
 }
 
 if (module.hot && canUseDOM) {
   require('eventsource-polyfill')
   const myvtexSSE = require('myvtex-sse')
 
-  const {account, workspace, eventEmitter} = global.__RUNTIME__
+  const {account, workspace, emitter} = global.__RUNTIME__
   const sseReact1Path = 'vtex.builder-hub:*:react1'
   const ssePages0Path = 'vtex.builder-hub:*:pages0'
 
@@ -26,7 +28,7 @@ if (module.hot && canUseDOM) {
         break
       case 'locales':
         console.log(`[react1] Received locale update. appId=${appId} locales=${locales}`)
-        eventEmitter.emit('localesUpdated', locales)
+        emitter.emit('localesUpdated', locales)
         break
     }
   })
@@ -36,7 +38,7 @@ if (module.hot && canUseDOM) {
     switch (type) {
       case 'changed':
         console.log('[pages0] Extensions changed.')
-        eventEmitter.emit('extensionsUpdated')
+        emitter.emit('extensionsUpdated')
         break
     }
   })
