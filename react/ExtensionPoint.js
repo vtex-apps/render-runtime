@@ -2,115 +2,157 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import treePath from 'react-tree-path'
 
-const empty = <span className="ExtensionPoint--empty" />
+import {fetchAssets, getComponents, getImplementations} from './utils/assets'
 
 class ExtensionPoint extends Component {
+  static contextTypes = {
+    components: PropTypes.object,
+    extensions: PropTypes.object,
+    emitter: PropTypes.object,
+    production: PropTypes.bool,
+  }
+
+  static propTypes = {
+    id: PropTypes.string.isRequired,
+    children: PropTypes.node,
+    treePath: PropTypes.string,
+  }
+
   constructor(props, context) {
     super()
+    this.state = this.getExtensionPointState(props, context)
+  }
 
+  getExtensionPointState = (props, context) => {
     const {treePath} = props
-
     const {extensions} = context
-
-    this._handleExtensionPointUpdate = this._handleExtensionPointUpdate.bind(this)
-
-    this.state = {
-      extension: extensions[treePath],
+    const extension = extensions[treePath]
+    return {
+      extension,
     }
   }
 
-  render() {
-    const {pages} = this.context
+  updateExtensionPoint = () => {
+    this.setState(this.getExtensionPointState(this.props, this.context))
+  }
+
+  subscribe = (subscribe) => {
+    const {production, emitter} = this.context
     const {extension} = this.state
-    const {children, treePath, ...other} = this.props
+    const {treePath} = this.props
 
-    if (!extension) {
-      return empty
+    if (production) {
+      return
     }
 
-    const {query} = global.__RUNTIME__
+    const events = [
+      'extension:*:update',
+      `extension:${treePath}:update`,
+    ]
 
-    const params = pages[treePath] && pages[treePath].params
-    const {component, props: extensionProps} = extension
-    const Component = global.__RENDER_6_COMPONENTS__[component]
-
-    const props = {
-      params,
-      query,
-      ...extensionProps,
-      ...other,
+    if (extension.component) {
+      events.push(`component:${extension.component}:update`)
     }
 
-    return Component ? <Component {...props}>{children}</Component> : empty
+    events.forEach(e => {
+      if (subscribe) {
+        emitter.addListener(e, this.updateExtensionPoint)
+      } else {
+        emitter.removeListener(e, this.updateExtensionPoint)
+      }
+    })
   }
 
-  _handleExtensionPointUpdate() {
-    const {treePath} = this.props
-    const {extensions} = this.context
-    this.setState({
-      extension: extensions[treePath],
-    })
+  fetchComponentAndSubscribe = () => {
+    const {components: componentAssets} = this.context
+    const {extension} = this.state
+    const components = getComponents(extension)
+    const Components = getImplementations(components)
+
+    // If this component is not loaded, fetch the assets and re-render
+    if (extension &&
+        extension.component &&
+        !Components.length !== components.length) {
+      fetchAssets(extension, componentAssets).then(this.updateExtensionPoint)
+    }
+
+    this.subscribe(true)
+  }
+
+  componentDidMount() {
+    this.fetchComponentAndSubscribe()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.treePath !== this.props.treePath) {
+      this.fetchComponentAndSubscribe()
+    }
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.treePath !== this.props.treePath) {
-      const {treePath} = nextProps
-      const {extensions} = this.context
-      this.setState({
-        extension: extensions[treePath],
-      })
+      this.subscribe(false)
+      this.setState(this.getExtensionPointState(nextProps, this.context))
     }
   }
 
-  componentDidMount() {
-    const {extension} = this.state
-    const {treePath} = this.props
-    const {production, eventEmitter} = global.__RUNTIME__
-    !production &&
-      extension &&
-      eventEmitter.addListener(
-        `component:${extension.component}:update`,
-        this._handleExtensionPointUpdate,
-      ).addListener(
-        `extension:${treePath}:update`,
-        this._handleExtensionPointUpdate,
-      ).addListener(
-        'extension:*:update',
-        this._handleExtensionPointUpdate,
-      )
-  }
-
   componentWillUnmount() {
-    const {extension} = this.state
-    const {treePath} = this.props
-    const {production, eventEmitter} = global.__RUNTIME__
-    !production &&
-      extension &&
-      eventEmitter.removeListener(
-        `component:${extension.component}:update`,
-        this._handleExtensionPointUpdate,
-      ).removeListener(
-        `extension:${treePath}:update`,
-        this._handleExtensionPointUpdate,
-      ).removeListener(
-        'extension:*:update',
-        this._handleExtensionPointUpdate,
-      )
+    this.subscribe(false)
   }
-}
 
-ExtensionPoint.propTypes = {
-  id: PropTypes.string.isRequired,
-  children: PropTypes.node,
-  implementation: PropTypes.func,
-  settings: PropTypes.object,
-  treePath: PropTypes.string,
-}
+  componentDidCatch(error, errorInfo) {
+    console.error('Failed to render extension point', this.props.treePath, error, errorInfo)
+    this.setState({
+      ...this.state,
+      error,
+      errorInfo,
+    })
+  }
 
-ExtensionPoint.contextTypes = {
-  extensions: PropTypes.object,
-  pages: PropTypes.object,
-  page: PropTypes.string,
+  render() {
+    const {children, treePath, ...parentProps} = this.props
+    const {extension, error, errorInfo} = this.state
+
+    // A children of this extension point throwed an uncaught error
+    if (error || errorInfo) {
+      return (
+        <div className="ExtensionPoint--error">
+          <p>Extension point {treePath} failed to render with error:</p>
+          <p>{error}</p>
+          <p>{errorInfo}</p>
+        </div>
+      )
+    }
+
+    // This extension point is not configured or has no component
+    if (!extension || !extension.component) {
+      return <span className="ExtensionPoint--empty" />
+    }
+
+    // Extensions may have multiple components (HOCs)
+    const components = getComponents(extension)
+    const Components = getImplementations(components)
+
+    // This extension assets' have not loaded yet,
+    // which will be handled by componentDidMount
+    // and trigger a re-render when available.
+    if (Components.length !== components.length) {
+      return (
+        <span className="ExtensionPoint--loading">
+          {children}
+        </span>
+      )
+    }
+
+    const props = {
+      ...parentProps,
+      ...extension.props,
+    }
+
+    return Components.reduce((acc, Component) => {
+      return <Component {...props}>{acc || children}</Component>
+    }, null)
+  }
 }
 
 export default treePath(ExtensionPoint)

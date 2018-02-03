@@ -1,9 +1,15 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
+
 import ExtensionPoint from './ExtensionPoint'
 
 // eslint-disable-next-line
 class ExtensionContainer extends Component {
+  static contextTypes = {
+    extensions: PropTypes.object,
+    treePath: PropTypes.string,
+  }
+
   render() {
     const {extensions, treePath} = this.context
     const relative = name => name.replace(`${treePath}/`, '')
@@ -20,11 +26,6 @@ class ExtensionContainer extends Component {
 
     return <div>{children.map(renderChildren)}</div>
   }
-}
-
-ExtensionContainer.contextTypes = {
-  treePath: PropTypes.string,
-  extensions: PropTypes.object,
 }
 
 export default ExtensionContainer

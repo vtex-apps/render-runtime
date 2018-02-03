@@ -1,62 +1,132 @@
 import {canUseDOM} from 'exenv'
-import React, {Component} from 'react'
 import PropTypes from 'prop-types'
+import React, {Component} from 'react'
+import {ApolloProvider} from 'react-apollo'
 import {IntlProvider} from 'react-intl'
-import {loadLocaleData} from '../internal/locales'
+import {Helmet} from 'react-helmet'
+import {parse} from 'qs'
 
-const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
+import {fetchAssets} from '../utils/assets'
+import getClient from '../utils/client'
+import {loadLocaleData} from '../utils/locales'
+import {createLocaleCookie, fetchMessages} from '../utils/messages'
+import {fetchRuntime} from '../utils/runtime'
+import {pageNameFromPath} from '../utils/pages'
 
-const acceptJson = canUseDOM && new Headers({
-  'Accept': 'application/json',
-})
-
-const fetchMessages = () =>
-  fetch('?vtex.render-resource=messages', {
-    credentials: 'same-origin',
-    headers: acceptJson,
-  }).then(res => res.json())
-
-const fetchRuntime = () =>
-  fetch('?vtex.render-resource=runtime', {
-    credentials: 'same-origin',
-    headers: acceptJson,
-  }).then(res => res.json())
-
-const updateInPlace = (old, current) => {
-  Object.keys(old).forEach((oldKey) => {
-    if (!current[oldKey]) {
-      delete old[oldKey]
-    }
-  })
-
-  Object.keys(current).forEach((key) => {
-    old[key] = current[key]
-  })
-}
-
-const createLocaleCookie = locale => {
-  const yearFromNow = Date.now() + YEAR_IN_MS
-  const expires = new Date(yearFromNow).toUTCString()
-  const localeCookie = `locale=${locale};path=/;expires=${expires}`
-  window.document.cookie = localeCookie
-}
+import IntrospectionFetcher from './IntrospectionFetcher'
+import NestedExtensionPoints from './NestedExtensionPoints'
 
 class RenderProvider extends Component {
+  static childContextTypes = {
+    account: PropTypes.string,
+    components: PropTypes.object,
+    extensions: PropTypes.object,
+    pages: PropTypes.object,
+    emitter: PropTypes.object,
+    history: PropTypes.object,
+    getSettings: PropTypes.func,
+    updateRuntime: PropTypes.func,
+    onPageChanged: PropTypes.func,
+    prefetchPage: PropTypes.func,
+    production: PropTypes.bool,
+  }
+
+  static propTypes = {
+    children: PropTypes.element,
+    history: PropTypes.object,
+  }
+
   constructor(props) {
     super(props)
+    const {culture: {locale}, messages, components, extensions, pages, page} = global.__RUNTIME__
+    const {history} = props
+
+    if (history) {
+      const renderLocation = {...history.location, state: {renderRouting: true}}
+      history.replace(renderLocation)
+    }
+
     this.state = {
-      locale: props.locale,
-      messages: props.messages,
+      components,
+      extensions,
+      locale,
+      messages,
+      pages,
+      page,
     }
   }
 
   componentDidMount() {
-    const {production, eventEmitter} = global.__RUNTIME__
-    eventEmitter.addListener('localesChanged', this.onLocaleSelected)
+    const {production, emitter} = global.__RUNTIME__
+    const {history} = this.props
+    this.unlisten = history && history.listen(this.onPageChanged)
+    emitter.addListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {
-      eventEmitter.addListener('localesUpdated', this.onLocalesUpdated)
-      eventEmitter.addListener('extensionsUpdated', this.updateRuntime)
+      emitter.addListener('localesUpdated', this.onLocalesUpdated)
+      emitter.addListener('extensionsUpdated', this.updateRuntime)
+    }
+  }
+
+  componentWillUnmount() {
+    const {production, emitter} = global.__RUNTIME__
+    this.unlisten && this.unlisten()
+    emitter.removeListener('localesChanged', this.onLocaleSelected)
+
+    if (!production) {
+      emitter.removeListener('localesUpdated', this.onLocalesUpdated)
+      emitter.removeListener('extensionsUpdated', this.updateRuntime)
+    }
+  }
+
+  getChildContext() {
+    const {account, emitter, settings, production} = global.__RUNTIME__
+    const {components, extensions, pages} = this.state
+    const {history} = this.props
+
+    return {
+      account,
+      components,
+      extensions,
+      emitter,
+      history,
+      pages,
+      production,
+      getSettings: app => settings[app],
+      updateRuntime: this.updateRuntime,
+      onPageChanged: this.onPageChanged,
+      prefetchPage: this.prefetchPage,
+    }
+  }
+
+  onPageChanged = (location) => {
+    const {pages} = this.state
+    const {pathname, state} = location
+
+    // Make sure this came from a Link component
+    if (!state || !state.renderRouting) {
+      return
+    }
+
+    const page = pageNameFromPath(pathname, pages)
+
+    if (!page) {
+      window.location.href = `${location.pathname}${location.search}`
+      return
+    }
+
+    const query = parse(location.search.substr(1))
+
+    this.setState({
+      page,
+      query,
+    })
+  }
+
+  prefetchPage = (pageName) => {
+    if (canUseDOM) {
+      const {components, extensions} = this.state
+      return fetchAssets(extensions[pageName], components)
     }
   }
 
@@ -67,7 +137,7 @@ class RenderProvider extends Component {
       fetchMessages()
         .then(messages => {
           this.setState({
-            locale: this.state.locale,
+            ...this.state,
             messages,
           })
         })
@@ -79,83 +149,69 @@ class RenderProvider extends Component {
   }
 
   onLocaleSelected = (locale) => {
-    // Current locale is one of the updated ones
     if (locale !== this.state.locale) {
-      global.__RUNTIME__.culture.locale = locale
       createLocaleCookie(locale)
       Promise.all([
         fetchMessages(),
         loadLocaleData(locale),
-      ]).then(([messages]) => {
-          this.setState({locale, messages})
+      ])
+      .then(([messages]) => {
+        this.setState({
+          ...this.state,
+          locale,
+          messages,
         })
-        .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))
-        .catch(e => {
-          console.log('Failed to fetch new locale file.')
-          console.error(e)
-        })
-    }
-  }
-
-  getChildContext() {
-    const {account, extensions, page, pages, settings} = global.__RUNTIME__
-    return {
-      account,
-      extensions,
-      pages,
-      page,
-      getSettings: locator => settings[locator],
-      updateRuntime: this.updateRuntime,
+      })
+      .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))
+      .catch(e => {
+        console.log('Failed to fetch new locale file.')
+        console.error(e)
+      })
     }
   }
 
   updateRuntime = () =>
-    Promise.all([
-      fetchMessages(),
-      fetchRuntime(),
-    ]).then(([messages, {extensions, pages}]) => {
+    fetchRuntime().then(({components, extensions, messages, pages}) => {
       // keep client-side params
       Object.keys(pages).forEach(page => {
         pages[page].params = global.__RUNTIME__.pages[page].params
       })
 
-      updateInPlace(global.__RUNTIME__.messages, messages)
-      updateInPlace(global.__RUNTIME__.extensions, extensions)
-      updateInPlace(global.__RUNTIME__.pages, pages)
+      this.setState({
+        ...this.state,
+        components,
+        messages,
+        extensions,
+        pages,
+      })
 
-      global.__RUNTIME__.eventEmitter.emit('extension:*:update')
+      global.__RUNTIME__.emitter.emit('extension:*:update')
 
       return global.__RUNTIME__
     })
 
   render() {
-    const {locale, messages} = this.state
+    const {children} = this.props
+    const {locale, messages, pages, page, query} = this.state
+    console.log(pages, page)
+    const component = children
+      ? React.Children.only(this.props.children)
+      : (
+        <div>
+          <Helmet title={pages[page] && pages[page].title} />
+          <NestedExtensionPoints page={page} query={query} />
+          <IntrospectionFetcher />
+        </div>
+      )
+
     return (
-      <IntlProvider locale={locale} messages={messages}>
-        {React.Children.only(this.props.children)}
-      </IntlProvider>
+      <ApolloProvider client={getClient()}>
+        <IntlProvider locale={locale} messages={messages}>
+          {component}
+        </IntlProvider>
+      </ApolloProvider>
     )
   }
-}
-
-RenderProvider.propTypes = {
-  children: PropTypes.element.isRequired,
-  account: PropTypes.string,
-  extensions: PropTypes.object,
-  pages: PropTypes.object,
-  settings: PropTypes.object,
-  page: PropTypes.string,
-  messages: PropTypes.object,
-  locale: PropTypes.string,
-}
-
-RenderProvider.childContextTypes = {
-  account: PropTypes.string,
-  extensions: PropTypes.object,
-  pages: PropTypes.object,
-  page: PropTypes.string,
-  getSettings: PropTypes.func,
-  updateRuntime: PropTypes.func,
 }
 
 export default RenderProvider

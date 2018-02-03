@@ -9,7 +9,7 @@ const isModifiedEvent = event =>
 const createLocationDescriptor = (to, {query}) => ({
   pathname: to,
   state: {renderRouting: true},
-  ...(query && {search: query})
+  ...(query && {search: query}),
 })
 
 const absoluteRegex = /^https?:\/\/|^\/\//i
@@ -18,12 +18,21 @@ const isAbsoluteUrl = url => absoluteRegex.test(url)
 
 //eslint-disable-next-line
 export default class Link extends React.Component {
-  constructor(props) {
-    super(props)
-    this.handleClick = this.handleClick.bind(this)
+  static contextTypes = {
+    history: PropTypes.object,
   }
 
-  handleClick(event) {
+  static defaultProps = {
+    onClick: () => {},
+  }
+
+  static propTypes = {
+    query: PropTypes.string,
+    to: PropTypes.string,
+    onClick: PropTypes.func,
+  }
+
+  handleClick = (event) => {
     const {to, query} = this.props
     if (
       isModifiedEvent(event) ||
@@ -33,23 +42,16 @@ export default class Link extends React.Component {
       return
     }
 
-    event.preventDefault()
-    const location = createLocationDescriptor(to, {query})
     this.props.onClick()
-    global.browserHistory.push(location)
+
+    if (this.context.history) {
+      const location = createLocationDescriptor(to, {query})
+      this.context.history.push(location)
+      event.preventDefault()
+    }
   }
 
   render() {
     return <a href={this.props.to} {...this.props} onClick={this.handleClick} />
   }
-}
-
-Link.defaultProps = {
-  onClick: () => {},
-}
-
-Link.propTypes = {
-  query: PropTypes.string,
-  to: PropTypes.string,
-  onClick: PropTypes.func,
 }
