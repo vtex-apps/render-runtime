@@ -222,7 +222,8 @@ export class Router extends Component {
     const path = location.pathname
     const page = this.pageNameFromPath(path)
     if (!page) {
-      throw new Error(`No pages matched the requested path: ${path}`)
+      window.location.href = location.pathname
+      return
     }
 
     // Change page info in context
