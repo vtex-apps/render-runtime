@@ -222,7 +222,7 @@ export class Router extends Component {
     const path = location.pathname
     const page = this.pageNameFromPath(path)
     if (!page) {
-      window.location.href = location.pathname
+      window.location.href = `${location.pathname}${location.search}`
       return
     }
 
