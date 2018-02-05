@@ -2,7 +2,7 @@ import {canUseDOM} from 'exenv'
 import {ApolloClient} from 'apollo-client'
 import {createHttpLink} from 'apollo-link-http'
 import {InMemoryCache} from 'apollo-cache-inmemory'
-import {createHttpSwitchLink, httpSwitchFetcher} from './http-switch-link'
+import {createHttpSwitchFetcher, createHttpSwitchLink} from 'vtex-graphql-utils'
 
 let client
 const {graphQlUri} = global.__RUNTIME__
@@ -18,14 +18,15 @@ export default () => {
       addTypename: true,
     })
 
+    const uri = canUseDOM ? graphQlUri.browser : graphQlUri.ssr
+
+    const fetcher = createHttpSwitchFetcher(fetch)
+    const httpSwitchLink = createHttpSwitchLink(uri)
     const httpLink = createHttpLink({
       batchInterval: 80,
       credentials: 'same-origin',
-      fetch: httpSwitchFetcher
+      fetch: fetcher
     })
-
-    const uri = canUseDOM ? graphQlUri.browser : graphQlUri.ssr
-    const httpSwitchLink = createHttpSwitchLink(uri)
 
     client = new ApolloClient({
       link: httpSwitchLink.concat(httpLink),

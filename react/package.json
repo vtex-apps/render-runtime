@@ -21,6 +21,6 @@
     "react-helmet": "^5.2.0",
     "react-intl": "^2.4.0",
     "route-parser": "^0.0.5",
-    "url": "^0.11.0"
+    "vtex-graphql-utils": "^0.0.1"
   }
 }
