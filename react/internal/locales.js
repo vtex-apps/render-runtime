@@ -6,7 +6,7 @@ const getLang = (locale) => locale.split('-')[0]
 const loadReactIntlData = (locale) => {
   const path = `https://unpkg.com/react-intl@2.4.0/locale-data/${getLang(locale)}.js`
   return shouldAddScriptToPage(path)
-    ? addScriptToPage(path).then(() => addReactLocaleData(locale))
+    ? addScriptToPage(path).then(() => addLocaleData(locale))
     : Promise.resolve()
 }
 
