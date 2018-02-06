@@ -15,7 +15,14 @@ import Link from './components/Link'
 import ExtensionContainer from './ExtensionContainer'
 import ExtensionPoint from './ExtensionPoint'
 
-global.Intl = global.IntlPolyfill
+if (global.IntlPolyfill) {
+  if (!global.Intl) {
+    global.Intl = global.IntlPolyfill
+  } else if (!canUseDOM) {
+    global.Intl.NumberFormat = global.IntlPolyfill.NumberFormat
+    global.Intl.DateTimeFormat = global.IntlPolyfill.DateTimeFormat
+  }
+}
 
 const {account, culture: {locale}, messages, settings, extensions, pages, page} = global.__RUNTIME__
 
