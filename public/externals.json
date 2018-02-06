@@ -26,6 +26,10 @@
     },
     {
       "path": "https://unpkg.com/vtex-tachyons@1.0.2/tachyons.css"
+    },
+    {
+      "path": "https://unpkg.com/intl@1.2.5/dist/Intl.js",
+      "serverOnly": true
     }
   ],
   "prod": [
@@ -55,6 +59,10 @@
     },
     {
       "path": "https://unpkg.com/vtex-tachyons@1.0.2/tachyons.min.css"
+    },
+    {
+      "path": "https://unpkg.com/intl@1.2.5/dist/Intl.min.js",
+      "serverOnly": true
     }
   ]
 }
