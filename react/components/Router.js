@@ -8,15 +8,6 @@ import {parse} from 'qs'
 import ExtensionPoint from '../ExtensionPoint'
 import IntrospectionFetcher from './IntrospectionFetcher'
 
-function isRelative(path) {
-  return !path.startsWith('http://') && !path.startsWith('https://')
-}
-
-function prefix(path) {
-  const prefix = isRelative(path) ? '/assets/' : ''
-  return `${prefix}${path}`
-}
-
 function getExtension(path) {
   return /\.\w+$/.exec(path)[0]
 }
@@ -29,7 +20,7 @@ function getParams(template, target) {
 export function addScriptToPage(src) {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script')
-    script.src = prefix(src)
+    script.src = src
     script.onload = resolve
     script.onerror = reject
     script.async = false
@@ -39,7 +30,7 @@ export function addScriptToPage(src) {
 
 function addStyleToPage(href) {
   const link = document.createElement('link')
-  link.href = prefix(href)
+  link.href = href
   link.type = 'text/css'
   link.rel = 'stylesheet'
   document.head.appendChild(link)
