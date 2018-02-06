@@ -2,6 +2,7 @@ import {canUseDOM} from 'exenv'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {IntlProvider} from 'react-intl'
+import {loadLocaleData} from '../internal/locales'
 
 const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
 
@@ -82,8 +83,10 @@ class RenderProvider extends Component {
     if (locale !== this.state.locale) {
       global.__RUNTIME__.culture.locale = locale
       createLocaleCookie(locale)
-      fetchMessages()
-        .then(messages => {
+      Promise.all([
+        fetchMessages(),
+        loadLocaleData(locale),
+      ]).then(([messages]) => {
           this.setState({locale, messages})
         })
         .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))

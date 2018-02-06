@@ -9,7 +9,7 @@ import ExtensionPoint from '../ExtensionPoint'
 import IntrospectionFetcher from './IntrospectionFetcher'
 
 function isRelative(path) {
-  return path[0] !== '/'
+  return !path.startsWith('http://') && !path.startsWith('https://')
 }
 
 function prefix(path) {
@@ -26,7 +26,7 @@ function getParams(template, target) {
     .match(target.replace(/\/$/, ''))
 }
 
-function addScriptToPage(src) {
+export function addScriptToPage(src) {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script')
     script.src = prefix(src)
@@ -78,7 +78,7 @@ function isStyle(path) {
   return getExtension(path) === '.css'
 }
 
-function shouldAddScriptToPage(path) {
+export function shouldAddScriptToPage(path) {
   return isScript(path) && !scriptOnPage(path)
 }
 

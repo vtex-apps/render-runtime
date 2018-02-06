@@ -1,19 +1,12 @@
-import Intl from 'intl'
 import {canUseDOM} from 'exenv'
 import React from 'react'
 import {hydrate, render as renderDOM} from 'react-dom'
 import {AppContainer} from 'react-hot-loader'
-import {addLocaleData} from 'react-intl'
 import {Helmet} from 'react-helmet'
-import pt from 'react-intl/locale-data/pt'
-import en from 'react-intl/locale-data/en'
-import es from 'react-intl/locale-data/es'
-import 'intl/locale-data/jsonp/pt.js'
-import 'intl/locale-data/jsonp/en.js'
-import 'intl/locale-data/jsonp/es.js'
 import {ApolloProvider} from 'react-apollo'
 
 import './internal/events'
+import {addLocaleData} from './internal/locales'
 import {Router} from './components/Router'
 import getClient from './internal/client'
 import RenderProvider from './components/RenderProvider'
@@ -22,8 +15,11 @@ import Link from './components/Link'
 import ExtensionContainer from './ExtensionContainer'
 import ExtensionPoint from './ExtensionPoint'
 
-global.Intl = Intl
-addLocaleData([...pt, ...en, ...es])
+global.Intl = global.IntlPolyfill
+
+const {account, culture: {locale}, messages, settings, extensions, pages, page} = global.__RUNTIME__
+
+addLocaleData(locale)
 
 function _renderToStringWithData(component) {
   var startGetDataFromTree = hrtime()
@@ -45,8 +41,6 @@ function _renderToStringWithData(component) {
 
 const renderToStringWithData =
   !canUseDOM && _renderToStringWithData
-
-const {account, culture: {locale}, messages, settings, extensions, pages, page} = global.__RUNTIME__
 
 // Map `placeholder/with/slashes` to `render-placeholder-with-slashes`.
 const containerId = name => `render-${name.replace(/\//g, '-')}`
