@@ -119,7 +119,10 @@ export function prefetchPage(pageName) {
 }
 
 if (canUseDOM) {
-  global.browserHistory = createHistory()
+  const browserHistory = createHistory()
+  const renderLocation = {...browserHistory.location, state: {renderRouting: true}}
+  browserHistory.replace(renderLocation)
+  global.browserHistory = browserHistory
 }
 
 function removeSegment(name) {
@@ -209,17 +212,21 @@ export class Router extends Component {
     }
   }
 
-  changePage(location) {
-    const path = location.pathname
-    const page = this.pageNameFromPath(path)
+  changePage(location, action) {
+    const {pathname, search, state = {}} = location
+    if (!state.renderRouting && global.__RUNTIME__.customRouting) {
+      return
+    }
+
+    const page = this.pageNameFromPath(pathname)
     if (!page) {
-      window.location.href = `${location.pathname}${location.search}`
+      window.location.href = `${pathname}${search}`
       return
     }
 
     // Change page info in context
     global.__RUNTIME__.page = page
-    global.__RUNTIME__.query = parse(location.search.substr(1))
+    global.__RUNTIME__.query = parse(search.substr(1))
 
     // Add found URL params to extension settings (e.g. :slug).
     this.fillPageParams()
