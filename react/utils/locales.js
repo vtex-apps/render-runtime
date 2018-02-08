@@ -1,5 +1,5 @@
 import {addLocaleData as addReactLocaleData} from 'react-intl'
-import {shouldAddScriptToPage, addScriptToPage} from '../components/Router'
+import {shouldAddScriptToPage, addScriptToPage} from '../utils/assets'
 
 const getLang = (locale) => locale.split('-')[0]
 
@@ -18,12 +18,12 @@ const loadIntlData = (locale) => {
 export const loadLocaleData = (locale) => {
   return Promise.all([
     loadReactIntlData(locale),
-    loadIntlData(locale)
+    loadIntlData(locale),
   ])
 }
 
 export const addLocaleData = (locale) => {
   const lang = getLang(locale)
-  addReactLocaleData(ReactIntlLocaleData[lang])
+  addReactLocaleData(global.ReactIntlLocaleData[lang])
 }
 

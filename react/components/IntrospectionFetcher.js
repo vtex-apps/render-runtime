@@ -2,7 +2,7 @@ import {toIdValue} from 'apollo-utilities'
 import {Component} from 'react'
 import {graphql} from 'react-apollo'
 import PropTypes from 'prop-types'
-import query from './query.gql'
+import IntrospectionQuery from './Introspection.graphql'
 
 const PREFIX_REGEX = /.+?\d+_\d+_\d+(?:build\d+)?_/
 
@@ -28,6 +28,14 @@ const addIdResolver = (
 }
 
 class IntrospectionFetcher extends Component {
+  static contextTypes = {
+    client: PropTypes.object,
+  }
+
+  static propTypes = {
+    data: PropTypes.object,
+  }
+
   resolversGenerated = false
 
   componentDidMount() {
@@ -60,12 +68,4 @@ class IntrospectionFetcher extends Component {
   }
 }
 
-IntrospectionFetcher.contextTypes = {
-  client: PropTypes.object,
-}
-
-IntrospectionFetcher.propTypes = {
-  data: PropTypes.object,
-}
-
-export default graphql(query)(IntrospectionFetcher)
+export default graphql(IntrospectionQuery)(IntrospectionFetcher)
