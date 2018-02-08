@@ -26,6 +26,7 @@ class RenderProvider extends Component {
     history: PropTypes.object,
     getSettings: PropTypes.func,
     updateRuntime: PropTypes.func,
+    updateExtension: PropTypes.func,
     onPageChanged: PropTypes.func,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
@@ -96,6 +97,7 @@ class RenderProvider extends Component {
       updateRuntime: this.updateRuntime,
       onPageChanged: this.onPageChanged,
       prefetchPage: this.prefetchPage,
+      updateExtension: this.updateExtension,
     }
   }
 
@@ -189,6 +191,15 @@ class RenderProvider extends Component {
 
       return global.__RUNTIME__
     })
+
+  updateExtension = (name, extension) => {
+    const extensions = this.state.extensions
+    extensions[name] = extension
+    this.setState({
+      ...this.state,
+      ...extensions,
+    })
+  }
 
   render() {
     const {children} = this.props
