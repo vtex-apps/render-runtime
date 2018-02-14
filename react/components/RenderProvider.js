@@ -204,7 +204,7 @@ class RenderProvider extends Component {
   render() {
     const {children} = this.props
     const {locale, messages, pages, page, query} = this.state
-    console.log(pages, page)
+
     const component = children
       ? React.Children.only(this.props.children)
       : (
