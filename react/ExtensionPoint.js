@@ -51,7 +51,8 @@ class ExtensionPoint extends Component {
     ]
 
     if (extension.component) {
-      events.push(`component:${extension.component}:update`)
+      const originalComponent = Array.isArray(extension.component) ? extension.component[0] : extension.component
+      events.push(`component:${originalComponent}:update`)
     }
 
     events.forEach(e => {
