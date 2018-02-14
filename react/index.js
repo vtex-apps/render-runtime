@@ -23,7 +23,7 @@ if (global.IntlPolyfill) {
   }
 }
 
-const {culture: {locale}, extensions, pages, customRouting} = global.__RUNTIME__
+const {culture: {locale}, extensions, pages} = global.__RUNTIME__
 
 addLocaleData(locale)
 
@@ -63,6 +63,7 @@ const ssrEnabled = canUseDOM ? window.location.search.indexOf('__disableSSR') ==
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = name => {
+  const {customRouting} = global.__RUNTIME__
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
   const id = isPage ? 'render-container' : containerId(name)
   const root = (
