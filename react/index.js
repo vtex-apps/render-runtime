@@ -1,14 +1,13 @@
 import {canUseDOM} from 'exenv'
+import createHistory from 'history/createBrowserHistory'
 import React from 'react'
 import {hydrate, render as renderDOM} from 'react-dom'
 import {AppContainer} from 'react-hot-loader'
 import {Helmet} from 'react-helmet'
-import {ApolloProvider} from 'react-apollo'
 
-import './internal/events'
-import {addLocaleData} from './internal/locales'
-import {Router} from './components/Router'
-import getClient from './internal/client'
+import './utils/events'
+import {addLocaleData} from './utils/locales'
+import getClient from './utils/client'
 import RenderProvider from './components/RenderProvider'
 import Img from './components/Img'
 import Link from './components/Link'
@@ -24,18 +23,18 @@ if (global.IntlPolyfill) {
   }
 }
 
-const {account, culture: {locale}, messages, settings, extensions, pages, page} = global.__RUNTIME__
+const {culture: {locale}, extensions, pages} = global.__RUNTIME__
 
 addLocaleData(locale)
 
 function _renderToStringWithData(component) {
-  var startGetDataFromTree = hrtime()
+  var startGetDataFromTree = global.hrtime()
   return require('react-apollo').getDataFromTree(component).then(() => {
-    var endGetDataFromTree = hrtime(startGetDataFromTree)
+    var endGetDataFromTree = global.hrtime(startGetDataFromTree)
 
-    var startRenderToString = hrtime()
+    var startRenderToString = global.hrtime()
     var markup = require('react-dom/server').renderToString(component)
-    var endRenderToString = hrtime(startRenderToString)
+    var endRenderToString = global.hrtime(startRenderToString)
     return {
       markup,
       renderTimeMetric: {
@@ -60,37 +59,27 @@ const isRoot = (name, index, names) =>
   names.find(parent => name !== parent && name.startsWith(parent)) === undefined
 
 // Check if this is a client-side-only rendering (used mostly in debug situations)
-const ssrEnabled = canUseDOM ? window.location.search.indexOf("__disableSSR") === -1 : true
+const ssrEnabled = canUseDOM ? window.location.search.indexOf('__disableSSR') === -1 : true
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = name => {
+  const {customRouting} = global.__RUNTIME__
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
   const id = isPage ? 'render-container' : containerId(name)
-  const component = isPage ? <Router /> : <ExtensionPoint id={name} />
   const root = (
     <AppContainer>
-      <ApolloProvider client={getClient()}>
-        <RenderProvider
-          account={account}
-          extensions={extensions}
-          pages={pages}
-          page={page}
-          settings={settings}
-          locale={locale}
-          messages={messages}
-        >
-          {component}
-        </RenderProvider>
-      </ApolloProvider>
+      <RenderProvider history={canUseDOM && isPage && !customRouting && createHistory()}>
+        {!isPage ? <ExtensionPoint id={name} /> : null}
+      </RenderProvider>
     </AppContainer>
   )
   return canUseDOM
     ? (ssrEnabled ? hydrate(root, document.getElementById(id)) : renderDOM(root, document.getElementById(id)))
     : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
-        name,
-        renderTimeMetric,
-        markup: `<div id="${id}">${markup}</div>`,
-      }))
+      name,
+      renderTimeMetric,
+      markup: `<div id="${id}">${markup}</div>`,
+    }))
 }
 
 function getRenderableExtensionPointNames(rootName) {

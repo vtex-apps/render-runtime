@@ -9,6 +9,6 @@ if (global.__RUNTIME__.start) {
 if (module.hot) {
   if (canUseDOM) {
     const runtimeIndexComponent = Object.keys(global.__RENDER_6_COMPONENTS__).find((c) => /vtex\.render-runtime@.*\/index/.test(c))
-    global.__RUNTIME__.eventEmitter.addListener(`component:${runtimeIndexComponent}:update`, startRuntime)
+    global.__RUNTIME__.emitter.addListener(`component:${runtimeIndexComponent}:update`, startRuntime)
   }
 }
