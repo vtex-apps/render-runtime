@@ -45,6 +45,8 @@ class RenderProvider extends Component {
     if (history) {
       const renderLocation = {...history.location, state: {renderRouting: true}}
       history.replace(renderLocation)
+      // backwards compatibility
+      global.browserHistory = history
     }
 
     this.state = {
