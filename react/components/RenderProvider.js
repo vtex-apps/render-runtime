@@ -39,7 +39,7 @@ class RenderProvider extends Component {
 
   constructor(props) {
     super(props)
-    const {culture: {locale}, messages, components, extensions, pages, page} = global.__RUNTIME__
+    const {culture: {locale}, messages, components, extensions, pages, page, query} = global.__RUNTIME__
     const {history} = props
 
     if (history) {
@@ -56,6 +56,7 @@ class RenderProvider extends Component {
       messages,
       pages,
       page,
+      query,
     }
   }
 
@@ -208,7 +209,7 @@ class RenderProvider extends Component {
     const {locale, messages, pages, page, query} = this.state
 
     const component = children
-      ? React.Children.only(this.props.children)
+      ? React.cloneElement(children, {query})
       : (
         <div>
           <Helmet title={pages[page] && pages[page].title} />
