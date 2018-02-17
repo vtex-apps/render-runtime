@@ -9,6 +9,8 @@ class ExtensionPoint extends Component {
     components: PropTypes.object,
     extensions: PropTypes.object,
     emitter: PropTypes.object,
+    updateExtension: PropTypes.func,
+    registerEmptyExtension: PropTypes.func,
     production: PropTypes.bool,
   }
 
@@ -50,7 +52,7 @@ class ExtensionPoint extends Component {
       `extension:${treePath}:update`,
     ]
 
-    if (extension.component) {
+    if (extension && extension.component) {
       const originalComponent = Array.isArray(extension.component) ? extension.component[0] : extension.component
       events.push(`component:${originalComponent}:update`)
     }
@@ -67,6 +69,12 @@ class ExtensionPoint extends Component {
   fetchComponentAndSubscribe = () => {
     const {components: componentAssets} = this.context
     const {extension} = this.state
+
+    this.subscribe(true)
+
+    if (!extension) {
+      return
+    }
     const components = getComponents(extension)
     const Components = getImplementations(components)
 
@@ -76,17 +84,27 @@ class ExtensionPoint extends Component {
         !Components.length !== components.length) {
       fetchAssets(extension, componentAssets).then(this.updateExtensionPoint)
     }
-
-    this.subscribe(true)
   }
 
   componentDidMount() {
+    const {extension} = this.state
+    const {production} = global.__RUNTIME__
+
+    if (!extension && !production) {
+      const {id, treePath} = this.props
+      this.context.registerEmptyExtension(treePath)
+    }
+
     this.fetchComponentAndSubscribe()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (prevProps.treePath !== this.props.treePath) {
       this.fetchComponentAndSubscribe()
+    }
+
+    if (prevState.extension == null) {
+      this.updateExtensionPoint()
     }
   }
 
