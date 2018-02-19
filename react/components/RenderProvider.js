@@ -20,6 +20,7 @@ class RenderProvider extends Component {
   static childContextTypes = {
     account: PropTypes.string,
     components: PropTypes.object,
+    culture: PropTypes.object,
     extensions: PropTypes.object,
     pages: PropTypes.object,
     emitter: PropTypes.object,
@@ -40,7 +41,7 @@ class RenderProvider extends Component {
 
   constructor(props) {
     super(props)
-    const {culture: {locale}, messages, components, extensions, pages, page, query} = global.__RUNTIME__
+    const {culture, messages, components, extensions, pages, page, query} = global.__RUNTIME__
     const {history} = props
 
     if (history) {
@@ -55,7 +56,7 @@ class RenderProvider extends Component {
     this.state = {
       components,
       extensions,
-      locale,
+      culture,
       messages,
       pages,
       page,
@@ -98,12 +99,13 @@ class RenderProvider extends Component {
 
   getChildContext() {
     const {account, emitter, settings, production} = global.__RUNTIME__
-    const {components, extensions, pages} = this.state
+    const {components, extensions, pages, culture} = this.state
     const {history} = this.props
 
     return {
       account,
       components,
+      culture,
       extensions,
       emitter,
       history,
@@ -151,7 +153,7 @@ class RenderProvider extends Component {
 
   onLocalesUpdated = (locales) => {
     // Current locale is one of the updated ones
-    if (locales.indexOf(this.state.locale) !== -1) {
+    if (locales.indexOf(this.state.culture.locale) !== -1) {
       // Force cache busting by appending date to url
       fetchMessages()
         .then(messages => {
@@ -168,7 +170,7 @@ class RenderProvider extends Component {
   }
 
   onLocaleSelected = (locale) => {
-    if (locale !== this.state.locale) {
+    if (locale !== this.state.culture.locale) {
       createLocaleCookie(locale)
       Promise.all([
         fetchMessages(),
@@ -176,9 +178,11 @@ class RenderProvider extends Component {
       ])
       .then(([messages]) => {
         this.setState({
-          ...this.state,
-          locale,
           messages,
+          culture: {
+            ...this.state.culture,
+            locale,
+          },
         })
       })
       .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))
@@ -197,7 +201,6 @@ class RenderProvider extends Component {
       })
 
       this.setState({
-        ...this.state,
         components,
         messages,
         extensions,
@@ -222,7 +225,7 @@ class RenderProvider extends Component {
 
   render() {
     const {children} = this.props
-    const {locale, messages, pages, page, query} = this.state
+    const {culture: {locale}, messages, pages, page, query} = this.state
 
     const component = children
       ? React.cloneElement(children, {query})
