@@ -169,6 +169,7 @@ class RenderProvider extends Component {
 
   onLocaleSelected = (locale) => {
     if (locale !== this.state.locale) {
+      global.__RUNTIME__.culture.locale = locale
       createLocaleCookie(locale)
       Promise.all([
         fetchMessages(),
