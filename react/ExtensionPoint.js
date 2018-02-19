@@ -81,7 +81,7 @@ class ExtensionPoint extends Component {
     // If this component is not loaded, fetch the assets and re-render
     if (extension &&
         extension.component &&
-        !Components.length !== components.length) {
+        Components.length !== components.length) {
       fetchAssets(extension, componentAssets)
         .then(this.updateExtensionPoint)
         .then(() => {
