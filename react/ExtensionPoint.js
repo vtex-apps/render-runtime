@@ -82,7 +82,11 @@ class ExtensionPoint extends Component {
     if (extension &&
         extension.component &&
         !Components.length !== components.length) {
-      fetchAssets(extension, componentAssets).then(this.updateExtensionPoint)
+      fetchAssets(extension, componentAssets)
+        .then(this.updateExtensionPoint)
+        .then(() => {
+          this.context.emitter.emit(`extension:${this.props.treePath}:update:complete`)
+        })
     }
   }
 
@@ -91,7 +95,7 @@ class ExtensionPoint extends Component {
     const {production} = global.__RUNTIME__
 
     if (!extension && !production) {
-      const {id, treePath} = this.props
+      const {treePath} = this.props
       this.context.registerEmptyExtension(treePath)
     }
 
@@ -104,7 +108,13 @@ class ExtensionPoint extends Component {
     }
 
     if (prevState.extension == null) {
-      this.updateExtensionPoint()
+      return this.updateExtensionPoint()
+    }
+
+    const previousComponent = Array.isArray(prevState.extension.component) ? prevState.extension.component[0] : prevState.extension.component
+    const newComponent = Array.isArray(this.state.extension.component) ? this.state.extension.component[0] : this.state.extension.component
+    if (previousComponent !== newComponent) {
+      this.fetchComponentAndSubscribe()
     }
   }
 
