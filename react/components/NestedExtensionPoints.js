@@ -5,6 +5,8 @@ import PropTypes from 'prop-types'
 import ExtensionPoint from '../ExtensionPoint'
 import {getParams} from '../utils/pages'
 
+const EMPTY_OBJECT = {}
+
 export default class NestedExtensionPoints extends PureComponent {
   static contextTypes = {
     pages: PropTypes.object,
@@ -18,7 +20,7 @@ export default class NestedExtensionPoints extends PureComponent {
   getPageParams(name) {
     const path = canUseDOM ? window.location.pathname : global.__pathname__
     const page = this.context.pages[name]
-    return getParams(page.path, path)
+    return getParams(page.path, path) || EMPTY_OBJECT
   }
 
   render() {
