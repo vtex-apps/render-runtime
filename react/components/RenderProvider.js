@@ -22,6 +22,7 @@ class RenderProvider extends Component {
     components: PropTypes.object,
     culture: PropTypes.object,
     extensions: PropTypes.object,
+    page: PropTypes.string,
     pages: PropTypes.object,
     emitter: PropTypes.object,
     history: PropTypes.object,
@@ -99,7 +100,7 @@ class RenderProvider extends Component {
 
   getChildContext() {
     const {account, emitter, settings, production} = global.__RUNTIME__
-    const {components, extensions, pages, culture} = this.state
+    const {components, extensions, page, pages, culture} = this.state
     const {history} = this.props
 
     return {
@@ -109,6 +110,7 @@ class RenderProvider extends Component {
       extensions,
       emitter,
       history,
+      page,
       pages,
       production,
       getSettings: app => settings[app],
