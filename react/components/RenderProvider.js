@@ -76,11 +76,11 @@ class RenderProvider extends Component {
     }
 
     const {extensions} = this.state
-    this.emptyExtensions.forEach((name) =>
+    this.emptyExtensions.forEach((name) => {
       extensions[name] = {
         component: null,
       }
-    )
+    })
     this.setState({
       extensions,
     })
