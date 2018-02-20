@@ -232,7 +232,7 @@ class RenderProvider extends Component {
     const component = children
       ? React.cloneElement(children, {query})
       : (
-        <div>
+        <div id="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
           <NestedExtensionPoints page={page} query={query} />
           <IntrospectionFetcher />
