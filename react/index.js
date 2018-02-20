@@ -66,9 +66,10 @@ const render = name => {
   const {customRouting} = global.__RUNTIME__
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
   const id = isPage ? 'render-container' : containerId(name)
+  const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
     <AppContainer>
-      <RenderProvider history={canUseDOM && isPage && !customRouting && createHistory()}>
+      <RenderProvider history={history}>
         {!isPage ? <ExtensionPoint id={name} /> : null}
       </RenderProvider>
     </AppContainer>
