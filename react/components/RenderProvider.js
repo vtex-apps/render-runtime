@@ -29,7 +29,7 @@ class RenderProvider extends Component {
     getSettings: PropTypes.func,
     updateRuntime: PropTypes.func,
     updateExtension: PropTypes.func,
-    registerEmptyExtension: PropTypes.func,
+    registerExtension: PropTypes.func,
     onPageChanged: PropTypes.func,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
@@ -118,7 +118,7 @@ class RenderProvider extends Component {
       onPageChanged: this.onPageChanged,
       prefetchPage: this.prefetchPage,
       updateExtension: this.updateExtension,
-      registerEmptyExtension: this.registerEmptyExtension,
+      registerExtension: this.registerExtension,
     }
   }
 
@@ -156,13 +156,11 @@ class RenderProvider extends Component {
   onLocalesUpdated = (locales) => {
     // Current locale is one of the updated ones
     if (locales.indexOf(this.state.culture.locale) !== -1) {
-      // Force cache busting by appending date to url
       fetchMessages()
         .then(messages => {
           this.setState({
-            ...this.state,
             messages,
-          })
+          }, () => global.__RUNTIME__.emitter.emit('extension:*:update'))
         })
         .catch(e => {
           console.log('Failed to fetch new locale file.')
@@ -185,7 +183,7 @@ class RenderProvider extends Component {
             ...this.state.culture,
             locale,
           },
-        })
+        }, () => global.__RUNTIME__.emitter.emit('extension:*:update'))
       })
       .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))
       .catch(e => {
@@ -202,28 +200,39 @@ class RenderProvider extends Component {
         pages[page].params = global.__RUNTIME__.pages[page].params
       })
 
-      this.setState({
+      const newState = {
         components,
         messages,
         extensions,
         pages,
-      })
+      }
 
-      global.__RUNTIME__.emitter.emit('extension:*:update')
+      this.setState(newState, () =>
+        global.__RUNTIME__.emitter.emit('extension:*:update', newState))
 
       return global.__RUNTIME__
     })
 
   updateExtension = (name, extension) => {
     const {extensions} = this.state
-    extensions[name] = extension
-    this.setState({
-      extensions,
-    })
+
+    const newState = {
+      extensions: {
+        ...extensions,
+        [name]: extension,
+      },
+    }
+
+    this.setState(newState, () =>
+      global.__RUNTIME__.emitter.emit(`extension:${name}:update`), newState)
   }
 
-  registerEmptyExtension = (name) =>
-    this.emptyExtensions.push(name)
+  registerExtension = (name) => {
+    const {extensions} = this.state
+    if (!extensions[name]) {
+      this.emptyExtensions.push(name)
+    }
+  }
 
   render() {
     const {children} = this.props
