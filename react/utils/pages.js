@@ -27,8 +27,8 @@ export function getPagePath(name, pages) {
   const [rootName] = name.split('/')
   const {[rootName]: {path: rootPath, cname}, [name]: {path: pagePath}} = pages
 
-  return cname
-    ? isHost(cname) && pagePath && pagePath.substr(rootPath.length)
+  return cname && isHost(cname)
+    ? pagePath && pagePath.substr(rootPath.length)
     : pagePath
 }
 
