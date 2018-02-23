@@ -1,5 +1,3 @@
-const EMPTY_ARRAY = []
-
 function getExtension(path) {
   return /\.\w+$/.exec(path)[0]
 }
@@ -64,23 +62,11 @@ function shouldAddStyleToPage(path, idx, arr) {
   return isStyle(path) && !styleOnPage(path) && arr.map(({path: pt}) => pt).indexOf(path) === idx
 }
 
-function getAllAssets(components, componentAssets) {
-  return components.reduce((acc, value) => {
-    acc = acc.concat(componentAssets[value])
-    return acc
-  }, [])
-}
-
-function getImplementation(component) {
+export function getImplementation(component) {
   return global.__RENDER_6_COMPONENTS__[component]
 }
 
-export function getImplementations(components = EMPTY_ARRAY) {
-  return components.map(getImplementation).filter((c) => c != null)
-}
-
-export function fetchAssets(components, componentAssets) {
-  const assets = getAllAssets(components, componentAssets)
+export function fetchAssets(assets) {
   const scripts = assets.filter(shouldAddScriptToPage)
   const styles = assets.filter(shouldAddStyleToPage)
   styles.forEach(addStyleToPage)

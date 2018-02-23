@@ -1,72 +1,61 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-import {fetchAssets, getImplementations} from '../utils/assets'
+import {fetchAssets, getImplementation} from '../utils/assets'
 
 export default class ExtensionPointComponent extends Component {
   static contextTypes = {
     components: PropTypes.object,
+    extensions: PropTypes.object,
     emitter: PropTypes.object,
+    treePath: PropTypes.string,
   }
 
   static propTypes = {
     children: PropTypes.node,
-    components: PropTypes.array,
+    component: PropTypes.string,
     props: PropTypes.object,
-  }
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      Components: getImplementations(props.components),
-    }
+    production: PropTypes.bool,
   }
 
   updateComponents = () => {
-    const {components} = this.props
-    const Components = getImplementations(components)
-    this.setState({Components})
+    this.forceUpdate()
   }
 
   fetchAndRerender = () => {
     const {components: componentAssets} = this.context
-    const {components} = this.props
-    const Components = getImplementations(components)
+    const {component} = this.props
+    const Component = getImplementation(component)
 
-    // We have configured components but they aren't all loaded. Let's fetch the assets and re-render.
-    if (Components.length < components.length) {
-      fetchAssets(components, componentAssets).then(this.updateComponents)
+    // Let's fetch the assets and re-render.
+    if (!Component) {
+      fetchAssets(componentAssets[component]).then(this.updateComponents)
     }
   }
 
-  subscribeToComponents = (components) => {
+  subscribeToComponent = (c) => {
     const {emitter} = this.context
-    components.forEach(c => {
-      emitter.addListener(`component:${c}:update`, this.updateComponents)
-    })
+    emitter.addListener(`component:${c}:update`, this.updateComponents)
   }
 
-  unsubscribeToComponents = (components) => {
+  unsubscribeToComponent = (c) => {
     const {emitter} = this.context
-    components.forEach(c => {
-      emitter.removeListener(`component:${c}:update`, this.updateComponents)
-    })
+    emitter.removeListener(`component:${c}:update`, this.updateComponents)
   }
 
   componentDidMount() {
-    const {components} = this.props
-    this.subscribeToComponents(components)
+    const {component} = this.props
+    this.subscribeToComponent(component)
     this.fetchAndRerender()
   }
 
   componentWillReceiveProps(nextProps) {
-    const {components} = this.props
-    const {components: nextComponents} = nextProps
-    const Components = getImplementations(nextComponents)
+    const {component} = this.props
+    const {component: nextComponent} = nextProps
 
-    this.unsubscribeToComponents(components)
-    this.subscribeToComponents(nextComponents)
-    this.setState({Components})
+    this.unsubscribeToComponent(component)
+    this.subscribeToComponent(nextComponent)
+    this.updateComponents()
   }
 
   componentDidUpdate() {
@@ -74,21 +63,29 @@ export default class ExtensionPointComponent extends Component {
   }
 
   componentWillUnmount() {
-    const {components} = this.props
-    this.unsubscribeToComponents(components)
+    const {component} = this.props
+    this.unsubscribeToComponent(component)
   }
 
   render() {
-    const {components, props, children} = this.props
-    const {Components} = this.state
+    const {treePath, production} = this.context
+    const {component, props, children} = this.props
+    const Component = getImplementation(component)
 
-    // This extension point is not configured or it's assets haven't loaded yet.
-    if (components.length === 0 || (Components.length !== components.length)) {
-      return children
+    const root = treePath.split('/')[0]
+    const emptyExtensionPoint = this.context.extensions[`${root}/__empty`]
+    const EmptyExtensionPoint = emptyExtensionPoint && getImplementation(emptyExtensionPoint.component)
+
+    // This extension point is not configured.
+    if (!component && !production) {
+      return <EmptyExtensionPoint />
     }
 
-    return Components.reduce((acc, Component) => {
-      return <Component {...props}>{acc || children}</Component>
-    }, null)
+    // This extension point's assets haven't loaded yet.
+    if (!Component) {
+      return children || null
+    }
+
+    return <Component {...props}>{children}</Component>
   }
 }

@@ -6,7 +6,7 @@ import {IntlProvider} from 'react-intl'
 import {Helmet} from 'react-helmet'
 import {parse} from 'qs'
 
-import {fetchAssets} from '../utils/assets'
+import {fetchAssets, getImplementation} from '../utils/assets'
 import getClient from '../utils/client'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages} from '../utils/messages'
@@ -42,7 +42,7 @@ class RenderProvider extends Component {
 
   constructor(props) {
     super(props)
-    const {culture, messages, components, extensions, pages, page, query} = global.__RUNTIME__
+    const {culture, messages, components, extensions, pages, page, query, production} = global.__RUNTIME__
     const {history} = props
 
     if (history) {
@@ -62,6 +62,7 @@ class RenderProvider extends Component {
       pages,
       page,
       query,
+      production,
     }
   }
 
@@ -149,7 +150,7 @@ class RenderProvider extends Component {
   prefetchPage = (pageName) => {
     if (canUseDOM) {
       const {components, extensions} = this.state
-      return fetchAssets(extensions[pageName], components)
+      return fetchAssets(components[extensions[pageName]])
     }
   }
 
@@ -200,15 +201,12 @@ class RenderProvider extends Component {
         pages[page].params = global.__RUNTIME__.pages[page].params
       })
 
-      const newState = {
+      this.setState({
         components,
         messages,
         extensions,
         pages,
-      }
-
-      this.setState(newState, () =>
-        global.__RUNTIME__.emitter.emit('extension:*:update', newState))
+      }, () => global.__RUNTIME__.emitter.emit('extension:*:update', this.state))
 
       return global.__RUNTIME__
     })
@@ -216,15 +214,12 @@ class RenderProvider extends Component {
   updateExtension = (name, extension) => {
     const {extensions} = this.state
 
-    const newState = {
+    this.setState({
       extensions: {
         ...extensions,
         [name]: extension,
       },
-    }
-
-    this.setState(newState, () =>
-      global.__RUNTIME__.emitter.emit(`extension:${name}:update`), newState)
+    }, () => global.__RUNTIME__.emitter.emit(`extension:${name}:update`, this.state))
   }
 
   registerExtension = (name) => {
@@ -236,7 +231,7 @@ class RenderProvider extends Component {
 
   render() {
     const {children} = this.props
-    const {culture: {locale}, messages, pages, page, query} = this.state
+    const {culture: {locale}, messages, pages, page, query, production, extensions} = this.state
 
     const component = children
       ? React.cloneElement(children, {query})
@@ -248,10 +243,17 @@ class RenderProvider extends Component {
         </div>
       )
 
+    const root = page.split('/')[0]
+    const editorProvider = extensions[`${root}/__provider`]
+    const EditorProvider = editorProvider && getImplementation(editorProvider.component)
+    const maybeEditable = !production && EditorProvider
+      ? <EditorProvider extensions={extensions}>{component}</EditorProvider>
+      : component
+
     return (
       <ApolloProvider client={getClient()}>
         <IntlProvider locale={locale} messages={messages}>
-          {component}
+          {maybeEditable}
         </IntlProvider>
       </ApolloProvider>
     )

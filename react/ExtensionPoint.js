@@ -2,9 +2,8 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import treePath from 'react-tree-path'
 
+import {getImplementation} from './utils/assets'
 import ExtensionPointComponent from './components/ExtensionPointComponent'
-
-const EMPTY_ARRAY = []
 
 class ExtensionPoint extends Component {
   static contextTypes = {
@@ -95,6 +94,7 @@ class ExtensionPoint extends Component {
   }
 
   render() {
+    const {production} = this.context
     const {children, treePath, ...parentProps} = this.props
     const {component, props: extensionProps, error, errorInfo} = this.state
 
@@ -115,14 +115,23 @@ class ExtensionPoint extends Component {
       ...parentProps,
       ...extensionProps,
     }
+    const extensionPointComponent = <ExtensionPointComponent component={component} props={props}>{children}</ExtensionPointComponent>
 
-    const components = !component
-      ? EMPTY_ARRAY
-      : Array.isArray(component)
-        ? component
-        : [component]
+    const root = treePath.split('/')[0]
+    const editableExtensionPointComponent = this.context.extensions[`${root}/__editable`]
+    const editableProps = {
+      treePath,
+      component,
+      props,
+    }
+    const editableExtensionPoint = editableExtensionPointComponent &&
+      <ExtensionPointComponent component={editableExtensionPointComponent.component} props={editableProps}>{extensionPointComponent}</ExtensionPointComponent>
 
-    return <ExtensionPointComponent components={components} props={props}>{children}</ExtensionPointComponent>
+    const maybeEditable = !production && editableExtensionPoint
+      ? editableExtensionPoint
+      : extensionPointComponent
+
+    return maybeEditable
   }
 }
 
