@@ -29,7 +29,6 @@ class RenderProvider extends Component {
     getSettings: PropTypes.func,
     updateRuntime: PropTypes.func,
     updateExtension: PropTypes.func,
-    registerExtension: PropTypes.func,
     onPageChanged: PropTypes.func,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
@@ -51,8 +50,6 @@ class RenderProvider extends Component {
       // backwards compatibility
       global.browserHistory = history
     }
-
-    this.emptyExtensions = []
 
     this.state = {
       components,
@@ -76,16 +73,6 @@ class RenderProvider extends Component {
       emitter.addListener('localesUpdated', this.onLocalesUpdated)
       emitter.addListener('extensionsUpdated', this.updateRuntime)
     }
-
-    const {extensions} = this.state
-    this.emptyExtensions.forEach((name) => {
-      extensions[name] = {
-        component: null,
-      }
-    })
-    this.setState({
-      extensions,
-    })
   }
 
   componentWillUnmount() {
@@ -119,7 +106,6 @@ class RenderProvider extends Component {
       onPageChanged: this.onPageChanged,
       prefetchPage: this.prefetchPage,
       updateExtension: this.updateExtension,
-      registerExtension: this.registerExtension,
     }
   }
 
@@ -220,13 +206,6 @@ class RenderProvider extends Component {
         [name]: extension,
       },
     }, () => global.__RUNTIME__.emitter.emit(`extension:${name}:update`, this.state))
-  }
-
-  registerExtension = (name) => {
-    const {extensions} = this.state
-    if (!extensions[name]) {
-      this.emptyExtensions.push(name)
-    }
   }
 
   render() {

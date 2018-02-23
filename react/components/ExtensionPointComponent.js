@@ -18,6 +18,14 @@ export default class ExtensionPointComponent extends Component {
     production: PropTypes.bool,
   }
 
+  constructor(props, context) {
+    super(props, context)
+
+    const root = context.treePath.split('/')[0]
+    this.emptyExtensionPoint = context.extensions[`${root}/__empty`]
+    this.editableExtensionPoint = context.extensions[`${root}/__editable`]
+  }
+
   updateComponents = () => {
     this.forceUpdate()
   }
@@ -28,7 +36,7 @@ export default class ExtensionPointComponent extends Component {
     const Component = getImplementation(component)
 
     // Let's fetch the assets and re-render.
-    if (!Component) {
+    if (component && !Component) {
       fetchAssets(componentAssets[component]).then(this.updateComponents)
     }
   }
@@ -47,6 +55,11 @@ export default class ExtensionPointComponent extends Component {
     const {component} = this.props
     this.subscribeToComponent(component)
     this.fetchAndRerender()
+
+    if (this.emptyExtensionPoint && this.editableExtensionPoint) {
+      this.subscribeToComponent(this.emptyExtensionPoint.component)
+      this.subscribeToComponent(this.editableExtensionPoint.component)
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -65,6 +78,11 @@ export default class ExtensionPointComponent extends Component {
   componentWillUnmount() {
     const {component} = this.props
     this.unsubscribeToComponent(component)
+
+    if (this.emptyExtensionPoint && this.editableExtensionPoint) {
+      this.unsubscribeToComponent(this.emptyExtensionPoint.component)
+      this.unsubscribeToComponent(this.editableExtensionPoint.component)
+    }
   }
 
   render() {
@@ -72,20 +90,17 @@ export default class ExtensionPointComponent extends Component {
     const {component, props, children} = this.props
     const Component = getImplementation(component)
 
-    const root = treePath.split('/')[0]
-    const emptyExtensionPoint = this.context.extensions[`${root}/__empty`]
-    const EmptyExtensionPoint = emptyExtensionPoint && getImplementation(emptyExtensionPoint.component)
+    const EmptyExtensionPoint = this.emptyExtensionPoint && getImplementation(this.emptyExtensionPoint.component)
+    const EditableExtensionPoint = this.editableExtensionPoint && getImplementation(this.editableExtensionPoint.component)
 
     // This extension point is not configured.
     if (!component && !production) {
-      return <EmptyExtensionPoint />
+      return <EditableExtensionPoint treePath={treePath} component={this.emptyExtensionPoint.component}><EmptyExtensionPoint /></EditableExtensionPoint>
     }
 
-    // This extension point's assets haven't loaded yet.
-    if (!Component) {
-      return children || null
-    }
-
-    return <Component {...props}>{children}</Component>
+    const configuredComponent = Component ? <Component {...props}>{children}</Component> : children || null
+    return this.editableExtensionPoint
+      ? <EditableExtensionPoint treePath={treePath} component={component} props={props}>{configuredComponent}</EditableExtensionPoint>
+      : configuredComponent
   }
 }

@@ -2,14 +2,12 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import treePath from 'react-tree-path'
 
-import {getImplementation} from './utils/assets'
 import ExtensionPointComponent from './components/ExtensionPointComponent'
 
 class ExtensionPoint extends Component {
   static contextTypes = {
     extensions: PropTypes.object,
     emitter: PropTypes.object,
-    registerExtension: PropTypes.func,
     production: PropTypes.bool,
   }
 
@@ -49,10 +47,8 @@ class ExtensionPoint extends Component {
   }
 
   componentDidMount() {
-    const {registerExtension, production} = this.context
+    const {production} = this.context
     const {treePath} = this.props
-
-    registerExtension(treePath)
 
     if (!production) {
       this.subscribeToTreePath('*')
@@ -61,11 +57,9 @@ class ExtensionPoint extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const {production, registerExtension} = this.context
+    const {production} = this.context
 
     if (nextProps.treePath !== this.props.treePath) {
-      registerExtension(nextProps.treePath)
-
       if (!production) {
         this.unsubscribeToTreePath(this.props.treePath)
         this.subscribeToTreePath(nextProps.treePath)
@@ -94,7 +88,6 @@ class ExtensionPoint extends Component {
   }
 
   render() {
-    const {production} = this.context
     const {children, treePath, ...parentProps} = this.props
     const {component, props: extensionProps, error, errorInfo} = this.state
 
@@ -115,23 +108,8 @@ class ExtensionPoint extends Component {
       ...parentProps,
       ...extensionProps,
     }
-    const extensionPointComponent = <ExtensionPointComponent component={component} props={props}>{children}</ExtensionPointComponent>
 
-    const root = treePath.split('/')[0]
-    const editableExtensionPointComponent = this.context.extensions[`${root}/__editable`]
-    const editableProps = {
-      treePath,
-      component,
-      props,
-    }
-    const editableExtensionPoint = editableExtensionPointComponent &&
-      <ExtensionPointComponent component={editableExtensionPointComponent.component} props={editableProps}>{extensionPointComponent}</ExtensionPointComponent>
-
-    const maybeEditable = !production && editableExtensionPoint
-      ? editableExtensionPoint
-      : extensionPointComponent
-
-    return maybeEditable
+    return <ExtensionPointComponent component={component} props={props}>{children}</ExtensionPointComponent>
   }
 }
 
