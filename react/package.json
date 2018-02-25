@@ -12,7 +12,7 @@
     "exenv": "^1.2.2",
     "graphql": "^0.12.3",
     "history": "^4.7.2",
-    "myvtex-sse": "^1.0.0",
+    "myvtex-sse": "^1.1.1",
     "prop-types": "^15.6.0",
     "qs": "^6.5.1",
     "react": "^16.2.0",
