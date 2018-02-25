@@ -9,7 +9,7 @@ import {parse} from 'qs'
 import {fetchAssets, getImplementation} from '../utils/assets'
 import getClient from '../utils/client'
 import {loadLocaleData} from '../utils/locales'
-import {createLocaleCookie, fetchMessages} from '../utils/messages'
+import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
 import {fetchRuntime} from '../utils/runtime'
 import {pageNameFromPath} from '../utils/pages'
 
@@ -31,6 +31,7 @@ class RenderProvider extends Component {
     updateExtension: PropTypes.func,
     onPageChanged: PropTypes.func,
     prefetchPage: PropTypes.func,
+    fetchComponent: PropTypes.func,
     production: PropTypes.bool,
   }
 
@@ -105,6 +106,7 @@ class RenderProvider extends Component {
       updateRuntime: this.updateRuntime,
       onPageChanged: this.onPageChanged,
       prefetchPage: this.prefetchPage,
+      fetchComponent: this.fetchComponent,
       updateExtension: this.updateExtension,
     }
   }
@@ -134,10 +136,34 @@ class RenderProvider extends Component {
   }
 
   prefetchPage = (pageName) => {
-    if (canUseDOM) {
-      const {components, extensions} = this.state
-      return fetchAssets(components[extensions[pageName]])
+    const {extensions} = this.state
+    const component = extensions[pageName].component
+    return this.fetchComponent(component)
+  }
+
+  fetchComponent = (component) => {
+    if (!canUseDOM) {
+      throw new Error('Cannot fetch components during server side rendering.')
     }
+
+    const {components, culture: {locale}} = this.state
+    const [app] = component.split('/')
+    const sameAppAsset = Object.keys(global.__RENDER_6_COMPONENTS__).find((c) => c.startsWith(app))
+
+    if (sameAppAsset) {
+      return fetchAssets(components[component])
+    }
+
+    return fetchMessagesForApp(app, locale)
+      .then((messages) => {
+        this.setState({
+          messages: {
+            ...this.state.messages,
+            ...messages,
+          },
+        })
+      })
+      .then(() => fetchAssets(components[component]))
   }
 
   onLocalesUpdated = (locales) => {

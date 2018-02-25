@@ -1,14 +1,14 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-import {fetchAssets, getImplementation} from '../utils/assets'
+import {getImplementation} from '../utils/assets'
 
 export default class ExtensionPointComponent extends Component {
   static contextTypes = {
-    components: PropTypes.object,
     extensions: PropTypes.object,
     emitter: PropTypes.object,
     treePath: PropTypes.string,
+    fetchComponent: PropTypes.func,
   }
 
   static propTypes = {
@@ -31,13 +31,13 @@ export default class ExtensionPointComponent extends Component {
   }
 
   fetchAndRerender = () => {
-    const {components: componentAssets} = this.context
+    const {fetchComponent} = this.context
     const {component} = this.props
     const Component = getImplementation(component)
 
     // Let's fetch the assets and re-render.
     if (component && !Component) {
-      fetchAssets(componentAssets[component]).then(this.updateComponents)
+      fetchComponent(component).then(this.updateComponents)
     }
   }
 
