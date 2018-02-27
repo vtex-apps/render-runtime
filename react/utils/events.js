@@ -14,9 +14,16 @@ if (module.hot && canUseDOM) {
   const {account, workspace, emitter} = global.__RUNTIME__
   const sseReact1Path = 'vtex.builder-hub:*:react1'
   const ssePages0Path = 'vtex.builder-hub:*:pages0'
+  let reload = false
 
   myvtexSSE(account, workspace, sseReact1Path, {verbose: true}, function(event) {
+    // Skip any events after reload was issued
+    if (reload) {
+      return false
+    }
+
     const {body: {type, appId, hash, locales}} = event
+
     switch (type) {
       case 'hmr':
         console.log(`[react1] Received update. app=${appId} hash=${hash}`)
@@ -24,6 +31,7 @@ if (module.hot && canUseDOM) {
         break
       case 'reload':
         console.log(`[react1] Received reload. app=${appId}`)
+        reload = true
         location.reload(true)
         break
       case 'locales':
@@ -34,7 +42,13 @@ if (module.hot && canUseDOM) {
   })
 
   myvtexSSE(account, workspace, ssePages0Path, {verbose: true}, function(event) {
+    // Skip any events after reload was issued
+    if (reload) {
+      return false
+    }
+
     const {body: {type}} = event
+
     switch (type) {
       case 'changed':
         console.log('[pages0] Extensions changed.')

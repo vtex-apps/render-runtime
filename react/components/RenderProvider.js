@@ -6,10 +6,10 @@ import {IntlProvider} from 'react-intl'
 import {Helmet} from 'react-helmet'
 import {parse} from 'qs'
 
-import {fetchAssets} from '../utils/assets'
+import {fetchAssets, getImplementation} from '../utils/assets'
 import getClient from '../utils/client'
 import {loadLocaleData} from '../utils/locales'
-import {createLocaleCookie, fetchMessages} from '../utils/messages'
+import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
 import {fetchRuntime} from '../utils/runtime'
 import {pageNameFromPath} from '../utils/pages'
 
@@ -29,9 +29,9 @@ class RenderProvider extends Component {
     getSettings: PropTypes.func,
     updateRuntime: PropTypes.func,
     updateExtension: PropTypes.func,
-    registerEmptyExtension: PropTypes.func,
     onPageChanged: PropTypes.func,
     prefetchPage: PropTypes.func,
+    fetchComponent: PropTypes.func,
     production: PropTypes.bool,
   }
 
@@ -42,7 +42,7 @@ class RenderProvider extends Component {
 
   constructor(props) {
     super(props)
-    const {culture, messages, components, extensions, pages, page, query} = global.__RUNTIME__
+    const {culture, messages, components, extensions, pages, page, query, production} = global.__RUNTIME__
     const {history} = props
 
     if (history) {
@@ -52,8 +52,6 @@ class RenderProvider extends Component {
       global.browserHistory = history
     }
 
-    this.emptyExtensions = []
-
     this.state = {
       components,
       extensions,
@@ -62,6 +60,7 @@ class RenderProvider extends Component {
       pages,
       page,
       query,
+      production,
     }
   }
 
@@ -75,16 +74,6 @@ class RenderProvider extends Component {
       emitter.addListener('localesUpdated', this.onLocalesUpdated)
       emitter.addListener('extensionsUpdated', this.updateRuntime)
     }
-
-    const {extensions} = this.state
-    this.emptyExtensions.forEach((name) => {
-      extensions[name] = {
-        component: null,
-      }
-    })
-    this.setState({
-      extensions,
-    })
   }
 
   componentWillUnmount() {
@@ -117,8 +106,8 @@ class RenderProvider extends Component {
       updateRuntime: this.updateRuntime,
       onPageChanged: this.onPageChanged,
       prefetchPage: this.prefetchPage,
+      fetchComponent: this.fetchComponent,
       updateExtension: this.updateExtension,
-      registerEmptyExtension: this.registerEmptyExtension,
     }
   }
 
@@ -147,22 +136,44 @@ class RenderProvider extends Component {
   }
 
   prefetchPage = (pageName) => {
-    if (canUseDOM) {
-      const {components, extensions} = this.state
-      return fetchAssets(extensions[pageName], components)
+    const {extensions} = this.state
+    const component = extensions[pageName].component
+    return this.fetchComponent(component)
+  }
+
+  fetchComponent = (component) => {
+    if (!canUseDOM) {
+      throw new Error('Cannot fetch components during server side rendering.')
     }
+
+    const {components, culture: {locale}} = this.state
+    const [app] = component.split('/')
+    const sameAppAsset = Object.keys(global.__RENDER_6_COMPONENTS__).find((c) => c.startsWith(app))
+
+    if (sameAppAsset) {
+      return fetchAssets(components[component])
+    }
+
+    return fetchMessagesForApp(app, locale)
+      .then((messages) => {
+        this.setState({
+          messages: {
+            ...this.state.messages,
+            ...messages,
+          },
+        })
+      })
+      .then(() => fetchAssets(components[component]))
   }
 
   onLocalesUpdated = (locales) => {
     // Current locale is one of the updated ones
     if (locales.indexOf(this.state.culture.locale) !== -1) {
-      // Force cache busting by appending date to url
       fetchMessages()
         .then(messages => {
           this.setState({
-            ...this.state,
             messages,
-          })
+          }, () => global.__RUNTIME__.emitter.emit('extension:*:update'))
         })
         .catch(e => {
           console.log('Failed to fetch new locale file.')
@@ -185,7 +196,7 @@ class RenderProvider extends Component {
             ...this.state.culture,
             locale,
           },
-        })
+        }, () => global.__RUNTIME__.emitter.emit('extension:*:update'))
       })
       .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))
       .catch(e => {
@@ -207,27 +218,25 @@ class RenderProvider extends Component {
         messages,
         extensions,
         pages,
-      })
-
-      global.__RUNTIME__.emitter.emit('extension:*:update')
+      }, () => global.__RUNTIME__.emitter.emit('extension:*:update', this.state))
 
       return global.__RUNTIME__
     })
 
   updateExtension = (name, extension) => {
     const {extensions} = this.state
-    extensions[name] = extension
-    this.setState({
-      extensions,
-    })
-  }
 
-  registerEmptyExtension = (name) =>
-    this.emptyExtensions.push(name)
+    this.setState({
+      extensions: {
+        ...extensions,
+        [name]: extension,
+      },
+    }, () => global.__RUNTIME__.emitter.emit(`extension:${name}:update`, this.state))
+  }
 
   render() {
     const {children} = this.props
-    const {culture: {locale}, messages, pages, page, query} = this.state
+    const {culture: {locale}, messages, pages, page, query, production, extensions} = this.state
 
     const component = children
       ? React.cloneElement(children, {query})
@@ -239,10 +248,17 @@ class RenderProvider extends Component {
         </div>
       )
 
+    const root = page.split('/')[0]
+    const editorProvider = extensions[`${root}/__provider`]
+    const EditorProvider = editorProvider && getImplementation(editorProvider.component)
+    const maybeEditable = !production && EditorProvider
+      ? <EditorProvider extensions={extensions}>{component}</EditorProvider>
+      : component
+
     return (
       <ApolloProvider client={getClient()}>
         <IntlProvider locale={locale} messages={messages}>
-          {component}
+          {maybeEditable}
         </IntlProvider>
       </ApolloProvider>
     )

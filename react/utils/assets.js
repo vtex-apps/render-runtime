@@ -62,28 +62,11 @@ function shouldAddStyleToPage(path, idx, arr) {
   return isStyle(path) && !styleOnPage(path) && arr.map(({path: pt}) => pt).indexOf(path) === idx
 }
 
-function getAssetsForComponent(extension, componentAssets) {
-  const components = getComponents(extension)
-  return components.reduce((acc, value) => {
-    acc = acc.concat(componentAssets[value])
-    return acc
-  }, [])
-}
-
-function getImplementation(component) {
+export function getImplementation(component) {
   return global.__RENDER_6_COMPONENTS__[component]
 }
 
-export function getComponents(extension) {
-  return Array.isArray(extension.component) ? extension.component : [extension.component]
-}
-
-export function getImplementations(components) {
-  return components.map(getImplementation).filter((c) => c != null)
-}
-
-export function fetchAssets(extension, componentAssets) {
-  const assets = getAssetsForComponent(extension, componentAssets)
+export function fetchAssets(assets) {
   const scripts = assets.filter(shouldAddScriptToPage)
   const styles = assets.filter(shouldAddStyleToPage)
   styles.forEach(addStyleToPage)
