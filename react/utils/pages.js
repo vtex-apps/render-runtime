@@ -1,12 +1,6 @@
 import RouteParser from 'route-parser'
 import {canUseDOM} from 'exenv'
 
-function removeSegment(name) {
-  const segments = name.split('/')
-  segments.pop()
-  return segments.join('/')
-}
-
 function getScore(path) {
   const catchAll = (path.match(/\*/g) || []).length
   const catchOne = (path.match(/:/g) || []).length
@@ -18,9 +12,15 @@ function isHost(hostname) {
   return hostname === (canUseDOM ? window.location.hostname : global.__hostname__)
 }
 
+function trimEndingSlash(token) {
+  return token.replace(/\/$/, '')
+}
+
 export function getParams(template, target) {
-  return new RouteParser(template.replace(/\/$/, ''))
-    .match(target.replace(/\/$/, ''))
+  // make last splat capture optional
+  const properTemplate = trimEndingSlash(template).replace(/(\/\*\w+)$/, '($1)')
+  const properTarget = trimEndingSlash(target)
+  return new RouteParser(properTemplate).match(properTarget)
 }
 
 export function getPagePath(name, pages) {
@@ -39,15 +39,7 @@ export function pageNameFromPath(path, pages) {
     if (pagePath) {
       const matches = !!getParams(pagePath, path)
       if (!matches) {
-        // We have to admit `/admin/*slug` matches `/admin`
-        if (!/\/\*.*$/.test(pagePath)) {
-          continue
-        }
-        const withoutLastSegment = removeSegment(pagePath)
-        const matchesWithoutSlug = !!getParams(withoutLastSegment, path)
-        if (!matchesWithoutSlug) {
-          continue
-        }
+        continue
       }
 
       score = getScore(pagePath)
