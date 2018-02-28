@@ -64,12 +64,12 @@
   "vtex": {
     "dev": [
       {
-        "path": "https://unpkg.com/vtex-tachyons@1.0.3/tachyons.css"
+        "path": "https://unpkg.com/vtex-tachyons@1.0.4/tachyons.css"
       }
     ],
     "prod": [
       {
-        "path": "https://unpkg.com/vtex-tachyons@1.0.3/tachyons.min.css"
+        "path": "https://unpkg.com/vtex-tachyons@1.0.4/tachyons.min.css"
       }
     ]
   },
