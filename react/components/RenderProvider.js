@@ -6,7 +6,8 @@ import {IntlProvider} from 'react-intl'
 import {Helmet} from 'react-helmet'
 import {parse} from 'qs'
 
-import {fetchAssets, getImplementation} from '../utils/assets'
+import ExtensionPointComponent from './ExtensionPointComponent'
+import {fetchAssets} from '../utils/assets'
 import getClient from '../utils/client'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
@@ -248,9 +249,8 @@ class RenderProvider extends Component {
 
     const root = page.split('/')[0]
     const editorProvider = extensions[`${root}/__provider`]
-    const EditorProvider = editorProvider && getImplementation(editorProvider.component)
-    const maybeEditable = !production && EditorProvider
-      ? <EditorProvider extensions={extensions}>{component}</EditorProvider>
+    const maybeEditable = !production && editorProvider
+      ? <ExtensionPointComponent component={editorProvider.component} props={{extensions}}>{component}</ExtensionPointComponent>
       : component
 
     return (

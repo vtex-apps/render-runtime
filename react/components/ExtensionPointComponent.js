@@ -15,13 +15,12 @@ export default class ExtensionPointComponent extends Component {
     children: PropTypes.node,
     component: PropTypes.string,
     props: PropTypes.object,
-    production: PropTypes.bool,
   }
 
   constructor(props, context) {
     super(props, context)
 
-    const root = context.treePath.split('/')[0]
+    const root = context.treePath && context.treePath.split('/')[0]
     this.emptyExtensionPoint = context.extensions[`${root}/__empty`]
     this.editableExtensionPoint = context.extensions[`${root}/__editable`]
   }
