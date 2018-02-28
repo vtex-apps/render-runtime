@@ -13,7 +13,6 @@ import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/m
 import {fetchRuntime} from '../utils/runtime'
 import {pageNameFromPath} from '../utils/pages'
 
-import IntrospectionFetcher from './IntrospectionFetcher'
 import NestedExtensionPoints from './NestedExtensionPoints'
 
 class RenderProvider extends Component {
@@ -244,7 +243,6 @@ class RenderProvider extends Component {
         <div id="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
           <NestedExtensionPoints page={page} query={query} />
-          <IntrospectionFetcher />
         </div>
       )
 
