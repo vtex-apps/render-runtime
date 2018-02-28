@@ -94,7 +94,7 @@ export default class ExtensionPointComponent extends Component {
     const EditableExtensionPoint = this.editableExtensionPoint && getImplementation(this.editableExtensionPoint.component)
 
     // This extension point is not configured.
-    if (!component && !production) {
+    if (!component && !production && this.emptyExtensionPoint) {
       return <EditableExtensionPoint treePath={treePath} component={this.emptyExtensionPoint.component}><EmptyExtensionPoint /></EditableExtensionPoint>
     }
 
