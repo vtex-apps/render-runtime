@@ -6,7 +6,6 @@ import {getImplementation} from '../utils/assets'
 export default class ExtensionPointComponent extends Component {
   static contextTypes = {
     extensions: PropTypes.object,
-    emitter: PropTypes.object,
     treePath: PropTypes.string,
     fetchComponent: PropTypes.func,
   }
@@ -41,13 +40,17 @@ export default class ExtensionPointComponent extends Component {
   }
 
   subscribeToComponent = (c) => {
-    const {emitter} = this.context
-    emitter.addListener(`component:${c}:update`, this.updateComponents)
+    const app = c && c.split('/')[0]
+    if (global.__RENDER_6_HOT__[app]) {
+      global.__RENDER_6_HOT__[app].addListener(`component:${c}:update`, this.updateComponents)
+    }
   }
 
   unsubscribeToComponent = (c) => {
-    const {emitter} = this.context
-    emitter.removeListener(`component:${c}:update`, this.updateComponents)
+    const app = c && c.split('/')[0]
+    if (global.__RENDER_6_HOT__[app]) {
+      global.__RENDER_6_HOT__[app].removeListener(`component:${c}:update`, this.updateComponents)
+    }
   }
 
   componentDidMount() {
