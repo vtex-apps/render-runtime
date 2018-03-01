@@ -11,9 +11,9 @@ const acceptAndContentJson = canUseDOM && new Headers({
   'Content-Type': 'application/json',
 })
 
-export const fetchMessagesForApp = (app, locale) =>
-  fetch('?vtex.render-resource=graphql', {
-    credentials: 'same-origin',
+export const fetchMessagesForApp = (graphQlUri, app, locale) =>
+  fetch(graphQlUri, {
+    credentials: 'include',
     headers: acceptAndContentJson,
     method: 'POST',
     body: JSON.stringify({
@@ -26,9 +26,9 @@ export const fetchMessagesForApp = (app, locale) =>
     return JSON.parse(messagesJSON)
   })
 
-export const fetchMessages = () =>
-  fetch('?vtex.render-resource=messages', {
-    credentials: 'same-origin',
+export const fetchMessages = (graphQlUri) =>
+  fetch(graphQlUri.replace('=graphql', '=messages'), {
+    credentials: 'include',
     headers: acceptJson,
   }).then(res => res.json())
 
