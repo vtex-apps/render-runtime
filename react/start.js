@@ -1,6 +1,6 @@
 import {canUseDOM} from 'exenv'
 
-const startRuntime = () => global.__RENDER_6_RUNTIME__.start(global.__RUNTIME__.page)
+const startRuntime = () => global.__RENDER_6_RUNTIME__.start()
 
 if (global.__RUNTIME__.start) {
   startRuntime()
@@ -9,6 +9,7 @@ if (global.__RUNTIME__.start) {
 if (module.hot) {
   if (canUseDOM) {
     const runtimeIndexComponent = Object.keys(global.__RENDER_6_COMPONENTS__).find((c) => /vtex\.render-runtime@.*\/index/.test(c))
-    global.__RUNTIME__.emitter.addListener(`component:${runtimeIndexComponent}:update`, startRuntime)
+    const [app] = runtimeIndexComponent.split('/')
+    global.__RENDER_6_HOT__[app].addListener(`component:${runtimeIndexComponent}:update`, startRuntime)
   }
 }

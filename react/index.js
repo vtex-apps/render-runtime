@@ -5,9 +5,9 @@ import {hydrate, render as renderDOM} from 'react-dom'
 import {AppContainer} from 'react-hot-loader'
 import {Helmet} from 'react-helmet'
 
-import './utils/events'
+import {registerEmitter} from './utils/events'
 import {addLocaleData} from './utils/locales'
-import getClient from './utils/client'
+import {getState} from './utils/client'
 import RenderProvider from './components/RenderProvider'
 import Img from './components/Img'
 import Link from './components/Link'
@@ -22,10 +22,6 @@ if (global.IntlPolyfill) {
     global.Intl.DateTimeFormat = global.IntlPolyfill.DateTimeFormat
   }
 }
-
-const {culture: {locale}, extensions, pages, disableSSR} = global.__RUNTIME__
-
-addLocaleData(locale)
 
 function _renderToStringWithData(component) {
   var startGetDataFromTree = global.hrtime()
@@ -59,15 +55,19 @@ const isRoot = (name, index, names) =>
   names.find(parent => name !== parent && name.startsWith(parent)) === undefined
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
-const render = (name, element) => {
-  const {customRouting} = global.__RUNTIME__
+const render = (name, runtime, element) => {
+  const {customRouting, disableSSR, pages, extensions, culture: {locale}} = runtime
+
+  registerEmitter(runtime)
+  addLocaleData(locale)
+
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
   const id = isPage ? 'render-container' : containerId(name)
   const elem = element || canUseDOM && document.getElementById(id)
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
     <AppContainer>
-      <RenderProvider history={history}>
+      <RenderProvider history={history} root={name} runtime={runtime}>
         {!isPage ? <ExtensionPoint id={name} /> : null}
       </RenderProvider>
     </AppContainer>
@@ -81,7 +81,7 @@ const render = (name, element) => {
     }))
 }
 
-function getRenderableExtensionPointNames(rootName) {
+function getRenderableExtensionPointNames(rootName, extensions) {
   const childExtensionPoints = Object.keys(extensions).reduce((acc, value) => {
     if (value.startsWith(rootName)) {
       acc[value] = extensions[value]
@@ -97,11 +97,13 @@ function getRenderableExtensionPointNames(rootName) {
   return rootWithComponentNames
 }
 
-function start(rootName) {
-  const renderableExtensionPointNames = getRenderableExtensionPointNames(rootName)
+function start() {
+  const runtime = global.__RUNTIME__
+  const renderableExtensionPointNames = getRenderableExtensionPointNames(runtime.page, runtime.extensions)
+
   try {
     // If there are multiple renderable extensions, render them in parallel.
-    const renderPromises = renderableExtensionPointNames.map(e => render(e))
+    const renderPromises = renderableExtensionPointNames.map(e => render(e, runtime))
     console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     if (!canUseDOM) {
       // Expose render promises to global context.
@@ -115,7 +117,7 @@ function start(rootName) {
           (acc, {name, renderTimeMetric}) => (acc[name] = renderTimeMetric) && acc,
           {},
         ),
-        state: getClient().cache.extract(),
+        state: getState(runtime),
       }))
     }
   } catch (error) {

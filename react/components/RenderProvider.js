@@ -8,7 +8,7 @@ import {parse} from 'qs'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
 import {fetchAssets} from '../utils/assets'
-import getClient from '../utils/client'
+import {getClient} from '../utils/client'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
 import {fetchRuntime} from '../utils/runtime'
@@ -38,11 +38,13 @@ class RenderProvider extends Component {
   static propTypes = {
     children: PropTypes.element,
     history: PropTypes.object,
+    root: PropTypes.string,
+    runtime: PropTypes.object,
   }
 
   constructor(props) {
     super(props)
-    const {culture, messages, components, extensions, pages, page, query, production} = global.__RUNTIME__
+    const {culture, messages, components, extensions, pages, page, query, production} = props.runtime
     const {history} = props
 
     if (history) {
@@ -65,8 +67,10 @@ class RenderProvider extends Component {
   }
 
   componentDidMount() {
-    const {production, emitter} = global.__RUNTIME__
-    const {history} = this.props
+    this.rendered = true
+    const {history, runtime} = this.props
+    const {production, emitter} = runtime
+
     this.unlisten = history && history.listen(this.onPageChanged)
     emitter.addListener('localesChanged', this.onLocaleSelected)
 
@@ -76,8 +80,18 @@ class RenderProvider extends Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    // If RenderProvider is being re-rendered, the global runtime might have changed
+    // so we must update the root extension.
+    if (this.rendered) {
+      console.log('updating root extension from runtime', nextProps.root)
+      this.updateExtension(nextProps.root, nextProps.runtime.extensions[nextProps.root])
+    }
+  }
+
   componentWillUnmount() {
-    const {production, emitter} = global.__RUNTIME__
+    const {runtime} = this.props
+    const {production, emitter} = runtime
     this.unlisten && this.unlisten()
     emitter.removeListener('localesChanged', this.onLocaleSelected)
 
@@ -88,9 +102,9 @@ class RenderProvider extends Component {
   }
 
   getChildContext() {
-    const {account, emitter, settings, production} = global.__RUNTIME__
+    const {history, runtime} = this.props
     const {components, extensions, page, pages, culture} = this.state
-    const {history} = this.props
+    const {account, emitter, settings, production} = runtime
 
     return {
       account,
@@ -154,7 +168,7 @@ class RenderProvider extends Component {
       return fetchAssets(components[component])
     }
 
-    return fetchMessagesForApp(app, locale)
+    return fetchMessagesForApp(this.props.runtime.graphQlUri.browser, app, locale)
       .then((messages) => {
         this.setState({
           messages: {
@@ -167,13 +181,15 @@ class RenderProvider extends Component {
   }
 
   onLocalesUpdated = (locales) => {
+    const {runtime: {emitter}} = this.props
+
     // Current locale is one of the updated ones
     if (locales.indexOf(this.state.culture.locale) !== -1) {
-      fetchMessages()
+      fetchMessages(this.props.runtime.graphQlUri.browser)
         .then(messages => {
           this.setState({
             messages,
-          }, () => global.__RUNTIME__.emitter.emit('extension:*:update'))
+          }, () => emitter.emit('extension:*:update'))
         })
         .catch(e => {
           console.log('Failed to fetch new locale file.')
@@ -183,10 +199,12 @@ class RenderProvider extends Component {
   }
 
   onLocaleSelected = (locale) => {
+    const {runtime: {emitter}} = this.props
+
     if (locale !== this.state.culture.locale) {
       createLocaleCookie(locale)
       Promise.all([
-        fetchMessages(),
+        fetchMessages(this.props.runtime.graphQlUri.browser),
         loadLocaleData(locale),
       ])
       .then(([messages]) => {
@@ -196,7 +214,7 @@ class RenderProvider extends Component {
             ...this.state.culture,
             locale,
           },
-        }, () => global.__RUNTIME__.emitter.emit('extension:*:update'))
+        }, () => emitter.emit('extension:*:update'))
       })
       .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))
       .catch(e => {
@@ -207,23 +225,19 @@ class RenderProvider extends Component {
   }
 
   updateRuntime = () =>
-    fetchRuntime().then(({components, extensions, messages, pages}) => {
-      // keep client-side params
-      Object.keys(pages).forEach(page => {
-        pages[page].params = global.__RUNTIME__.pages[page].params
-      })
+    fetchRuntime(this.props.runtime.graphQlUri.browser).then(({components, extensions, messages, pages}) => {
+      const {runtime: {emitter}} = this.props
 
       this.setState({
         components,
         messages,
         extensions,
         pages,
-      }, () => global.__RUNTIME__.emitter.emit('extension:*:update', this.state))
-
-      return global.__RUNTIME__
+      }, () => emitter.emit('extension:*:update', this.state))
     })
 
   updateExtension = (name, extension) => {
+    const {runtime: {emitter}} = this.props
     const {extensions} = this.state
 
     this.setState({
@@ -231,11 +245,11 @@ class RenderProvider extends Component {
         ...extensions,
         [name]: extension,
       },
-    }, () => global.__RUNTIME__.emitter.emit(`extension:${name}:update`, this.state))
+    }, () => emitter.emit(`extension:${name}:update`, this.state))
   }
 
   render() {
-    const {children} = this.props
+    const {children, runtime} = this.props
     const {culture: {locale}, messages, pages, page, query, production, extensions} = this.state
 
     const component = children
@@ -254,7 +268,7 @@ class RenderProvider extends Component {
       : component
 
     return (
-      <ApolloProvider client={getClient()}>
+      <ApolloProvider client={getClient(runtime)}>
         <IntlProvider locale={locale} messages={messages}>
           {maybeEditable}
         </IntlProvider>
