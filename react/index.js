@@ -23,7 +23,7 @@ if (global.IntlPolyfill) {
   }
 }
 
-const {culture: {locale}, extensions, pages} = global.__RUNTIME__
+const {culture: {locale}, extensions, pages, disableSSR} = global.__RUNTIME__
 
 addLocaleData(locale)
 
@@ -58,14 +58,12 @@ const hasComponent = extensions => name => !!extensions[name].component
 const isRoot = (name, index, names) =>
   names.find(parent => name !== parent && name.startsWith(parent)) === undefined
 
-// Check if this is a client-side-only rendering (used mostly in debug situations)
-const ssrEnabled = canUseDOM ? window.location.search.indexOf('__disableSSR') === -1 : true
-
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
-const render = name => {
+const render = (name, element) => {
   const {customRouting} = global.__RUNTIME__
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
   const id = isPage ? 'render-container' : containerId(name)
+  const elem = element || canUseDOM && document.getElementById(id)
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
     <AppContainer>
@@ -75,7 +73,7 @@ const render = name => {
     </AppContainer>
   )
   return canUseDOM
-    ? (ssrEnabled ? hydrate(root, document.getElementById(id)) : renderDOM(root, document.getElementById(id)))
+    ? (disableSSR ? renderDOM(root, elem) : hydrate(root, elem))
     : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
       name,
       renderTimeMetric,
@@ -103,7 +101,7 @@ function start(rootName) {
   const renderableExtensionPointNames = getRenderableExtensionPointNames(rootName)
   try {
     // If there are multiple renderable extensions, render them in parallel.
-    const renderPromises = renderableExtensionPointNames.map(render)
+    const renderPromises = renderableExtensionPointNames.map(e => render(e))
     console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     if (!canUseDOM) {
       // Expose render promises to global context.
@@ -130,6 +128,7 @@ function start(rootName) {
 
 global.__RENDER_6_RUNTIME__ = {
   start,
+  render,
   ExtensionContainer,
   ExtensionPoint,
   Img,
