@@ -265,7 +265,7 @@ class RenderProvider extends Component {
     const root = page.split('/')[0]
     const editorProvider = extensions[`${root}/__provider`]
     const maybeEditable = !production && editorProvider
-      ? <ExtensionPointComponent component={editorProvider.component} props={{extensions}}>{component}</ExtensionPointComponent>
+      ? <ExtensionPointComponent component={editorProvider.component} props={{extensions, pages, page}}>{component}</ExtensionPointComponent>
       : component
 
     return (
