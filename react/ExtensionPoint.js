@@ -14,6 +14,8 @@ class ExtensionPoint extends Component {
   static propTypes = {
     children: PropTypes.node,
     treePath: PropTypes.string.isRequired,
+    params: PropTypes.object,
+    query: PropTypes.object,
   }
 
   constructor(props, context) {
@@ -88,7 +90,7 @@ class ExtensionPoint extends Component {
   }
 
   render() {
-    const {children, treePath, ...parentProps} = this.props
+    const {children, treePath, params, query, ...parentProps} = this.props
     const {component, props: extensionProps, error, errorInfo} = this.state
 
     delete parentProps.id
@@ -107,6 +109,8 @@ class ExtensionPoint extends Component {
     const props = {
       ...parentProps,
       ...extensionProps,
+      params,
+      query,
     }
 
     return <ExtensionPointComponent component={component} props={props}>{children}</ExtensionPointComponent>
