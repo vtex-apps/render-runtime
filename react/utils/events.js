@@ -3,12 +3,13 @@ import {canUseDOM} from 'exenv'
 
 const emittersByWorkspace = []
 
-const initSSE = (account, workspace) => {
+const initSSE = (account, workspace, publicEndpoint = 'myvtex.com') => {
   if (Object.keys(global.__RENDER_6_HOT__).length > 0) {
     require('eventsource-polyfill')
     const myvtexSSE = require('myvtex-sse')
+    const host = `${workspace}--${account}.${publicEndpoint}`
 
-    myvtexSSE(account, workspace, 'vtex.builder-hub:*:react1', {verbose: true}, function(event) {
+    myvtexSSE(account, workspace, 'vtex.builder-hub:*:react1', {verbose: true, host}, function(event) {
       const {body: {type, appId, hash, locales}} = event
 
       switch (type) {
@@ -27,7 +28,7 @@ const initSSE = (account, workspace) => {
       }
     })
 
-    myvtexSSE(account, workspace, 'vtex.builder-hub:*:pages0', {verbose: true}, function(event) {
+    myvtexSSE(account, workspace, 'vtex.builder-hub:*:pages0', {verbose: true, host}, function(event) {
       const {body: {type}} = event
 
       switch (type) {
@@ -45,12 +46,12 @@ export const registerEmitter = (runtime) => {
     return
   }
 
-  const {account, workspace} = runtime
+  const {account, workspace, publicEndpoint} = runtime
 
   // Share SSE connections for same account and workspace
   if (!emittersByWorkspace[`${account}/${workspace}`]) {
     emittersByWorkspace[`${account}/${workspace}`] = []
-    initSSE(account, workspace)
+    initSSE(account, workspace, publicEndpoint)
   }
 
   if (!runtime.emitter) {
