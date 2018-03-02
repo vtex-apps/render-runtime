@@ -36,7 +36,7 @@ export const getClient = (runtime) => {
       disable: defaultOptions.disable
     })
 
-    client = new ApolloClient({
+    clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       link: persistedQueryLink.concat(httpLink),
       ssrMode: !canUseDOM,
       cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
