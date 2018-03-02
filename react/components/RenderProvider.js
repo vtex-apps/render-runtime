@@ -168,16 +168,17 @@ class RenderProvider extends Component {
       return fetchAssets(components[component])
     }
 
-    return fetchMessagesForApp(this.props.runtime.graphQlUri.browser, app, locale)
-      .then((messages) => {
-        this.setState({
-          messages: {
-            ...this.state.messages,
-            ...messages,
-          },
-        })
+    const messagesPromise = fetchMessagesForApp(this.props.runtime.graphQlUri.browser, app, locale)
+    const assetsPromise = fetchAssets(components[component])
+
+    return Promise.all([messagesPromise, assetsPromise]).then(([messages]) => {
+      this.setState({
+        messages: {
+          ...this.state.messages,
+          ...messages,
+        },
       })
-      .then(() => fetchAssets(components[component]))
+    })
   }
 
   onLocalesUpdated = (locales) => {
