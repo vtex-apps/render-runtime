@@ -7,22 +7,22 @@
       {
         "global": "PropTypes",
         "import": "prop-types",
-        "path": "https://unpkg.com/prop-types@15.6.0/prop-types.js"
+        "path": "https://unpkg.com/prop-types@15.6.1/prop-types.js"
       },
       {
         "global": "React",
         "import": "react",
-        "path": "https://unpkg.com/react@16.1.1/umd/react.development.js"
+        "path": "https://unpkg.com/react@16.2.0/umd/react.development.js"
       },
       {
         "global": "ReactDOM",
         "import": "react-dom",
-        "path": "https://unpkg.com/react-dom@16.1.1/umd/react-dom.development.js"
+        "path": "https://unpkg.com/react-dom@16.2.0/umd/react-dom.development.js"
       },
       {
         "global": "ReactDOMServer",
         "import": "react-dom/server",
-        "path": "https://unpkg.com/react-dom@16.1.1/umd/react-dom-server.browser.development.js",
+        "path": "https://unpkg.com/react-dom@16.2.0/umd/react-dom-server.browser.development.js",
         "serverOnly": true
       },
       {
@@ -37,22 +37,22 @@
       {
         "global": "PropTypes",
         "import": "prop-types",
-        "path": "https://unpkg.com/prop-types@15.6.0/prop-types.min.js"
+        "path": "https://unpkg.com/prop-types@15.6.1/prop-types.min.js"
       },
       {
         "global": "React",
         "import": "react",
-        "path": "https://unpkg.com/react@16.1.1/umd/react.production.min.js"
+        "path": "https://unpkg.com/react@16.2.0/umd/react.production.min.js"
       },
       {
         "global": "ReactDOM",
         "import": "react-dom",
-        "path": "https://unpkg.com/react-dom@16.1.1/umd/react-dom.production.min.js"
+        "path": "https://unpkg.com/react-dom@16.2.0/umd/react-dom.production.min.js"
       },
       {
         "global": "ReactDOMServer",
         "import": "react-dom/server",
-        "path": "https://unpkg.com/react-dom@16.1.1/umd/react-dom-server.browser.production.min.js",
+        "path": "https://unpkg.com/react-dom@16.2.0/umd/react-dom-server.browser.production.min.js",
         "serverOnly": true
       },
       {
