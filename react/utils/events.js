@@ -8,36 +8,52 @@ const initSSE = (account, workspace, publicEndpoint = 'myvtex.com') => {
     require('eventsource-polyfill')
     const myvtexSSE = require('myvtex-sse')
     const host = `${workspace}--${account}.${publicEndpoint}`
+    const source = myvtexSSE(account, workspace, 'vtex.builder-hub:*:react2,pages0,build.status', {verbose: true, host})
 
-    myvtexSSE(account, workspace, 'vtex.builder-hub:*:react2', {verbose: true, host}, function(event) {
-      const {body: {type, appId, hash, locales}} = event
+    const handler = function({data}) {
+      const event = JSON.parse(data)
+      const {key, body: {code, type, hash, locales, subject}} = event
+
+      if (key === 'build.status') {
+        switch (code) {
+          case 'start':
+            console.log(`[build] Build started. app=${subject}`)
+            emittersByWorkspace[`${account}/${workspace}`].forEach(e => e.emit('build.status', code))
+            break
+          case 'success':
+            console.log(`[build] Build success. app=${subject}`)
+            emittersByWorkspace[`${account}/${workspace}`].forEach(e => e.emit('build.status', code))
+            break
+          case 'fail':
+            console.log(`[build] Build failed. app=${subject}`)
+            emittersByWorkspace[`${account}/${workspace}`].forEach(e => e.emit('build.status', code))
+            console.log('build failed')
+            break
+        }
+        return
+      }
 
       switch (type) {
         case 'hmr':
-          console.log(`[react2] Received update. app=${appId} hash=${hash}`)
-          global.__RENDER_7_HOT__[appId].emit('webpackHotUpdate', hash)
+          console.log(`[react2] Received update. app=${subject} hash=${hash}`)
+          global.__RENDER_7_HOT__[subject].emit('webpackHotUpdate', hash)
           break
         case 'reload':
-          console.log(`[react2] Received reload. app=${appId}`)
+          console.log(`[react2] Received reload. app=${subject}`)
           location.reload(true)
           break
         case 'locales':
-          console.log(`[react2] Received locale update. appId=${appId} locales=${locales}`)
+          console.log(`[react2] Received locale update. appId=${subject} locales=${locales}`)
           emittersByWorkspace[`${account}/${workspace}`].forEach(e => e.emit('localesUpdated', locales))
           break
-      }
-    })
-
-    myvtexSSE(account, workspace, 'vtex.builder-hub:*:pages0', {verbose: true, host}, function(event) {
-      const {body: {type}} = event
-
-      switch (type) {
         case 'changed':
           console.log('[pages0] Extensions changed.')
           emittersByWorkspace[`${account}/${workspace}`].forEach(e => e.emit('extensionsUpdated'))
           break
       }
-    })
+    }
+
+    source.addEventListener('message', handler)
   }
 }
 
