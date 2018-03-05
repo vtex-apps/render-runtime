@@ -162,7 +162,7 @@ class RenderProvider extends Component {
 
     const {components, culture: {locale}} = this.state
     const [app] = component.split('/')
-    const sameAppAsset = Object.keys(global.__RENDER_6_COMPONENTS__).find((c) => c.startsWith(app))
+    const sameAppAsset = Object.keys(global.__RENDER_7_COMPONENTS__).find((c) => c.startsWith(app))
 
     if (sameAppAsset) {
       return fetchAssets(components[component])

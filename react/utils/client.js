@@ -2,6 +2,7 @@ import {canUseDOM} from 'exenv'
 import {ApolloClient} from 'apollo-client'
 import {createHttpLink} from 'apollo-link-http'
 import {InMemoryCache} from 'apollo-cache-inmemory'
+import {createPersistedQueryLink, defaultOptions} from 'apollo-link-persisted-queries'
 
 function getDataIdFromObject({id, __typename}) {
   return id && __typename ? `${__typename}:${id}` : null
@@ -22,13 +23,21 @@ export const getClient = (runtime) => {
       dataIdFromObject: getDataIdFromObject,
       addTypename: true,
     })
+    const uri = canUseDOM ? graphQlUri.browser : graphQlUri.ssr
+
+    const httpLink = createHttpLink({
+      batchInterval: 80,
+      credentials: 'same-origin',
+      uri,
+    })
+
+    const persistedQueryLink = createPersistedQueryLink({
+      generateHash: ({documentId}) => documentId,
+      disable: defaultOptions.disable
+    })
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
-      link: createHttpLink({
-        uri: canUseDOM ? graphQlUri.browser : graphQlUri.ssr,
-        batchInterval: 80,
-        credentials: 'include',
-      }),
+      link: persistedQueryLink.concat(httpLink),
       ssrMode: !canUseDOM,
       cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
     })

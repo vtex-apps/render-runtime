@@ -41,15 +41,15 @@ export default class ExtensionPointComponent extends Component {
 
   subscribeToComponent = (c) => {
     const app = c && c.split('/')[0]
-    if (global.__RENDER_6_HOT__[app]) {
-      global.__RENDER_6_HOT__[app].addListener(`component:${c}:update`, this.updateComponents)
+    if (global.__RENDER_7_HOT__[app]) {
+      global.__RENDER_7_HOT__[app].addListener(`component:${c}:update`, this.updateComponents)
     }
   }
 
   unsubscribeToComponent = (c) => {
     const app = c && c.split('/')[0]
-    if (global.__RENDER_6_HOT__[app]) {
-      global.__RENDER_6_HOT__[app].removeListener(`component:${c}:update`, this.updateComponents)
+    if (global.__RENDER_7_HOT__[app]) {
+      global.__RENDER_7_HOT__[app].removeListener(`component:${c}:update`, this.updateComponents)
     }
   }
 

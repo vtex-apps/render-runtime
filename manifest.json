@@ -6,7 +6,7 @@
   "description": "The VTEX Render framework runtime",
   "defaultLocale": "pt-BR",
   "builders": {
-    "react": "1.x"
+    "react": "2.x"
   },
   "mustUpdateAt": "2018-09-05",
   "categories": [],
