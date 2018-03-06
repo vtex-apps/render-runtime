@@ -2,7 +2,7 @@ import {canUseDOM} from 'exenv'
 import {ApolloClient} from 'apollo-client'
 import {createHttpLink} from 'apollo-link-http'
 import {InMemoryCache} from 'apollo-cache-inmemory'
-import {createPersistedQueryLink, defaultOptions} from 'apollo-link-persisted-queries'
+import {createPersistedQueryLink} from 'apollo-link-persisted-queries'
 
 function getDataIdFromObject({id, __typename}) {
   return id && __typename ? `${__typename}:${id}` : null
