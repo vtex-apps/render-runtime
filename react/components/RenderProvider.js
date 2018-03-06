@@ -85,7 +85,6 @@ class RenderProvider extends Component {
     // If RenderProvider is being re-rendered, the global runtime might have changed
     // so we must update the root extension.
     if (this.rendered) {
-      console.log('updating root extension from runtime', nextProps.root)
       this.updateExtension(nextProps.root, nextProps.runtime.extensions[nextProps.root])
     }
   }
