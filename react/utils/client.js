@@ -33,7 +33,8 @@ export const getClient = (runtime) => {
 
     const persistedQueryLink = createPersistedQueryLink({
       generateHash: ({documentId}) => documentId,
-      disable: defaultOptions.disable
+      disable: () => true,
+      useGETForHashedQueries: false
     })
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
