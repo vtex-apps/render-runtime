@@ -24,33 +24,28 @@ export default class BuildStatus extends Component {
     }
   }
 
-  updateStatus = code => {
+  clearTimeouts = () => {
+    clearTimeout(this.animateOutHandle)
+    clearTimeout(this.hideHandle)
+  }
+
+  hideWithDelay = (delayMillis) => {
+    this.animateOutHandle = setTimeout(() => this.setState({ animateOut: true }), delayMillis)
+    this.hideHandle = setTimeout(() => this.setState({ status: null, animateOut: false }), delayMillis + 300)
+  }
+
+  updateStatus = (status) => {
     // After we started a reload, the UI shouldn't move.
     if (this.state.status === 'reload') {
       return
     }
 
-    this.setState({
-      status: code,
-    })
+    this.setState({status, animateOut: false})
+    this.clearTimeouts()
 
-    if (code === 'success') {
-      this.animateOutHandle = setTimeout(() => this.setState({ animateOut: true }), 2000)
-      this.hideHandle = setTimeout(
-        () => this.setState({ status: null, animateOut: false }),
-        2400
-      )
-    } else if (code === 'reload') {
-      clearTimeout(this.animateOutHandle)
-      clearTimeout(this.hideHandle)
-    } else if (code === 'hmr:success') {
-      clearTimeout(this.animateOutHandle)
-      clearTimeout(this.hideHandle)
-      this.setState({ animateOut: true })
-      this.hideHandle = setTimeout(
-        () => this.setState({ status: null, animateOut: false }),
-        400
-      )
+    if (status === 'success' || status === 'hmr:success') {
+      const delay = status === 'success' ? 2000 : 0
+      this.hideWithDelay(delay)
     }
   }
 
@@ -70,6 +65,7 @@ export default class BuildStatus extends Component {
 
   componentWillUnmount() {
     this.unsubscribeToStatus()
+    this.clearTimeouts()
   }
 
   render() {
