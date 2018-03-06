@@ -19,7 +19,7 @@ class ExtensionPoint extends Component {
   }
 
   constructor(props, context) {
-    super()
+    super(props, context)
     this.state = this.getExtensionPointState(props.treePath, context.extensions)
   }
 
