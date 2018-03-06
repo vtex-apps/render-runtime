@@ -79,7 +79,7 @@ export default class BuildStatus extends Component {
       return null
     }
 
-    const className = `fixed animated pa3 bg-near-white br3 rebel-pink flex items-center shadow-4 ${
+    const className = `build-status z-999 fixed animated pa3 bg-near-white br3 rebel-pink flex items-center shadow-4 ${
       animateOut ? 'fadeOut' : 'fadeIn'
     }`
 
