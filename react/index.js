@@ -1,7 +1,7 @@
 import {canUseDOM} from 'exenv'
 import createHistory from 'history/createBrowserHistory'
 import React from 'react'
-import {render as renderDOM} from 'react-dom'
+import {hydrate, render as renderDOM} from 'react-dom'
 import {AppContainer} from 'react-hot-loader'
 import {Helmet} from 'react-helmet'
 import NoSSR from 'react-no-ssr'
@@ -57,7 +57,7 @@ const isRoot = (name, index, names) =>
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = (name, runtime, element) => {
-  const {customRouting, pages, extensions, culture: {locale}} = runtime
+  const {customRouting, disableSSR, pages, extensions, culture: {locale}} = runtime
 
   registerEmitter(runtime)
   addLocaleData(locale)
@@ -74,7 +74,7 @@ const render = (name, runtime, element) => {
     </AppContainer>
   )
   return canUseDOM
-    ? renderDOM(root, elem)
+    ? (disableSSR ? renderDOM(root, elem) : hydrate(root, elem))
     : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
       name,
       renderTimeMetric,
