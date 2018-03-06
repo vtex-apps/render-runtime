@@ -4,6 +4,7 @@ import React from 'react'
 import {render as renderDOM} from 'react-dom'
 import {AppContainer} from 'react-hot-loader'
 import {Helmet} from 'react-helmet'
+import NoSSR from 'react-no-ssr'
 
 import {registerEmitter} from './utils/events'
 import {addLocaleData} from './utils/locales'
@@ -135,4 +136,7 @@ global.__RENDER_7_RUNTIME__ = {
   ExtensionPoint,
   Img,
   Link,
+  NoSSR,
+  Helmet,
+  canUseDOM,
 }
