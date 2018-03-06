@@ -1,9 +1,9 @@
-import React, {Component} from 'react'
+import React, {PureComponent} from 'react'
 import PropTypes from 'prop-types'
 
 import {getImplementation} from '../utils/assets'
 
-export default class ExtensionPointComponent extends Component {
+export default class ExtensionPointComponent extends PureComponent {
   static contextTypes = {
     emitter: PropTypes.object,
     extensions: PropTypes.object,
@@ -26,8 +26,12 @@ export default class ExtensionPointComponent extends Component {
   }
 
   updateComponents = () => {
-    this.emitBuildStatus('hmr:success')
     this.forceUpdate()
+  }
+
+  updateComponentsWithEvent = () => {
+    this.emitBuildStatus('hmr:success')
+    this.updateComponents()
   }
 
   emitBuildStatus = (status) => {
@@ -42,8 +46,9 @@ export default class ExtensionPointComponent extends Component {
 
     // Let's fetch the assets and re-render.
     if (component && !Component) {
+      this.emitBuildStatus('start')
       fetchComponent(component)
-      .then(this.updateComponents)
+      .then(this.updateComponentsWithEvent)
       .catch(() => {
         this.emitBuildStatus('fail')
       })
@@ -53,14 +58,14 @@ export default class ExtensionPointComponent extends Component {
   subscribeToComponent = (c) => {
     const app = c && c.split('/')[0]
     if (global.__RENDER_7_HOT__[app]) {
-      global.__RENDER_7_HOT__[app].addListener(`component:${c}:update`, this.updateComponents)
+      global.__RENDER_7_HOT__[app].addListener(`component:${c}:update`, this.updateComponentsWithEvent)
     }
   }
 
   unsubscribeToComponent = (c) => {
     const app = c && c.split('/')[0]
     if (global.__RENDER_7_HOT__[app]) {
-      global.__RENDER_7_HOT__[app].removeListener(`component:${c}:update`, this.updateComponents)
+      global.__RENDER_7_HOT__[app].removeListener(`component:${c}:update`, this.updateComponentsWithEvent)
     }
   }
 
@@ -81,7 +86,10 @@ export default class ExtensionPointComponent extends Component {
 
     this.unsubscribeToComponent(component)
     this.subscribeToComponent(nextComponent)
-    this.updateComponents()
+
+    if (this.props.component !== nextProps.component) {
+      this.updateComponents()
+    }
   }
 
   componentDidUpdate() {
