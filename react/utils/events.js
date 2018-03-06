@@ -8,7 +8,7 @@ const initSSE = (account, workspace, publicEndpoint = 'myvtex.com') => {
     require('eventsource-polyfill')
     const myvtexSSE = require('myvtex-sse')
     const host = `${workspace}--${account}.${publicEndpoint}`
-    const source = myvtexSSE(account, workspace, 'vtex.builder-hub:*:react2,pages0,build.status', {verbose: true, host})
+    const source = myvtexSSE(account, workspace, 'vtex.builder-hub:*:react2,pages0,build.status', {verbose: false, host})
 
     const handler = function({data}) {
       const event = JSON.parse(data)
@@ -54,6 +54,8 @@ const initSSE = (account, workspace, publicEndpoint = 'myvtex.com') => {
     }
 
     source.addEventListener('message', handler)
+    source.addEventListener('open', () => console.log('[render] Connected to event server successfully'))
+    source.addEventListener('error', () => console.log('[render] Connection to event server failed'))
   }
 }
 

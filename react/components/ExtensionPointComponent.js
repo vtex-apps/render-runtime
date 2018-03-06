@@ -26,12 +26,24 @@ export default class ExtensionPointComponent extends PureComponent {
   }
 
   updateComponents = () => {
+    if (!this._isMounted) {
+      return false
+    }
+
     this.forceUpdate()
   }
 
-  updateComponentsWithEvent = () => {
+  updateComponentsWithEvent = (component) => {
+    if (!this._isMounted) {
+      return false
+    }
+
     this.emitBuildStatus('hmr:success')
     this.updateComponents()
+
+    const {treePath} = this.context
+    const {component: mounted} = this.props
+    console.log(`[render] Component updated. treePath=${treePath} ${mounted !== component ? `mounted=${mounted} ` : ''}updated=${component}`)
   }
 
   emitBuildStatus = (status) => {
@@ -70,6 +82,7 @@ export default class ExtensionPointComponent extends PureComponent {
   }
 
   componentDidMount() {
+    this._isMounted = true
     const {component} = this.props
     this.subscribeToComponent(component)
     this.fetchAndRerender()
@@ -84,10 +97,9 @@ export default class ExtensionPointComponent extends PureComponent {
     const {component} = this.props
     const {component: nextComponent} = nextProps
 
-    this.unsubscribeToComponent(component)
-    this.subscribeToComponent(nextComponent)
-
-    if (this.props.component !== nextProps.component) {
+    if (component !== nextComponent) {
+      this.unsubscribeToComponent(component)
+      this.subscribeToComponent(nextComponent)
       this.updateComponents()
     }
   }
@@ -97,6 +109,7 @@ export default class ExtensionPointComponent extends PureComponent {
   }
 
   componentWillUnmount() {
+    this._isMounted = false
     const {component} = this.props
     this.unsubscribeToComponent(component)
 
