@@ -27,7 +27,6 @@ const initSSE = (account, workspace, publicEndpoint = 'myvtex.com') => {
           case 'fail':
             console.log(`[build] Build failed. app=${subject}`)
             emittersByWorkspace[`${account}/${workspace}`].forEach(e => e.emit('build.status', code))
-            console.log('build failed')
             break
         }
         return
@@ -40,6 +39,7 @@ const initSSE = (account, workspace, publicEndpoint = 'myvtex.com') => {
           break
         case 'reload':
           console.log(`[react2] Received reload. app=${subject}`)
+          emittersByWorkspace[`${account}/${workspace}`].forEach(e => e.emit('build.status', 'reload'))
           location.reload(true)
           break
         case 'locales':

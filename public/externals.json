@@ -28,6 +28,9 @@
       {
         "path": "https://unpkg.com/intl@1.2.5/dist/Intl.js",
         "serverOnly": true
+      },
+      {
+        "path": "https://unpkg.com/animate.css@3.6.1/animate.css"
       }
     ],
     "prod": [
@@ -58,6 +61,9 @@
       {
         "path": "https://unpkg.com/intl@1.2.5/dist/Intl.min.js",
         "serverOnly": true
+      },
+      {
+        "path": "https://unpkg.com/animate.css@3.6.1/animate.min.css"
       }
     ]
   },

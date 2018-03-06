@@ -5,6 +5,7 @@ import {getImplementation} from '../utils/assets'
 
 export default class ExtensionPointComponent extends Component {
   static contextTypes = {
+    emitter: PropTypes.object,
     extensions: PropTypes.object,
     treePath: PropTypes.string,
     fetchComponent: PropTypes.func,
@@ -25,7 +26,13 @@ export default class ExtensionPointComponent extends Component {
   }
 
   updateComponents = () => {
+    this.emitBuildStatus('hmr:success')
     this.forceUpdate()
+  }
+
+  emitBuildStatus = (status) => {
+    const {emitter} = this.context
+    emitter.emit('build.status', status)
   }
 
   fetchAndRerender = () => {
@@ -35,7 +42,11 @@ export default class ExtensionPointComponent extends Component {
 
     // Let's fetch the assets and re-render.
     if (component && !Component) {
-      fetchComponent(component).then(this.updateComponents)
+      fetchComponent(component)
+      .then(this.updateComponents)
+      .catch(() => {
+        this.emitBuildStatus('fail')
+      })
     }
   }
 

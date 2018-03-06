@@ -6,7 +6,6 @@ import {IntlProvider} from 'react-intl'
 import {Helmet} from 'react-helmet'
 import {parse} from 'qs'
 
-import ExtensionPointComponent from './ExtensionPointComponent'
 import {fetchAssets} from '../utils/assets'
 import {getClient} from '../utils/client'
 import {loadLocaleData} from '../utils/locales'
@@ -14,6 +13,8 @@ import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/m
 import {fetchRuntime} from '../utils/runtime'
 import {pageNameFromPath} from '../utils/pages'
 
+import BuildStatus from './BuildStatus'
+import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
 
 class RenderProvider extends Component {
@@ -84,7 +85,6 @@ class RenderProvider extends Component {
     // If RenderProvider is being re-rendered, the global runtime might have changed
     // so we must update the root extension.
     if (this.rendered) {
-      console.log('updating root extension from runtime', nextProps.root)
       this.updateExtension(nextProps.root, nextProps.runtime.extensions[nextProps.root])
     }
   }
@@ -258,6 +258,7 @@ class RenderProvider extends Component {
       : (
         <div id="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
+          {!production && <BuildStatus />}
           <NestedExtensionPoints page={page} query={query} />
         </div>
       )
