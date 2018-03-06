@@ -81,30 +81,11 @@ class ExtensionPoint extends Component {
     }
   }
 
-  componentDidCatch(error, errorInfo) {
-    console.error('Failed to render extension point', this.props.treePath, error, errorInfo)
-    this.setState({
-      error,
-      errorInfo,
-    })
-  }
-
   render() {
-    const {children, treePath, params, query, ...parentProps} = this.props
-    const {component, props: extensionProps, error, errorInfo} = this.state
+    const {children, params, query, ...parentProps} = this.props
+    const {component, props: extensionProps} = this.state
 
     delete parentProps.id
-
-    // A children of this extension point throwed an uncaught error
-    if (error || errorInfo) {
-      return (
-        <div className="ExtensionPoint--error">
-          <p>Extension point {treePath} failed to render with error:</p>
-          <p>{error}</p>
-          <p>{errorInfo}</p>
-        </div>
-      )
-    }
 
     const props = {
       ...parentProps,

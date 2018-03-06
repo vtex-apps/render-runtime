@@ -23,6 +23,7 @@ export default class ExtensionPointComponent extends PureComponent {
     const root = context.treePath && context.treePath.split('/')[0]
     this.emptyExtensionPoint = context.extensions[`${root}/__empty`]
     this.editableExtensionPoint = context.extensions[`${root}/__editable`]
+    this.state = {}
   }
 
   updateComponents = () => {
@@ -30,7 +31,7 @@ export default class ExtensionPointComponent extends PureComponent {
       return false
     }
 
-    this.forceUpdate()
+    this.setState({error: null, errorInfo: null, lastUpdate: Date.now()})
   }
 
   updateComponentsWithEvent = (component) => {
@@ -81,6 +82,48 @@ export default class ExtensionPointComponent extends PureComponent {
     }
   }
 
+  handleToggleErrorDetails = () => {
+    this.setState({
+      errorDetails: !this.state.errorDetails,
+    })
+  }
+
+  renderError = () => {
+    const {treePath} = this.context
+    const {error, errorInfo, errorDetails} = this.state
+    const componentStack = errorInfo && errorInfo.componentStack
+
+    return (
+      <div className="bg-washed-yellow pa6 f5 serious-black br3 pre">
+        <span>Error rendering extension point <strong>{treePath}</strong></span>
+        <button className="blue bg-transparent bn pointer link" onClick={this.handleToggleErrorDetails}>({errorDetails ? 'hide' : 'show'} details)</button>
+        {errorDetails && (
+          <pre>
+            <code className="f6">
+              {error.stack}
+            </code>
+          </pre>
+        )}
+        {errorDetails && componentStack && (
+          <pre>
+            <code className="f6">
+              {componentStack}
+            </code>
+          </pre>
+        )}
+      </div>
+    )
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Failed to render extension point', this.context.treePath)
+    this.setState({
+      error,
+      errorInfo,
+      errorDetails: false,
+    })
+  }
+
   componentDidMount() {
     this._isMounted = true
     const {component} = this.props
@@ -122,7 +165,13 @@ export default class ExtensionPointComponent extends PureComponent {
   render() {
     const {treePath, production} = this.context
     const {component, props, children} = this.props
+    const {error} = this.state
     const Component = getImplementation(component)
+
+    // A children of this extension point throwed an uncaught error
+    if (error) {
+      return production ? null : this.renderError()
+    }
 
     const EmptyExtensionPoint = this.emptyExtensionPoint && getImplementation(this.emptyExtensionPoint.component)
     const EditableExtensionPoint = this.editableExtensionPoint && getImplementation(this.editableExtensionPoint.component)
