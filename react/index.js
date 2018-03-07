@@ -10,7 +10,6 @@ import {registerEmitter} from './utils/events'
 import {addLocaleData} from './utils/locales'
 import {getState} from './utils/client'
 import RenderProvider from './components/RenderProvider'
-import Img from './components/Img'
 import Link from './components/Link'
 import ExtensionContainer from './ExtensionContainer'
 import ExtensionPoint from './ExtensionPoint'
@@ -134,7 +133,6 @@ global.__RENDER_7_RUNTIME__ = {
   render,
   ExtensionContainer,
   ExtensionPoint,
-  Img,
   Link,
   NoSSR,
   Helmet,
