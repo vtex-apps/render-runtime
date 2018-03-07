@@ -35,7 +35,7 @@ const initSSE = (account, workspace, publicEndpoint = 'myvtex.com') => {
       switch (type) {
         case 'hmr':
           console.log(`[react2] Received update. app=${subject} hash=${hash}`)
-          global.__RENDER_7_HOT__[subject].emit('webpackHotUpdate', hash)
+          global.__RENDER_7_HOT__[subject] && global.__RENDER_7_HOT__[subject].emit('webpackHotUpdate', hash)
           break
         case 'reload':
           console.log(`[react2] Received reload. app=${subject}`)

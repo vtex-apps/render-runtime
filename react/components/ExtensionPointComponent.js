@@ -94,9 +94,9 @@ export default class ExtensionPointComponent extends PureComponent {
     const componentStack = errorInfo && errorInfo.componentStack
 
     return (
-      <div className="bg-washed-yellow pa6 f5 serious-black br3 pre">
+      <div className="bg-washed-red pa6 f5 serious-black br3 pre">
         <span>Error rendering extension point <strong>{treePath}</strong></span>
-        <button className="blue bg-transparent bn pointer link" onClick={this.handleToggleErrorDetails}>({errorDetails ? 'hide' : 'show'} details)</button>
+        <button className="red ph0 ma0 mh3 bg-transparent bn pointer link" onClick={this.handleToggleErrorDetails}>({errorDetails ? 'hide' : 'show'} details)</button>
         {errorDetails && (
           <pre>
             <code className="f6">

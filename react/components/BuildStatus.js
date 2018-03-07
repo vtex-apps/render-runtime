@@ -2,9 +2,9 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
 const loader = (
-  <svg width="32px" height="32px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-    <circle cx="50" opacity="0.4" cy="50" fill="none" stroke="#F71963" strokeWidth="12" r="40"></circle>
-    <circle cx="50" cy="50" fill="none" stroke="#F71963" strokeWidth="10" r="40" strokeDasharray="60 900" strokeLinecap="round" transform="rotate(96 50 50)">
+  <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+    <circle cx="50" opacity="0.4" cy="50" fill="none" stroke="#F71963" strokeWidth="14" r="40"></circle>
+    <circle cx="50" cy="50" fill="none" stroke="#F71963" strokeWidth="12" r="40" strokeDasharray="60 900" strokeLinecap="round" transform="rotate(96 50 50)">
       <animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50" keyTimes="0;1" dur="0.7s" begin="0s" repeatCount="indefinite"></animateTransform>
     </circle>
   </svg>
@@ -75,7 +75,7 @@ export default class BuildStatus extends Component {
       return null
     }
 
-    const className = `build-status z-999 fixed animated pa3 bg-near-white br3 rebel-pink flex items-center shadow-4 ${
+    const className = `build-status ${status} z-999 fixed animated pa3 bg-near-white br3 rebel-pink flex items-center shadow-4 ${
       animateOut ? 'fadeOut' : 'fadeIn'
     }`
 
@@ -88,7 +88,7 @@ export default class BuildStatus extends Component {
     )
 
     return (
-      <div className={className} style={{ top: '20px', left: '20px', animationDuration: '0.2s'}}>
+      <div className={className} style={{ top: '12px', left: '12px', animationDuration: '0.2s'}}>
         {status === 'fail'
           ? fail
           : status === 'reload'
