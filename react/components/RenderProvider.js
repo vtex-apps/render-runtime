@@ -20,6 +20,7 @@ import NestedExtensionPoints from './NestedExtensionPoints'
 class RenderProvider extends Component {
   static childContextTypes = {
     account: PropTypes.string,
+    workspace: PropTypes.string,
     components: PropTypes.object,
     culture: PropTypes.object,
     extensions: PropTypes.object,
@@ -104,9 +105,10 @@ class RenderProvider extends Component {
   getChildContext() {
     const {history, runtime} = this.props
     const {components, extensions, page, pages, culture} = this.state
-    const {account, emitter, settings, production} = runtime
+    const {account, emitter, settings, production, workspace} = runtime
 
     return {
+      workspace,
       account,
       components,
       culture,
