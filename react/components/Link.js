@@ -21,6 +21,8 @@ export default class Link extends React.Component {
   }
 
   static propTypes = {
+    page: PropTypes.string,
+    params: PropTypes.object,
     query: PropTypes.string,
     to: PropTypes.string,
     onClick: PropTypes.func,
