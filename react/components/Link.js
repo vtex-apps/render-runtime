@@ -6,12 +6,6 @@ const isLeftClickEvent = event => event.button === 0
 const isModifiedEvent = event =>
   !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey)
 
-const createLocationDescriptor = (to, {query}) => ({
-  pathname: to,
-  state: {renderRouting: true},
-  ...(query && {search: query}),
-})
-
 const absoluteRegex = /^https?:\/\/|^\/\//i
 
 const isAbsoluteUrl = url => absoluteRegex.test(url)
@@ -19,7 +13,7 @@ const isAbsoluteUrl = url => absoluteRegex.test(url)
 //eslint-disable-next-line
 export default class Link extends React.Component {
   static contextTypes = {
-    history: PropTypes.object,
+    navigate: PropTypes.func
   }
 
   static defaultProps = {
@@ -33,7 +27,7 @@ export default class Link extends React.Component {
   }
 
   handleClick = (event) => {
-    const {to, query} = this.props
+    const {page, params, query, to} = this.props
     if (
       isModifiedEvent(event) ||
       !isLeftClickEvent(event) ||
@@ -44,9 +38,8 @@ export default class Link extends React.Component {
 
     this.props.onClick()
 
-    if (this.context.history) {
-      const location = createLocationDescriptor(to, {query})
-      this.context.history.push(location)
+    const options = {page, params, query, to, fallbackToWindowLocation: false}
+    if (this.context.navigate(options)) {
       event.preventDefault()
     }
   }

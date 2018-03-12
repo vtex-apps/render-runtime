@@ -11,7 +11,7 @@ import {getClient} from '../utils/client'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
 import {fetchRuntime} from '../utils/runtime'
-import {pageNameFromPath} from '../utils/pages'
+import {navigate as pageNavigate, pageNameFromPath} from '../utils/pages'
 
 import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
@@ -29,6 +29,7 @@ class RenderProvider extends Component {
     emitter: PropTypes.object,
     history: PropTypes.object,
     getSettings: PropTypes.func,
+    navigate: PropTypes.func,
     updateRuntime: PropTypes.func,
     updateExtension: PropTypes.func,
     onPageChanged: PropTypes.func,
@@ -119,12 +120,19 @@ class RenderProvider extends Component {
       pages,
       production,
       getSettings: app => settings[app],
+      navigate: this.navigate,
       updateRuntime: this.updateRuntime,
       onPageChanged: this.onPageChanged,
       prefetchPage: this.prefetchPage,
       fetchComponent: this.fetchComponent,
       updateExtension: this.updateExtension,
     }
+  }
+
+  navigate = (options) => {
+    const {history} = this.props
+    const {pages} = this.state
+    return pageNavigate(history, pages, options)
   }
 
   onPageChanged = (location) => {

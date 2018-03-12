@@ -16,9 +16,38 @@ function trimEndingSlash(token) {
   return token.replace(/\/$/, '')
 }
 
-export function getParams(template, target) {
+function createLocationDescriptor (path, {query}) {
+  return {
+    pathname: path,
+    state: {renderRouting: true},
+    ...(query && {search: query}),
+  }
+}
+
+function adjustTemplate (template) {
   // make last splat capture optional
-  const properTemplate = trimEndingSlash(template).replace(/(\/\*\w+)$/, '($1)')
+  return trimEndingSlash(template).replace(/(\/\*\w+)$/, '($1)')
+}
+
+function pathFromPageName(page, pages, params) {
+  const {[page]: pageDescriptor} = pages
+  if (!pageDescriptor) {
+    console.error(`Page ${page} was not found`)
+    return null
+  }
+
+  const {path: template} = pageDescriptor
+  if (!template) {
+    console.error(`Page ${page} has no path`)
+    return null
+  }
+
+  const properTemplate = adjustTemplate(template)
+  return new RouteParser(properTemplate).reverse(params)
+}
+
+export function getParams(template, target) {
+  const properTemplate = adjustTemplate(template)
   const properTarget = trimEndingSlash(target)
   return new RouteParser(properTemplate).match(properTarget)
 }
@@ -30,6 +59,37 @@ export function getPagePath(name, pages) {
   return cname && isHost(cname)
     ? pagePath && pagePath.substr(rootPath.length)
     : pagePath
+}
+
+export function navigate(history, pages, options) {
+  let path
+  const {page, params, query, to, fallbackToWindowLocation = true} = options
+
+  if (page) {
+    path = pathFromPageName(page, pages, params)
+  } else if (to) {
+    path = to
+  } else {
+    console.error(`Invalid navigation options. You should use 'page' or 'to' parameters`)
+    return false
+  }
+
+  if (!path) {
+    return false
+  }
+
+  if (history) {
+    const location = createLocationDescriptor(path, {query})
+    history.push(location)
+    return true
+  }
+
+  if (fallbackToWindowLocation) {
+    window.location.href = `${path}${query}`
+    return true
+  }
+
+  return false
 }
 
 export function pageNameFromPath(path, pages) {
