@@ -81,11 +81,15 @@ export function navigate(history, pages, options) {
   if (history) {
     const location = createLocationDescriptor(path, {query})
     history.push(location)
-  } else if (fallbackToWindowLocation) {
-    window.location.href = `${path}${query}`
+    return true
   }
 
-  return true
+  if (fallbackToWindowLocation) {
+    window.location.href = `${path}${query}`
+    return true
+  }
+
+  return false
 }
 
 export function pageNameFromPath(path, pages) {
