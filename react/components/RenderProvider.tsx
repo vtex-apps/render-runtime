@@ -1,51 +1,73 @@
 import {canUseDOM} from 'exenv'
 import PropTypes from 'prop-types'
-import React, {Component} from 'react'
-import {ApolloProvider} from 'react-apollo'
-import {IntlProvider} from 'react-intl'
-import {Helmet} from 'react-helmet'
 import {parse} from 'qs'
+import React, {Component, ReactElement} from 'react'
+import {ApolloProvider} from 'react-apollo'
+import {Helmet} from 'react-helmet'
+import {IntlProvider} from 'react-intl'
 
+import {History, Location, LocationListener, UnregisterCallback} from 'history'
 import {fetchAssets} from '../utils/assets'
 import {getClient} from '../utils/client'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
+import {navigate as pageNavigate, NavigateOptions, pageNameFromPath} from '../utils/pages'
 import {fetchRuntime} from '../utils/runtime'
-import {navigate as pageNavigate, pageNameFromPath} from '../utils/pages'
 
 import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
 
-class RenderProvider extends Component {
-  static childContextTypes = {
+interface Props {
+  children: ReactElement<any> | null
+  history: History | null
+  root: string
+  runtime: RenderRuntime
+}
+
+export interface RenderProviderState {
+  components: RenderRuntime['components']
+  culture: RenderRuntime['culture']
+  extensions: RenderRuntime['extensions']
+  messages: RenderRuntime['messages']
+  page: RenderRuntime['page']
+  pages: RenderRuntime['pages']
+  production: RenderRuntime['production']
+  query: RenderRuntime['query']
+}
+
+class RenderProvider extends Component<Props, RenderProviderState> {
+  public static childContextTypes = {
     account: PropTypes.string,
-    workspace: PropTypes.string,
     components: PropTypes.object,
     culture: PropTypes.object,
+    emitter: PropTypes.object,
     extensions: PropTypes.object,
+    fetchComponent: PropTypes.func,
+    getSettings: PropTypes.func,
+    history: PropTypes.object,
+    navigate: PropTypes.func,
+    onPageChanged: PropTypes.func,
     page: PropTypes.string,
     pages: PropTypes.object,
-    emitter: PropTypes.object,
-    history: PropTypes.object,
-    getSettings: PropTypes.func,
-    navigate: PropTypes.func,
-    updateRuntime: PropTypes.func,
-    updateExtension: PropTypes.func,
-    onPageChanged: PropTypes.func,
     prefetchPage: PropTypes.func,
-    fetchComponent: PropTypes.func,
     production: PropTypes.bool,
+    updateExtension: PropTypes.func,
+    updateRuntime: PropTypes.func,
+    workspace: PropTypes.string,
   }
 
-  static propTypes = {
+  public static propTypes = {
     children: PropTypes.element,
     history: PropTypes.object,
     root: PropTypes.string,
     runtime: PropTypes.object,
   }
 
-  constructor(props) {
+  private rendered!: boolean
+  private unlisten!: UnregisterCallback | null
+
+  constructor(props: Props) {
     super(props)
     const {culture, messages, components, extensions, pages, page, query, production} = props.runtime
     const {history} = props
@@ -59,17 +81,17 @@ class RenderProvider extends Component {
 
     this.state = {
       components,
-      extensions,
       culture,
+      extensions,
       messages,
-      pages,
       page,
-      query,
+      pages,
       production,
+      query,
     }
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     this.rendered = true
     const {history, runtime} = this.props
     const {production, emitter} = runtime
@@ -83,7 +105,7 @@ class RenderProvider extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  public componentWillReceiveProps(nextProps: Props) {
     // If RenderProvider is being re-rendered, the global runtime might have changed
     // so we must update the root extension.
     if (this.rendered) {
@@ -91,10 +113,12 @@ class RenderProvider extends Component {
     }
   }
 
-  componentWillUnmount() {
+  public componentWillUnmount() {
     const {runtime} = this.props
     const {production, emitter} = runtime
-    this.unlisten && this.unlisten()
+    if (this.unlisten) {
+      this.unlisten()
+    }
     emitter.removeListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {
@@ -103,43 +127,43 @@ class RenderProvider extends Component {
     }
   }
 
-  getChildContext() {
+  public getChildContext() {
     const {history, runtime} = this.props
     const {components, extensions, page, pages, culture} = this.state
     const {account, emitter, settings, production, workspace} = runtime
 
     return {
-      workspace,
       account,
       components,
       culture,
-      extensions,
       emitter,
+      extensions,
+      fetchComponent: this.fetchComponent,
+      getSettings: (app: string) => settings[app],
       history,
+      navigate: this.navigate,
+      onPageChanged: this.onPageChanged,
       page,
       pages,
-      production,
-      getSettings: app => settings[app],
-      navigate: this.navigate,
-      updateRuntime: this.updateRuntime,
-      onPageChanged: this.onPageChanged,
       prefetchPage: this.prefetchPage,
-      fetchComponent: this.fetchComponent,
+      production,
       updateExtension: this.updateExtension,
+      updateRuntime: this.updateRuntime,
+      workspace,
     }
   }
 
-  navigate = (options) => {
+  public navigate = (options: NavigateOptions) => {
     const {history} = this.props
     const {pages} = this.state
     return pageNavigate(history, pages, options)
   }
 
-  onPageChanged = (location) => {
+  public onPageChanged = (location: Location) => {
     const {pages} = this.state
     const {pathname, state} = location
 
-    // Make sure this came from a Link component
+    // Make sure this is our navigation
     if (!state || !state.renderRouting) {
       return
     }
@@ -159,13 +183,13 @@ class RenderProvider extends Component {
     })
   }
 
-  prefetchPage = (pageName) => {
+  public prefetchPage = (pageName: string) => {
     const {extensions} = this.state
     const component = extensions[pageName].component
     return this.fetchComponent(component)
   }
 
-  fetchComponent = (component) => {
+  public fetchComponent = (component: string) => {
     if (!canUseDOM) {
       throw new Error('Cannot fetch components during server side rendering.')
     }
@@ -191,7 +215,7 @@ class RenderProvider extends Component {
     })
   }
 
-  onLocalesUpdated = (locales) => {
+  public onLocalesUpdated = (locales: string[]) => {
     const {runtime: {emitter}} = this.props
 
     // Current locale is one of the updated ones
@@ -209,7 +233,7 @@ class RenderProvider extends Component {
     }
   }
 
-  onLocaleSelected = (locale) => {
+  public onLocaleSelected = (locale: string) => {
     const {runtime: {emitter}} = this.props
 
     if (locale !== this.state.culture.locale) {
@@ -220,11 +244,11 @@ class RenderProvider extends Component {
       ])
       .then(([messages]) => {
         this.setState({
-          messages,
           culture: {
             ...this.state.culture,
             locale,
           },
+          messages,
         }, () => emitter.emit('extension:*:update'))
       })
       .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))
@@ -235,19 +259,19 @@ class RenderProvider extends Component {
     }
   }
 
-  updateRuntime = () =>
+  public updateRuntime = () =>
     fetchRuntime(this.props.runtime.graphQlUri.browser).then(({components, extensions, messages, pages}) => {
       const {runtime: {emitter}} = this.props
 
       this.setState({
         components,
-        messages,
         extensions,
+        messages,
         pages,
       }, () => emitter.emit('extension:*:update', this.state))
     })
 
-  updateExtension = (name, extension) => {
+  public updateExtension = (name: string, extension: Extension) => {
     const {runtime: {emitter}} = this.props
     const {extensions} = this.state
 
@@ -259,12 +283,12 @@ class RenderProvider extends Component {
     }, () => emitter.emit(`extension:${name}:update`, this.state))
   }
 
-  render() {
+  public render() {
     const {children, runtime} = this.props
     const {culture: {locale}, messages, pages, page, query, production, extensions} = this.state
 
     const component = children
-      ? React.cloneElement(children, {query})
+      ? React.cloneElement(children as ReactElement<any>, {query})
       : (
         <div id="render-provider">
           <Helmet title={pages[page] && pages[page].title} />

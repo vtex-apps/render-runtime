@@ -1,29 +1,43 @@
-import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import treePath from 'react-tree-path'
+import React, {Component, ReactElement} from 'react'
+import withTreePath, {TreePathProps} from 'react-tree-path'
 
 import ExtensionPointComponent from './components/ExtensionPointComponent'
+import {RenderProviderState} from './components/RenderProvider'
 
-class ExtensionPoint extends Component {
-  static contextTypes = {
-    extensions: PropTypes.object,
+interface Props {
+  id: string,
+  params?: any,
+  query?: any,
+}
+
+type ExtendedProps = Props & TreePathProps
+
+interface State {
+  component: string | null,
+  props: any
+}
+
+class ExtensionPoint extends Component<ExtendedProps, State> {
+  public static contextTypes = {
     emitter: PropTypes.object,
+    extensions: PropTypes.object,
     production: PropTypes.bool,
   }
 
-  static propTypes = {
+  public static propTypes = {
     children: PropTypes.node,
-    treePath: PropTypes.string.isRequired,
     params: PropTypes.object,
     query: PropTypes.object,
+    treePath: PropTypes.string.isRequired,
   }
 
-  constructor(props, context) {
+  constructor(props: ExtendedProps, context: RenderContext) {
     super(props, context)
     this.state = this.getExtensionPointState(props.treePath, context.extensions)
   }
 
-  getExtensionPointState = (treePath, extensions) => {
+  public getExtensionPointState = (treePath: string, extensions: Extensions): State => {
     const extension = extensions[treePath]
     return {
       component: extension ? extension.component : null,
@@ -31,24 +45,24 @@ class ExtensionPoint extends Component {
     }
   }
 
-  updateExtensionPoint = (state) => {
+  public updateExtensionPoint = (state?: RenderProviderState) => {
     if (state && state.extensions) {
       this.context.extensions = state.extensions
     }
     this.setState(this.getExtensionPointState(this.props.treePath, this.context.extensions))
   }
 
-  subscribeToTreePath = (treePath) => {
+  public subscribeToTreePath = (treePath: string) => {
     const {emitter} = this.context
     emitter.addListener(`extension:${treePath}:update`, this.updateExtensionPoint)
   }
 
-  unsubscribeToTreePath = (treePath) => {
+  public unsubscribeToTreePath = (treePath: string) => {
     const {emitter} = this.context
     emitter.removeListener(`extension:${treePath}:update`, this.updateExtensionPoint)
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     const {production} = this.context
     const {treePath} = this.props
 
@@ -58,7 +72,7 @@ class ExtensionPoint extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  public componentWillReceiveProps(nextProps: ExtendedProps) {
     const {production} = this.context
 
     if (nextProps.treePath !== this.props.treePath) {
@@ -71,7 +85,7 @@ class ExtensionPoint extends Component {
     }
   }
 
-  componentWillUnmount() {
+  public componentWillUnmount() {
     const {production} = this.context
     const {treePath} = this.props
 
@@ -81,11 +95,9 @@ class ExtensionPoint extends Component {
     }
   }
 
-  render() {
-    const {children, params, query, ...parentProps} = this.props
+  public render() {
+    const {children, params, query, id, ...parentProps} = this.props
     const {component, props: extensionProps} = this.state
-
-    delete parentProps.id
 
     const props = {
       ...parentProps,
@@ -98,4 +110,4 @@ class ExtensionPoint extends Component {
   }
 }
 
-export default treePath(ExtensionPoint)
+export default withTreePath<Props>(ExtensionPoint)

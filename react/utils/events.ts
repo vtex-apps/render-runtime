@@ -1,17 +1,32 @@
-import EventEmitter from 'eventemitter3'
+import * as EventEmitter from 'eventemitter3'
 import {canUseDOM} from 'exenv'
 
-const emittersByWorkspace = []
+interface IOEvent {
+  key: string
+  body: {
+    code: string,
+    type: string,
+    hash: string,
+    locales: any,
+    subject: string,
+  }
+}
 
-const initSSE = (account, workspace, publicEndpoint = 'myvtex.com') => {
+interface EmittersRegistry {
+  [key: string]: EventEmitter[]
+}
+
+const emittersByWorkspace: EmittersRegistry = {}
+
+const initSSE = (account: string, workspace: string, publicEndpoint: string = 'myvtex.com') => {
   if (Object.keys(global.__RENDER_7_HOT__).length > 0) {
     require('eventsource-polyfill')
     const myvtexSSE = require('myvtex-sse')
     const host = `${workspace}--${account}.${publicEndpoint}`
-    const source = myvtexSSE(account, workspace, 'vtex.builder-hub:*:react2,pages0,build.status', {verbose: false, host})
+    const source: EventSource = myvtexSSE(account, workspace, 'vtex.builder-hub:*:react2,pages0,build.status', {verbose: false, host})
 
-    const handler = function({data}) {
-      const event = JSON.parse(data)
+    const handler = ({data}: MessageEvent) => {
+      const event = JSON.parse(data) as IOEvent
       const {key, body: {code, type, hash, locales, subject}} = event
 
       if (key === 'build.status') {
@@ -35,7 +50,9 @@ const initSSE = (account, workspace, publicEndpoint = 'myvtex.com') => {
       switch (type) {
         case 'hmr':
           console.log(`[react2] Received update. app=${subject} hash=${hash}`)
-          global.__RENDER_7_HOT__[subject] && global.__RENDER_7_HOT__[subject].emit('webpackHotUpdate', hash)
+          if (global.__RENDER_7_HOT__[subject]) {
+            global.__RENDER_7_HOT__[subject].emit('webpackHotUpdate', hash)
+          }
           break
         case 'reload':
           console.log(`[react2] Received reload. app=${subject}`)
@@ -53,13 +70,13 @@ const initSSE = (account, workspace, publicEndpoint = 'myvtex.com') => {
       }
     }
 
-    source.addEventListener('message', handler)
-    source.addEventListener('open', () => console.log('[render] Connected to event server successfully'))
-    source.addEventListener('error', () => console.log('[render] Connection to event server failed'))
+    source.onmessage = handler
+    source.onopen = () => console.log('[render] Connected to event server successfully')
+    source.onerror = () => console.log('[render] Connection to event server failed')
   }
 }
 
-export const registerEmitter = (runtime) => {
+export const registerEmitter = (runtime: RenderRuntime) => {
   if (!canUseDOM) {
     return
   }

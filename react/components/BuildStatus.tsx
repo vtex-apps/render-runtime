@@ -1,5 +1,5 @@
-import React, {Component} from 'react'
 import PropTypes from 'prop-types'
+import React, {Component} from 'react'
 
 const loader = (
   <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
@@ -10,31 +10,40 @@ const loader = (
   </svg>
 )
 
-export default class BuildStatus extends Component {
-  static contextTypes = {
+interface State {
+  animateOut: boolean
+  status: string | null
+}
+
+export default class BuildStatus extends Component<any, State> {
+  public static contextTypes = {
     emitter: PropTypes.object,
   }
 
-  constructor(props, context) {
+  public context!: RenderContext
+  private animateOutHandle!: NodeJS.Timer
+  private hideHandle!: NodeJS.Timer
+
+  constructor(props: any, context: RenderContext) {
     super(props, context)
 
     this.state = {
-      status: null,
       animateOut: false,
+      status: null,
     }
   }
 
-  clearTimeouts = () => {
+  public clearTimeouts = () => {
     clearTimeout(this.animateOutHandle)
     clearTimeout(this.hideHandle)
   }
 
-  hideWithDelay = (delayMillis) => {
+  public hideWithDelay = (delayMillis: number) => {
     this.animateOutHandle = setTimeout(() => this.setState({ animateOut: true }), delayMillis)
     this.hideHandle = setTimeout(() => this.setState({ status: null, animateOut: false }), delayMillis + 300)
   }
 
-  updateStatus = (status) => {
+  public updateStatus = (status: string) => {
     // After we started a reload, the UI shouldn't move.
     if (this.state.status === 'reload') {
       return
@@ -49,26 +58,26 @@ export default class BuildStatus extends Component {
     }
   }
 
-  subscribeToStatus = () => {
+  public subscribeToStatus = () => {
     const {emitter} = this.context
     emitter.addListener('build.status', this.updateStatus)
   }
 
-  unsubscribeToStatus = () => {
+  public unsubscribeToStatus = () => {
     const {emitter} = this.context
     emitter.removeListener('build.status', this.updateStatus)
   }
 
-  componentDidMount() {
+  public componentDidMount() {
     this.subscribeToStatus()
   }
 
-  componentWillUnmount() {
+  public componentWillUnmount() {
     this.unsubscribeToStatus()
     this.clearTimeouts()
   }
 
-  render() {
+  public render() {
     const {status, animateOut} = this.state
 
     if (status === null) {
