@@ -1,46 +1,53 @@
-import {canUseDOM} from 'exenv'
+import {InMemoryCache, NormalizedCacheObject} from 'apollo-cache-inmemory'
 import {ApolloClient} from 'apollo-client'
 import {createHttpLink} from 'apollo-link-http'
-import {InMemoryCache} from 'apollo-cache-inmemory'
 import {createPersistedQueryLink} from 'apollo-link-persisted-queries'
+import {canUseDOM} from 'exenv'
 
-function getDataIdFromObject({id, __typename}) {
+interface ApolloClientsRegistry {
+  [key: string]: ApolloClient<NormalizedCacheObject>
+}
+
+function getDataIdFromObject(value: any) {
+  if (!value) {
+    return null
+  }
+  const {id, __typename} = value
   return id && __typename ? `${__typename}:${id}` : null
 }
 
-const clientsByWorkspace = []
+const clientsByWorkspace: ApolloClientsRegistry = {}
 
-export const getState = (runtime) => {
+export const getState = (runtime: RenderRuntime) => {
   const {account, workspace} = runtime
   return clientsByWorkspace[`${account}/${workspace}`].cache.extract()
 }
 
-export const getClient = (runtime) => {
+export const getClient = (runtime: RenderRuntime) => {
   const {graphQlUri, account, workspace} = runtime
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
     const cache = new InMemoryCache({
-      dataIdFromObject: getDataIdFromObject,
       addTypename: true,
+      dataIdFromObject: getDataIdFromObject,
     })
     const uri = canUseDOM ? graphQlUri.browser : graphQlUri.ssr
 
     const httpLink = createHttpLink({
-      batchInterval: 80,
       credentials: 'same-origin',
       uri,
     })
 
     const persistedQueryLink = createPersistedQueryLink({
-      generateHash: ({documentId}) => documentId,
       disable: () => true,
+      generateHash: ({documentId}: {documentId: string}) => documentId,
       useGETForHashedQueries: true
     })
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
+      cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
       link: persistedQueryLink.concat(httpLink),
       ssrMode: !canUseDOM,
-      cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
     })
   }
 

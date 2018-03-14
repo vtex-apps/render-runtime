@@ -1,22 +1,24 @@
-import RouteParser from 'route-parser'
 import {canUseDOM} from 'exenv'
+import {History, LocationDescriptorObject} from 'history'
+import * as RouteParser from 'route-parser'
 
-function getScore(path) {
+function getScore(path: string) {
   const catchAll = (path.match(/\*/g) || []).length
   const catchOne = (path.match(/:/g) || []).length
   const fixed = (path.match(/\/[\w_-]+/g) || []).length
+  // tslint:disable-next-line:no-bitwise
   return ~((catchAll << 12) + (catchOne << 6) + ((1 << 6) - fixed - 1))
 }
 
-function isHost(hostname) {
+function isHost(hostname: string) {
   return hostname === (canUseDOM ? window.location.hostname : global.__hostname__)
 }
 
-function trimEndingSlash(token) {
+function trimEndingSlash(token: string) {
   return token.replace(/\/$/, '')
 }
 
-function createLocationDescriptor (path, {query}) {
+function createLocationDescriptor (path: string, {query}: {query: any}): LocationDescriptorObject {
   return {
     pathname: path,
     state: {renderRouting: true},
@@ -24,13 +26,13 @@ function createLocationDescriptor (path, {query}) {
   }
 }
 
-function adjustTemplate (template) {
+function adjustTemplate (template: string) {
   // make last splat capture optional
   return trimEndingSlash(template).replace(/(\/\*\w+)$/, '($1)')
 }
 
-function pathFromPageName(page, pages, params) {
-  const {[page]: pageDescriptor} = pages
+function pathFromPageName(page: string, pages: Pages, params: any) {
+  const pageDescriptor = pages[page]
   if (!pageDescriptor) {
     console.error(`Page ${page} was not found`)
     return null
@@ -43,26 +45,27 @@ function pathFromPageName(page, pages, params) {
   }
 
   const properTemplate = adjustTemplate(template)
-  return new RouteParser(properTemplate).reverse(params)
+  return new RouteParser(properTemplate).reverse(params) || null
 }
 
-export function getParams(template, target) {
+export function getParams(template: string, target: string) {
   const properTemplate = adjustTemplate(template)
   const properTarget = trimEndingSlash(target)
   return new RouteParser(properTemplate).match(properTarget)
 }
 
-export function getPagePath(name, pages) {
+export function getPagePath(name: string, pages: Pages) {
   const [rootName] = name.split('/')
-  const {[rootName]: {path: rootPath, cname}, [name]: {path: pagePath}} = pages
+  const {path: rootPath, cname} = pages[rootName]
+  const {path: pagePath} = pages[name]
 
   return cname && isHost(cname)
     ? pagePath && pagePath.substr(rootPath.length)
     : pagePath
 }
 
-export function navigate(history, pages, options) {
-  let path
+export function navigate(history: History | null, pages: Pages, options: NavigateOptions) {
+  let path: string | null
   const {page, params, query, to, fallbackToWindowLocation = true} = options
 
   if (page) {
@@ -92,8 +95,12 @@ export function navigate(history, pages, options) {
   return false
 }
 
-export function pageNameFromPath(path, pages) {
-  let pageName, score, highScore
+export function pageNameFromPath(path: string, pages: Pages) {
+  let pageName: string | undefined
+  let score: number
+  let highScore: number = Number.NEGATIVE_INFINITY
+
+  // tslint:disable-next-line:forin
   for (const name in pages) {
     const pagePath = getPagePath(name, pages)
     if (pagePath) {
@@ -111,5 +118,14 @@ export function pageNameFromPath(path, pages) {
       pageName = name
     }
   }
+
   return pageName
+}
+
+export interface NavigateOptions {
+  page?: string
+  params?: any
+  query?: any
+  to?: string
+  fallbackToWindowLocation?: boolean
 }

@@ -1,18 +1,20 @@
-import React, {Component} from 'react'
 import PropTypes from 'prop-types'
+import React, {Component} from 'react'
 
 import ExtensionPoint from './ExtensionPoint'
 
 // eslint-disable-next-line
 class ExtensionContainer extends Component {
-  static contextTypes = {
+  public static contextTypes = {
     extensions: PropTypes.object,
     treePath: PropTypes.string,
   }
 
-  render() {
+  public context!: RenderContext
+
+  public render() {
     const {extensions, treePath} = this.context
-    const relative = name => name.replace(`${treePath}/`, '')
+    const relative = (name: string) => name.replace(`${treePath}/`, '')
     const children = Object.keys(extensions).filter(
       extension => {
         return extensions[extension].component &&
@@ -20,7 +22,7 @@ class ExtensionContainer extends Component {
           (new RegExp(`^${treePath}/[a-zA-Z0-9-]+$`)).test(extension)
       }
     )
-    const renderChildren = (extension) => (
+    const renderChildren = (extension: string) => (
       <ExtensionPoint key={relative(extension)} id={relative(extension)} />
     )
 
