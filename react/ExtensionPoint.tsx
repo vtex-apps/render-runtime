@@ -66,8 +66,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const {production} = this.context
     const {treePath} = this.props
 
+    this.subscribeToTreePath('*')
     if (!production) {
-      this.subscribeToTreePath('*')
       this.subscribeToTreePath(treePath)
     }
   }
@@ -89,8 +89,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const {production} = this.context
     const {treePath} = this.props
 
+    this.unsubscribeToTreePath('*')
     if (!production) {
-      this.unsubscribeToTreePath('*')
       this.unsubscribeToTreePath(treePath)
     }
   }
