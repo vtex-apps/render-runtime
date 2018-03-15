@@ -1,5 +1,6 @@
 import {InMemoryCache, NormalizedCacheObject} from 'apollo-cache-inmemory'
 import {ApolloClient} from 'apollo-client'
+import {BatchHttpLink} from 'apollo-link-batch-http'
 import {createHttpLink} from 'apollo-link-http'
 import {createPersistedQueryLink} from 'apollo-link-persisted-queries'
 import {canUseDOM} from 'exenv'
@@ -33,7 +34,8 @@ export const getClient = (runtime: RenderRuntime, baseURI: string) => {
       dataIdFromObject: getDataIdFromObject,
     })
 
-    const httpLink = createHttpLink({
+    const httpLink = new BatchHttpLink({
+      batchInterval: 80,
       credentials: 'same-origin',
     })
 
