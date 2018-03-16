@@ -22,7 +22,12 @@ const initSSE = (account: string, workspace: string, publicEndpoint: string = 'm
   if (Object.keys(global.__RENDER_7_HOT__).length > 0) {
     require('eventsource-polyfill')
     const myvtexSSE = require('myvtex-sse')
-    const host = `${workspace}--${account}.${publicEndpoint}`
+
+    const generatorMetaTag = document.querySelector(`meta[name='generator']`)
+    const generator = generatorMetaTag && generatorMetaTag.getAttribute('content')
+    const isRenderGenerator = generator && generator.startsWith('vtex.render-server')
+    const host = isRenderGenerator ? window.location.hostname : `${workspace}--${account}.${publicEndpoint}`
+
     const source: EventSource = myvtexSSE(account, workspace, 'vtex.builder-hub:*:react2,pages0,build.status', {verbose: false, host})
 
     const handler = ({data}: MessageEvent) => {
