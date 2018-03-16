@@ -32,6 +32,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     treePath: PropTypes.string.isRequired,
   }
 
+  public context!: RenderContext
+
   constructor(props: ExtendedProps, context: RenderContext) {
     super(props, context)
     this.state = this.getExtensionPointState(props.treePath, context.extensions)
