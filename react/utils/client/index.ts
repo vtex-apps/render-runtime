@@ -3,6 +3,7 @@ import {ApolloClient} from 'apollo-client'
 import {createHttpLink} from 'apollo-link-http'
 import {createPersistedQueryLink} from 'apollo-link-persisted-queries'
 import {canUseDOM} from 'exenv'
+import {uriSwitchLink} from './links/uriSwitchLink'
 
 interface ApolloClientsRegistry {
   [key: string]: ApolloClient<NormalizedCacheObject>
@@ -24,29 +25,29 @@ export const getState = (runtime: RenderRuntime) => {
 }
 
 export const getClient = (runtime: RenderRuntime) => {
-  const {graphQlUri, account, workspace} = runtime
+  const {account, workspace} = runtime
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
     const cache = new InMemoryCache({
       addTypename: true,
       dataIdFromObject: getDataIdFromObject,
     })
-    const uri = canUseDOM ? graphQlUri.browser : graphQlUri.ssr
 
     const httpLink = createHttpLink({
       credentials: 'same-origin',
-      uri,
     })
 
     const persistedQueryLink = createPersistedQueryLink({
       disable: () => true,
-      generateHash: ({documentId}: {documentId: string}) => documentId,
+      generateHash: ({documentId}: any) => documentId,
       useGETForHashedQueries: true
     })
 
+    const link = uriSwitchLink.concat(persistedQueryLink.concat(httpLink))
+
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
-      link: persistedQueryLink.concat(httpLink),
+      link,
       ssrMode: !canUseDOM,
     })
   }
