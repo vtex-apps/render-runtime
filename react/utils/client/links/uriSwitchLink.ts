@@ -1,5 +1,5 @@
 import {ApolloLink, NextLink, Observable, Operation, RequestHandler} from 'apollo-link'
-import {visit} from 'graphql'
+import {DocumentNode, visit} from 'graphql'
 
 const versionExtractorVisitor = (assets: any) => ({
   Argument (node: any) {
@@ -17,18 +17,22 @@ const scopeExtractorVisitor = (assets: any) => ({
   }
 })
 
-const uriFromQuery = (query: any) => {
+const assetsFromQuery = (query: DocumentNode) => {
   const assets = {version: '1', scope: 'public'}
   visit(query, versionExtractorVisitor(assets))
   visit(query, scopeExtractorVisitor(assets))
-
-  return `/_v/v${assets.version}/${assets.scope}/graphql`
+  return assets
 }
 
 export const uriSwitchLink = new ApolloLink((operation: Operation, forward?: NextLink) => {
-  operation.setContext({
-    ...operation.getContext(),
-    uri: uriFromQuery(operation.query)
+  const assets = assetsFromQuery(operation.query)
+  operation.setContext(({ fetchOptions = {} }) => {
+    const method = assets.scope === 'private' ? 'POST' : 'GET'
+    return {
+      ...operation.getContext(),
+      fetchOptions: {...fetchOptions, method},
+      uri: `/_v/v${assets.version}/${assets.scope}/graphql`,
+    }
   })
   return forward ? forward(operation) : null
 })

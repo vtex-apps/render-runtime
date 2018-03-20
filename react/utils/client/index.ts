@@ -39,8 +39,7 @@ export const getClient = (runtime: RenderRuntime) => {
 
     const persistedQueryLink = createPersistedQueryLink({
       disable: () => true,
-      generateHash: ({documentId}: any) => documentId,
-      useGETForHashedQueries: true
+      generateHash: ({documentId}: any) => documentId
     })
 
     const link = uriSwitchLink.concat(persistedQueryLink.concat(httpLink))
