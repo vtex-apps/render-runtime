@@ -31,7 +31,7 @@ export const uriSwitchLink = new ApolloLink((operation: Operation, forward?: Nex
     return {
       ...operation.getContext(),
       fetchOptions: {...fetchOptions, method},
-      uri: `/_v/v${assets.version}/${assets.scope}/graphql`,
+      uri: `/_v/graphql/v${assets.version}/${assets.scope}`,
     }
   })
   return forward ? forward(operation) : null
