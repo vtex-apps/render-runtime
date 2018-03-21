@@ -1,5 +1,6 @@
 import {ApolloLink, NextLink, Observable, Operation, RequestHandler} from 'apollo-link'
 import {DocumentNode, visit} from 'graphql'
+import { canUseDOM } from 'react-helmet'
 
 const versionExtractorVisitor = (assets: any) => ({
   Argument (node: any) {
@@ -31,7 +32,7 @@ export const uriSwitchLink = (baseURI: string) => new ApolloLink((operation: Ope
     return {
       ...operation.getContext(),
       fetchOptions: {...fetchOptions, method},
-      uri: `${baseURI}/_v/graphql/v${assets.version}/${assets.scope}`,
+      uri: `//${baseURI}/_v/graphql/v${assets.version}/${assets.scope}`,
     }
   })
   return forward ? forward(operation) : null
