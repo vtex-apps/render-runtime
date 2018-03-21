@@ -9,9 +9,9 @@ const acceptJson = canUseDOM ? new Headers({
 
 export const fetchRuntime = (apolloClient: ApolloClient<NormalizedCacheObject>, page: string, production: boolean, locale: string, renderMajor: number) => {
   const renderVersion = `${renderMajor}.x`
-  return apolloClient.query<PageQueryResponse>({query: runtimeQuery, variables: {page, production, locale, renderVersion}})
+  return apolloClient.query<{page: PageQueryResponse}>({query: runtimeQuery, variables: {page, production, locale, renderVersion}})
     .then<ParsedPageQueryResponse>(result => {
-      const {data: {componentsJSON, extensionsJSON, messagesJSON, pagesJSON}} = result
+      const {data: {page: {componentsJSON, extensionsJSON, messagesJSON, pagesJSON}}} = result
       const [components, extensions, messages, pages] = [componentsJSON, extensionsJSON, messagesJSON, pagesJSON].map(json => JSON.parse(json))
 
       return {
