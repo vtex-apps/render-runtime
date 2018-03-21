@@ -1,6 +1,6 @@
 import {ApolloLink, NextLink, Observable, Operation, RequestHandler} from 'apollo-link'
+import {canUseDOM} from 'exenv'
 import {DocumentNode, visit} from 'graphql'
-import { canUseDOM } from 'react-helmet'
 
 const versionExtractorVisitor = (assets: any) => ({
   Argument (node: any) {
@@ -27,12 +27,13 @@ const assetsFromQuery = (query: DocumentNode) => {
 
 export const uriSwitchLink = (baseURI: string) => new ApolloLink((operation: Operation, forward?: NextLink) => {
   const assets = assetsFromQuery(operation.query)
+  const protocol = canUseDOM ? '' : 'http:'
   operation.setContext(({ fetchOptions = {} }) => {
     const method = assets.scope === 'private' ? 'POST' : 'GET'
     return {
       ...operation.getContext(),
       fetchOptions: {...fetchOptions, method},
-      uri: `//${baseURI}/_v/graphql/v${assets.version}/${assets.scope}`,
+      uri: `${protocol}//${baseURI}/_v/graphql/v${assets.version}/${assets.scope}`,
     }
   })
   return forward ? forward(operation) : null
