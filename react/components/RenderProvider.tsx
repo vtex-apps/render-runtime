@@ -14,6 +14,8 @@ import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/m
 import {navigate as pageNavigate, NavigateOptions, pageNameFromPath} from '../utils/pages'
 import {fetchRuntime} from '../utils/runtime'
 
+import {NormalizedCacheObject} from 'apollo-cache-inmemory'
+import ApolloClient from 'apollo-client'
 import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
@@ -66,6 +68,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   private rendered!: boolean
   private unlisten!: UnregisterCallback | null
+  private apolloClient: ApolloClient<NormalizedCacheObject>
 
   constructor(props: Props) {
     super(props)
@@ -79,6 +82,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       global.browserHistory = history
     }
 
+    this.apolloClient = getClient(props.runtime)
     this.state = {
       components,
       culture,
@@ -202,7 +206,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return fetchAssets(components[component])
     }
 
-    const messagesPromise = fetchMessagesForApp(this.props.runtime.graphQlUri.browser, app, locale)
+    const messagesPromise = fetchMessagesForApp(this.apolloClient, app, locale)
     const assetsPromise = fetchAssets(components[component])
 
     return Promise.all([messagesPromise, assetsPromise]).then(([messages]) => {
@@ -304,7 +308,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       : component
 
     return (
-      <ApolloProvider client={getClient(runtime)}>
+      <ApolloProvider client={this.apolloClient}>
         <IntlProvider locale={locale} messages={messages}>
           {maybeEditable}
         </IntlProvider>
