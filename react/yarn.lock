@@ -47,6 +47,12 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-hot-loader@^3.0.6":
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/@types/react-hot-loader/-/react-hot-loader-3.0.6.tgz#23b1875a327c32cbab705fbf660d8f207ede4d69"
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-intl@^2.3.5":
   version "2.3.5"
   resolved "https://registry.yarnpkg.com/@types/react-intl/-/react-intl-2.3.5.tgz#eafa170d83c06302416075867a6fd219c1cf84d8"
