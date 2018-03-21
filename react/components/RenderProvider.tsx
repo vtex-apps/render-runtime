@@ -23,6 +23,7 @@ import NestedExtensionPoints from './NestedExtensionPoints'
 interface Props {
   children: ReactElement<any> | null
   history: History | null
+  baseURI: string
   root: string
   runtime: RenderRuntime
 }
@@ -73,7 +74,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   constructor(props: Props) {
     super(props)
     const {culture, messages, components, extensions, pages, page, query, production} = props.runtime
-    const {history} = props
+    const {history, baseURI} = props
 
     if (history) {
       const renderLocation = {...history.location, state: {renderRouting: true}}
@@ -82,7 +83,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       global.browserHistory = history
     }
 
-    this.apolloClient = getClient(props.runtime)
+    this.apolloClient = getClient(props.runtime, baseURI)
     this.state = {
       components,
       culture,
@@ -220,11 +221,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onLocalesUpdated = (locales: string[]) => {
-    const {runtime: {emitter}} = this.props
+    const {runtime: {emitter, renderMajor}} = this.props
+    const {page, production, culture: {locale}} = this.state
 
     // Current locale is one of the updated ones
     if (locales.indexOf(this.state.culture.locale) !== -1) {
-      fetchMessages(this.props.runtime.graphQlUri.browser)
+      fetchMessages(this.apolloClient, page, production, locale, renderMajor)
         .then(messages => {
           this.setState({
             messages,
@@ -238,12 +240,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onLocaleSelected = (locale: string) => {
-    const {runtime: {emitter}} = this.props
+    const {runtime: {emitter, renderMajor}} = this.props
+    const {page, production} = this.state
 
     if (locale !== this.state.culture.locale) {
       createLocaleCookie(locale)
       Promise.all([
-        fetchMessages(this.props.runtime.graphQlUri.browser),
+        fetchMessages(this.apolloClient, page, production, locale, renderMajor),
         loadLocaleData(locale),
       ])
       .then(([messages]) => {
@@ -263,17 +266,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public updateRuntime = () =>
-    fetchRuntime(this.props.runtime.graphQlUri.browser).then(({components, extensions, messages, pages}) => {
-      const {runtime: {emitter}} = this.props
+  public updateRuntime = () => {
+    const {runtime: {emitter, renderMajor}} = this.props
+    const {page, production, culture: {locale}} = this.state
 
-      this.setState({
-        components,
-        extensions,
-        messages,
-        pages,
-      }, () => emitter.emit('extension:*:update', this.state))
-    })
+    return fetchRuntime(this.apolloClient, page, production, locale, renderMajor)
+      .then(({components, extensions, messages, pages}) => {
+        this.setState({
+          components,
+          extensions,
+          messages,
+          pages,
+        }, () => emitter.emit('extension:*:update', this.state))
+      })
+  }
 
   public updateExtension = (name: string, extension: Extension) => {
     const {runtime: {emitter}} = this.props

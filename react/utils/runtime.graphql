@@ -1,4 +1,4 @@
-query Messages ($page: String!, $production: Boolean!, $locale: String!, $renderVersion: String!) {
+query Runtime ($page: String!, $production: Boolean!, $locale: String!, $renderVersion: String!) {
   page(page: $page, production: $production, locale: $locale, renderVersion: $renderVersion) {
     messagesJSON
   }

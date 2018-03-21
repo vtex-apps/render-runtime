@@ -24,7 +24,7 @@ export const getState = (runtime: RenderRuntime) => {
   return clientsByWorkspace[`${account}/${workspace}`].cache.extract()
 }
 
-export const getClient = (runtime: RenderRuntime) => {
+export const getClient = (runtime: RenderRuntime, baseURI: string) => {
   const {account, workspace} = runtime
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
@@ -42,7 +42,7 @@ export const getClient = (runtime: RenderRuntime) => {
       generateHash: ({documentId}: any) => documentId
     })
 
-    const link = uriSwitchLink.concat(persistedQueryLink.concat(httpLink))
+    const link = uriSwitchLink(baseURI).concat(persistedQueryLink.concat(httpLink))
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(global.__STATE__) : cache,

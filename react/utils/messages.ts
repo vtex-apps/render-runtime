@@ -1,7 +1,8 @@
 import { NormalizedCacheObject } from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
 import {canUseDOM} from 'exenv'
-import messagesQuery from './messages.graphql'
+import appMessagesQuery from './appMessages.graphql'
+import pageMessagesQuery from './messages.graphql'
 
 const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
 
@@ -15,17 +16,20 @@ const acceptAndContentJson = canUseDOM ? new Headers({
 }) : undefined
 
 export const fetchMessagesForApp = (apolloClient: ApolloClient<NormalizedCacheObject>, app: string, locale: string) =>
-  apolloClient.query<{messages: string}>({query: messagesQuery, variables: {app, locale}})
+  apolloClient.query<{messages: string}>({query: appMessagesQuery, variables: {app, locale}})
     .then<RenderRuntime['messages']>(result => {
       const messagesJSON = result.data.messages
       return JSON.parse(messagesJSON)
     })
 
-export const fetchMessages = (graphQlUri: string) =>
-  fetch(graphQlUri.replace('=graphql', '=messages'), {
-    credentials: 'include',
-    headers: acceptJson,
-  }).then<RenderRuntime['messages']>(res => res.json())
+export const fetchMessages = (apolloClient: ApolloClient<NormalizedCacheObject>, page: string, production: boolean, locale: string, renderMajor: number) => {
+  const renderVersion = `${renderMajor}.x`
+  return apolloClient.query<PageQueryResponse>({query: pageMessagesQuery, variables: {page, production, locale, renderVersion}})
+    .then<RenderRuntime['messages']>(result => {
+      const messagesJSON = result.data.messagesJSON
+      return JSON.parse(messagesJSON)
+    })
+}
 
 export const createLocaleCookie = (locale: string) => {
   const yearFromNow = Date.now() + YEAR_IN_MS

@@ -24,14 +24,14 @@ const assetsFromQuery = (query: DocumentNode) => {
   return assets
 }
 
-export const uriSwitchLink = new ApolloLink((operation: Operation, forward?: NextLink) => {
+export const uriSwitchLink = (baseURI: string) => new ApolloLink((operation: Operation, forward?: NextLink) => {
   const assets = assetsFromQuery(operation.query)
   operation.setContext(({ fetchOptions = {} }) => {
     const method = assets.scope === 'private' ? 'POST' : 'GET'
     return {
       ...operation.getContext(),
       fetchOptions: {...fetchOptions, method},
-      uri: `/_v/graphql/v${assets.version}/${assets.scope}`,
+      uri: `${baseURI}/_v/graphql/v${assets.version}/${assets.scope}`,
     }
   })
   return forward ? forward(operation) : null

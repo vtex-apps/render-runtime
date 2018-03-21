@@ -1,0 +1,3 @@
+query AppMessages ($app: String!, $locale: String!) {
+  messages(app: $app, locale: $locale)
+}
