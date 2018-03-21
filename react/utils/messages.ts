@@ -17,18 +17,16 @@ const acceptAndContentJson = canUseDOM ? new Headers({
 
 export const fetchMessagesForApp = (apolloClient: ApolloClient<NormalizedCacheObject>, app: string, locale: string) =>
   apolloClient.query<{messages: string}>({query: appMessagesQuery, variables: {app, locale}})
-    .then<RenderRuntime['messages']>(result => {
-      const messagesJSON = result.data.messages
-      return JSON.parse(messagesJSON)
-    })
+    .then<RenderRuntime['messages']>(({data, errors}) =>
+      errors ? Promise.reject(errors) : JSON.parse(data.messages)
+    )
 
 export const fetchMessages = (apolloClient: ApolloClient<NormalizedCacheObject>, page: string, production: boolean, locale: string, renderMajor: number) => {
   const renderVersion = `${renderMajor}.x`
   return apolloClient.query<{page: PageQueryResponse}>({query: pageMessagesQuery, variables: {page, production, locale, renderVersion}})
-    .then<RenderRuntime['messages']>(result => {
-      const messagesJSON = result.data.page.messagesJSON
-      return JSON.parse(messagesJSON)
-    })
+    .then<RenderRuntime['messages']>(({data, errors}) =>
+      errors ? Promise.reject(errors) : JSON.parse(data.page.messagesJSON)
+    )
 }
 
 export const createLocaleCookie = (locale: string) => {
