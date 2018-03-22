@@ -27,7 +27,7 @@ const assetsFromQuery = (query: DocumentNode) => {
 
 export const uriSwitchLink = (baseURI: string) => new ApolloLink((operation: Operation, forward?: NextLink) => {
   const assets = assetsFromQuery(operation.query)
-  const protocol = canUseDOM ? '' : 'http:'
+  const protocol = canUseDOM ? 'https:' : 'http:'
   operation.setContext(({ fetchOptions = {} }) => {
     const method = assets.scope === 'private' ? 'POST' : 'GET'
     return {
