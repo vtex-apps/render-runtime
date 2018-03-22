@@ -8,6 +8,6 @@ export const getBaseURI = (runtime: RenderRuntime) => {
     const generatorMetaTag = document.querySelector(`meta[name='generator']`)
     const generator = generatorMetaTag && generatorMetaTag.getAttribute('content')
     const isRenderGenerator = generator && generator.startsWith('vtex.render-server')
-    return isRenderGenerator ? window.location.hostname : `${window.location.hostname}/api/io/${workspace}`
+    return isRenderGenerator ? window.location.hostname : `${workspace}--${account}.${publicEndpoint}`
   }
 }
