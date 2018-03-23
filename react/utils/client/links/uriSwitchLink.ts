@@ -25,7 +25,7 @@ const assetsFromQuery = (query: DocumentNode) => {
   return assets
 }
 
-export const uriSwitchLink = (baseURI: string) => new ApolloLink((operation: Operation, forward?: NextLink) => {
+export const uriSwitchLink = (workspace: string, baseURI: string) => new ApolloLink((operation: Operation, forward?: NextLink) => {
   const assets = assetsFromQuery(operation.query)
   const protocol = canUseDOM ? 'https:' : 'http:'
   operation.setContext(({ fetchOptions = {} }) => {
@@ -33,7 +33,7 @@ export const uriSwitchLink = (baseURI: string) => new ApolloLink((operation: Ope
     return {
       ...operation.getContext(),
       fetchOptions: {...fetchOptions, method},
-      uri: `${protocol}//${baseURI}/_v/graphql/v${assets.version}/${assets.scope}`,
+      uri: `${protocol}//${baseURI}/_v/graphql/v${assets.version}/${assets.scope}?workspace=${workspace}`,
     }
   })
   return forward ? forward(operation) : null

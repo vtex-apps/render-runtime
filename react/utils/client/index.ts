@@ -42,7 +42,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string) => {
       generateHash: ({documentId}: any) => documentId
     })
 
-    const link = uriSwitchLink(baseURI).concat(persistedQueryLink.concat(httpLink))
+    const link = uriSwitchLink(workspace, baseURI).concat(persistedQueryLink.concat(httpLink))
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
