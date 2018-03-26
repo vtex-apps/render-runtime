@@ -5,7 +5,7 @@ import {createHttpLink} from 'apollo-link-http'
 import {createPersistedQueryLink} from 'apollo-link-persisted-queries'
 import {canUseDOM} from 'exenv'
 import {generateHash} from './generateHash'
-import {uriSwitchLink} from './links/uriSwitchLink'
+import {createUriSwitchLink} from './links/uriSwitchLink'
 import {versionSplitterLink} from './links/versionSplitterLink'
 
 interface ApolloClientsRegistry {

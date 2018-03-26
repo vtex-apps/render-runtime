@@ -33,7 +33,7 @@ export const uriSwitchLink = (workspace: string, baseURI: string) => new ApolloL
     return {
       ...operation.getContext(),
       fetchOptions: {...fetchOptions, method},
-      uri: `${protocol}//${baseURI}/_v/graphql/v${assets.version}/${assets.scope}?workspace=${workspace}`,
+      uri: `${protocol}//${baseURI}/_v/graphql/${assets.scope}/v${assets.version}?workspace=${workspace}`,
     }
   })
   return forward ? forward(operation) : null
