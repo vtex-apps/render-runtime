@@ -4,6 +4,7 @@ import {BatchHttpLink} from 'apollo-link-batch-http'
 import {createHttpLink} from 'apollo-link-http'
 import {createPersistedQueryLink} from 'apollo-link-persisted-queries'
 import {canUseDOM} from 'exenv'
+import {generateHash} from './generateHash'
 import {uriSwitchLink} from './links/uriSwitchLink'
 import {versionSplitterLink} from './links/versionSplitterLink'
 
@@ -35,14 +36,13 @@ export const getClient = (runtime: RenderRuntime, baseURI: string) => {
       dataIdFromObject: getDataIdFromObject,
     })
 
-    const httpLink = new BatchHttpLink({
-      batchInterval: 80,
+    const httpLink = createHttpLink({
       credentials: 'same-origin',
     })
 
     const persistedQueryLink = createPersistedQueryLink({
       disable: () => true,
-      generateHash: ({documentId}: any) => documentId
+      generateHash
     })
 
     const link = uriSwitchLink(workspace, baseURI).concat(persistedQueryLink.concat(httpLink))

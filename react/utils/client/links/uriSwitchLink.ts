@@ -9,7 +9,6 @@ const versionExtractorVisitor = (assets: any) => ({
     }
   }
 })
-<<<<<<< HEAD
 
 const scopeExtractorVisitor = (assets: any) => ({
   Argument (node: any) {
@@ -36,29 +35,6 @@ export const uriSwitchLink = (workspace: string, baseURI: string) => new ApolloL
       fetchOptions: {...fetchOptions, method},
       uri: `${protocol}//${baseURI}/_v/graphql/v${assets.version}/${assets.scope}?workspace=${workspace}`,
     }
-=======
-
-const scopeExtractorVisitor = (assets: any) => ({
-  Argument (node: any) {
-    if (node.name.value === 'scope') {
-      assets.scope = node.value.value
-    }
-  }
-})
-
-const uriFromQuery = (query: any) => {
-  const assets = {version: '1', scope: 'public'}
-  visit(query, versionExtractorVisitor(assets))
-  visit(query, scopeExtractorVisitor(assets))
-
-  return `/_v/v${assets.version}/${assets.scope}/graphql`
-}
-
-export const uriSwitchLink = new ApolloLink((operation: Operation, forward?: NextLink) => {
-  operation.setContext({
-    ...operation.getContext(),
-    uri: uriFromQuery(operation.query)
->>>>>>> last work before change
   })
   return forward ? forward(operation) : null
 })
