@@ -9,6 +9,10 @@ const hashFromQuery = (asset: any) => ({
 })
 
 export const generateHash = (query: DocumentNode) => {
+  if (query.documentId) {
+    return query.documentId
+  }
+
   const asset = {hash: ''}
   visit(query, hashFromQuery(asset))
   return asset.hash
