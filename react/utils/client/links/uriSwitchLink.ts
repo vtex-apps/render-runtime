@@ -2,30 +2,24 @@ import {ApolloLink, NextLink, Observable, Operation, RequestHandler} from 'apoll
 import {canUseDOM} from 'exenv'
 import {DocumentNode, visit} from 'graphql'
 
-const versionExtractorVisitor = (assets: any) => ({
-  Argument (node: any) {
-    if (node.name.value === 'version') {
-      assets.version = node.value.value
-    }
-  }
-})
-
-const scopeExtractorVisitor = (assets: any) => ({
+const assetsExtractorVisitor = (assets: any) => ({
   Argument (node: any) {
     if (node.name.value === 'scope') {
       assets.scope = node.value.value
+    }
+    else if (node.name.value === 'version') {
+      assets.version = node.value.value
     }
   }
 })
 
 const assetsFromQuery = (query: DocumentNode) => {
   const assets = {version: '1', scope: 'public'}
-  visit(query, versionExtractorVisitor(assets))
-  visit(query, scopeExtractorVisitor(assets))
+  visit(query, assetsExtractorVisitor(assets))
   return assets
 }
 
-export const uriSwitchLink = (workspace: string, baseURI: string) => new ApolloLink((operation: Operation, forward?: NextLink) => {
+export const createUriSwitchLink = (workspace: string, baseURI: string) => new ApolloLink((operation: Operation, forward?: NextLink) => {
   const assets = assetsFromQuery(operation.query)
   const protocol = canUseDOM ? 'https:' : 'http:'
   operation.setContext(({ fetchOptions = {} }) => {
