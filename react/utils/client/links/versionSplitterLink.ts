@@ -27,22 +27,25 @@ const operationByContextDirective = (operation: Operation) => {
 }
 
 const observableFromOperations = (operations: Operation[], forward: NextLink) => new Observable(observer => {
-  const datas: any[] = []
-  let sent = false
+  const reduced = {}
+  let togo = 0
 
   operations.forEach((op: Operation) => forward(op).subscribe({
     complete: () => {
-      if (!sent && datas.length === operations.length) {
-        sent = true
-        observer.next(datas.reduce(mergeRecursively))
+      if (togo === operations.length) {
+        togo += 1
+        observer.next(reduced)
         observer.complete()
       }
     },
     error: (err) => {
-      datas.push({})
+      togo += 1
       observer.error(err)
     },
-    next: (data) => datas.push(data),
+    next: (data) => {
+      togo += 1
+      mergeRecursively(reduced, data)
+    },
   }))
 })
 
