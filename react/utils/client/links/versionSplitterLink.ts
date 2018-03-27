@@ -26,26 +26,33 @@ const operationByContextDirective = (operation: Operation) => {
   return queries.map(queryToOperation)
 }
 
+const observableFromOperations = (operations: Operation[], forward: NextLink) => new Observable(observer => {
+  const datas: any[] = []
+  let sent = false
+
+  operations.forEach((op: Operation) => forward(op).subscribe({
+    complete: () => {
+      if (!sent && datas.length === operations.length) {
+        sent = true
+        observer.next(datas.reduce(mergeRecursively))
+        observer.complete()
+      }
+    },
+    error: (err) => {
+      datas.push({})
+      observer.error(err)
+    },
+    next: (data) => datas.push(data),
+  }))
+})
+
 export const versionSplitterLink = new ApolloLink((operation: Operation, forward?: NextLink) => {
   const operations = operationByContextDirective(operation)
 
-  return forward ? new Observable(observer => {
-    const datas: any[] = []
-    let sent = false
-
-    operations.forEach((op: Operation) => forward(op).subscribe({
-      complete: () => {
-        if (!sent && datas.length === operations.length) {
-          sent = true
-          observer.next(datas.reduce(mergeRecursively))
-        }
-      },
-      error: (err) => {
-        datas.push({})
-        observer.error(err)
-      },
-      next: (data) => datas.push(data),
-    }))
-  }) :
-  null
+  if (forward) {
+    return operations.length ?
+      observableFromOperations(operations, forward) :
+      forward(operation)
+  }
+  return null
 })
