@@ -2,7 +2,7 @@ import {ApolloLink, NextLink, Observable, Operation, RequestHandler} from 'apoll
 import {canUseDOM} from 'exenv'
 import {ArgumentNode, DocumentNode, OperationDefinitionNode, visit} from 'graphql'
 
-const assetsExtractorVisitor = (assets: any) => ({
+const assetsVisitor = (assets: any) => ({
   Argument (node: ArgumentNode) {
     if (node.name.value === 'scope') {
       assets.scope = node.value.value
@@ -13,10 +13,7 @@ const assetsExtractorVisitor = (assets: any) => ({
     else if (node.name.value === 'maxAge') {
       assets.maxAge = node.value.value
     }
-  }
-})
-
-const operationNameVisitor = (assets: any) => ({
+  },
   OperationDefinition (node: OperationDefinitionNode) {
     if (!assets.operation) {
       assets.operation = node.operation
@@ -26,8 +23,7 @@ const operationNameVisitor = (assets: any) => ({
 
 const assetsFromQuery = (query: DocumentNode) => {
   const assets = {version: '1', scope: 'public', maxAge: 'long', operation: undefined}
-  visit(query, assetsExtractorVisitor(assets))
-  visit(query, operationNameVisitor(assets))
+  visit(query, assetsVisitor(assets))
   return assets
 }
 

@@ -21,9 +21,8 @@ const createOperationForQuery = (operation: Operation) => (query: DocumentNode) 
 }
 
 const operationByContextDirective = (operation: Operation) => {
-  const queryToOperation = createOperationForQuery(operation)
   const queries = queriesByContextDirective(operation.query)
-  return queries.map(queryToOperation)
+  return queries.map(createOperationForQuery(operation))
 }
 
 const observableFromOperations = (operations: Operation[], forward: NextLink) => new Observable(observer => {
@@ -33,17 +32,17 @@ const observableFromOperations = (operations: Operation[], forward: NextLink) =>
   operations.forEach((op: Operation) => forward(op).subscribe({
     complete: () => {
       if (togo === operations.length) {
-        togo += 1
+        togo++
         observer.next(reduced)
         observer.complete()
       }
     },
     error: (err) => {
-      togo += 1
+      togo++
       observer.error(err)
     },
     next: (data) => {
-      togo += 1
+      togo++
       mergeRecursively(reduced, data)
     },
   }))
