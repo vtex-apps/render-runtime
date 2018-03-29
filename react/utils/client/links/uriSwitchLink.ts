@@ -10,6 +10,9 @@ const assetsExtractorVisitor = (assets: any) => ({
     else if (node.name.value === 'version') {
       assets.version = node.value.value
     }
+    else if (node.name.value === 'maxAge') {
+      assets.maxAge = node.value.value
+    }
   }
 })
 
@@ -22,7 +25,7 @@ const operationNameVisitor = (assets: any) => ({
 })
 
 const assetsFromQuery = (query: DocumentNode) => {
-  const assets = {version: '1', scope: 'public', operation: undefined}
+  const assets = {version: '1', scope: 'public', maxAge: 'long', operation: undefined}
   visit(query, assetsExtractorVisitor(assets))
   visit(query, operationNameVisitor(assets))
   return assets
@@ -37,7 +40,7 @@ export const createUriSwitchLink = (workspace: string, baseURI: string) => new A
     return {
       ...operation.getContext(),
       fetchOptions: {...fetchOptions, method},
-      uri: `${protocol}//${baseURI}/_v/graphql/${assets.scope}/v${assets.version}?workspace=${workspace}`,
+      uri: `${protocol}//${baseURI}/_v/graphql/${assets.scope}/v${assets.version}?workspace=${workspace}&maxAge=${assets.maxAge}`,
     }
   })
   return forward ? forward(operation) : null
