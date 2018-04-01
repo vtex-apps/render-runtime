@@ -71,11 +71,21 @@
     "dev": [
       {
         "path": "https://unpkg.com/vtex-tachyons@2.3.0/tachyons.css"
+      },
+      {
+        "clientOnly": true,
+        "defer": false,
+        "path": "https://io.vtex.com.br/rc/rc.js"
       }
     ],
     "prod": [
       {
         "path": "https://unpkg.com/vtex-tachyons@2.3.0/tachyons.min.css"
+      },
+      {
+        "clientOnly": true,
+        "defer": false,
+        "path": "https://io.vtex.com.br/rc/rc.js"
       }
     ]
   },
