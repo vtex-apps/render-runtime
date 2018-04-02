@@ -22,7 +22,8 @@ const initSSE = (account: string, workspace: string, baseURI: string) => {
   if (Object.keys(global.__RENDER_7_HOT__).length > 0) {
     require('eventsource-polyfill')
     const myvtexSSE = require('myvtex-sse')
-    const source: EventSource = myvtexSSE(account, workspace, 'vtex.builder-hub:*:react2,pages0,build.status', {verbose: false, host: baseURI})
+    const path = `vtex.builder-hub:*:react2,pages0,build.status?workspace=${workspace}`
+    const source: EventSource = myvtexSSE(account, workspace, path, {verbose: false, host: baseURI})
 
     const handler = ({data}: MessageEvent) => {
       const event = JSON.parse(data) as IOEvent
