@@ -10,6 +10,7 @@ import Link from './components/Link'
 import RenderProvider from './components/RenderProvider'
 import ExtensionContainer from './ExtensionContainer'
 import ExtensionPoint from './ExtensionPoint'
+import PageCacheControl from './utils/cacheControl'
 import {getState} from './utils/client'
 import {registerEmitter} from './utils/events'
 import {getBaseURI} from './utils/host'
@@ -56,6 +57,7 @@ const isRoot = (name: string, index: number, names: string[]) =>
 const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered => {
   const {customRouting, disableSSR, pages, extensions, culture: {locale}} = runtime
 
+  const cacheControl = canUseDOM ? undefined : new PageCacheControl()
   const baseURI = getBaseURI(runtime)
   registerEmitter(runtime, baseURI)
   addLocaleData(locale)
@@ -66,7 +68,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
     <AppContainer>
-      <RenderProvider history={history} baseURI={baseURI} root={name} runtime={runtime}>
+      <RenderProvider history={history} cacheControl={cacheControl} baseURI={baseURI} root={name} runtime={runtime}>
         {!isPage ? <ExtensionPoint id={name} /> : null}
       </RenderProvider>
     </AppContainer>
@@ -75,6 +77,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
     ? (disableSSR ? renderDOM(root, elem) : hydrate(root, elem)) as Element
     : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
       markup: `<div id="${id}">${markup}</div>`,
+      maxAge: cacheControl!.maxAge,
       name,
       renderTimeMetric,
     }))
@@ -112,6 +115,7 @@ function start() {
           {} as RenderedSuccess['extensions'],
         ),
         head: Helmet.rewind(),
+        maxAge: Math.min(...results.map(({maxAge}) => maxAge)),
         renderMetrics: results.reduce(
           (acc, {name, renderTimeMetric}) => (acc[name] = renderTimeMetric, acc),
           {} as RenderedSuccess['renderMetrics'],

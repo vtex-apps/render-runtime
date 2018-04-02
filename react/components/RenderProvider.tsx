@@ -16,6 +16,7 @@ import {fetchRuntime} from '../utils/runtime'
 
 import {NormalizedCacheObject} from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
+import PageCacheControl from '../utils/cacheControl'
 import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
@@ -23,6 +24,7 @@ import NestedExtensionPoints from './NestedExtensionPoints'
 interface Props {
   children: ReactElement<any> | null
   history: History | null
+  cacheControl?: PageCacheControl
   baseURI: string
   root: string
   runtime: RenderRuntime
@@ -74,7 +76,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   constructor(props: Props) {
     super(props)
     const {culture, messages, components, extensions, pages, page, query, production} = props.runtime
-    const {history, baseURI} = props
+    const {history, baseURI, cacheControl} = props
 
     if (history) {
       const renderLocation = {...history.location, state: {renderRouting: true}}
@@ -83,7 +85,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       global.browserHistory = history
     }
 
-    this.apolloClient = getClient(props.runtime, baseURI)
+    this.apolloClient = getClient(props.runtime, baseURI, cacheControl)
     this.state = {
       components,
       culture,

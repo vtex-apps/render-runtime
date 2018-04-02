@@ -15,6 +15,7 @@ declare global {
 
   interface ServerRendered {
     markup: string
+    maxAge: number
     renderTimeMetric: RenderMetric
   }
 
@@ -61,6 +62,7 @@ declare global {
   interface RenderedSuccess {
     state: any,
     head: HelmetData,
+    maxAge: number
     extensions: {
       [id: string]: string
     }

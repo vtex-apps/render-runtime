@@ -1,10 +1,13 @@
 import {InMemoryCache, NormalizedCacheObject} from 'apollo-cache-inmemory'
 import {ApolloClient} from 'apollo-client'
+import {ApolloLink} from 'apollo-link'
 import {BatchHttpLink} from 'apollo-link-batch-http'
 import {createHttpLink} from 'apollo-link-http'
 import {createPersistedQueryLink} from 'apollo-link-persisted-queries'
 import {canUseDOM} from 'exenv'
+import PageCacheControl from '../cacheControl'
 import {generateHash} from './generateHash'
+import {cachingLink} from './links/cachingLink'
 import {createUriSwitchLink} from './links/uriSwitchLink'
 import {versionSplitterLink} from './links/versionSplitterLink'
 
@@ -27,7 +30,7 @@ export const getState = (runtime: RenderRuntime) => {
   return clientsByWorkspace[`${account}/${workspace}`].cache.extract()
 }
 
-export const getClient = (runtime: RenderRuntime, baseURI: string) => {
+export const getClient = (runtime: RenderRuntime, baseURI: string, cacheControl?: PageCacheControl) => {
   const {account, workspace} = runtime
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
@@ -46,8 +49,9 @@ export const getClient = (runtime: RenderRuntime, baseURI: string) => {
     })
 
     const uriSwitchLink = createUriSwitchLink(workspace, baseURI)
-
-    const link = versionSplitterLink.concat(uriSwitchLink.concat(persistedQueryLink.concat(httpLink)))
+    const link = cacheControl
+      ? ApolloLink.from([versionSplitterLink, uriSwitchLink, cachingLink(cacheControl), persistedQueryLink, httpLink])
+      : ApolloLink.from([versionSplitterLink, uriSwitchLink, persistedQueryLink, httpLink])
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
