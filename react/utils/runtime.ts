@@ -3,10 +3,6 @@ import ApolloClient from 'apollo-client'
 import {canUseDOM} from 'exenv'
 import runtimeQuery from './runtime.graphql'
 
-const acceptJson = canUseDOM ? new Headers({
-  'Accept': 'application/json',
-}) : undefined
-
 const parsePageQueryResponse = (response: PageQueryResponse): ParsedPageQueryResponse => {
   const {componentsJSON, extensionsJSON, messagesJSON, pagesJSON} = response
   const [components, extensions, messages, pages] = [

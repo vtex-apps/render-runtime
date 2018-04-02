@@ -6,15 +6,6 @@ import pageMessagesQuery from './messages.graphql'
 
 const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
 
-const acceptJson = canUseDOM ? new Headers({
-  'Accept': 'application/json',
-}) : undefined
-
-const acceptAndContentJson = canUseDOM ? new Headers({
-  'Accept': 'application/json',
-  'Content-Type': 'application/json',
-}) : undefined
-
 export const fetchMessagesForApp = (apolloClient: ApolloClient<NormalizedCacheObject>, app: string, locale: string) =>
   apolloClient.query<{messages: string}>({query: appMessagesQuery, variables: {app, locale}})
     .then<RenderRuntime['messages']>(({data, errors}) =>
