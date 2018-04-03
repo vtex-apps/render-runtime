@@ -15,6 +15,7 @@ declare global {
 
   interface ServerRendered {
     markup: string
+    maxAge: number
     renderTimeMetric: RenderMetric
   }
 
@@ -61,6 +62,7 @@ declare global {
   interface RenderedSuccess {
     state: any,
     head: HelmetData,
+    maxAge: number
     extensions: {
       [id: string]: string
     }
@@ -92,12 +94,27 @@ declare global {
     [appId: string]: EventEmitter
   }
 
+  interface PageQueryResponse {
+    componentsJSON: string
+    extensionsJSON: string
+    messagesJSON: string
+    pagesJSON: string
+  }
+
+  interface ParsedPageQueryResponse {
+    components: RenderRuntime['components']
+    extensions: RenderRuntime['extensions']
+    messages: RenderRuntime['messages']
+    pages: RenderRuntime['pages']
+  }
+
   type Rendered = ClientRendered | Promise<NamedServerRendered>
 
   interface RenderRuntime {
     account: string
     accountId: string
     customRouting?: boolean
+    emitter: EventEmitter
     workspace: string
     disableSSR: boolean
     hints: any
@@ -112,15 +129,10 @@ declare global {
     components: Record<string, string[]>
     renderMajor: number
     query?: Record<string, string>
-    graphQlUri: {
-      browser: string
-      ssr: string
-    }
     start: boolean
     settings: {
       [app: string]: any;
     }
-    emitter: EventEmitter
   }
 
   interface RuntimeExports {

@@ -1,18 +1,20 @@
 import {canUseDOM} from 'exenv'
 import createHistory from 'history/createBrowserHistory'
-import {hydrate, render as renderDOM} from 'react-dom'
-import {AppContainer} from 'react-hot-loader'
-import {Helmet} from 'react-helmet'
-import NoSSR from 'react-no-ssr'
 import React, {ReactElement} from 'react'
+import {hydrate, render as renderDOM} from 'react-dom'
+import {Helmet} from 'react-helmet'
+import {AppContainer} from 'react-hot-loader'
+import NoSSR from 'react-no-ssr'
 
-import {registerEmitter} from './utils/events'
-import {addLocaleData} from './utils/locales'
-import {getState} from './utils/client'
-import RenderProvider from './components/RenderProvider'
 import Link from './components/Link'
+import RenderProvider from './components/RenderProvider'
 import ExtensionContainer from './ExtensionContainer'
 import ExtensionPoint from './ExtensionPoint'
+import PageCacheControl from './utils/cacheControl'
+import {getState} from './utils/client'
+import {registerEmitter} from './utils/events'
+import {getBaseURI} from './utils/host'
+import {addLocaleData} from './utils/locales'
 
 if (global.IntlPolyfill) {
   if (!global.Intl) {
@@ -24,13 +26,13 @@ if (global.IntlPolyfill) {
 }
 
 function renderToStringWithData(component: ReactElement<any>): Promise<ServerRendered> {
-  var startGetDataFromTree = global.hrtime()
+  const startGetDataFromTree = global.hrtime()
   return require('react-apollo').getDataFromTree(component).then(() => {
-    var endGetDataFromTree = global.hrtime(startGetDataFromTree)
+    const endGetDataFromTree = global.hrtime(startGetDataFromTree)
 
-    var startRenderToString = global.hrtime()
-    var markup = require('react-dom/server').renderToString(component)
-    var endRenderToString = global.hrtime(startRenderToString)
+    const startRenderToString = global.hrtime()
+    const markup = require('react-dom/server').renderToString(component)
+    const endRenderToString = global.hrtime(startRenderToString)
     return {
       markup,
       renderTimeMetric: {
@@ -55,7 +57,9 @@ const isRoot = (name: string, index: number, names: string[]) =>
 const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered => {
   const {customRouting, disableSSR, pages, extensions, culture: {locale}} = runtime
 
-  registerEmitter(runtime)
+  const cacheControl = canUseDOM ? undefined : new PageCacheControl()
+  const baseURI = getBaseURI(runtime)
+  registerEmitter(runtime, baseURI)
   addLocaleData(locale)
 
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
@@ -64,7 +68,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
     <AppContainer>
-      <RenderProvider history={history} root={name} runtime={runtime}>
+      <RenderProvider history={history} cacheControl={cacheControl} baseURI={baseURI} root={name} runtime={runtime}>
         {!isPage ? <ExtensionPoint id={name} /> : null}
       </RenderProvider>
     </AppContainer>
@@ -72,9 +76,10 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   return canUseDOM
     ? (disableSSR ? renderDOM(root, elem) : hydrate(root, elem)) as Element
     : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
+      markup: `<div id="${id}">${markup}</div>`,
+      maxAge: cacheControl!.maxAge,
       name,
       renderTimeMetric,
-      markup: `<div id="${id}">${markup}</div>`,
     }))
 }
 
@@ -104,12 +109,13 @@ function start() {
     console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     if (!canUseDOM) {
       // Expose render promises to global context.
-      global.rendered = Promise.all(renderPromises as Promise<NamedServerRendered>[]).then(results => ({
-        head: Helmet.rewind(),
+      global.rendered = Promise.all(renderPromises as Array<Promise<NamedServerRendered>>).then(results => ({
         extensions: results.reduce(
           (acc, {name, markup}) => (acc[name] = markup, acc),
           {} as RenderedSuccess['extensions'],
         ),
+        head: Helmet.rewind(),
+        maxAge: Math.min(...results.map(({maxAge}) => maxAge)),
         renderMetrics: results.reduce(
           (acc, {name, renderTimeMetric}) => (acc[name] = renderTimeMetric, acc),
           {} as RenderedSuccess['renderMetrics'],
@@ -126,12 +132,12 @@ function start() {
 }
 
 global.__RENDER_7_RUNTIME__ = {
-  start,
-  render,
   ExtensionContainer,
   ExtensionPoint,
+  Helmet,
   Link,
   NoSSR,
-  Helmet,
   canUseDOM,
+  render,
+  start,
 }

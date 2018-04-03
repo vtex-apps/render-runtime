@@ -18,17 +18,12 @@ interface EmittersRegistry {
 
 const emittersByWorkspace: EmittersRegistry = {}
 
-const initSSE = (account: string, workspace: string, publicEndpoint: string = 'myvtex.com') => {
+const initSSE = (account: string, workspace: string, baseURI: string) => {
   if (Object.keys(global.__RENDER_7_HOT__).length > 0) {
     require('eventsource-polyfill')
     const myvtexSSE = require('myvtex-sse')
-
-    const generatorMetaTag = document.querySelector(`meta[name='generator']`)
-    const generator = generatorMetaTag && generatorMetaTag.getAttribute('content')
-    const isRenderGenerator = generator && generator.startsWith('vtex.render-server')
-    const host = isRenderGenerator ? window.location.hostname : `${workspace}--${account}.${publicEndpoint}`
-
-    const source: EventSource = myvtexSSE(account, workspace, 'vtex.builder-hub:*:react2,pages0,build.status', {verbose: false, host})
+    const path = `vtex.builder-hub:*:react2,pages0,build.status?workspace=${workspace}`
+    const source: EventSource = myvtexSSE(account, workspace, path, {verbose: false, host: baseURI})
 
     const handler = ({data}: MessageEvent) => {
       const event = JSON.parse(data) as IOEvent
@@ -81,17 +76,17 @@ const initSSE = (account: string, workspace: string, publicEndpoint: string = 'm
   }
 }
 
-export const registerEmitter = (runtime: RenderRuntime) => {
+export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
   if (!canUseDOM) {
     return
   }
 
-  const {account, workspace, publicEndpoint} = runtime
+  const {account, workspace} = runtime
 
   // Share SSE connections for same account and workspace
   if (!emittersByWorkspace[`${account}/${workspace}`]) {
     emittersByWorkspace[`${account}/${workspace}`] = []
-    initSSE(account, workspace, publicEndpoint)
+    initSSE(account, workspace, baseURI)
   }
 
   if (!runtime.emitter) {

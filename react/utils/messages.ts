@@ -1,36 +1,24 @@
+import { NormalizedCacheObject } from 'apollo-cache-inmemory'
+import ApolloClient from 'apollo-client'
 import {canUseDOM} from 'exenv'
+import appMessagesQuery from './appMessages.graphql'
+import pageMessagesQuery from './messages.graphql'
 
 const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
 
-const acceptJson = canUseDOM ? new Headers({
-  'Accept': 'application/json',
-}) : undefined
+export const fetchMessagesForApp = (apolloClient: ApolloClient<NormalizedCacheObject>, app: string, locale: string) =>
+  apolloClient.query<{messages: string}>({query: appMessagesQuery, variables: {app, locale}})
+    .then<RenderRuntime['messages']>(({data, errors}) =>
+      errors ? Promise.reject(errors) : JSON.parse(data.messages)
+    )
 
-const acceptAndContentJson = canUseDOM ? new Headers({
-  'Accept': 'application/json',
-  'Content-Type': 'application/json',
-}) : undefined
-
-export const fetchMessagesForApp = (graphQlUri: string, app: string, locale: string) =>
-  fetch(graphQlUri, {
-    body: JSON.stringify({
-      query: `{ messages(app: "${app}", locale: "${locale}") }`,
-    }),
-    credentials: 'include',
-    headers: acceptAndContentJson,
-    method: 'POST',
-  })
-  .then(res => res.json())
-  .then<RenderRuntime['messages']>(data => {
-    const messagesJSON = data.data.messages
-    return JSON.parse(messagesJSON)
-  })
-
-export const fetchMessages = (graphQlUri: string) =>
-  fetch(graphQlUri.replace('=graphql', '=messages'), {
-    credentials: 'include',
-    headers: acceptJson,
-  }).then<RenderRuntime['messages']>(res => res.json())
+export const fetchMessages = (apolloClient: ApolloClient<NormalizedCacheObject>, page: string, production: boolean, locale: string, renderMajor: number) => {
+  const renderVersion = `${renderMajor}.x`
+  return apolloClient.query<{page: PageQueryResponse}>({query: pageMessagesQuery, variables: {page, production, locale, renderVersion}})
+    .then<RenderRuntime['messages']>(({data, errors}) =>
+      errors ? Promise.reject(errors) : JSON.parse(data.page.messagesJSON)
+    )
+}
 
 export const createLocaleCookie = (locale: string) => {
   const yearFromNow = Date.now() + YEAR_IN_MS
