@@ -113,6 +113,7 @@ declare global {
   interface RenderRuntime {
     account: string
     accountId: string
+    appsEtag: string
     customRouting?: boolean
     emitter: EventEmitter
     workspace: string

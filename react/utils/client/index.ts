@@ -30,7 +30,7 @@ export const getState = (runtime: RenderRuntime) => {
 }
 
 export const getClient = (runtime: RenderRuntime, baseURI: string, cacheControl?: PageCacheControl) => {
-  const {account, workspace} = runtime
+  const {account, workspace, appsEtag} = runtime
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
     const cache = new InMemoryCache({
@@ -47,7 +47,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, cacheControl?
       generateHash
     })
 
-    const uriSwitchLink = createUriSwitchLink(workspace, baseURI)
+    const uriSwitchLink = createUriSwitchLink(workspace, baseURI, appsEtag)
     const link = cacheControl
       ? ApolloLink.from([versionSplitterLink, uriSwitchLink, cachingLink(cacheControl), persistedQueryLink, httpLink])
       : ApolloLink.from([versionSplitterLink, uriSwitchLink, persistedQueryLink, httpLink])
