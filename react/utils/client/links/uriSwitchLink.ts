@@ -27,17 +27,18 @@ const assetsFromQuery = (query: DocumentNode) => {
   return assets
 }
 
-export const createUriSwitchLink = (workspace: string, baseURI: string) => new ApolloLink((operation: Operation, forward?: NextLink) => {
-  const {query} = operation
-  const assets = assetsFromQuery(operation.query)
-  const protocol = canUseDOM ? 'https:' : 'http:'
-  operation.setContext(({ fetchOptions = {} }) => {
-    const method = (assets.scope === 'public' && assets.operation === 'query') ? 'GET' : 'POST'
-    return {
-      ...operation.getContext(),
-      fetchOptions: {...fetchOptions, method},
-      uri: `${protocol}//${baseURI}/_v/graphql/${assets.scope}/v${assets.version}?workspace=${workspace}&maxAge=${assets.maxAge}`,
-    }
+export const createUriSwitchLink = (workspace: string, baseURI: string, appsEtag: string) =>
+  new ApolloLink((operation: Operation, forward?: NextLink) => {
+    const {query} = operation
+    const assets = assetsFromQuery(operation.query)
+    const protocol = canUseDOM ? 'https:' : 'http:'
+    operation.setContext(({ fetchOptions = {} }) => {
+      const method = (assets.scope === 'public' && assets.operation === 'query') ? 'GET' : 'POST'
+      return {
+        ...operation.getContext(),
+        fetchOptions: {...fetchOptions, method},
+        uri: `${protocol}//${baseURI}/_v/graphql/${assets.scope}/v${assets.version}?workspace=${workspace}&maxAge=${assets.maxAge}&appsEtag=${appsEtag}`,
+      }
+    })
+    return forward ? forward(operation) : null
   })
-  return forward ? forward(operation) : null
-})
