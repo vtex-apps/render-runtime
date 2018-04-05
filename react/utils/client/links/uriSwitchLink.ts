@@ -1,17 +1,21 @@
 import {ApolloLink, NextLink, Observable, Operation, RequestHandler} from 'apollo-link'
 import {canUseDOM} from 'exenv'
-import {ArgumentNode, DocumentNode, OperationDefinitionNode, visit} from 'graphql'
+import {ArgumentNode, DocumentNode, OperationDefinitionNode, visit, DirectiveNode} from 'graphql'
 
 const assetsVisitor = (assets: any) => ({
-  Argument (node: ArgumentNode) {
-    if (node.name.value === 'scope') {
-      assets.scope = node.value.value
-    }
-    else if (node.name.value === 'version') {
-      assets.version = node.value.value
-    }
-    else if (node.name.value === 'maxAge') {
-      assets.maxAge = node.value.value
+  Directive (node: DirectiveNode) {
+    if (node.name.value === 'context' && node.arguments) {
+      node.arguments.forEach((argNode: ArgumentNode) => {
+        if (argNode.name.value === 'scope') {
+          assets.scope = argNode.value.value
+        }
+        else if (argNode.name.value === 'version') {
+          assets.version = argNode.value.value
+        }
+        else if (argNode.name.value === 'maxAge') {
+          assets.maxAge = argNode.value.value
+        }
+      })
     }
   },
   OperationDefinition (node: OperationDefinitionNode) {
