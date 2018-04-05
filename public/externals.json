@@ -70,7 +70,7 @@
   "vtex": {
     "dev": [
       {
-        "path": "https://unpkg.com/vtex-tachyons@2.3.0/tachyons.css"
+        "path": "https://unpkg.com/vtex-tachyons@2.4.0/tachyons.css"
       },
       {
         "clientOnly": true,
@@ -80,7 +80,7 @@
     ],
     "prod": [
       {
-        "path": "https://unpkg.com/vtex-tachyons@2.3.0/tachyons.min.css"
+        "path": "https://unpkg.com/vtex-tachyons@2.4.0/tachyons.min.css"
       },
       {
         "clientOnly": true,
