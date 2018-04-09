@@ -15,6 +15,8 @@ interface State {
   lastUpdate?: number
 }
 
+const componentPromiseMap: any = {}
+
 export default class ExtensionPointComponent extends PureComponent<Props, State> {
   public static contextTypes = {
     emitter: PropTypes.object,
@@ -76,9 +78,9 @@ export default class ExtensionPointComponent extends PureComponent<Props, State>
     const Component = component && getImplementation(component)
 
     // Let's fetch the assets and re-render.
-    if (component && !Component) {
+    if (component && !Component && !componentPromiseMap[component]) {
       this.emitBuildStatus('start')
-      fetchComponent(component)
+      componentPromiseMap[component] = fetchComponent(component)
       .then(this.updateComponentsWithEvent)
       .catch(() => {
         this.emitBuildStatus('fail')
