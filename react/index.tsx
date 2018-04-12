@@ -63,7 +63,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   addLocaleData(locale)
 
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
-  const id = isPage ? 'render-container' : containerId(name)
+  const id = containerId(name)
   const elem = element || (canUseDOM ? document.getElementById(id) : null)
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
@@ -76,7 +76,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   return canUseDOM
     ? (disableSSR ? renderDOM(root, elem) : hydrate(root, elem)) as Element
     : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
-      markup: `<div id="${id}">${markup}</div>`,
+      markup: `<div class="render-container" id="${id}">${markup}</div>`,
       maxAge: cacheControl!.maxAge,
       name,
       renderTimeMetric,
