@@ -302,7 +302,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const component = children
       ? React.cloneElement(children as ReactElement<any>, {query})
       : (
-        <div id="render-provider">
+        <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
           {!production && <BuildStatus />}
           <NestedExtensionPoints page={page} query={query} />
