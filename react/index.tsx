@@ -12,6 +12,7 @@ import ExtensionContainer from './ExtensionContainer'
 import ExtensionPoint from './ExtensionPoint'
 import PageCacheControl from './utils/cacheControl'
 import {getState} from './utils/client'
+import {getContainer, getMarkups} from './utils/dom'
 import {registerEmitter} from './utils/events'
 import {getBaseURI} from './utils/host'
 import {addLocaleData} from './utils/locales'
@@ -43,9 +44,6 @@ function renderToStringWithData(component: ReactElement<any>): Promise<ServerRen
   })
 }
 
-// Map `placeholder/with/slashes` to `render-placeholder-with-slashes`.
-const containerId = (name: string) => `render-${name.replace(/\//g, '-')}`
-
 // Whether this placeholder has a component.
 const hasComponent = (extensions: Extensions) => (name: string) => !!extensions[name].component
 
@@ -63,8 +61,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   addLocaleData(locale)
 
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
-  const id = containerId(name)
-  const elem = element || (canUseDOM ? document.getElementById(id) : null)
+  const elem = element || getContainer(name)
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
     <AppContainer>
@@ -75,12 +72,10 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   )
   return canUseDOM
     ? (disableSSR ? renderDOM(root, elem) : hydrate(root, elem)) as Element
-    : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
-      markup: `<div class="render-container" id="${id}">${markup}</div>`,
-      maxAge: cacheControl!.maxAge,
-      name,
-      renderTimeMetric,
-    }))
+    : renderToStringWithData(root).then(({markup, renderTimeMetric}) => {
+      const markups = getMarkups(name, markup)
+      return {markups, pageName: name, maxAge: cacheControl!.maxAge, renderTimeMetric}
+    })
 }
 
 function getRenderableExtensionPointNames(rootName: string, extensions: Extensions) {
@@ -111,13 +106,13 @@ function start() {
       // Expose render promises to global context.
       global.rendered = Promise.all(renderPromises as Array<Promise<NamedServerRendered>>).then(results => ({
         extensions: results.reduce(
-          (acc, {name, markup}) => (acc[name] = markup, acc),
+          (acc, {markups}) => (markups.forEach(({name, markup}) => acc[name] = markup), acc),
           {} as RenderedSuccess['extensions'],
         ),
         head: Helmet.rewind(),
         maxAge: Math.min(...results.map(({maxAge}) => maxAge)),
         renderMetrics: results.reduce(
-          (acc, {name, renderTimeMetric}) => (acc[name] = renderTimeMetric, acc),
+          (acc, {pageName, renderTimeMetric}) => (acc[pageName] = renderTimeMetric, acc),
           {} as RenderedSuccess['renderMetrics'],
         ),
         state: getState(runtime),

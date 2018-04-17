@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 
 import ExtensionPoint from './ExtensionPoint'
+import {getDirectChildren} from './utils/treePath'
 
 // eslint-disable-next-line
 class ExtensionContainer extends Component {
@@ -14,19 +15,8 @@ class ExtensionContainer extends Component {
 
   public render() {
     const {extensions, treePath} = this.context
-    const relative = (name: string) => name.replace(`${treePath}/`, '')
-    const children = Object.keys(extensions).filter(
-      extension => {
-        return extensions[extension].component &&
-          extension !== treePath &&
-          (new RegExp(`^${treePath}/[a-zA-Z0-9-]+$`)).test(extension)
-      }
-    )
-    const renderChildren = (extension: string) => (
-      <ExtensionPoint key={relative(extension)} id={relative(extension)} />
-    )
-
-    return <div>{children.map(renderChildren)}</div>
+    const children = getDirectChildren(extensions, treePath)
+    return <div>{children.map(id => <ExtensionPoint key={id} id={id} />)}</div>
   }
 }
 
