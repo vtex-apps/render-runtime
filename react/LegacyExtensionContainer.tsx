@@ -24,7 +24,7 @@ class LegacyExtensionContainer extends Component<{}, {hydrate: boolean}> {
   public render() {
     const {extensions, treePath} = this.context
     const children = getDirectChildren(extensions, treePath)
-    return children.map(id => createPortal(<ExtensionPoint id={id} />, id, this.state.hydrate))
+    return children.map(id => createPortal(<ExtensionPoint id={id} />, `${treePath}/${id}`, this.state.hydrate))
   }
 }
 
