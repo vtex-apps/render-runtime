@@ -12,7 +12,7 @@ import ExtensionContainer from './ExtensionContainer'
 import ExtensionPoint from './ExtensionPoint'
 import PageCacheControl from './utils/cacheControl'
 import {getState} from './utils/client'
-import {getContainer, getMarkups} from './utils/dom'
+import {ensureContainer, getContainer, getMarkups} from './utils/dom'
 import {registerEmitter} from './utils/events'
 import {getBaseURI} from './utils/host'
 import {addLocaleData} from './utils/locales'
@@ -53,7 +53,7 @@ const isRoot = (name: string, index: number, names: string[]) =>
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered => {
-  const {customRouting, disableSSR, pages, extensions, culture: {locale}} = runtime
+  const {customRouting, disableSSR, page, pages, extensions, culture: {locale}} = runtime
 
   const cacheControl = canUseDOM ? undefined : new PageCacheControl()
   const baseURI = getBaseURI(runtime)
@@ -61,6 +61,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   addLocaleData(locale)
 
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
+  const created = ensureContainer(page)
   const elem = element || getContainer(name)
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
@@ -71,7 +72,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
     </AppContainer>
   )
   return canUseDOM
-    ? (disableSSR ? renderDOM(root, elem) : hydrate(root, elem)) as Element
+    ? (disableSSR || created ? renderDOM(root, elem) : hydrate(root, elem)) as Element
     : renderToStringWithData(root).then(({markup, renderTimeMetric}) => {
       const markups = getMarkups(name, markup)
       return {markups, pageName: name, maxAge: cacheControl!.maxAge, renderTimeMetric}

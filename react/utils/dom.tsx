@@ -63,6 +63,25 @@ export const getMarkups = (pageName: string, pageMarkup: string): NamedMarkup[] 
   return markups
 }
 
+
 export const getContainer = (name: string) => {
   return canUseDOM ? document.getElementById(containerId(name)) : null
+}
+
+export const ensureContainer = (name: string) => {
+  if (!canUseDOM) {
+    return false
+  }
+
+  const existingContainer = document.getElementById(containerId(name))
+  if (existingContainer) {
+    return false
+  }
+
+  const containerDiv = document.createElement('div')
+  containerDiv.className = 'render-container'
+  containerDiv.style.display = 'none'
+  containerDiv.id = containerId(name)
+  document.body.appendChild(containerDiv)
+  return true
 }
