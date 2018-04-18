@@ -61,7 +61,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   addLocaleData(locale)
 
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
-  const created = ensureContainer(page)
+  const created = !element && ensureContainer(page)
   const elem = element || getContainer(name)
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
