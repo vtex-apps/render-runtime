@@ -73,10 +73,13 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   )
   return canUseDOM
     ? (disableSSR || created ? renderDOM(root, elem) : hydrate(root, elem)) as Element
-    : renderToStringWithData(root).then(({markup, renderTimeMetric}) => {
-      const markups = getMarkups(name, markup)
-      return {markups, pageName: name, maxAge: cacheControl!.maxAge, renderTimeMetric}
-    })
+    : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
+        markups: getMarkups(name, markup),
+        maxAge: cacheControl!.maxAge,
+        page,
+        renderTimeMetric
+      })
+    )
 }
 
 function getRenderableExtensionPointNames(rootName: string, extensions: Extensions) {
@@ -113,7 +116,7 @@ function start() {
         head: Helmet.rewind(),
         maxAge: Math.min(...results.map(({maxAge}) => maxAge)),
         renderMetrics: results.reduce(
-          (acc, {pageName, renderTimeMetric}) => (acc[pageName] = renderTimeMetric, acc),
+          (acc, {page, renderTimeMetric}) => (acc[page] = renderTimeMetric, acc),
           {} as RenderedSuccess['renderMetrics'],
         ),
         state: getState(runtime),

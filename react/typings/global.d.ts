@@ -26,7 +26,7 @@ declare global {
   interface NamedServerRendered {
     markups: NamedMarkup[]
     maxAge: number
-    pageName: string
+    page: string
     renderTimeMetric: RenderMetric
   }
 
