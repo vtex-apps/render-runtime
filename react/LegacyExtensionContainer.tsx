@@ -5,7 +5,12 @@ import ExtensionPoint from './ExtensionPoint'
 import {createPortal} from './utils/dom'
 import {getDirectChildren} from './utils/treePath'
 
-class LegacyExtensionContainer extends Component<{}, {hydrate: boolean}> {
+interface Props {
+  query: any,
+  params: any
+}
+
+class LegacyExtensionContainer extends Component<Props, {hydrate: boolean}> {
   public static contextTypes = {
     extensions: PropTypes.object,
     treePath: PropTypes.string,
@@ -22,9 +27,10 @@ class LegacyExtensionContainer extends Component<{}, {hydrate: boolean}> {
   }
 
   public render() {
+    const {params, query} = this.props
     const {extensions, treePath} = this.context
     const children = getDirectChildren(extensions, treePath)
-    return children.map(id => createPortal(<ExtensionPoint id={id} />, `${treePath}/${id}`, this.state.hydrate))
+    return children.map(id => createPortal(<ExtensionPoint id={id} query={query} params={params} />, `${treePath}/${id}`, this.state.hydrate))
   }
 }
 
