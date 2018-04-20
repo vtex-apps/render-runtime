@@ -15,12 +15,19 @@ declare global {
 
   interface ServerRendered {
     markup: string
-    maxAge: number
     renderTimeMetric: RenderMetric
   }
 
-  interface NamedServerRendered extends ServerRendered {
+  interface NamedMarkup {
+    markup: string
     name: string
+  }
+
+  interface NamedServerRendered {
+    markups: NamedMarkup[]
+    maxAge: number
+    page: string
+    renderTimeMetric: RenderMetric
   }
 
   type ClientRendered = Element
@@ -155,6 +162,7 @@ declare global {
     __hostname__: string
     __pathname__: string
     __STATE__: NormalizedCacheObject
+    __hasPortals__: boolean
     browserHistory: History
     ReactIntlLocaleData: any
     IntlPolyfill: any
