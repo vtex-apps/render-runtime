@@ -33,7 +33,7 @@ export const createPortal = (children: ReactElement<any>, name: string, hydrate:
 
   const container = document.getElementById(containerId(name))
   if (!container) {
-    console.error(`Missing React Portal container div#${containerId(name)}`)
+    console.warn(`Missing React Portal container div#${containerId(name)}`)
     return null
   }
 
