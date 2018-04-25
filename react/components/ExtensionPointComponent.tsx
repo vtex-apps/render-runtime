@@ -201,8 +201,9 @@ export default class ExtensionPointComponent extends PureComponent<Props, State>
       return <EditableExtensionPoint treePath={treePath} component={this.emptyExtensionPoint.component}><EmptyExtensionPoint /></EditableExtensionPoint>
     }
 
+    const isEditable = Component && (Component.hasOwnProperty('schema') || Component.hasOwnProperty('getSchema'))
     const configuredComponent = Component ? <Component {...props}>{children}</Component> : children || null
-    return this.editableExtensionPoint
+    return this.editableExtensionPoint && isEditable
       ? <EditableExtensionPoint treePath={treePath} component={component} props={props}>{configuredComponent}</EditableExtensionPoint>
       : configuredComponent
   }
