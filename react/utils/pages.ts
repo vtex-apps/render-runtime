@@ -15,7 +15,7 @@ function isHost(hostname: string) {
 }
 
 function trimEndingSlash(token: string) {
-  return token.replace(/\/$/, '')
+  return token.replace(/\/$/, '') || '/'
 }
 
 function createLocationDescriptor (path: string, {query}: {query: any}): LocationDescriptorObject {
