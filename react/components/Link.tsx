@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {Component, MouseEvent} from 'react'
-import {NavigateOptions} from '../utils/pages'
+import {NavigateOptions, pathFromPageName} from '../utils/pages'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) => event.button === 0
 
@@ -22,7 +22,8 @@ interface Props {
 // eslint-disable-next-line
 export default class Link extends Component<Props> {
   public static contextTypes = {
-    navigate: PropTypes.func
+    navigate: PropTypes.func,
+    pages: PropTypes.object,
   }
 
   public static defaultProps = {
@@ -56,6 +57,7 @@ export default class Link extends Component<Props> {
   }
 
   public render() {
-    return <a href={this.props.to} {...this.props} onClick={this.handleClick} />
+    const href = this.props.to || this.props.page && pathFromPageName(this.props.page, this.context.pages, this.props.params) || undefined
+    return <a href={href} {...this.props} onClick={this.handleClick} />
   }
 }
