@@ -15,7 +15,7 @@ function isHost(hostname: string) {
 }
 
 function trimEndingSlash(token: string) {
-  return token.replace(/\/$/, '')
+  return token.replace(/\/$/, '') || '/'
 }
 
 function createLocationDescriptor (path: string, {query}: {query: any}): LocationDescriptorObject {
@@ -31,7 +31,7 @@ function adjustTemplate (template: string) {
   return trimEndingSlash(template).replace(/(\/\*\w+)$/, '($1)')
 }
 
-function pathFromPageName(page: string, pages: Pages, params: any) {
+export function pathFromPageName(page: string, pages: Pages, params: any) {
   const pageDescriptor = pages[page]
   if (!pageDescriptor) {
     console.error(`Page ${page} was not found`)
