@@ -57,7 +57,7 @@ export default class Link extends Component<Props> {
   }
 
   public render() {
-    const href = this.props.to || this.props.page && pathFromPageName(this.props.page, this.context.pages, this.props.params) || undefined
+    const href = this.props.to || this.props.page && pathFromPageName(this.props.page, this.context.pages, this.props.params) || '#'
     return <a href={href} {...this.props} onClick={this.handleClick} />
   }
 }
