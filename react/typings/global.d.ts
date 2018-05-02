@@ -166,6 +166,7 @@ declare global {
     NoSSR: any
     Helmet: any
     canUseDOM: boolean
+    withHMR: any
   }
 
   interface RenderGlobal extends NodeJS.Global {
@@ -182,5 +183,4 @@ declare global {
     IntlPolyfill: any
     hrtime: NodeJS.Process['hrtime']
     rendered: Promise<RenderedSuccess> | RenderedFailure
-  }
 }
