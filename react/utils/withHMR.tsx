@@ -1,3 +1,4 @@
+import hoistNonReactStatics from 'hoist-non-react-statics'
 import PropTypes from 'prop-types'
 import React, {Component, ComponentType, ErrorInfo} from 'react'
 
@@ -38,6 +39,7 @@ export default (module: Module, InitialImplementer: any) => {
 
     public static hotReload = (NewImplementer: ComponentType) => {
       HMRComponent.Implementer = NewImplementer
+      hoistNonReactStatics(HMRComponent, NewImplementer)
       instances.forEach(instance => instance.updateComponent())
     }
 
@@ -63,5 +65,5 @@ export default (module: Module, InitialImplementer: any) => {
     }
   }
 
-  return HMRComponent
+  return hoistNonReactStatics(HMRComponent, InitialImplementer)
 }
