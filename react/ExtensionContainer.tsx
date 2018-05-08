@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {Component} from 'react'
+import React, {Component, Fragment} from 'react'
 
 import ExtensionPoint from './ExtensionPoint'
 import {getDirectChildren} from './utils/treePath'
@@ -16,11 +16,11 @@ class ExtensionContainer extends Component {
     const {extensions, treePath} = this.context
     const children = getDirectChildren(extensions, treePath)
     return (
-      <div>
+      <Fragment>
         {children.map(id =>
           <ExtensionPoint {...this.props} key={id} id={id} />
         )}
-      </div>
+      </Fragment>
     )
   }
 }
