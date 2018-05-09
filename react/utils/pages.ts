@@ -59,9 +59,12 @@ export function getPagePath(name: string, pages: Pages) {
   const {path: rootPath, cname} = pages[rootName]
   const {path: pagePath} = pages[name]
 
-  return cname && isHost(cname)
-    ? pagePath && pagePath.substr(rootPath.length)
-    : pagePath
+  if (cname && isHost(cname)) {
+    const rootStart = rootPath.endsWith('/') ? rootPath.length - 1 : rootPath.length
+    return pagePath && pagePath.substr(rootStart)
+  }
+
+  return pagePath
 }
 
 export function navigate(history: History | null, pages: Pages, options: NavigateOptions) {
