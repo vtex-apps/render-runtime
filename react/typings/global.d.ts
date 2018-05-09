@@ -117,6 +117,20 @@ declare global {
 
   type Rendered = ClientRendered | Promise<NamedServerRendered>
 
+  interface ComponentTraversalResult {
+    apps: string[]
+    assets: string[]
+  }
+
+  interface ComponentEntry {
+    assets: string[]
+    dependencies: string[]
+  }
+
+  interface Components {
+    [entrypoint: string]: ComponentEntry
+  }
+
   interface RenderRuntime {
     account: string
     accountId: string
@@ -134,7 +148,7 @@ declare global {
     production: boolean
     publicEndpoint: string
     messages: Record<string, string>
-    components: Record<string, string[]>
+    components: Components | Record<string, string[]>
     renderMajor: number
     query?: Record<string, string>
     start: boolean
@@ -152,6 +166,7 @@ declare global {
     NoSSR: any
     Helmet: any
     canUseDOM: boolean
+    withHMR: any
   }
 
   interface RenderGlobal extends NodeJS.Global {
@@ -168,5 +183,4 @@ declare global {
     IntlPolyfill: any
     hrtime: NodeJS.Process['hrtime']
     rendered: Promise<RenderedSuccess> | RenderedFailure
-  }
 }

@@ -46,66 +46,31 @@ export default class ExtensionPointComponent extends PureComponent<Props, State>
     this.state = {}
   }
 
-  public updateComponents = () => {
-    if (!this._isMounted) {
-      return false
-    }
-
-    this.setState({error: null, errorInfo: null, lastUpdate: Date.now()})
-  }
-
   public updateComponentsWithEvent = (component: string) => {
     if (!this._isMounted) {
       return false
     }
 
-    this.emitBuildStatus('hmr:success')
-    this.updateComponents()
-
+    this.setState({error: null, errorInfo: null, lastUpdate: Date.now()})
     const {treePath} = this.context
     const {component: mounted} = this.props
     console.log(`[render] Component updated. treePath=${treePath} ${mounted !== component ? `mounted=${mounted} ` : ''}updated=${component}`)
   }
 
-  public emitBuildStatus = (status: string) => {
-    const {emitter} = this.context
-    emitter.emit('build.status', status)
-  }
-
   public fetchAndRerender = () => {
-    const {fetchComponent} = this.context
+    const {fetchComponent, emitter} = this.context
     const {component} = this.props
     const Component = component && getImplementation(component)
 
     // Let's fetch the assets and re-render.
     if (component && !Component && !componentPromiseMap[component]) {
-      this.emitBuildStatus('start')
+      emitter.emit('build.status', 'start')
       componentPromiseMap[component] = fetchComponent(component)
       .then(this.updateComponentsWithEvent)
       .catch(() => {
-        this.emitBuildStatus('fail')
+        emitter.emit('build.status', 'fail')
       })
     }
-  }
-
-  public subscribeToComponent = (c: string | null) => {
-    const app = c && c.split('/')[0]
-    if (app && global.__RENDER_7_HOT__[app]) {
-      global.__RENDER_7_HOT__[app].addListener(`component:${c}:update`, this.updateComponentsWithEvent)
-    }
-  }
-
-  public unsubscribeToComponent = (c: string | null) => {
-    const app = c && c.split('/')[0]
-    if (app && global.__RENDER_7_HOT__[app]) {
-      global.__RENDER_7_HOT__[app].removeListener(`component:${c}:update`, this.updateComponentsWithEvent)
-    }
-  }
-
-  public handleToggleErrorDetails = () => {
-    this.setState({
-      errorDetails: !this.state.errorDetails,
-    })
   }
 
   public renderError = () => {
@@ -146,25 +111,7 @@ export default class ExtensionPointComponent extends PureComponent<Props, State>
 
   public componentDidMount() {
     this._isMounted = true
-    const {component} = this.props
-    this.subscribeToComponent(component)
     this.fetchAndRerender()
-
-    if (this.emptyExtensionPoint && this.editableExtensionPoint) {
-      this.subscribeToComponent(this.emptyExtensionPoint.component)
-      this.subscribeToComponent(this.editableExtensionPoint.component)
-    }
-  }
-
-  public componentWillReceiveProps(nextProps: Props) {
-    const {component} = this.props
-    const {component: nextComponent} = nextProps
-
-    if (component !== nextComponent) {
-      this.unsubscribeToComponent(component)
-      this.subscribeToComponent(nextComponent)
-      this.updateComponents()
-    }
   }
 
   public componentDidUpdate() {
@@ -173,13 +120,12 @@ export default class ExtensionPointComponent extends PureComponent<Props, State>
 
   public componentWillUnmount() {
     this._isMounted = false
-    const {component} = this.props
-    this.unsubscribeToComponent(component)
+  }
 
-    if (this.emptyExtensionPoint && this.editableExtensionPoint) {
-      this.unsubscribeToComponent(this.emptyExtensionPoint.component)
-      this.unsubscribeToComponent(this.editableExtensionPoint.component)
-    }
+  public handleToggleErrorDetails = () => {
+    this.setState({
+      errorDetails: !this.state.errorDetails,
+    })
   }
 
   public render() {

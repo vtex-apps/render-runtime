@@ -17,6 +17,7 @@ import {fetchRuntime} from '../utils/runtime'
 import {NormalizedCacheObject} from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
 import PageCacheControl from '../utils/cacheControl'
+import {traverseComponent} from '../utils/components'
 import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
@@ -202,21 +203,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     const {components, culture: {locale}} = this.state
-    const [app] = component.split('/')
-    const sameAppAsset = Object.keys(global.__RENDER_7_COMPONENTS__).find((c) => c.startsWith(app))
-
-    if (sameAppAsset) {
-      return fetchAssets(components[component])
+    const {apps, assets} = traverseComponent(components, component)
+    const unfetchedApps = apps.filter(app => !Object.keys(global.__RENDER_7_COMPONENTS__).some(c => c.startsWith(app)))
+    if (unfetchedApps.length === 0) {
+      return fetchAssets(assets)
     }
 
-    const messagesPromise = fetchMessagesForApp(this.apolloClient, app, locale)
-    const assetsPromise = fetchAssets(components[component])
+    const messagesPromises = Promise.all(unfetchedApps.map(app => fetchMessagesForApp(this.apolloClient, app, locale)))
+    const assetsPromise = fetchAssets(assets)
 
-    return Promise.all([messagesPromise, assetsPromise]).then(([messages]) => {
+    return Promise.all([messagesPromises, assetsPromise]).then(([messages]) => {
       this.setState({
         messages: {
           ...this.state.messages,
-          ...messages,
+          ...Object.assign({}, ...messages),
         },
       })
     })
