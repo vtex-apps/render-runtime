@@ -106,6 +106,7 @@ declare global {
     extensionsJSON: string
     messagesJSON: string
     pagesJSON: string
+    appsEtag: string
   }
 
   interface ParsedPageQueryResponse {
@@ -113,6 +114,7 @@ declare global {
     extensions: RenderRuntime['extensions']
     messages: RenderRuntime['messages']
     pages: RenderRuntime['pages']
+    appsEtag: RenderRuntime['appsEtag']
   }
 
   type Rendered = ClientRendered | Promise<NamedServerRendered>
@@ -183,4 +185,5 @@ declare global {
     IntlPolyfill: any
     hrtime: NodeJS.Process['hrtime']
     rendered: Promise<RenderedSuccess> | RenderedFailure
+  }
 }
