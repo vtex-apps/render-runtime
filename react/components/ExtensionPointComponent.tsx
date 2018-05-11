@@ -64,12 +64,8 @@ export default class ExtensionPointComponent extends PureComponent<Props, State>
 
     // Let's fetch the assets and re-render.
     if (component && !Component && !componentPromiseMap[component]) {
-      emitter.emit('build.status', 'start')
       componentPromiseMap[component] = fetchComponent(component)
       .then(this.updateComponentsWithEvent)
-      .catch(() => {
-        emitter.emit('build.status', 'fail')
-      })
     }
   }
 
