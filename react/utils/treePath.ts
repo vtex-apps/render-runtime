@@ -8,4 +8,5 @@ export const getDirectChildren = (extensions: Extensions, treePath: string) => {
   return Object.entries(extensions)
     .filter(([id, extension]) => extension.component && isDirectChild(id, treePath))
     .map(([id]) => relative(treePath, id))
+    .sort()
 }
