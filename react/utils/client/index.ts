@@ -47,7 +47,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       generateHash
     })
 
-    const uriSwitchLink = createUriSwitchLink(baseURI)
+    const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
     const link = cacheControl
       ? ApolloLink.from([versionSplitterLink, runtimeContextLink, uriSwitchLink, cachingLink(cacheControl), persistedQueryLink, httpLink])
       : ApolloLink.from([versionSplitterLink, runtimeContextLink, uriSwitchLink, persistedQueryLink, httpLink])

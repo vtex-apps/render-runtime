@@ -36,12 +36,12 @@ interface OperationContext {
   runtime: RenderRuntime,
 }
 
-export const createUriSwitchLink = (baseURI: string) =>
+export const createUriSwitchLink = (baseURI: string, workspace: string) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     const {query} = operation
     const assets = assetsFromQuery(operation.query)
     const protocol = canUseDOM ? 'https:' : 'http:'
-    operation.setContext(({ fetchOptions = {}, runtime: {workspace, appsEtag} } : OperationContext) => {
+    operation.setContext(({ fetchOptions = {}, runtime: {appsEtag} } : OperationContext) => {
       const method = (assets.scope === 'public' && assets.operation === 'query') ? 'GET' : 'POST'
       return {
         ...operation.getContext(),
