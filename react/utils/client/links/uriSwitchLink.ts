@@ -1,6 +1,6 @@
 import {ApolloLink, NextLink, Observable, Operation, RequestHandler} from 'apollo-link'
 import {canUseDOM} from 'exenv'
-import {ArgumentNode, DocumentNode, OperationDefinitionNode, visit, DirectiveNode} from 'graphql'
+import {ArgumentNode, DirectiveNode, DocumentNode, OperationDefinitionNode, visit} from 'graphql'
 
 const assetsVisitor = (assets: any) => ({
   Directive (node: DirectiveNode) {
@@ -31,12 +31,17 @@ const assetsFromQuery = (query: DocumentNode) => {
   return assets
 }
 
-export const createUriSwitchLink = (workspace: string, baseURI: string, appsEtag: string) =>
+interface OperationContext {
+  fetchOptions: any,
+  runtime: RenderRuntime,
+}
+
+export const createUriSwitchLink = (baseURI: string, workspace: string) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     const {query} = operation
     const assets = assetsFromQuery(operation.query)
     const protocol = canUseDOM ? 'https:' : 'http:'
-    operation.setContext(({ fetchOptions = {} }) => {
+    operation.setContext(({ fetchOptions = {}, runtime: {appsEtag} } : OperationContext) => {
       const method = (assets.scope === 'public' && assets.operation === 'query') ? 'GET' : 'POST'
       return {
         ...operation.getContext(),

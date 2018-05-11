@@ -16,6 +16,7 @@ import {fetchRuntime} from '../utils/runtime'
 
 import {NormalizedCacheObject} from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
+import {ApolloLink, NextLink, Operation} from 'apollo-link'
 import PageCacheControl from '../utils/cacheControl'
 import {traverseComponent} from '../utils/components'
 import BuildStatus from './BuildStatus'
@@ -32,6 +33,7 @@ interface Props {
 }
 
 export interface RenderProviderState {
+  appsEtag: RenderRuntime['appsEtag']
   components: RenderRuntime['components']
   culture: RenderRuntime['culture']
   extensions: RenderRuntime['extensions']
@@ -76,7 +78,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const {culture, messages, components, extensions, pages, page, query, production} = props.runtime
+    const {appsEtag, culture, messages, components, extensions, pages, page, query, production} = props.runtime
     const {history, baseURI, cacheControl} = props
 
     if (history) {
@@ -86,8 +88,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       global.browserHistory = history
     }
 
-    this.apolloClient = getClient(props.runtime, baseURI, cacheControl)
+    const runtimeContextLink = this.createRuntimeContextLink()
+    this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, cacheControl)
     this.state = {
+      appsEtag,
       components,
       culture,
       extensions,
@@ -273,14 +277,34 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {page, production, culture: {locale}} = this.state
 
     return fetchRuntime(this.apolloClient, page, production, locale, renderMajor)
-      .then(({components, extensions, messages, pages}) => {
+      .then(({appsEtag, components, extensions, messages, pages}) => {
         this.setState({
+          appsEtag,
           components,
           extensions,
           messages,
           pages,
         }, () => emitter.emit('extension:*:update', this.state))
       })
+  }
+
+  public createRuntimeContextLink() {
+    return new ApolloLink((operation: Operation, forward?: NextLink) => {
+      const {appsEtag, components, extensions, messages, pages} = this.state
+      operation.setContext((currentContext: Record<string, any>) => {
+        return {
+          ...currentContext,
+          runtime: {
+            appsEtag,
+            components,
+            extensions,
+            messages,
+            pages,
+          },
+        }
+      })
+      return forward ? forward(operation) : null
+    })
   }
 
   public updateExtension = (name: string, extension: Extension) => {

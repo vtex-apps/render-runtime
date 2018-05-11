@@ -29,8 +29,8 @@ export const getState = (runtime: RenderRuntime) => {
   return clientsByWorkspace[`${account}/${workspace}`].cache.extract()
 }
 
-export const getClient = (runtime: RenderRuntime, baseURI: string, cacheControl?: PageCacheControl) => {
-  const {account, workspace, appsEtag} = runtime
+export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContextLink: ApolloLink, cacheControl?: PageCacheControl) => {
+  const {account, workspace} = runtime
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
     const cache = new InMemoryCache({
@@ -47,10 +47,10 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, cacheControl?
       generateHash
     })
 
-    const uriSwitchLink = createUriSwitchLink(workspace, baseURI, appsEtag)
+    const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
     const link = cacheControl
-      ? ApolloLink.from([versionSplitterLink, uriSwitchLink, cachingLink(cacheControl), persistedQueryLink, httpLink])
-      : ApolloLink.from([versionSplitterLink, uriSwitchLink, persistedQueryLink, httpLink])
+      ? ApolloLink.from([versionSplitterLink, runtimeContextLink, uriSwitchLink, cachingLink(cacheControl), persistedQueryLink, httpLink])
+      : ApolloLink.from([versionSplitterLink, runtimeContextLink, uriSwitchLink, persistedQueryLink, httpLink])
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
