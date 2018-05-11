@@ -39,7 +39,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
     })
 
     const httpLink = createHttpLink({
-      credentials: 'same-origin',
+      credentials: 'include',
     })
 
     const persistedQueryLink = createPersistedQueryLink({
