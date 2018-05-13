@@ -78,7 +78,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const {appsEtag, culture, messages, components, extensions, pages, page, query, production} = props.runtime
+    const {appsEtag, culture, messages, components, extensions, pages, page, query, production, settings} = props.runtime
     const {history, baseURI, cacheControl} = props
 
     if (history) {
@@ -100,6 +100,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       production,
       query,
+      settings,
     }
   }
 
@@ -141,8 +142,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public getChildContext() {
     const {history, runtime} = this.props
-    const {components, extensions, page, pages, culture} = this.state
-    const {account, emitter, settings, production, workspace} = runtime
+    const {components, extensions, page, pages, settings, culture} = this.state
+    const {account, emitter, production, workspace} = runtime
 
     return {
       account,
@@ -277,8 +278,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {page, production, culture: {locale}} = this.state
 
     return fetchRuntime(this.apolloClient, page, production, locale, renderMajor)
-      .then(({appsEtag, components, extensions, messages, pages}) => {
+      .then(({appsEtag, components, extensions, messages, pages, settings}) => {
         this.setState({
+          settings,
           appsEtag,
           components,
           extensions,

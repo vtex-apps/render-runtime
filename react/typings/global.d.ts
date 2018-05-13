@@ -106,6 +106,7 @@ declare global {
     extensionsJSON: string
     messagesJSON: string
     pagesJSON: string
+    appsSettingsJSON: string
     appsEtag: string
   }
 
