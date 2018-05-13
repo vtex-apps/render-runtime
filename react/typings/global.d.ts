@@ -116,6 +116,7 @@ declare global {
     messages: RenderRuntime['messages']
     pages: RenderRuntime['pages']
     appsEtag: RenderRuntime['appsEtag']
+    settings: RenderRuntime['settings']
   }
 
   type Rendered = ClientRendered | Promise<NamedServerRendered>

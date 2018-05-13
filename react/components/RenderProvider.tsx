@@ -42,6 +42,7 @@ export interface RenderProviderState {
   pages: RenderRuntime['pages']
   production: RenderRuntime['production']
   query: RenderRuntime['query']
+  settings: RenderRuntime['settings']
 }
 
 class RenderProvider extends Component<Props, RenderProviderState> {
@@ -280,12 +281,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return fetchRuntime(this.apolloClient, page, production, locale, renderMajor)
       .then(({appsEtag, components, extensions, messages, pages, settings}) => {
         this.setState({
-          settings,
           appsEtag,
           components,
           extensions,
           messages,
           pages,
+          settings,
         }, () => emitter.emit('extension:*:update', this.state))
       })
   }
