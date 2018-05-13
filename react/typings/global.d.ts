@@ -106,6 +106,7 @@ declare global {
     extensionsJSON: string
     messagesJSON: string
     pagesJSON: string
+    appsSettingsJSON: string
     appsEtag: string
   }
 
@@ -115,6 +116,7 @@ declare global {
     messages: RenderRuntime['messages']
     pages: RenderRuntime['pages']
     appsEtag: RenderRuntime['appsEtag']
+    settings: RenderRuntime['settings']
   }
 
   type Rendered = ClientRendered | Promise<NamedServerRendered>
