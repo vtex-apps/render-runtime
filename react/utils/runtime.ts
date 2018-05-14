@@ -25,7 +25,7 @@ const parsePageQueryResponse = (response: PageQueryResponse): ParsedPageQueryRes
 
 export const fetchRuntime = (apolloClient: ApolloClient<NormalizedCacheObject>, page: string, production: boolean, locale: string, renderMajor: number) => {
   const renderVersion = `${renderMajor}.x`
-  return apolloClient.query<{page: PageQueryResponse}>({query: runtimeQuery, variables: {page, production, locale, renderVersion}})
+  return apolloClient.query<{page: PageQueryResponse}>({query: runtimeQuery, fetchPolicy: 'network-only', variables: {page, production, locale, renderVersion}})
     .then<ParsedPageQueryResponse>(({data, errors}) =>
       errors ? Promise.reject(errors) : parsePageQueryResponse(data.page)
     )
