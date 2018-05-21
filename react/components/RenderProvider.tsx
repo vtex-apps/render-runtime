@@ -121,9 +121,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public componentWillReceiveProps(nextProps: Props) {
     // If RenderProvider is being re-rendered, the global runtime might have changed
-    // so we must update the root extension.
+    // so we must update the all extensions.
     if (this.rendered) {
-      this.updateExtension(nextProps.root, nextProps.runtime.extensions[nextProps.root])
+      const {runtime: {extensions, emitter}} = nextProps
+      this.setState({extensions}, () => emitter.emit('extension:*:update', this.state))
     }
   }
 
