@@ -14,7 +14,7 @@
     "classnames": "^2.2.5",
     "eventemitter3": "^3.0.0",
     "exenv": "^1.2.2",
-    "graphql": "^0.13.1",
+    "graphql": "^0.13.2",
     "history": "^4.7.2",
     "hoist-non-react-statics": "^2.5.0",
     "myvtex-sse": "^1.2.0",
@@ -29,7 +29,7 @@
     "react-no-ssr": "^1.1.0",
     "react-tree-path": "^0.2.0",
     "route-parser": "^0.0.5",
-    "vtex-graphql-utils": "^0.0.8"
+    "vtex-graphql-utils": "^0.1.0"
   },
   "devDependencies": {
     "@types/graphql": "^0.12.5",
