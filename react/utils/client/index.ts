@@ -7,6 +7,7 @@ import {canUseDOM} from 'exenv'
 import PageCacheControl from '../cacheControl'
 import {generateHash} from './generateHash'
 import {cachingLink} from './links/cachingLink'
+import {omitTypenameLink} from './links/omitVariableTypenameLink'
 import {createUriSwitchLink} from './links/uriSwitchLink'
 import {versionSplitterLink} from './links/versionSplitterLink'
 
@@ -49,8 +50,8 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
 
     const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
     const link = cacheControl
-      ? ApolloLink.from([versionSplitterLink, runtimeContextLink, uriSwitchLink, cachingLink(cacheControl), persistedQueryLink, httpLink])
-      : ApolloLink.from([versionSplitterLink, runtimeContextLink, uriSwitchLink, persistedQueryLink, httpLink])
+      ? ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, uriSwitchLink, cachingLink(cacheControl), persistedQueryLink, httpLink])
+      : ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, uriSwitchLink, persistedQueryLink, httpLink])
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
