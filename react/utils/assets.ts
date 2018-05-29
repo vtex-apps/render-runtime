@@ -35,7 +35,7 @@ function getExistingScriptSrcs() {
 function getExistingStyleHrefs() {
   const hrefs: string[] = []
   for (let i = 0; i < document.styleSheets.length; i++) {
-    const href = document.styleSheets.item(i).href
+    const href = document!.styleSheets!.item(i)!.href
     if (href) {
       hrefs.push(href)
     }

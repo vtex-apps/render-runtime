@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types'
 import React, {Component, Fragment} from 'react'
 
+import {TreePathProps} from 'react-tree-path'
+import {RenderContext} from './components/RenderContext'
 import ExtensionPoint from './ExtensionPoint'
 import {createPortal} from './utils/dom'
 import {getDirectChildren} from './utils/treePath'
@@ -12,7 +14,6 @@ interface Props {
 
 class LegacyExtensionContainer extends Component<Props, {hydrate: boolean}> {
   public static contextTypes = {
-    extensions: PropTypes.object,
     treePath: PropTypes.string,
   }
 
@@ -20,7 +21,7 @@ class LegacyExtensionContainer extends Component<Props, {hydrate: boolean}> {
     hydrate: false
   }
 
-  public context!: RenderContext
+  public context!: TreePathProps
 
   public componentDidMount() {
     this.setState({hydrate: true})
@@ -28,9 +29,15 @@ class LegacyExtensionContainer extends Component<Props, {hydrate: boolean}> {
 
   public render() {
     const {params, query} = this.props
-    const {extensions, treePath} = this.context
-    const children = getDirectChildren(extensions, treePath)
-    return children.map(id => createPortal(<ExtensionPoint id={id} query={query} params={params} />, `${treePath}/${id}`, this.state.hydrate))
+    const {treePath} = this.context
+    return (
+      <RenderContext.Consumer>
+        {runtime =>
+          getDirectChildren(runtime!.extensions, treePath)
+            .map(id => createPortal(<ExtensionPoint id={id} query={query} params={params} />, `${treePath}/${id}`, this.state.hydrate))
+        }
+      </RenderContext.Consumer>
+    )
   }
 }
 

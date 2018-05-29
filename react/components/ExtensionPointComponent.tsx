@@ -3,10 +3,12 @@ import React, {ErrorInfo, PureComponent, ReactElement} from 'react'
 
 import {getImplementation} from '../utils/assets'
 import logEvent from '../utils/logger'
+import {RenderContextProps, withContext} from './RenderContext'
 
 interface Props {
   component: string | null
   props: any
+  treePath: string
 }
 
 interface State {
@@ -18,34 +20,25 @@ interface State {
 
 const componentPromiseMap: any = {}
 
-export default class ExtensionPointComponent extends PureComponent<Props, State> {
-  public static contextTypes = {
-    account: PropTypes.string,
-    emitter: PropTypes.object,
-    extensions: PropTypes.object,
-    fetchComponent: PropTypes.func,
-    treePath: PropTypes.string,
-    workspace: PropTypes.string
-  }
-
+class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, State> {
   public static propTypes = {
     children: PropTypes.node,
     component: PropTypes.string,
     props: PropTypes.object,
+    treePath: PropTypes.string,
   }
 
-  public context!: RenderContext
   // tslint:disable-next-line:variable-name
   private _isMounted!: boolean
   private emptyExtensionPoint: Extension
   private editableExtensionPoint: Extension
 
-  constructor(props: Props, context: RenderContext) {
-    super(props, context)
+  constructor(props: Props & RenderContextProps) {
+    super(props)
 
-    const root = context.treePath && context.treePath.split('/')[0]
-    this.emptyExtensionPoint = context.extensions[`${root}/__empty`]
-    this.editableExtensionPoint = context.extensions[`${root}/__editable`]
+    const root = props.treePath && props.treePath.split('/')[0]
+    this.emptyExtensionPoint = props.runtime.extensions[`${root}/__empty`]
+    this.editableExtensionPoint = props.runtime.extensions[`${root}/__editable`]
     this.state = {}
   }
 
@@ -55,25 +48,23 @@ export default class ExtensionPointComponent extends PureComponent<Props, State>
     }
 
     this.setState({error: null, errorInfo: null, lastUpdate: Date.now()})
-    const {treePath} = this.context
-    const {component: mounted} = this.props
+    const {component: mounted, treePath} = this.props
     console.log(`[render] Component updated. treePath=${treePath} ${mounted !== component ? `mounted=${mounted} ` : ''}updated=${component}`)
   }
 
   public fetchAndRerender = () => {
-    const {fetchComponent, emitter} = this.context
-    const {component} = this.props
+    const {component, runtime: {fetchComponent, emitter}} = this.props
     const Component = component && getImplementation(component)
 
     // Let's fetch the assets and re-render.
     if (component && !Component && !componentPromiseMap[component]) {
       componentPromiseMap[component] = fetchComponent(component)
-      .then(this.updateComponentsWithEvent)
+      .then(() => this.updateComponentsWithEvent(component))
     }
   }
 
   public renderError = () => {
-    const {treePath} = this.context
+    const {treePath} = this.props
     const {error, errorInfo, errorDetails} = this.state
     const componentStack = errorInfo && errorInfo.componentStack
 
@@ -100,7 +91,7 @@ export default class ExtensionPointComponent extends PureComponent<Props, State>
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    const {account, treePath: path, workspace} = this.context
+    const {treePath: path, runtime: {account, workspace}} = this.props
     const {message, stack} = error
     const {componentStack} = errorInfo
     const event = {
@@ -145,8 +136,7 @@ export default class ExtensionPointComponent extends PureComponent<Props, State>
   }
 
   public render() {
-    const {treePath, production} = this.context
-    const {component, props, children} = this.props
+    const {component, props, children, treePath, runtime: {production}} = this.props
     const {error} = this.state
     const Component = component && getImplementation(component)
 
@@ -176,3 +166,5 @@ interface EditableExtensionPointProps {
   component: string | null
   props?: any
 }
+
+export default withContext<Props>(ExtensionPointComponent)
