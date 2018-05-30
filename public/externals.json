@@ -34,6 +34,11 @@
       },
       {
         "path": "https://unpkg.com/vtex-tachyons@2.4.0/tachyons.css"
+      },
+      {
+        "clientOnly": true,
+        "defer": false,
+        "path": "https://io.vtex.com.br/rc/rc.js"
       }
     ],
     "prod": [
@@ -70,18 +75,7 @@
       },
       {
         "path": "https://unpkg.com/vtex-tachyons@2.4.0/tachyons.min.css"
-      }
-    ]
-  },
-  "vtex": {
-    "dev": [
-      {
-        "clientOnly": true,
-        "defer": false,
-        "path": "https://io.vtex.com.br/rc/rc.js"
-      }
-    ],
-    "prod": [
+      },
       {
         "clientOnly": true,
         "defer": false,
@@ -89,6 +83,7 @@
       }
     ]
   },
+  "vtex": {},
   "gocommerce": {
     "dev": [
       {
