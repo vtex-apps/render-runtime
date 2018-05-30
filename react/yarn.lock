@@ -596,10 +596,6 @@ react-side-effect@^1.1.0:
     exenv "^1.2.1"
     shallowequal "^1.0.1"
 
-react-tree-path@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/react-tree-path/-/react-tree-path-0.2.0.tgz#07f0b570dd621ba27b82894acc2a2facfdd7fba7"
-
 react@^16.3.2:
   version "16.4.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.4.0.tgz#402c2db83335336fba1962c08b98c6272617d585"

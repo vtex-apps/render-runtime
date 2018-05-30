@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {Component, ReactElement} from 'react'
-import withTreePath, {TreePathProps} from 'react-tree-path'
+import {TreePathProps, withTreePath} from './utils/treePath'
 
 import ExtensionPointComponent from './components/ExtensionPointComponent'
 import {RenderContext} from './components/RenderContext'
@@ -52,4 +52,4 @@ class ExtensionPoint extends Component<ExtendedProps> {
   }
 }
 
-export default withTreePath<Props>(ExtensionPoint)
+export default withTreePath<Props>(ExtensionPoint, true)
