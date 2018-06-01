@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, {Component, MouseEvent} from 'react'
 import {NavigateOptions, pathFromPageName} from '../utils/pages'
-import {RenderContext} from './RenderContext'
+import {RenderContextProps, withContext} from './RenderContext'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) => event.button === 0
 
@@ -21,7 +21,7 @@ interface Props {
 }
 
 // eslint-disable-next-line
-export default class Link extends Component<Props> {
+class Link extends Component<Props & RenderContextProps> {
   public static defaultProps = {
     onClick: () => { return },
   }
@@ -34,8 +34,8 @@ export default class Link extends Component<Props> {
     to: PropTypes.string,
   }
 
-  public handleClick = (navigate: RenderContext['navigate']) => (event: MouseEvent<HTMLAnchorElement>) => {
-    const {page, params, query, to} = this.props
+  public handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    const {page, params, query, to, runtime: {navigate}} = this.props
     if (
       isModifiedEvent(event) ||
       !isLeftClickEvent(event) ||
@@ -52,17 +52,11 @@ export default class Link extends Component<Props> {
     }
   }
 
-  public getHref = (pages: RenderContext['pages']) => {
-    return this.props.to || this.props.page && pathFromPageName(this.props.page, pages, this.props.params) || '#'
-  }
-
   public render() {
-    return (
-      <RenderContext.Consumer>
-        {runtime =>
-          <a href={this.getHref(runtime.pages)} {...this.props} onClick={this.handleClick(runtime.navigate)} />
-        }
-      </RenderContext.Consumer>
-    )
+    const {page, params, to, runtime: {pages}} = this.props
+    const href = to || page && pathFromPageName(page, pages, params) || '#'
+    return <a href={href} {...this.props} onClick={this.handleClick} />
   }
 }
+
+export default withContext<Props>(Link)
