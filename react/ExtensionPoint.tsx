@@ -48,7 +48,7 @@ class ExtensionPoint extends Component<ExtendedProps> {
       query,
     }
 
-    return <ExtensionPointComponent component={component} props={props} treePath={treePath}>{children}</ExtensionPointComponent>
+    return <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={treePath}>{children}</ExtensionPointComponent>
   }
 }
 

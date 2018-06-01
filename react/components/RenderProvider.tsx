@@ -337,12 +337,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const root = page.split('/')[0]
     const editorProvider = extensions[`${root}/__provider`]
+    const context = this.getChildContext()
     const maybeEditable = !production && editorProvider
-      ? <ExtensionPointComponent component={editorProvider.component} props={{extensions, pages, page}} treePath="">{component}</ExtensionPointComponent>
+      ? <ExtensionPointComponent component={editorProvider.component} props={{extensions, pages, page}} runtime={context} treePath="">{component}</ExtensionPointComponent>
       : component
 
     return (
-      <RenderContext.Provider value={this.getChildContext()}>
+      <RenderContext.Provider value={context}>
         <ApolloProvider client={this.apolloClient}>
           <IntlProvider locale={locale} messages={messages}>
             {maybeEditable}

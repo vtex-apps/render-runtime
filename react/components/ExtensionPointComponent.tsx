@@ -3,7 +3,7 @@ import React, {ErrorInfo, PureComponent, ReactElement} from 'react'
 
 import {getImplementation} from '../utils/assets'
 import logEvent from '../utils/logger'
-import {RenderContextProps, withContext} from './RenderContext'
+import {RenderContextProps} from './RenderContext'
 
 interface Props {
   component: string | null
@@ -167,4 +167,4 @@ interface EditableExtensionPointProps {
   props?: any
 }
 
-export default withContext<Props>(ExtensionPointComponent)
+export default ExtensionPointComponent
