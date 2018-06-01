@@ -25,6 +25,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
     children: PropTypes.node,
     component: PropTypes.string,
     props: PropTypes.object,
+    runtime: PropTypes.object,
     treePath: PropTypes.string,
   }
 
