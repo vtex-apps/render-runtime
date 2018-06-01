@@ -60,7 +60,7 @@ export default class Link extends Component<Props> {
     return (
       <RenderContext.Consumer>
         {runtime =>
-          <a href={this.getHref(runtime!.pages)} {...this.props} onClick={this.handleClick(runtime!.navigate)} />
+          <a href={this.getHref(runtime.pages)} {...this.props} onClick={this.handleClick(runtime.navigate)} />
         }
       </RenderContext.Consumer>
     )

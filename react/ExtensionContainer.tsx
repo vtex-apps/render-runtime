@@ -12,7 +12,7 @@ class ExtensionContainer extends Component {
         {runtime =>
           <TreePathContext.Consumer>
             {({treePath}) =>
-              getDirectChildren(runtime!.extensions, treePath)
+              getDirectChildren(runtime.extensions, treePath)
                 .map(id =><ExtensionPoint {...this.props} key={id} id={id} />)
             }
           </TreePathContext.Consumer>

@@ -33,12 +33,12 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
     // Nest extension points for nested pages
     // a/b/c should render three extension points
     // <a><b><c></c></b></a>
-    const getNestedExtensionPoints = (runtime?: RenderContext) => {
+    const getNestedExtensionPoints = (runtime: RenderContext) => {
       return reverse.reduce((acc: JSX.Element | null, value: string, index: number) => (
         <ExtensionPoint
           id={value}
           query={query}
-          params={this.getPageParams(runtime!, segments.slice(0, segments.length - index).join('/'))}>
+          params={this.getPageParams(runtime, segments.slice(0, segments.length - index).join('/'))}>
           {acc}
         </ExtensionPoint>
       ), null as JSX.Element | null)

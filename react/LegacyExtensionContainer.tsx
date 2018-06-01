@@ -28,7 +28,7 @@ class LegacyExtensionContainer extends Component<Props, {hydrate: boolean}> {
         {runtime =>
           <TreePathContext.Consumer>
             {({treePath}) =>
-              getDirectChildren(runtime!.extensions, treePath)
+              getDirectChildren(runtime.extensions, treePath)
                 .map(id => createPortal(<ExtensionPoint id={id} query={query} params={params} />, `${treePath}/${id}`, this.state.hydrate))
             }
           </TreePathContext.Consumer>

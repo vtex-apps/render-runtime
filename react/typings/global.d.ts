@@ -185,7 +185,7 @@ declare global {
     Helmet: any
     canUseDOM: boolean
     withHMR: any
-    RenderContext: React.Context<RenderContext | undefined>
+    RenderContext: React.Context<RenderContext>
   }
 
   interface RenderGlobal extends NodeJS.Global {

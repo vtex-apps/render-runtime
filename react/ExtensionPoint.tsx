@@ -35,9 +35,9 @@ class ExtensionPoint extends Component<ExtendedProps> {
     )
   }
 
-  private getExtensionPointComponent = (runtime?: RenderContext) => {
+  private getExtensionPointComponent = (runtime: RenderContext) => {
     const {children, params, query, id, treePath, ...parentProps} = this.props
-    const extension = runtime!.extensions[treePath]
+    const extension = runtime.extensions[treePath]
     const component = extension ? extension.component : null
     const extensionProps = extension ? extension.props : null
 
