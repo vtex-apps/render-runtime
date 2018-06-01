@@ -1,7 +1,86 @@
 import {ApolloLink, createOperation, FetchResult, GraphQLRequest, NextLink, Observable, Operation, RequestHandler} from 'apollo-link'
 import {transformOperation, validateOperation} from 'apollo-link/lib/linkUtils'
-import {ASTKindToNode, DefinitionNode, DirectiveNode, DocumentNode, FieldNode, GraphQLNonNull, Kind, OperationDefinitionNode, OperationTypeDefinitionNode, parse, print, SelectionNode, SelectionSetNode, visit} from 'graphql'
-import {queriesByContextDirective} from 'vtex-graphql-utils'
+import {ASTKindToNode, DefinitionNode, DirectiveNode, DocumentNode, FieldNode, GraphQLNonNull, Kind, OperationDefinitionNode, OperationTypeDefinitionNode, parse, print, SelectionNode, SelectionSetNode, VariableDefinitionNode, VariableNode, visit} from 'graphql'
+
+interface Variables {
+  [name: string]: VariableDefinitionNode
+}
+
+interface Node {
+  selection: SelectionNode
+  usedVariables: Variables
+}
+
+const pickAvailableVariables = (query: DocumentNode) => {
+  const availableVariables: Variables = {}
+  visit(query, {
+    VariableDefinition (node: VariableDefinitionNode) {
+      availableVariables[node.variable.name.value] = node
+    },
+  })
+  return availableVariables
+}
+
+const isRuntimeMetaDirective = (node: DirectiveNode) => node.name.value === 'runtimeMeta'
+
+const pickUsedVariables = (selection: SelectionNode, availableVariables: Variables) => {
+  const usedVariables: Variables = {}
+  visit(selection, {
+    Variable (varNode: VariableNode) {
+      usedVariables[varNode.name.value] = availableVariables[varNode.name.value]
+    },
+  })
+  return usedVariables
+}
+
+const pickFields = (query: DocumentNode, availableVariables: Variables) => {
+  const nodes: Node[] = []
+  visit(query, {
+    Field (selection: SelectionNode) {
+      if (selection.directives && selection.directives.find(isRuntimeMetaDirective)) {
+        nodes.push({
+          selection,
+          usedVariables: pickUsedVariables(selection, availableVariables),
+        })
+      }
+    },
+  })
+  return nodes
+}
+
+const operationWhiteList = ['query', 'mutation', 'subscription']
+
+const queryFromNodeCreator = (query: DocumentNode) => (node: Node) => visit(parse(print(query)), {
+  OperationDefinition (opNode: OperationDefinitionNode) {
+    if (operationWhiteList.find((op) => op === opNode.operation)) {
+      return {
+        ...opNode,
+        selectionSet: {
+          ...opNode.selectionSet,
+          selections: [node.selection],
+        },
+        variableDefinitions: Object.values(node.usedVariables),
+      }
+    }
+  },
+}) as DocumentNode
+
+const assertSingleOperation = (query: DocumentNode) => {
+  const ops = query.definitions.filter((def: OperationDefinitionNode) => operationWhiteList.find(op => op === def.operation))
+
+  if (ops.length > 1) {
+    throw new Error('Only one operation definition is allowed per query. Please split your queries in two different files')
+  }
+}
+
+const queriesByRuntimeMetaDirective = (query: DocumentNode) => {
+  const availableVariables: Variables = pickAvailableVariables(query)
+  const nodes: Node[] = pickFields(query, availableVariables)
+
+  assertSingleOperation(query)
+
+  return nodes.map(queryFromNodeCreator(query))
+}
 
 const mergeRecursively = (accumulator: any, value: any) => {
   Object.keys(value).forEach(key => {
@@ -21,7 +100,7 @@ const createOperationForQuery = (operation: Operation) => (query: DocumentNode) 
 }
 
 const operationByContextDirective = (operation: Operation) => {
-  const queries = queriesByContextDirective(operation.query)
+  const queries = queriesByRuntimeMetaDirective(operation.query)
   return queries.map(createOperationForQuery(operation))
 }
 

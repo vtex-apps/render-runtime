@@ -45,6 +45,7 @@ export interface RenderProviderState {
   production: RenderRuntime['production']
   query: RenderRuntime['query']
   settings: RenderRuntime['settings']
+  cacheHints: RenderRuntime['cacheHints']
 }
 
 class RenderProvider extends Component<Props, RenderProviderState> {
@@ -81,7 +82,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const {appsEtag, culture, messages, components, extensions, pages, page, query, production, settings} = props.runtime
+    const {appsEtag, culture, messages, components, extensions, pages, page, query, production, settings, cacheHints} = props.runtime
     const {history, baseURI, cacheControl} = props
 
     if (history) {
@@ -95,6 +96,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, cacheControl)
     this.state = {
       appsEtag,
+      cacheHints,
       components,
       culture,
       extensions,
@@ -293,9 +295,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {page, production, culture: {locale}} = this.state
 
     return fetchRuntime(this.apolloClient, page, production, locale, renderMajor)
-      .then(({appsEtag, components, extensions, messages, pages, settings}) => {
+      .then(({appsEtag, components, extensions, messages, pages, settings, cacheHints}) => {
         this.setState({
           appsEtag,
+          cacheHints,
           components,
           extensions,
           messages,

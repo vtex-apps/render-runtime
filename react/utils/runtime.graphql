@@ -6,5 +6,6 @@ query Runtime ($page: String!, $production: Boolean!, $locale: String!, $renderV
     extensionsJSON
     appsEtag
     appsSettingsJSON
+    cacheHintsJSON
   }
 }
