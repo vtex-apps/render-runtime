@@ -22,7 +22,7 @@ export interface TreePathProps {
 }
 
 export const withTreePath = <TOriginalProps extends {id: string}>(Component: ComponentType<TOriginalProps & TreePathProps>, provider: boolean = false): ComponentType<TOriginalProps> => {
-  class TreePath extends React.Component<TOriginalProps> {
+  class TreePath extends React.Component<TOriginalProps, TreePathProps> {
     public static contextTypes = {
       treePath: PropTypes.string
     }
@@ -43,12 +43,20 @@ export const withTreePath = <TOriginalProps extends {id: string}>(Component: Com
       return parentTreePath ? `${parentTreePath}/${currentId}` : currentId
     }
 
-    public getChildContext() {
-      return {
+    public componentWillMount() {
+      this.componentWillReceiveProps(this.props, this.context)
+    }
+
+    public componentWillReceiveProps(nextProps: TOriginalProps, nextContext: TreePathProps) {
+      this.setState({
         treePath: provider
-          ? TreePath.getId(this.props.id, this.context.treePath)
-          : this.context.treePath
-      }
+          ? TreePath.getId(nextProps.id, nextContext.treePath)
+          : nextContext.treePath
+      })
+    }
+
+    public getChildContext() {
+      return { treePath: this.state.treePath }
     }
 
     public render() {
