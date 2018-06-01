@@ -42,6 +42,11 @@ declare global {
     [name: string]: Extension
   }
 
+  interface LogEvent {
+    name: string
+    data?: any
+  }
+
   interface Culture {
     availableLocales: string[]
     locale: string

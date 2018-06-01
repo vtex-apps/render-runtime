@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, {ErrorInfo, PureComponent, ReactElement} from 'react'
 
 import {getImplementation} from '../utils/assets'
+import logEvent from '../utils/logger'
 
 interface Props {
   component: string | null
@@ -19,10 +20,12 @@ const componentPromiseMap: any = {}
 
 export default class ExtensionPointComponent extends PureComponent<Props, State> {
   public static contextTypes = {
+    account: PropTypes.string,
     emitter: PropTypes.object,
     extensions: PropTypes.object,
     fetchComponent: PropTypes.func,
     treePath: PropTypes.string,
+    workspace: PropTypes.string
   }
 
   public static propTypes = {
@@ -97,7 +100,24 @@ export default class ExtensionPointComponent extends PureComponent<Props, State>
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Failed to render extension point', this.context.treePath)
+    const {account, treePath: path, workspace} = this.context
+    const {message, stack} = error
+    const {componentStack} = errorInfo
+    const event = {
+      data: {
+        account,
+        componentStack,
+        message,
+        path,
+        stack,
+        workspace
+      },
+      name: 'JSError'
+    }
+
+    console.error('Failed to render extension point', path)
+    logEvent(event)
+
     this.setState({
       error,
       errorDetails: false,
