@@ -4,8 +4,7 @@ import React, {Component, Fragment} from 'react'
 import {RenderContext} from './components/RenderContext'
 import ExtensionPoint from './ExtensionPoint'
 import {createPortal} from './utils/dom'
-import {TreePathContext} from './utils/treePath'
-import {getDirectChildren} from './utils/treePath'
+import {getDirectChildren, TreePathContext} from './utils/treePath'
 
 interface Props {
   query: any,
