@@ -22,7 +22,6 @@ import {traverseComponent} from '../utils/components'
 import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
-import {RenderContext} from './RenderContext'
 
 interface Props {
   children: ReactElement<any> | null
@@ -124,8 +123,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // If RenderProvider is being re-rendered, the global runtime might have changed
     // so we must update the all extensions.
     if (this.rendered) {
-      const {runtime: {extensions}} = nextProps
-      this.setState({extensions})
+      const {runtime: {extensions, emitter}} = nextProps
+      this.setState({extensions}, () => emitter.emit('extension:*:update', this.state))
     }
   }
 
@@ -231,14 +230,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onLocalesUpdated = (locales: string[]) => {
-    const {runtime: {renderMajor}} = this.props
+    const {runtime: {emitter, renderMajor}} = this.props
     const {page, production, culture: {locale}} = this.state
 
     // Current locale is one of the updated ones
     if (locales.indexOf(this.state.culture.locale) !== -1) {
       fetchMessages(this.apolloClient, page, production, locale, renderMajor)
         .then(messages => {
-          this.setState({messages})
+          this.setState({
+            messages,
+          }, () => emitter.emit('extension:*:update'))
         })
         .catch(e => {
           console.log('Failed to fetch new locale file.')
@@ -248,7 +249,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onLocaleSelected = (locale: string) => {
-    const {runtime: {renderMajor}} = this.props
+    const {runtime: {emitter, renderMajor}} = this.props
     const {page, production} = this.state
 
     if (locale !== this.state.culture.locale) {
@@ -264,7 +265,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             locale,
           },
           messages,
-        })
+        }, () => emitter.emit('extension:*:update'))
       })
       .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))
       .catch(e => {
@@ -275,7 +276,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public updateRuntime = () => {
-    const {runtime: {renderMajor}} = this.props
+    const {runtime: {emitter, renderMajor}} = this.props
     const {page, production, culture: {locale}} = this.state
 
     return fetchRuntime(this.apolloClient, page, production, locale, renderMajor)
@@ -287,7 +288,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           messages,
           pages,
           settings,
-        })
+        }, () => emitter.emit('extension:*:update', this.state))
       })
   }
 
@@ -311,6 +312,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public updateExtension = (name: string, extension: Extension) => {
+    const {runtime: {emitter}} = this.props
     const {extensions} = this.state
 
     this.setState({
@@ -318,7 +320,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         ...extensions,
         [name]: extension,
       },
-    })
+    }, () => emitter.emit(`extension:${name}:update`, this.state))
   }
 
   public render() {
@@ -337,19 +339,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const root = page.split('/')[0]
     const editorProvider = extensions[`${root}/__provider`]
-    const context = this.getChildContext()
     const maybeEditable = !production && editorProvider
-      ? <ExtensionPointComponent component={editorProvider.component} props={{extensions, pages, page}} runtime={context} treePath="">{component}</ExtensionPointComponent>
+      ? <ExtensionPointComponent component={editorProvider.component} props={{extensions, pages, page}}>{component}</ExtensionPointComponent>
       : component
 
     return (
-      <RenderContext.Provider value={context}>
-        <ApolloProvider client={this.apolloClient}>
-          <IntlProvider locale={locale} messages={messages}>
-            {maybeEditable}
-          </IntlProvider>
-        </ApolloProvider>
-      </RenderContext.Provider>
+      <ApolloProvider client={this.apolloClient}>
+        <IntlProvider locale={locale} messages={messages}>
+          {maybeEditable}
+        </IntlProvider>
+      </ApolloProvider>
     )
   }
 }
