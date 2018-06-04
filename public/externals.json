@@ -12,17 +12,17 @@
       {
         "global": "React",
         "import": "react",
-        "path": "https://unpkg.com/react@16.4.0/umd/react.development.js"
+        "path": "https://unpkg.com/react@16.3.2/umd/react.development.js"
       },
       {
         "global": "ReactDOM",
         "import": "react-dom",
-        "path": "https://unpkg.com/react-dom@16.4.0/umd/react-dom.development.js"
+        "path": "https://unpkg.com/react-dom@16.3.2/umd/react-dom.development.js"
       },
       {
         "global": "ReactDOMServer",
         "import": "react-dom/server",
-        "path": "https://unpkg.com/react-dom@16.4.0/umd/react-dom-server.browser.development.js",
+        "path": "https://unpkg.com/react-dom@16.3.2/umd/react-dom-server.browser.development.js",
         "serverOnly": true
       },
       {
@@ -53,17 +53,17 @@
       {
         "global": "React",
         "import": "react",
-        "path": "https://unpkg.com/react@16.4.0/umd/react.production.min.js"
+        "path": "https://unpkg.com/react@16.3.2/umd/react.production.min.js"
       },
       {
         "global": "ReactDOM",
         "import": "react-dom",
-        "path": "https://unpkg.com/react-dom@16.4.0/umd/react-dom.production.min.js"
+        "path": "https://unpkg.com/react-dom@16.3.2/umd/react-dom.production.min.js"
       },
       {
         "global": "ReactDOMServer",
         "import": "react-dom/server",
-        "path": "https://unpkg.com/react-dom@16.4.0/umd/react-dom-server.browser.production.min.js",
+        "path": "https://unpkg.com/react-dom@16.3.2/umd/react-dom-server.browser.production.min.js",
         "serverOnly": true
       },
       {

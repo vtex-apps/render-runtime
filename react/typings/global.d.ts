@@ -4,7 +4,7 @@ import { ReactElement, Component } from "react";
 import ExtensionContainer from "../ExtensionContainer"
 import ExtensionPoint from "../ExtensionPoint"
 import Link from "../components/Link";
-import { History, Location } from "history";
+import { History } from "history";
 import { HelmetData } from "react-helmet";
 
 declare global {
@@ -87,24 +87,15 @@ declare global {
     error: any
   }
 
-  interface RenderContext {
-    account: RenderRuntime['account'],
-    components: RenderRuntime['components'],
-    culture: RenderRuntime['culture'],
-    emitter: RenderRuntime['emitter'],
-    extensions: RenderRuntime['extensions'],
-    fetchComponent: (component: string) => Promise<void>,
-    getSettings: (app: string) => any,
-    history: History | null,
-    navigate: (options: NavigateOptions) => boolean,
-    onPageChanged: (location: Location) => void,
-    page: RenderRuntime['page'],
-    pages: RenderRuntime['pages'],
-    prefetchPage: (name: string) => Promise<void>,
-    production: RenderRuntime['production'],
-    updateExtension: (name: string, extension: Extension) => void,
-    updateRuntime: () => Promise<void>,
-    workspace: RenderRuntime['workspace'],
+  interface Dynamic {
+    [field: string]: any
+  }
+
+  interface RenderContext extends Dynamic {
+    emitter: EventEmitter
+    extensions: Extensions
+    production: boolean
+    treePath: string
   }
 
   interface ComponentsRegistry {
@@ -185,7 +176,6 @@ declare global {
     Helmet: any
     canUseDOM: boolean
     withHMR: any
-    RenderContext: React.Context<RenderContext>
   }
 
   interface RenderGlobal extends NodeJS.Global {
