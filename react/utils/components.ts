@@ -1,5 +1,5 @@
 const prependUniq = (arrOne: any[], arrTwo: any[]) => {
-  return [...arrOne.filter(item => !arrTwo.includes(item)), ...arrTwo]
+  return [...arrOne, ...arrTwo.filter(item => !arrOne.includes(item))]
 }
 
 export const traverseComponent = (components: Components | Record<string, string[]>, component: string): ComponentTraversalResult => {
