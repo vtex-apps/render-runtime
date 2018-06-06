@@ -31,9 +31,6 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
     const {workspace, cacheHints} = runtime
     const hash = hashFromExtensions(operation.extensions)
     const {maxAge, scope, version} = cacheHints[hash] || defaultAssets
-
-    console.log('these are the assets', maxAge, scope, version)
-
     const {operationType} = assetsFromQuery(operation.query)
     const protocol = canUseDOM ? 'https:' : 'http:'
     operation.setContext(({ fetchOptions = {}, runtime: {appsEtag} } : OperationContext) => {
