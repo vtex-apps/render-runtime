@@ -23,7 +23,7 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
   }
 
   public getPageParams(name: string) {
-    const path = canUseDOM ? window.location.pathname : global.__pathname__
+    const path = canUseDOM ? window.location.pathname : window.__pathname__
     const pagePath = getPagePath(name, this.context.pages)
     const pagePathWithRest = pagePath && /\*\w+$/.test(pagePath) ? pagePath : pagePath.replace(/\/?$/, '*_rest')
     return pagePath && getParams(pagePathWithRest, path) || EMPTY_OBJECT

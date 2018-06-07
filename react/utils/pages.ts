@@ -11,7 +11,7 @@ function getScore(path: string) {
 }
 
 function isHost(hostname: string) {
-  return hostname === (canUseDOM ? window.location.hostname : global.__hostname__)
+  return hostname === (canUseDOM ? window.location.hostname : window.__hostname__)
 }
 
 function trimEndingSlash(token: string) {

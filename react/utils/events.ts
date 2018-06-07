@@ -19,7 +19,7 @@ interface EmittersRegistry {
 const emittersByWorkspace: EmittersRegistry = {}
 
 const initSSE = (account: string, workspace: string, baseURI: string) => {
-  if (Object.keys(global.__RENDER_7_HOT__).length > 0) {
+  if (Object.keys(window.__RENDER_7_HOT__).length > 0) {
     require('eventsource-polyfill')
     const myvtexSSE = require('myvtex-sse')
     const path = `vtex.builder-hub:*:react2,pages0,build.status?workspace=${workspace}`
@@ -50,8 +50,8 @@ const initSSE = (account: string, workspace: string, baseURI: string) => {
       switch (type) {
         case 'hmr':
           console.log(`[react2] Received update. app=${subject} hash=${hash}`)
-          if (global.__RENDER_7_HOT__[subject]) {
-            global.__RENDER_7_HOT__[subject].emit('webpackHotUpdate', hash)
+          if (window.__RENDER_7_HOT__[subject]) {
+            window.__RENDER_7_HOT__[subject].emit('webpackHotUpdate', hash)
           }
           break
         case 'reload':

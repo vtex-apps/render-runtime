@@ -68,7 +68,7 @@ function shouldAddStyleToPage(path: string) {
 }
 
 export function getImplementation<P={}, S={}>(component: string) {
-  return global.__RENDER_7_COMPONENTS__[component] as new() => Component<P, S>
+  return window.__RENDER_7_COMPONENTS__[component] as new() => Component<P, S>
 }
 
 export function fetchAssets(assets: string[]) {
