@@ -178,7 +178,7 @@ declare global {
     withHMR: any
   }
 
-  interface RenderGlobal extends NodeJS.Global {
+  interface Window extends Window {
     __RENDER_7_RUNTIME__: RuntimeExports
     __RENDER_7_COMPONENTS__: ComponentsRegistry
     __RENDER_7_HOT__: HotEmitterRegistry
@@ -190,6 +190,7 @@ declare global {
     browserHistory: History
     ReactIntlLocaleData: any
     IntlPolyfill: any
+    Intl: any
     hrtime: NodeJS.Process['hrtime']
     rendered: Promise<RenderedSuccess> | RenderedFailure
   }
