@@ -12,3 +12,5 @@ declare module '*.graphql' {
   const value: DocumentNode;
   export default value;
 }
+
+declare var vtex: any

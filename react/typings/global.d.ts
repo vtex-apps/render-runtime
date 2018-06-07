@@ -98,8 +98,13 @@ declare global {
     treePath: string
   }
 
+interface RenderComponent<P={}, S={}> {
+  new(): Component<P,S>
+  getCustomMessages?: (locale: string) => any
+}
+
   interface ComponentsRegistry {
-    [component: string]: new() => Component<any, any>
+    [component: string]: RenderComponent<any, any>
   }
 
   interface HotEmitterRegistry {
