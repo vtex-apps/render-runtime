@@ -18,19 +18,13 @@ interface OperationContext {
   runtime: RenderRuntime,
 }
 
-const defaultAssets = {
-  maxAge: 'LONG',
-  scope: 'public',
-  version: 1
-}
-
 const hashFromExtensions = ext => ext && ext.persistedQuery && ext.persistedQuery.sha256Hash
 
 export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     const {workspace, cacheHints} = runtime
     const hash = hashFromExtensions(operation.extensions)
-    const {maxAge, scope, version} = cacheHints[hash] || defaultAssets
+    const {maxAge = 'LONG', scope = 'PUBLIC', version = 1} = cacheHints[hash] || {}
     const {operationType} = assetsFromQuery(operation.query)
     const protocol = canUseDOM ? 'https:' : 'http:'
     operation.setContext(({ fetchOptions = {}, runtime: {appsEtag} } : OperationContext) => {
@@ -38,7 +32,7 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
       return {
         ...operation.getContext(),
         fetchOptions: {...fetchOptions, method},
-        uri: `${protocol}//${baseURI}/_v/graphql/${scope}/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
+        uri: `${protocol}//${baseURI}/_v/graphql/${scope.toLowerCase()}/v${version}?workspace=${workspace}&maxAge=${maxAge.toLowerCase()}&appsEtag=${appsEtag}`,
       }
     })
     return forward ? forward(operation) : null
