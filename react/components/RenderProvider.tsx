@@ -86,7 +86,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       const renderLocation = {...history.location, state: {renderRouting: true}}
       history.replace(renderLocation)
       // backwards compatibility
-      global.browserHistory = history
+      window.browserHistory = global.browserHistory = history
     }
 
     const runtimeContextLink = this.createRuntimeContextLink()
@@ -211,7 +211,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const {components, culture: {locale}} = this.state
     const {apps, assets} = traverseComponent(components, component)
-    const unfetchedApps = apps.filter(app => !Object.keys(global.__RENDER_7_COMPONENTS__).some(c => c.startsWith(app)))
+    const unfetchedApps = apps.filter(app => !Object.keys(window.__RENDER_7_COMPONENTS__).some(c => c.startsWith(app)))
     if (unfetchedApps.length === 0) {
       return fetchAssets(assets)
     }

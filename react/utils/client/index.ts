@@ -54,7 +54,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       : ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, uriSwitchLink, persistedQueryLink, httpLink])
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
-      cache: canUseDOM ? cache.restore(global.__STATE__) : cache,
+      cache: canUseDOM ? cache.restore(window.__STATE__) : cache,
       link,
       ssrMode: !canUseDOM,
     })

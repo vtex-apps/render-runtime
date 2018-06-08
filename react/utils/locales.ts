@@ -12,7 +12,7 @@ const loadReactIntlData = (locale: string) => {
 
 const loadIntlData = (locale: string) => {
   const path = `https://unpkg.com/intl@1.2.5/locale-data/jsonp/${locale}.js`
-  return global.IntlPolyfill && shouldAddScriptToPage(path) ? addScriptToPage(path) : Promise.resolve()
+  return window.IntlPolyfill && shouldAddScriptToPage(path) ? addScriptToPage(path) : Promise.resolve()
 }
 
 export const loadLocaleData = (locale: string) => {
@@ -24,6 +24,6 @@ export const loadLocaleData = (locale: string) => {
 
 export const addLocaleData = (locale: string) => {
   const lang = getLang(locale)
-  addReactLocaleData(global.ReactIntlLocaleData[lang])
+  addReactLocaleData(window.ReactIntlLocaleData[lang])
 }
 

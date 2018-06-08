@@ -2,7 +2,7 @@ interface Module {
   hot: any
 }
 
-declare var global: RenderGlobal
+declare var global: Window
 
 declare var module: Module
 

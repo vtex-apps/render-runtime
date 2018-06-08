@@ -17,23 +17,23 @@ import {getBaseURI} from '../utils/host'
 import {addLocaleData} from '../utils/locales'
 import withHMR from '../utils/withHMR'
 
-if (global.IntlPolyfill) {
-  if (!global.Intl) {
-    global.Intl = global.IntlPolyfill
+if (window.IntlPolyfill) {
+  if (!window.Intl) {
+    window.Intl = window.IntlPolyfill
   } else if (!canUseDOM) {
-    global.Intl.NumberFormat = global.IntlPolyfill.NumberFormat
-    global.Intl.DateTimeFormat = global.IntlPolyfill.DateTimeFormat
+    window.Intl.NumberFormat = window.IntlPolyfill.NumberFormat
+    window.Intl.DateTimeFormat = window.IntlPolyfill.DateTimeFormat
   }
 }
 
 function renderToStringWithData(component: ReactElement<any>): Promise<ServerRendered> {
-  const startGetDataFromTree = global.hrtime()
+  const startGetDataFromTree = window.hrtime()
   return require('react-apollo').getDataFromTree(component).then(() => {
-    const endGetDataFromTree = global.hrtime(startGetDataFromTree)
+    const endGetDataFromTree = window.hrtime(startGetDataFromTree)
 
-    const startRenderToString = global.hrtime()
+    const startRenderToString = window.hrtime()
     const markup = require('react-dom/server').renderToString(component)
-    const endRenderToString = global.hrtime(startRenderToString)
+    const endRenderToString = window.hrtime(startRenderToString)
     return {
       markup,
       renderTimeMetric: {
@@ -98,7 +98,7 @@ function getRenderableExtensionPointNames(rootName: string, extensions: Extensio
 }
 
 function start() {
-  const runtime = global.__RUNTIME__
+  const runtime = window.__RUNTIME__
   const renderableExtensionPointNames = getRenderableExtensionPointNames(runtime.page, runtime.extensions)
 
   try {
@@ -107,7 +107,7 @@ function start() {
     console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     if (!canUseDOM) {
       // Expose render promises to global context.
-      global.rendered = Promise.all(renderPromises as Array<Promise<NamedServerRendered>>).then(results => ({
+      window.rendered = Promise.all(renderPromises as Array<Promise<NamedServerRendered>>).then(results => ({
         extensions: results.reduce(
           (acc, {markups}) => (markups.forEach(({name, markup}) => acc[name] = markup), acc),
           {} as RenderedSuccess['extensions'],
@@ -124,7 +124,7 @@ function start() {
   } catch (error) {
     console.error('Unexpected error rendering:', error)
     if (!canUseDOM) {
-      global.rendered = {error}
+      window.rendered = {error}
     }
   }
 }

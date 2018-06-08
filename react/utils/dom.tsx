@@ -18,7 +18,7 @@ const portalWrapper = (name: string, markup: string) =>
   `<span id="${portalWrapperId(name)}">${markup}</span>`
 
 export const createPortal = (children: ReactElement<any>, name: string, hydrate: boolean) => {
-  global.__hasPortals__ = true
+  window.__hasPortals__ = true
 
   if (!hydrate) {
     return canUseDOM
@@ -43,7 +43,7 @@ export const createPortal = (children: ReactElement<any>, name: string, hydrate:
 export const getMarkups = (pageName: string, pageMarkup: string): NamedMarkup[] => {
   const markups: NamedMarkup[] = []
 
-  let matches = global.__hasPortals__ && portalPattern.exec(pageMarkup)
+  let matches = window.__hasPortals__ && portalPattern.exec(pageMarkup)
   let strippedMarkup = pageMarkup
   while (matches) {
     const [matched, name, markup] = matches
