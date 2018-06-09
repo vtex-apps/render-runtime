@@ -36,6 +36,7 @@ interface Props {
 
 export interface RenderProviderState {
   appsEtag: RenderRuntime['appsEtag']
+  cacheHints: RenderRuntime['cacheHints']
   components: RenderRuntime['components']
   culture: RenderRuntime['culture']
   extensions: RenderRuntime['extensions']
@@ -45,7 +46,6 @@ export interface RenderProviderState {
   production: RenderRuntime['production']
   query: RenderRuntime['query']
   settings: RenderRuntime['settings']
-  cacheHints: RenderRuntime['cacheHints']
 }
 
 class RenderProvider extends Component<Props, RenderProviderState> {
@@ -82,7 +82,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const {appsEtag, culture, messages, components, extensions, pages, page, query, production, settings, cacheHints} = props.runtime
+    const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings} = props.runtime
     const {history, baseURI, cacheControl} = props
 
     if (history) {
@@ -295,7 +295,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {page, production, culture: {locale}} = this.state
 
     return fetchRuntime(this.apolloClient, page, production, locale, renderMajor)
-      .then(({appsEtag, components, extensions, messages, pages, settings, cacheHints}) => {
+      .then(({appsEtag, cacheHints, components, extensions, messages, pages, settings}) => {
         this.setState({
           appsEtag,
           cacheHints,
@@ -310,12 +310,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public createRuntimeContextLink() {
     return new ApolloLink((operation: Operation, forward?: NextLink) => {
-      const {appsEtag, components, extensions, messages, pages} = this.state
+      const {appsEtag, cacheHints, components, extensions, messages, pages} = this.state
       operation.setContext((currentContext: Record<string, any>) => {
         return {
           ...currentContext,
           runtime: {
             appsEtag,
+            cacheHints,
             components,
             extensions,
             messages,
