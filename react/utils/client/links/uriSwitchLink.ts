@@ -20,12 +20,12 @@ interface OperationContext {
 
 const hashFromExtensions = ext => ext && ext.persistedQuery && ext.persistedQuery.sha256Hash
 
-export const createUriSwitchLink = (baseURI: string) =>
+export const createUriSwitchLink = (baseURI: string, workspace: string) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     const hash = hashFromExtensions(operation.extensions)
     const {operationType} = assetsFromQuery(operation.query)
     const protocol = canUseDOM ? 'https:' : 'http:'
-    operation.setContext(({ fetchOptions = {}, runtime: {appsEtag, cacheHints, workspace} } : OperationContext) => {
+    operation.setContext(({ fetchOptions = {}, runtime: {appsEtag, cacheHints} } : OperationContext) => {
       const {maxAge = 'LONG', scope = 'PUBLIC', version = 1} = cacheHints[hash] || {}
       const method = (scope.toLowerCase() === 'public' && operationType.toLowerCase() === 'query') ? 'GET' : 'POST'
       return {
