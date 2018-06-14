@@ -7,7 +7,7 @@ import {Helmet} from 'react-helmet'
 import {IntlProvider} from 'react-intl'
 
 import {History, Location, LocationListener, UnregisterCallback} from 'history'
-import {fetchAssets} from '../utils/assets'
+import {fetchAssets, getImplementation} from '../utils/assets'
 import {getClient} from '../utils/client'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
@@ -168,6 +168,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
+  public getCustomMessages = (locale: string) => {
+    const {components} = this.state
+    const componentsArray = Object.keys(components)
+
+    const customMessages = componentsArray
+          .map(getImplementation)
+          .filter(component => component && component.getCustomMessages)
+          .map(component => component.getCustomMessages!(locale))
+          .reduce(Object.assign, {})
+
+    return customMessages
+  }
+
   public navigate = (options: NavigateOptions) => {
     const {history} = this.props
     const {pages} = this.state
@@ -326,6 +339,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public render() {
     const {children, runtime} = this.props
     const {culture: {locale}, messages, pages, page, query, production, extensions} = this.state
+    const customMessages = this.getCustomMessages(locale)
+    const mergedMessages = {
+      ...messages,
+      ...customMessages
+    }
 
     const component = children
       ? React.cloneElement(children as ReactElement<any>, {query})
@@ -345,7 +363,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     return (
       <ApolloProvider client={this.apolloClient}>
-        <IntlProvider locale={locale} messages={messages}>
+        <IntlProvider locale={locale} messages={mergedMessages}>
           {maybeEditable}
         </IntlProvider>
       </ApolloProvider>

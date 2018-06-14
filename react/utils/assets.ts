@@ -35,7 +35,7 @@ function getExistingScriptSrcs() {
 function getExistingStyleHrefs() {
   const hrefs: string[] = []
   for (let i = 0; i < document.styleSheets.length; i++) {
-    const href = document.styleSheets.item(i).href
+    const href = document.styleSheets.item(i)!.href
     if (href) {
       hrefs.push(href)
     }
@@ -68,7 +68,7 @@ function shouldAddStyleToPage(path: string) {
 }
 
 export function getImplementation<P={}, S={}>(component: string) {
-  return window.__RENDER_7_COMPONENTS__[component] as new() => Component<P, S>
+  return window.__RENDER_7_COMPONENTS__[component] as RenderComponent<P, S>
 }
 
 export function fetchAssets(assets: string[]) {
