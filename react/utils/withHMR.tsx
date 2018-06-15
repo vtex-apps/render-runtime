@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import React, {Component, ComponentType} from 'react'
 
 const isComponentType = (Arg: any): Arg is ComponentType => {
-  return typeof Arg === 'function' || (Arg.prototype && Arg.prototype.render)
+  return typeof Arg === 'function' || (Arg && Arg.prototype && Arg.prototype.render)
 }
 
 export default (module: Module, InitialImplementer: any) => {
