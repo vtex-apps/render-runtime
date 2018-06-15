@@ -1,17 +1,13 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import PropTypes from 'prop-types'
-import React, {Component, ComponentType, ErrorInfo} from 'react'
+import React, {Component, ComponentType} from 'react'
 
 const isComponentType = (Arg: any): Arg is ComponentType => {
   return typeof Arg === 'function' || (Arg.prototype && Arg.prototype.render)
 }
 
 export default (module: Module, InitialImplementer: any) => {
-  if (!isComponentType(InitialImplementer)) {
-    return null
-  }
-
-  if (!module.hot) {
+  if (!isComponentType(InitialImplementer) || !module.hot) {
     return InitialImplementer
   }
 
