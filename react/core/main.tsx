@@ -47,13 +47,6 @@ function renderToStringWithData(component: ReactElement<any>): Promise<ServerRen
   })
 }
 
-// Whether this placeholder has a component.
-const hasComponent = (extensions: Extensions) => (name: string) => !!extensions[name].component
-
-// The placeholder "foo/bar" is root if there is no placeholder "foo" (inside names)
-const isRoot = (name: string, index: number, names: string[]) =>
-  names.find(parent => name !== parent && name.startsWith(parent)) === undefined
-
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered => {
   const {customRouting, disableSSR, page, pages, extensions, culture: {locale}} = runtime
@@ -84,45 +77,38 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   )
 }
 
-function getRenderableExtensionPointNames(rootName: string, extensions: Extensions) {
-  const childExtensionPoints = Object.keys(extensions).reduce((acc, value) => {
-    if (value.startsWith(rootName)) {
-      acc[value] = extensions[value]
-    }
-    return acc
-  }, {} as Extensions)
-  // Names of all extensions with a component
-  const withComponentNames = Object.keys(childExtensionPoints).filter(
-    hasComponent(childExtensionPoints),
-  )
-  // Names of all top-level extensions with a component
-  const rootWithComponentNames = withComponentNames.filter(isRoot)
-  return rootWithComponentNames
+function validateRootComponent(rootName: string, extensions: Extensions) {
+  if (!extensions[rootName]) {
+    throw new Error(`Missing extension point for page ${rootName}`)
+  }
+
+  if (!extensions[rootName].component) {
+    throw new Error(`Missing component for extension point ${rootName}`)
+  }
 }
 
 function start() {
-  const runtime = window.__RUNTIME__
-  const renderableExtensionPointNames = getRenderableExtensionPointNames(runtime.page, runtime.extensions)
-
   try {
-    // If there are multiple renderable extensions, render them in parallel.
-    const renderPromises = renderableExtensionPointNames.map(e => render(e, runtime))
-    console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
+    const runtime = window.__RUNTIME__
+    const rootName = runtime.page
+    validateRootComponent(rootName, runtime.extensions)
+
+    const maybeRenderPromise = render(rootName, runtime)
     if (!canUseDOM) {
-      // Expose render promises to global context.
-      window.rendered = Promise.all(renderPromises as Array<Promise<NamedServerRendered>>).then(results => ({
-        extensions: results.reduce(
-          (acc, {markups}) => (markups.forEach(({name, markup}) => acc[name] = markup), acc),
-          {} as RenderedSuccess['extensions'],
-        ),
-        head: Helmet.rewind(),
-        maxAge: Math.min(...results.map(({maxAge}) => maxAge)),
-        renderMetrics: results.reduce(
-          (acc, {page, renderTimeMetric}) => (acc[page] = renderTimeMetric, acc),
-          {} as RenderedSuccess['renderMetrics'],
-        ),
-        state: getState(runtime),
-      }))
+      // Expose render promise to global context.
+      window.rendered = (maybeRenderPromise as Promise<NamedServerRendered>)
+        .then(({markups, maxAge, page, renderTimeMetric}) => ({
+          extensions: markups.reduce(
+            (acc, {name, markup}) => (acc[name] = markup, acc),
+            {} as RenderedSuccess['extensions'],
+          ),
+          head: Helmet.rewind(),
+          maxAge,
+          renderMetrics: {[page]: renderTimeMetric},
+          state: getState(runtime),
+        }))
+    } else {
+      console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     }
   } catch (error) {
     console.error('Unexpected error rendering:', error)
