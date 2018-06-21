@@ -1,7 +1,6 @@
-import {canUseDOM} from 'exenv'
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import PropTypes from 'prop-types'
-import React, {ComponentClass, ComponentType} from 'react'
+import React, {ComponentType} from 'react'
 
 const relative = (parent: string, id: string) => id.replace(`${parent}/`, '')
 
@@ -22,13 +21,9 @@ export interface TreePathProps {
   treePath: string
 }
 
-export const withTreePath = <TOriginalProps extends {id: string}>(Component: ComponentType<TOriginalProps & TreePathProps>, provider: boolean = false): ComponentType<TOriginalProps> => {
+export function withTreePath <TOriginalProps>(Component: ComponentType<TOriginalProps & TreePathProps>): ComponentType<TOriginalProps> {
   class TreePath extends React.Component<TOriginalProps, TreePathProps> {
     public static contextTypes = {
-      treePath: PropTypes.string
-    }
-
-    public static childContextTypes = {
       treePath: PropTypes.string
     }
 
@@ -40,43 +35,15 @@ export const withTreePath = <TOriginalProps extends {id: string}>(Component: Com
       return Component
     }
 
-    private static getId (currentId: string, parentTreePath: string) {
-      return parentTreePath ? `${parentTreePath}/${currentId}` : currentId
-    }
-
-    public componentWillMount() {
-      this.componentWillReceiveProps(this.props, this.context)
-    }
-
-    public componentWillReceiveProps(nextProps: TOriginalProps, nextContext: TreePathProps) {
-      this.setState({
-        treePath: provider
-          ? TreePath.getId(nextProps.id, nextContext.treePath)
-          : nextContext.treePath
-      })
-    }
-
-    public getChildContext() {
-      return { treePath: this.state.treePath }
-    }
-
     public render() {
       return (
         <TreePathContext.Consumer>
           {
             context => {
-              const treePath = canUseDOM
-                ? TreePath.getId(this.props.id, context.treePath)
-                : this.getChildContext().treePath
-
-              return provider
-                ? (
-                  <TreePathContext.Provider value={{treePath}}>
-                    <Component {...this.props} treePath={treePath}/>
-                  </TreePathContext.Provider>
-                ) : (
-                  <Component {...this.props} treePath={treePath}/>
-                )
+              // get treePath from old react context during apollo's getDataFromTree
+              // it is buggy when dealing with contexts that are overwritten, like treePath
+              const treePath = window.__APOLLO_SSR__ ? this.context.treePath : context.treePath
+              return <Component {...this.props} treePath={treePath}/>
             }
           }
         </TreePathContext.Consumer>
