@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
-import React, {Component, Fragment} from 'react'
+import React, { Component, Fragment } from 'react'
 
 import ExtensionPoint from './ExtensionPoint'
-import {getDirectChildren} from './utils/treePath'
+import { getDirectChildren } from './utils/treePath'
 
 class ExtensionContainer extends Component {
   public static contextTypes = {
@@ -13,13 +13,15 @@ class ExtensionContainer extends Component {
   public context!: RenderContext
 
   public render() {
-    const {extensions, treePath} = this.context
+    const { extensions, treePath } = this.context
     const children = getDirectChildren(extensions, treePath)
+      .map(id => parseInt(id))
+      .sort()
     return (
       <Fragment>
-        {children.map(id =>
-          <ExtensionPoint {...this.props} key={id} id={id} />
-        )}
+        {children.map(id => (
+          <ExtensionPoint {...this.props} key={id} id={id.toString()} />
+        ))}
       </Fragment>
     )
   }
