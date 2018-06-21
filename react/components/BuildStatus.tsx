@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
+import {RenderContextProps, withContext} from './RenderContext'
 
 const loader = (
   <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
@@ -15,17 +16,12 @@ interface State {
   status: string | null
 }
 
-export default class BuildStatus extends Component<any, State> {
-  public static contextTypes = {
-    emitter: PropTypes.object,
-  }
-
-  public context!: RenderContext
+class BuildStatus extends Component<RenderContextProps, State> {
   private animateOutHandle!: NodeJS.Timer
   private hideHandle!: NodeJS.Timer
 
-  constructor(props: any, context: RenderContext) {
-    super(props, context)
+  constructor(props: RenderContextProps) {
+    super(props)
 
     this.state = {
       animateOut: false,
@@ -59,12 +55,12 @@ export default class BuildStatus extends Component<any, State> {
   }
 
   public subscribeToStatus = () => {
-    const {emitter} = this.context
+    const {emitter} = this.props.runtime
     emitter.addListener('build.status', this.updateStatus)
   }
 
   public unsubscribeToStatus = () => {
-    const {emitter} = this.context
+    const {emitter} = this.props.runtime
     emitter.removeListener('build.status', this.updateStatus)
   }
 
@@ -107,3 +103,5 @@ export default class BuildStatus extends Component<any, State> {
     )
   }
 }
+
+export default withContext<{}>(BuildStatus)

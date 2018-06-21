@@ -6,6 +6,7 @@ import {Helmet} from 'react-helmet'
 import NoSSR from 'react-no-ssr'
 
 import Link from '../components/Link'
+import {RenderContext} from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
 import ExtensionContainer from '../ExtensionContainer'
 import ExtensionPoint from '../ExtensionPoint'
@@ -27,10 +28,12 @@ if (window.IntlPolyfill) {
 }
 
 function renderToStringWithData(component: ReactElement<any>): Promise<ServerRendered> {
+  window.__APOLLO_SSR__ = true
   const startGetDataFromTree = window.hrtime()
   return require('react-apollo').getDataFromTree(component).then(() => {
     const endGetDataFromTree = window.hrtime(startGetDataFromTree)
 
+    window.__APOLLO_SSR__ = false
     const startRenderToString = window.hrtime()
     const markup = require('react-dom/server').renderToString(component)
     const endRenderToString = window.hrtime(startRenderToString)
@@ -73,12 +76,12 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   return canUseDOM
     ? (disableSSR || created ? renderDOM(root, elem) : hydrate(root, elem)) as Element
     : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
-        markups: getMarkups(name, markup),
-        maxAge: cacheControl!.maxAge,
-        page,
-        renderTimeMetric
-      })
-    )
+      markups: getMarkups(name, markup),
+      maxAge: cacheControl!.maxAge,
+      page,
+      renderTimeMetric
+    })
+  )
 }
 
 function getRenderableExtensionPointNames(rootName: string, extensions: Extensions) {
@@ -135,6 +138,7 @@ export {
   Helmet,
   Link,
   NoSSR,
+  RenderContext,
   canUseDOM,
   render,
   start,
