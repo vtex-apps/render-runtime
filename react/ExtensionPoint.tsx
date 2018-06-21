@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types'
-import React, {Component, ReactElement} from 'react'
-import {TreePathProps, withTreePath} from './utils/treePath'
+import React, {Component} from 'react'
+import {TreePathContext, TreePathProps, withTreePath} from './utils/treePath'
 
 import ExtensionPointComponent from './components/ExtensionPointComponent'
 import {RenderContext} from './components/RenderContext'
-import {RenderProviderState} from './components/RenderProvider'
 
 interface Props {
   id: string,
@@ -15,16 +14,37 @@ interface Props {
 type ExtendedProps = Props & TreePathProps
 
 interface State {
-  component: string | null,
-  props: any
+  newTreePath: string
 }
 
-class ExtensionPoint extends Component<ExtendedProps> {
+class ExtensionPoint extends Component<ExtendedProps, State> {
   public static propTypes = {
     children: PropTypes.node,
     params: PropTypes.object,
     query: PropTypes.object,
     treePath: PropTypes.string.isRequired,
+  }
+
+  public static childContextTypes = {
+    treePath: PropTypes.string
+  }
+
+  private static mountTreePath (currentId: string, parentTreePath: string) {
+    return [parentTreePath, currentId].filter(id => !!id).join('/')
+  }
+
+  public componentWillMount() {
+    this.componentWillReceiveProps(this.props)
+  }
+
+  public componentWillReceiveProps(nextProps: ExtendedProps) {
+    this.setState({
+      newTreePath: ExtensionPoint.mountTreePath(nextProps.id, nextProps.treePath)
+    })
+  }
+
+  public getChildContext() {
+    return { treePath: this.state.newTreePath }
   }
 
   public render() {
@@ -36,8 +56,9 @@ class ExtensionPoint extends Component<ExtendedProps> {
   }
 
   private getExtensionPointComponent = (runtime: RenderContext) => {
+    const {newTreePath} = this.state
     const {children, params, query, id, treePath, ...parentProps} = this.props
-    const extension = runtime.extensions[treePath]
+    const extension = runtime.extensions[newTreePath]
     const component = extension ? extension.component : null
     const extensionProps = extension ? extension.props : null
 
@@ -48,8 +69,12 @@ class ExtensionPoint extends Component<ExtendedProps> {
       query,
     }
 
-    return <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={treePath}>{children}</ExtensionPointComponent>
+    return (
+      <TreePathContext.Provider value={{treePath: newTreePath}}>
+        <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
+      </TreePathContext.Provider>
+    )
   }
 }
 
-export default withTreePath<Props>(ExtensionPoint, true)
+export default withTreePath(ExtensionPoint)
