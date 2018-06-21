@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.11.3] - 2018-6-21
+### Removed
+- Remove support for root extension without component
+
 ## [7.11.2] - 2018-6-21
 ### Fixed
 - Fix sorting direct children with numeric values.
