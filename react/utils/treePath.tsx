@@ -1,3 +1,4 @@
+import {canUseDOM} from 'exenv'
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import PropTypes from 'prop-types'
 import React, {ComponentClass, ComponentType} from 'react'
@@ -64,7 +65,10 @@ export const withTreePath = <TOriginalProps extends {id: string}>(Component: Com
         <TreePathContext.Consumer>
           {
             context => {
-              const treePath = TreePath.getId(this.props.id, context.treePath)
+              const treePath = canUseDOM
+                ? TreePath.getId(this.props.id, context.treePath)
+                : this.getChildContext().treePath
+
               return provider
                 ? (
                   <TreePathContext.Provider value={{treePath}}>
