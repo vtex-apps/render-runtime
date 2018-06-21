@@ -1,6 +1,10 @@
 import {ArgumentNode, BREAK, DocumentNode, visit} from 'graphql'
 
 export const generateHash = (query: DocumentNode) => {
+  if (query.documentId) {
+    return query.documentId
+  }
+
   const asset = {hash: ''}
   visit(query, {
     Argument(node: ArgumentNode) {

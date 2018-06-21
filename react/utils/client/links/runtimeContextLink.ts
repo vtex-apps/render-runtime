@@ -1,6 +1,4 @@
-import {ApolloLink, NextLink, Observable, Operation, RequestHandler} from 'apollo-link'
-import {canUseDOM} from 'exenv'
-import {ArgumentNode, DirectiveNode, DocumentNode, OperationDefinitionNode, visit} from 'graphql'
+import {ApolloLink, NextLink, Operation} from 'apollo-link'
 
 export const createRuntimeContextLink = () =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {

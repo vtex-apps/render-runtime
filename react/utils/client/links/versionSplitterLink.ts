@@ -1,6 +1,6 @@
-import {ApolloLink, createOperation, FetchResult, GraphQLRequest, NextLink, Observable, Operation, RequestHandler} from 'apollo-link'
+import {ApolloLink, createOperation, GraphQLRequest, NextLink, Observable, Operation} from 'apollo-link'
 import {transformOperation, validateOperation} from 'apollo-link/lib/linkUtils'
-import {ASTKindToNode, DefinitionNode, DirectiveNode, DocumentNode, FieldNode, GraphQLNonNull, Kind, OperationDefinitionNode, OperationTypeDefinitionNode, parse, print, SelectionNode, SelectionSetNode, VariableDefinitionNode, VariableNode, visit} from 'graphql'
+import {BREAK, DirectiveNode, DocumentNode, OperationDefinitionNode, parse, print, SelectionNode, VariableDefinitionNode, VariableNode, visit} from 'graphql'
 
 interface Variables {
   [name: string]: VariableDefinitionNode
@@ -52,7 +52,7 @@ const operationWhiteList = ['query', 'mutation', 'subscription']
 
 const queryFromNodeCreator = (query: DocumentNode) => (node: Node) => visit(parse(print(query)), {
   OperationDefinition (opNode: OperationDefinitionNode) {
-    if (operationWhiteList.find((op) => op === opNode.operation)) {
+    if (operationWhiteList.includes(opNode.operation)) {
       return {
         ...opNode,
         selectionSet: {
@@ -65,8 +65,21 @@ const queryFromNodeCreator = (query: DocumentNode) => (node: Node) => visit(pars
   },
 }) as DocumentNode
 
+const isTypeQuery = (docNode: DocumentNode) => {
+  const asset = {isQuery: false}
+  visit(docNode, {
+    OperationDefinition(node: OperationDefinitionNode) {
+      if (node.operation === 'query') {
+        asset.isQuery = true
+        return BREAK
+      }
+    }
+  })
+  return asset.isQuery
+}
+
 const assertSingleOperation = (query: DocumentNode) => {
-  const ops = query.definitions.filter((def: OperationDefinitionNode) => operationWhiteList.find(op => op === def.operation))
+  const ops = query.definitions.filter(({operation}: OperationDefinitionNode) => operationWhiteList.includes(operation))
 
   if (ops.length > 1) {
     throw new Error('Only one operation definition is allowed per query. Please split your queries in two different files')
@@ -99,7 +112,7 @@ const createOperationForQuery = (operation: Operation) => (query: DocumentNode) 
   return createOperation(operation.getContext(), op)
 }
 
-const operationByContextDirective = (operation: Operation) => {
+const operationByRuntimeMetaDirective = (operation: Operation) => {
   const queries = queriesByRuntimeMetaDirective(operation.query)
   return queries.map(createOperationForQuery(operation))
 }
@@ -128,12 +141,16 @@ const observableFromOperations = (operations: Operation[], forward: NextLink) =>
 })
 
 export const versionSplitterLink = new ApolloLink((operation: Operation, forward?: NextLink) => {
-  const operations = operationByContextDirective(operation)
-
   if (forward) {
-    return operations.length ?
-      observableFromOperations(operations, forward) :
-      forward(operation)
+    const query = operation.query
+    const operations = operationByRuntimeMetaDirective(operation)
+
+    if (operations.length && isTypeQuery(query)) {
+      return observableFromOperations(operations, forward)
+    }
+    else {
+      return forward(operation)
+    }
   }
   return null
 })

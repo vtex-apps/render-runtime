@@ -46,7 +46,10 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       credentials: 'include',
     })
 
-    const persistedQueryLink = createPersistedQueryLink({generateHash})
+    const persistedQueryLink = createPersistedQueryLink({
+      disable: () => true,
+      generateHash
+    })
 
     const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
     const link = cacheControl
