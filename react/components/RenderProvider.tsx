@@ -19,6 +19,7 @@ import ApolloClient from 'apollo-client'
 import {ApolloLink, NextLink, Operation} from 'apollo-link'
 import PageCacheControl from '../utils/cacheControl'
 import {traverseComponent} from '../utils/components'
+import {TreePathContext} from '../utils/treePath'
 import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
@@ -362,11 +363,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     return (
       <RenderContext.Provider value={context}>
-        <ApolloProvider client={this.apolloClient}>
-          <IntlProvider locale={locale} messages={mergedMessages}>
-            {maybeEditable}
-          </IntlProvider>
-        </ApolloProvider>
+        <TreePathContext.Provider value={{treePath: ''}}>
+          <ApolloProvider client={this.apolloClient}>
+            <IntlProvider locale={locale} messages={mergedMessages}>
+              {maybeEditable}
+            </IntlProvider>
+          </ApolloProvider>
+        </TreePathContext.Provider>
       </RenderContext.Provider>
     )
   }
