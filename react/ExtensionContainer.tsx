@@ -15,12 +15,11 @@ class ExtensionContainer extends Component {
               getDirectChildren(runtime.extensions, treePath)
                 .map(id => parseInt(id))
                 .sort()
-                .map(id => <ExtensionPoint {...this.props} key={id} id={id} />)
+                .map(id => <ExtensionPoint {...this.props} key={id} id={id.toString()} />)
             }
           </TreePathContext.Consumer>
         }
-      </RenderContext.Consumer>
-    )
+      </RenderContext.Consumer>  
   }
 }
 
