@@ -16,6 +16,7 @@ import {ensureContainer, getContainer, getMarkups} from '../utils/dom'
 import {registerEmitter} from '../utils/events'
 import {getBaseURI} from '../utils/host'
 import {addLocaleData} from '../utils/locales'
+import {TreePathContext} from '../utils/treePath'
 import withHMR from '../utils/withHMR'
 
 if (window.IntlPolyfill) {
@@ -118,13 +119,17 @@ function start() {
   }
 }
 
+const RenderContextConsumer = RenderContext.Consumer
+const TreePathContextConsumer = TreePathContext.Consumer
+
 export {
   ExtensionContainer,
   ExtensionPoint,
   Helmet,
   Link,
   NoSSR,
-  RenderContext,
+  RenderContextConsumer,
+  TreePathContextConsumer,
   canUseDOM,
   render,
   start,

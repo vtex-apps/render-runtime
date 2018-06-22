@@ -1,11 +1,12 @@
 import {NormalizedCacheObject} from "apollo-cache-inmemory"
 import * as EventEmitter from 'eventemitter3'
-import { ReactElement, Component } from "react";
+import {ReactElement, Component} from "react"
 import ExtensionContainer from "../ExtensionContainer"
 import ExtensionPoint from "../ExtensionPoint"
-import Link from "../components/Link";
-import { History, Location } from "history";
-import { HelmetData } from "react-helmet";
+import Link from "../components/Link"
+import {History, Location} from "history"
+import {HelmetData} from "react-helmet"
+import {TreePathProps} from "../utils/treePath"
 
 declare global {
   interface RenderMetric {
@@ -190,7 +191,8 @@ interface RenderComponent<P={}, S={}> {
     Helmet: any
     canUseDOM: boolean
     withHMR: any
-    RenderContext: React.Context<RenderContext>
+    RenderContextConsumer: React.Consumer<RenderContext>
+    TreePathContextConsumer: React.Consumer<TreePathProps>
   }
 
   interface Window extends Window {
