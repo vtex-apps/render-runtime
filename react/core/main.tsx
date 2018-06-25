@@ -6,7 +6,7 @@ import {Helmet} from 'react-helmet'
 import NoSSR from 'react-no-ssr'
 
 import Link from '../components/Link'
-import {RenderContext} from '../components/RenderContext'
+import {RenderContext, withRenderContext} from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
 import ExtensionContainer from '../ExtensionContainer'
 import ExtensionPoint from '../ExtensionPoint'
@@ -134,5 +134,6 @@ export {
   render,
   start,
   withHMR,
+  withRenderContext,
 }
 
