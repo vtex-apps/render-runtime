@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, {Component, MouseEvent} from 'react'
 import {NavigateOptions, pathFromPageName} from '../utils/pages'
-import {RenderContextProps, withContext} from './RenderContext'
+import {RenderContextProps, withRenderContext} from './RenderContext'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) => event.button === 0
 
@@ -35,7 +35,7 @@ class Link extends Component<Props & RenderContextProps> {
   }
 
   public handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    const {page, params, query, to, runtime: {navigate}} = this.props
+    const {page, params, query, to, renderContext: {navigate}} = this.props
     if (
       isModifiedEvent(event) ||
       !isLeftClickEvent(event) ||
@@ -53,10 +53,10 @@ class Link extends Component<Props & RenderContextProps> {
   }
 
   public render() {
-    const {page, params, to, runtime: {pages}} = this.props
+    const {page, params, to, renderContext: {pages}} = this.props
     const href = to || page && pathFromPageName(page, pages, params) || '#'
     return <a href={href} {...this.props} onClick={this.handleClick} />
   }
 }
 
-export default withContext<Props>(Link)
+export default withRenderContext<Props>(Link)

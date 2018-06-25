@@ -1,6 +1,6 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, {Component, ComponentType} from 'react'
-import {withContext} from '../components/RenderContext'
+import {withRenderContext} from '../components/RenderContext'
 import {withTreePath} from './treePath'
 
 const isComponentType = (Arg: any): Arg is ComponentType => {
@@ -38,7 +38,7 @@ export default (module: Module, InitialImplementer: any) => {
     private static Implementer = InitialImplementer as ComponentType
 
     public updateComponent = () => {
-      const {runtime: {emitter}, treePath} = this.props
+      const {renderContext: {emitter}, treePath} = this.props
       emitter.emit('build.status', 'hmr:success')
       this.setState({lastUpdate: Date.now()})
       console.log(`[render] Component updated. treePath=${treePath} updated=${HMRComponent.displayName}`)
@@ -57,5 +57,5 @@ export default (module: Module, InitialImplementer: any) => {
     }
   }
 
-  return hoistNonReactStatics(withContext(withTreePath(HMRComponent)), InitialImplementer)
+  return hoistNonReactStatics(withRenderContext(withTreePath(HMRComponent)), InitialImplementer)
 }
