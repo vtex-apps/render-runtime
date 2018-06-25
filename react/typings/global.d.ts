@@ -149,6 +149,7 @@ interface RenderComponent<P={}, S={}> {
   interface ComponentEntry {
     assets: string[]
     dependencies: string[]
+    overrides: string[]
   }
 
   interface Components {
