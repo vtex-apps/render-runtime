@@ -191,6 +191,7 @@ interface RenderComponent<P={}, S={}> {
     Helmet: any
     canUseDOM: boolean
     withHMR: any
+    withRenderContext: any,
     RenderContextConsumer: React.Consumer<RenderContext>
     TreePathContextConsumer: React.Consumer<TreePathProps>
   }

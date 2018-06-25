@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
-import {RenderContextProps, withContext} from './RenderContext'
+import {RenderContextProps, withRenderContext} from './RenderContext'
 
 const loader = (
   <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
@@ -55,12 +55,12 @@ class BuildStatus extends Component<RenderContextProps, State> {
   }
 
   public subscribeToStatus = () => {
-    const {emitter} = this.props.runtime
+    const {emitter} = this.props.renderContext
     emitter.addListener('build.status', this.updateStatus)
   }
 
   public unsubscribeToStatus = () => {
-    const {emitter} = this.props.runtime
+    const {emitter} = this.props.renderContext
     emitter.removeListener('build.status', this.updateStatus)
   }
 
@@ -104,4 +104,4 @@ class BuildStatus extends Component<RenderContextProps, State> {
   }
 }
 
-export default withContext<{}>(BuildStatus)
+export default withRenderContext<{}>(BuildStatus)
