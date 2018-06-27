@@ -173,7 +173,7 @@ interface RenderComponent<P={}, S={}> {
     production: boolean
     publicEndpoint: string
     messages: Record<string, string>
-    components: Components | Record<string, string[]>
+    components: Components
     renderMajor: number
     query?: Record<string, string>
     start: boolean

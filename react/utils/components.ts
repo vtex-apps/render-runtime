@@ -1,32 +1,25 @@
-const prependUniq = (arrOne: any[], arrTwo: any[]) => {
-  return [...arrOne, ...arrTwo.filter(item => !arrOne.includes(item))]
+const concatUniq = <T>(...arrays: T[][]) => {
+  return arrays.reduce((acc, array) => {
+    return [...acc, ...array.filter(item => !acc.includes(item))]
+  }, [] as T[])
 }
 
-export const traverseComponent = (components: Components | Record<string, string[]>, component: string): ComponentTraversalResult => {
-  const entry = components[component]
+export const traverseComponent = (components: Components, component: string): ComponentTraversalResult => {
+  const {dependencies, overrides = [], assets} = components[component]
   const [app] = component.split('/')
-  if (Array.isArray(entry)) {
-    return {apps: [app], assets: entry}
-  }
-
-  const {dependencies, overrides = [], assets} = entry
-
-  const dependenciesResult = dependencies
-    .map(dep => traverseComponent(components, dep))
-    .reduce((acc, dependency) => ({
-      apps: prependUniq(dependency.apps, acc.apps),
-      assets: prependUniq(dependency.assets, acc.assets)
-    }), {apps: [app], assets})
-
-  const overridesResult = overrides
-    .map(ov => traverseComponent(components, ov))
-    .reduce((acc, dependency) => ({
-      apps: prependUniq(dependency.apps, acc.apps),
-      assets: prependUniq(dependency.assets, acc.assets)
-    }), {apps: [app], assets})
+  const [before, after] = [dependencies, overrides].map(traverseComponents(components))
 
   return {
-    apps: prependUniq(dependenciesResult.apps, overridesResult.apps),
-    assets: prependUniq(dependenciesResult.assets, overridesResult.assets),
+    apps: concatUniq(before.apps, [app], after.apps),
+    assets: concatUniq(before.assets, assets, after.assets),
   }
+}
+
+const traverseComponents = (components: Components) => (componentList: string[]) => {
+  return componentList
+    .map(component => traverseComponent(components, component))
+    .reduce((acc, result) => ({
+      apps: concatUniq(acc.apps, result.apps),
+      assets: concatUniq(acc.assets, result.assets)
+    }), {apps: [], assets: []})
 }
