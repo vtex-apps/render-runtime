@@ -144,6 +144,7 @@ interface RenderComponent<P={}, S={}> {
   interface ComponentTraversalResult {
     apps: string[]
     assets: string[]
+    overrides: string[]
   }
 
   interface ComponentEntry {

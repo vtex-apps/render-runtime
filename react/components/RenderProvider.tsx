@@ -225,14 +225,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     const {components, culture: {locale}} = this.state
-    const {apps, assets} = traverseComponent(components, component)
+    const {apps, assets, overrides} = traverseComponent(components, component)
     const unfetchedApps = apps.filter(app => !Object.keys(window.__RENDER_7_COMPONENTS__).some(c => c.startsWith(app)))
     if (unfetchedApps.length === 0) {
-      return fetchAssets(assets)
+      return fetchAssets(assets, overrides)
     }
 
     const messagesPromises = Promise.all(unfetchedApps.map(app => fetchMessagesForApp(this.apolloClient, app, locale)))
-    const assetsPromise = fetchAssets(assets)
+    const assetsPromise = fetchAssets(assets, overrides)
 
     return Promise.all([messagesPromises, assetsPromise]).then(([messages]) => {
       this.setState({

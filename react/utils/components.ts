@@ -11,7 +11,8 @@ export const traverseComponent = (components: Components, component: string): Co
 
   return {
     apps: concatUniq(before.apps, [app], after.apps),
-    assets: concatUniq(before.assets, assets, after.assets),
+    assets: concatUniq(before.assets, assets),
+    overrides: concatUniq(after.assets, after.overrides)
   }
 }
 
@@ -20,6 +21,7 @@ const traverseComponents = (components: Components) => (componentList: string[])
     .map(component => traverseComponent(components, component))
     .reduce((acc, result) => ({
       apps: concatUniq(acc.apps, result.apps),
-      assets: concatUniq(acc.assets, result.assets)
-    }), {apps: [], assets: []})
+      assets: concatUniq(acc.assets, result.assets),
+      overrides: concatUniq(acc.overrides, result.overrides),
+    }), {apps: [], assets: [], overrides: []})
 }
