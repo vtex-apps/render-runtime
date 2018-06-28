@@ -144,11 +144,13 @@ interface RenderComponent<P={}, S={}> {
   interface ComponentTraversalResult {
     apps: string[]
     assets: string[]
+    overrides: string[]
   }
 
   interface ComponentEntry {
     assets: string[]
     dependencies: string[]
+    overrides: string[]
   }
 
   interface Components {
@@ -172,7 +174,7 @@ interface RenderComponent<P={}, S={}> {
     production: boolean
     publicEndpoint: string
     messages: Record<string, string>
-    components: Components | Record<string, string[]>
+    components: Components
     renderMajor: number
     query?: Record<string, string>
     start: boolean

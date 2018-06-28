@@ -5,23 +5,33 @@ function getExtension(path: string) {
   return result ? result[0] : ''
 }
 
-export function addScriptToPage(src: string): Promise<void> {
+function addElement (element: HTMLElement, isOverride: boolean) {
+  if (isOverride) {
+    element.className = 'render_override'
+    document.head.appendChild(element)
+  } else {
+    const override = document.querySelector('.render_override')
+    document.head.insertBefore(element, override)
+  }
+}
+
+export function addScriptToPage (src: string, isOverride: boolean = false): Promise<void> {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script')
     script.onload = () => resolve()
     script.onerror = () => reject()
     script.async = false
     script.src = src
-    document.head.appendChild(script)
+    addElement(script, isOverride)
   })
 }
 
-function addStyleToPage(href: string) {
+function addStyleToPage(href: string, isOverride: boolean = false) {
   const link = document.createElement('link')
   link.href = href
   link.type = 'text/css'
   link.rel = 'stylesheet'
-  document.head.appendChild(link)
+  addElement(link, isOverride)
 }
 
 function getExistingScriptSrcs() {
@@ -71,9 +81,15 @@ export function getImplementation<P={}, S={}>(component: string) {
   return window.__RENDER_7_COMPONENTS__[component] as RenderComponent<P, S>
 }
 
-export function fetchAssets(assets: string[]) {
-  const scripts = assets.filter(shouldAddScriptToPage)
-  const styles = assets.filter(shouldAddStyleToPage)
-  styles.forEach(addStyleToPage)
-  return Promise.all(scripts.map(addScriptToPage)).then(() => { return })
+export function fetchAssets(assets: string[], overrides: string[]) {
+  const [scripts, scriptOverrides] = [assets, overrides].map(array => array.filter(shouldAddScriptToPage))
+  const [styles, stylesOverrides] = [assets, overrides].map(array => array.filter(shouldAddStyleToPage))
+
+  styles.forEach(style => addStyleToPage(style, false))
+  stylesOverrides.forEach(style => addStyleToPage(style, true))
+
+  return Promise.all([
+    ...scripts.map(script => addScriptToPage(script, false)),
+    ...scriptOverrides.map(script => addScriptToPage(script, true)),
+  ]).then(() => { return })
 }
