@@ -27,7 +27,10 @@ const clientsByWorkspace: ApolloClientsRegistry = {}
 
 export const getState = (runtime: RenderRuntime) => {
   const {account, workspace} = runtime
-  return clientsByWorkspace[`${account}/${workspace}`].cache.extract()
+  const apolloClient = clientsByWorkspace[`${account}/${workspace}`]
+  return apolloClient
+    ? apolloClient.cache.extract()
+    : {}
 }
 
 export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContextLink: ApolloLink, cacheControl?: PageCacheControl) => {

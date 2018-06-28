@@ -1,11 +1,12 @@
 import {NormalizedCacheObject} from "apollo-cache-inmemory"
 import * as EventEmitter from 'eventemitter3'
-import { ReactElement, Component } from "react";
+import {ReactElement, Component} from "react"
 import ExtensionContainer from "../ExtensionContainer"
 import ExtensionPoint from "../ExtensionPoint"
-import Link from "../components/Link";
-import { History } from "history";
-import { HelmetData } from "react-helmet";
+import Link from "../components/Link"
+import {History, Location} from "history"
+import {HelmetData} from "react-helmet"
+import {TreePathProps} from "../utils/treePath"
 
 declare global {
   interface RenderMetric {
@@ -87,15 +88,24 @@ declare global {
     error: any
   }
 
-  interface Dynamic {
-    [field: string]: any
-  }
-
-  interface RenderContext extends Dynamic {
-    emitter: EventEmitter
-    extensions: Extensions
-    production: boolean
-    treePath: string
+  interface RenderContext {
+    account: RenderRuntime['account'],
+    components: RenderRuntime['components'],
+    culture: RenderRuntime['culture'],
+    emitter: RenderRuntime['emitter'],
+    extensions: RenderRuntime['extensions'],
+    fetchComponent: (component: string) => Promise<void>,
+    getSettings: (app: string) => any,
+    history: History | null,
+    navigate: (options: NavigateOptions) => boolean,
+    onPageChanged: (location: Location) => void,
+    page: RenderRuntime['page'],
+    pages: RenderRuntime['pages'],
+    prefetchPage: (name: string) => Promise<void>,
+    production: RenderRuntime['production'],
+    updateExtension: (name: string, extension: Extension) => void,
+    updateRuntime: () => Promise<void>,
+    workspace: RenderRuntime['workspace'],
   }
 
 interface RenderComponent<P={}, S={}> {
@@ -181,9 +191,12 @@ interface RenderComponent<P={}, S={}> {
     Helmet: any
     canUseDOM: boolean
     withHMR: any
+    RenderContextConsumer: React.Consumer<RenderContext>
+    TreePathContextConsumer: React.Consumer<TreePathProps>
   }
 
   interface Window extends Window {
+    __APOLLO_SSR__: boolean
     __RENDER_7_RUNTIME__: RuntimeExports
     __RENDER_7_COMPONENTS__: ComponentsRegistry
     __RENDER_7_HOT__: HotEmitterRegistry

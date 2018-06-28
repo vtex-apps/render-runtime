@@ -1,35 +1,44 @@
-import React, {Component, ReactElement} from 'react'
-import PropTypes from 'prop-types'
-import {graphql} from 'react-apollo'
 import gql from 'graphql-tag'
+import PropTypes from 'prop-types'
+import React, {Component, ReactElement} from 'react'
+import {graphql} from 'react-apollo'
 import {Helmet} from 'react-helmet'
 
 import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
 
-const LOGIN_PAGE = "store/login"
-
 class AuthWrapper extends Component {
-  static propTypes = {
+  public static propTypes = {
     children: PropTypes.element,
-    pages: PropTypes.object,
-    page: PropTypes.string,
+    data: PropTypes.object,
     navigate: PropTypes.func,
-    data: PropTypes.object
+    page: PropTypes.string,
+    pages: PropTypes.object
   }
 
-  componentDidMount() {
-    const { pages, page, data: { loading, profile }, navigate } = this.props
-    if (pages[page].login && !loading && !profile) {
-      navigate({
-        page: LOGIN_PAGE,
-        fallbackToWindowLocation: false,
-      })
+  public getLoginPage(pages: object) {
+    for (const key in pages) {
+      if (pages[key].loginPage) {
+        return key
+      }
     }
   }
 
-  render() {
+  public componentDidMount() {
+    const { pages, page, data: { loading, profile }, navigate } = this.props
+    if (pages[page].login && !loading && !profile) {
+      const loginPage = this.getLoginPage(pages)
+      if (loginPage) {
+        navigate({
+          fallbackToWindowLocation: false,
+          page: loginPage,
+        })
+      }
+    }
+  }
+
+  public render() {
     return this.props.children
   }
 }

@@ -6,6 +6,7 @@ import {Helmet} from 'react-helmet'
 import NoSSR from 'react-no-ssr'
 
 import Link from '../components/Link'
+import {RenderContext} from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
 import ExtensionContainer from '../ExtensionContainer'
 import ExtensionPoint from '../ExtensionPoint'
@@ -15,6 +16,7 @@ import {ensureContainer, getContainer, getMarkups} from '../utils/dom'
 import {registerEmitter} from '../utils/events'
 import {getBaseURI} from '../utils/host'
 import {addLocaleData} from '../utils/locales'
+import {TreePathContext} from '../utils/treePath'
 import withHMR from '../utils/withHMR'
 
 if (window.IntlPolyfill) {
@@ -27,10 +29,12 @@ if (window.IntlPolyfill) {
 }
 
 function renderToStringWithData(component: ReactElement<any>): Promise<ServerRendered> {
+  window.__APOLLO_SSR__ = true
   const startGetDataFromTree = window.hrtime()
   return require('react-apollo').getDataFromTree(component).then(() => {
     const endGetDataFromTree = window.hrtime(startGetDataFromTree)
 
+    window.__APOLLO_SSR__ = false
     const startRenderToString = window.hrtime()
     const markup = require('react-dom/server').renderToString(component)
     const endRenderToString = window.hrtime(startRenderToString)
@@ -43,13 +47,6 @@ function renderToStringWithData(component: ReactElement<any>): Promise<ServerRen
     }
   })
 }
-
-// Whether this placeholder has a component.
-const hasComponent = (extensions: Extensions) => (name: string) => !!extensions[name].component
-
-// The placeholder "foo/bar" is root if there is no placeholder "foo" (inside names)
-const isRoot = (name: string, index: number, names: string[]) =>
-  names.find(parent => name !== parent && name.startsWith(parent)) === undefined
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered => {
@@ -73,53 +70,46 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   return canUseDOM
     ? (disableSSR || created ? renderDOM(root, elem) : hydrate(root, elem)) as Element
     : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
-        markups: getMarkups(name, markup),
-        maxAge: cacheControl!.maxAge,
-        page,
-        renderTimeMetric
-      })
-    )
+      markups: getMarkups(name, markup),
+      maxAge: cacheControl!.maxAge,
+      page,
+      renderTimeMetric
+    })
+  )
 }
 
-function getRenderableExtensionPointNames(rootName: string, extensions: Extensions) {
-  const childExtensionPoints = Object.keys(extensions).reduce((acc, value) => {
-    if (value.startsWith(rootName)) {
-      acc[value] = extensions[value]
-    }
-    return acc
-  }, {} as Extensions)
-  // Names of all extensions with a component
-  const withComponentNames = Object.keys(childExtensionPoints).filter(
-    hasComponent(childExtensionPoints),
-  )
-  // Names of all top-level extensions with a component
-  const rootWithComponentNames = withComponentNames.filter(isRoot)
-  return rootWithComponentNames
+function validateRootComponent(rootName: string, extensions: Extensions) {
+  if (!extensions[rootName]) {
+    throw new Error(`Missing extension point for page ${rootName}`)
+  }
+
+  if (!extensions[rootName].component) {
+    throw new Error(`Missing component for extension point ${rootName}`)
+  }
 }
 
 function start() {
-  const runtime = window.__RUNTIME__
-  const renderableExtensionPointNames = getRenderableExtensionPointNames(runtime.page, runtime.extensions)
-
   try {
-    // If there are multiple renderable extensions, render them in parallel.
-    const renderPromises = renderableExtensionPointNames.map(e => render(e, runtime))
-    console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
+    const runtime = window.__RUNTIME__
+    const rootName = runtime.page
+    validateRootComponent(rootName, runtime.extensions)
+
+    const maybeRenderPromise = render(rootName, runtime)
     if (!canUseDOM) {
-      // Expose render promises to global context.
-      window.rendered = Promise.all(renderPromises as Array<Promise<NamedServerRendered>>).then(results => ({
-        extensions: results.reduce(
-          (acc, {markups}) => (markups.forEach(({name, markup}) => acc[name] = markup), acc),
-          {} as RenderedSuccess['extensions'],
-        ),
-        head: Helmet.rewind(),
-        maxAge: Math.min(...results.map(({maxAge}) => maxAge)),
-        renderMetrics: results.reduce(
-          (acc, {page, renderTimeMetric}) => (acc[page] = renderTimeMetric, acc),
-          {} as RenderedSuccess['renderMetrics'],
-        ),
-        state: getState(runtime),
-      }))
+      // Expose render promise to global context.
+      window.rendered = (maybeRenderPromise as Promise<NamedServerRendered>)
+        .then(({markups, maxAge, page, renderTimeMetric}) => ({
+          extensions: markups.reduce(
+            (acc, {name, markup}) => (acc[name] = markup, acc),
+            {} as RenderedSuccess['extensions'],
+          ),
+          head: Helmet.rewind(),
+          maxAge,
+          renderMetrics: {[page]: renderTimeMetric},
+          state: getState(runtime),
+        }))
+    } else {
+      console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     }
   } catch (error) {
     console.error('Unexpected error rendering:', error)
@@ -129,12 +119,17 @@ function start() {
   }
 }
 
+const RenderContextConsumer = RenderContext.Consumer
+const TreePathContextConsumer = TreePathContext.Consumer
+
 export {
   ExtensionContainer,
   ExtensionPoint,
   Helmet,
   Link,
   NoSSR,
+  RenderContextConsumer,
+  TreePathContextConsumer,
   canUseDOM,
   render,
   start,
