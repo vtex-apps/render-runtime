@@ -5,15 +5,8 @@ import {RenderContext} from './components/RenderContext'
 import ExtensionPoint from './ExtensionPoint'
 import {getDirectChildren, TreePathContext} from './utils/treePath'
 
-const join = (p: string | null, c: string | null): string => {
-  if (!p) {
-    return c as string
-  } else if (!c) {
-    return p
-  }
-  return `${p}/${c}`
-}
-
+const join = (p: string | null, c: string | null): string =>
+  [p, c].filter(id => !!id).join('/')
 
 interface Props {
   id: string | null,
