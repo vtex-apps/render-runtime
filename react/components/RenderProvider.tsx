@@ -22,6 +22,7 @@ import {traverseComponent} from '../utils/components'
 import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
+import AuthWrapper from './AuthWrapper'
 
 interface Props {
   children: ReactElement<any> | null
@@ -364,7 +365,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return (
       <ApolloProvider client={this.apolloClient}>
         <IntlProvider locale={locale} messages={mergedMessages}>
-          {maybeEditable}
+          <AuthWrapper pages={pages} page={page} navigate={this.navigate}>
+            {maybeEditable}
+          </AuthWrapper>
         </IntlProvider>
       </ApolloProvider>
     )
