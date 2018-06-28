@@ -18,11 +18,12 @@ class AuthWrapper extends Component {
   }
 
   public getLoginPage(pages: object) {
-    for (const key in pages) {
-      if (pages[key].loginPage) {
-        return key
-      }
-    }
+    const pagesFiltered = Object.entries(pages).filter(entry => {
+      const [value, ...rest] = entry.reverse()
+      return value.loginPage
+    })
+    const [[pageValue, loginPage]] = pagesFiltered
+    return loginPage
   }
 
   public componentDidMount() {
