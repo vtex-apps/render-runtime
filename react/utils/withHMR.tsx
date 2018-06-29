@@ -1,5 +1,7 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
+import PropTypes from 'prop-types'
 import React, {Component, ComponentType} from 'react'
+
 import {withContext} from '../components/RenderContext'
 import {withTreePath} from './treePath'
 
@@ -25,6 +27,11 @@ export default (module: Module, InitialImplementer: any) => {
   }
 
   class HMRComponent extends Component<any, {lastUpdate?: number}> {
+    public static propTypes = {
+      __clearError: PropTypes.func,
+      __errorInstance: PropTypes.node,
+    }
+
     public static get displayName(): string {
       return HMRComponent.Implementer.displayName || HMRComponent.Implementer.name || 'Component'
     }
@@ -38,9 +45,15 @@ export default (module: Module, InitialImplementer: any) => {
     private static Implementer = InitialImplementer as ComponentType
 
     public updateComponent = () => {
-      const {runtime: {emitter}, treePath} = this.props
+      const {runtime: {emitter}, treePath, __clearError, __errorInstance} = this.props
       emitter.emit('build.status', 'hmr:success')
-      this.setState({lastUpdate: Date.now()})
+
+      if (__clearError && __errorInstance) {
+        __clearError()
+      } else {
+        this.setState({lastUpdate: Date.now()})
+      }
+
       console.log(`[render] Component updated. treePath=${treePath} updated=${HMRComponent.displayName}`)
     }
 
@@ -53,7 +66,7 @@ export default (module: Module, InitialImplementer: any) => {
     }
 
     public render() {
-      return <HMRComponent.Implementer {...this.props} />
+      return this.props.__errorInstance || <HMRComponent.Implementer {...this.props} />
     }
   }
 
