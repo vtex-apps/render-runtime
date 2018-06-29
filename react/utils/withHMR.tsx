@@ -28,8 +28,7 @@ export default (module: Module, InitialImplementer: any) => {
 
   class HMRComponent extends Component<any, {lastUpdate?: number}> {
     public static propTypes = {
-      __clearError: PropTypes.func,
-      __errorInstance: PropTypes.node,
+      __errorHandle: PropTypes.object,
     }
 
     public static get displayName(): string {
@@ -45,11 +44,11 @@ export default (module: Module, InitialImplementer: any) => {
     private static Implementer = InitialImplementer as ComponentType
 
     public updateComponent = () => {
-      const {runtime: {emitter}, treePath, __clearError, __errorInstance} = this.props
+      const {runtime: {emitter}, treePath, __errorHandle} = this.props
       emitter.emit('build.status', 'hmr:success')
 
-      if (__clearError && __errorInstance) {
-        __clearError()
+      if (__errorHandle && __errorHandle.recover) {
+        __errorHandle.recover()
       } else {
         this.setState({lastUpdate: Date.now()})
       }
@@ -66,7 +65,8 @@ export default (module: Module, InitialImplementer: any) => {
     }
 
     public render() {
-      return this.props.__errorInstance || <HMRComponent.Implementer {...this.props} />
+      const {__errorHandle, ...props} = this.props
+      return __errorHandle && __errorHandle.component || <HMRComponent.Implementer {...props} />
     }
   }
 
