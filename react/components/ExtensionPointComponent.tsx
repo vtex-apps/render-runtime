@@ -3,6 +3,7 @@ import React, {ErrorInfo, PureComponent, ReactElement} from 'react'
 
 import {getImplementation} from '../utils/assets'
 import logEvent from '../utils/logger'
+import ExtensionPointError from './ExtensionPointError'
 import {RenderContextProps} from './RenderContext'
 
 interface Props {
@@ -14,7 +15,6 @@ interface Props {
 interface State {
   error?: Error | null
   errorInfo?: ErrorInfo | null
-  errorDetails?: boolean
   lastUpdate?: number
 }
 
@@ -54,7 +54,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
   }
 
   public fetchAndRerender = () => {
-    const {component, runtime: {fetchComponent, emitter}} = this.props
+    const {component, runtime: {fetchComponent}} = this.props
     const Component = component && getImplementation(component)
 
     // Let's fetch the assets and re-render.
@@ -64,31 +64,11 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
     }
   }
 
-  public renderError = () => {
-    const {treePath} = this.props
-    const {error, errorInfo, errorDetails} = this.state
-    const componentStack = errorInfo && errorInfo.componentStack
-
-    return (
-      <div className="bg-washed-red pa6 f5 serious-black br3 pre">
-        <span>Error rendering extension point <strong>{treePath}</strong></span>
-        <button type="button" className="red ph0 ma0 mh3 bg-transparent bn pointer link" onClick={this.handleToggleErrorDetails}>({errorDetails ? 'hide' : 'show'} details)</button>
-        {errorDetails && (
-          <pre>
-            <code className="f6">
-              {error!.stack}
-            </code>
-          </pre>
-        )}
-        {errorDetails && componentStack && (
-          <pre>
-            <code className="f6">
-              {componentStack}
-            </code>
-          </pre>
-        )}
-      </div>
-    )
+  public clearError = () => {
+    this.setState({
+      error: null,
+      errorInfo: null,
+    })
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -112,7 +92,6 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
 
     this.setState({
       error,
-      errorDetails: false,
       errorInfo,
     })
   }
@@ -130,20 +109,28 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
     this._isMounted = false
   }
 
-  public handleToggleErrorDetails = () => {
-    this.setState({
-      errorDetails: !this.state.errorDetails,
-    })
-  }
-
   public render() {
-    const {component, props, children, treePath, runtime: {production}} = this.props
-    const {error} = this.state
+    const {component, props, children, treePath, runtime: {production, pages, page}} = this.props
+    const {error, errorInfo} = this.state
     const Component = component && getImplementation(component)
 
     // A children of this extension point throwed an uncaught error
+    // Only show errors in production if the entire page explodes. (Ignore nested extension points)
     if (error) {
-      return production ? null : this.renderError()
+      if (production && !pages[treePath] && !page.startsWith('admin/')) {
+        return null
+      }
+
+      const errorInstance = <ExtensionPointError error={error} errorInfo={errorInfo!} treePath={treePath} />
+      props.__errorInstance = errorInstance
+      props.__clearError = this.clearError
+
+      if (!(Component as any).hotReload) {
+        return errorInstance
+      }
+    } else {
+      delete props.__errorInstance
+      delete props.__clearError
     }
 
     const EmptyExtensionPoint = this.emptyExtensionPoint && getImplementation(this.emptyExtensionPoint.component)
