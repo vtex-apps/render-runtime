@@ -367,9 +367,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         <TreePathContext.Provider value={{treePath: ''}}>
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider locale={locale} messages={mergedMessages}>
-	      <AuthWrapper pages={pages} page={page} navigate={this.navigate}>
-              	{maybeEditable}
-	      </AuthWrapper>
+              <AuthWrapper pages={pages} page={page} navigate={this.navigate}>
+                {maybeEditable}
+              </AuthWrapper>
             </IntlProvider>
           </ApolloProvider>
         </TreePathContext.Provider>

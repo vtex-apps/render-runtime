@@ -8,6 +8,8 @@ import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
 
+const LOGIN_PATH = '/login'
+
 class AuthWrapper extends Component {
   public static propTypes = {
     children: PropTypes.element,
@@ -20,7 +22,7 @@ class AuthWrapper extends Component {
   public getLoginPage(pages: object) {
     const pagesFiltered = Object.entries(pages).filter(entry => {
       const [value, ...rest] = entry.reverse()
-      return value.loginPage
+      return value.path === LOGIN_PATH
     })
     const [[pageValue, loginPage]] = pagesFiltered
     return loginPage
