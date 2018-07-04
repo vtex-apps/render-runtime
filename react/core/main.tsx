@@ -113,24 +113,26 @@ async function start() {
           state: getState(runtime),
         }))
     } else {
-      const {account: accountName} = window.__RUNTIME__
+      if (window.__RUNTIME__.page.startsWith('store')) {
+        const {account: accountName} = window.__RUNTIME__
 
-      const tagManagerId = await axios.get(
-        `/api/configurationRepository/pvt/bucket/portal/key/TagManagerId_${accountName}?an=${accountName}`
-      ).then(res => res.data)
+        const {tagManagerId} = await axios.get(
+          '/api/portal/pvt/sites/default/configuration'
+        ).then(res => res.data)
 
-      if (typeof tagManagerId === 'string' && tagManagerId !== '') {
-        const script = document.createElement('script')
+        if (typeof tagManagerId === 'string' && tagManagerId !== '') {
+          const script = document.createElement('script')
 
-        script.async = true
-        script.src = `https://www.googletagmanager.com/gtm.js?id=${tagManagerId}`
+          script.async = true
+          script.src = `https://www.googletagmanager.com/gtm.js?id=${tagManagerId}`
 
-        const firstScriptTag = document.getElementsByTagName('script')[0]
+          const firstScriptTag = document.getElementsByTagName('script')[0]
 
-        if (firstScriptTag.parentNode) {
-          firstScriptTag.parentNode.insertBefore(script, firstScriptTag)
-        } else {
-          document.head.insertBefore(script, document.head.firstChild)
+          if (firstScriptTag.parentNode) {
+            firstScriptTag.parentNode.insertBefore(script, firstScriptTag)
+          } else {
+            document.head.insertBefore(script, document.head.firstChild)
+          }
         }
       }
 
