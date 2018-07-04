@@ -24,12 +24,6 @@
     {
       "name": "outbound-access",
       "attrs": {
-        "path": "api/configurationRepository/pvt/bucket/portal/key/"
-      }
-    },
-    {
-      "name": "outbound-access",
-      "attrs": {
         "path": "api/portal/pvt/sites/default/configuration"
       }
     }
