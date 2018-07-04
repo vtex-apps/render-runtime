@@ -19,5 +19,14 @@
   "settingsSchema": {},
   "scripts": {
     "postreleasy": "vtex publish --verbose"
-  }
+  },
+  "policies": [
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "configurationrepository.vtex.com.br",
+        "path": "api/configurationRepository/pvt/bucket/portal/key/"
+      }
+    }
+  ]
 }

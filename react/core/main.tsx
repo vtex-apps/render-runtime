@@ -91,7 +91,7 @@ function validateRootComponent(rootName: string, extensions: Extensions) {
   }
 }
 
-function start() {
+async function start() {
   try {
     const runtime = window.__RUNTIME__
     const rootName = runtime.page
@@ -112,6 +112,25 @@ function start() {
           state: getState(runtime),
         }))
     } else {
+      const {account: accountName} = window.__RUNTIME__
+
+      const { tagManagerId } = await fetch(
+        // `/api/configurationRepository/pvt/bucket/portal/key/TagManagerId_${accountName}?an=${accountName}`,
+        '/api/portal/pvt/sites/default/configuration',
+        { headers: { Accept: 'application/json' }
+      })
+        .then(res => res.json())
+
+      if (tagManagerId !== '') {
+        const script = document.createElement('script')
+
+        script.async = true
+        script.src = `https://www.googletagmanager.com/gtm.js?id=${tagManagerId}`
+
+        const firstScriptTag = document.getElementsByTagName('script')[0]
+        firstScriptTag.parentNode && firstScriptTag.parentNode.insertBefore(script, firstScriptTag)
+      }
+
       console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
     }
   } catch (error) {
