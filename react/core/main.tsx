@@ -128,7 +128,12 @@ async function start() {
         script.src = `https://www.googletagmanager.com/gtm.js?id=${tagManagerId}`
 
         const firstScriptTag = document.getElementsByTagName('script')[0]
-        firstScriptTag.parentNode && firstScriptTag.parentNode.insertBefore(script, firstScriptTag)
+
+        if (firstScriptTag.parentNode) {
+          firstScriptTag.parentNode.insertBefore(script, firstScriptTag)
+        } else {
+          document.head.insertBefore(script, document.head.firstChild)
+        }
       }
 
       console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
