@@ -136,7 +136,7 @@ async function start() {
         }
       }
 
-      console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
+      console.log('Welcome to Render! Want to look under the hood? https://careers.vtex.com/')
     }
   } catch (error) {
     console.error('Unexpected error rendering:', error)
