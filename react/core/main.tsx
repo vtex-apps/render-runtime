@@ -1,3 +1,4 @@
+import axios from 'axios'
 import {canUseDOM} from 'exenv'
 import createHistory from 'history/createBrowserHistory'
 import React, {ReactElement} from 'react'
@@ -114,14 +115,11 @@ async function start() {
     } else {
       const {account: accountName} = window.__RUNTIME__
 
-      const { tagManagerId } = await fetch(
-        // `/api/configurationRepository/pvt/bucket/portal/key/TagManagerId_${accountName}?an=${accountName}`,
-        '/api/portal/pvt/sites/default/configuration',
-        { headers: { Accept: 'application/json' }
-      })
-        .then(res => res.json())
+      const tagManagerId = await axios.get(
+        `/api/configurationRepository/pvt/bucket/portal/key/TagManagerId_${accountName}?an=${accountName}`
+      ).then(res => res.data)
 
-      if (tagManagerId !== '') {
+      if (typeof tagManagerId === 'string' && tagManagerId !== '') {
         const script = document.createElement('script')
 
         script.async = true
