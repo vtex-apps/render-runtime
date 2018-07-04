@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-- Auth store treatment and redirectioning
+- Auth treatment and redirectioning of the store
 
 ## [7.11.3] - 2018-6-21
 ### Removed
