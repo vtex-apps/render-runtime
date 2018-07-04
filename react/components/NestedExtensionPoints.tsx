@@ -11,6 +11,7 @@ const EMPTY_OBJECT = {}
 interface Props {
   page: string,
   query?: Record<string, string>,
+  breakPoint?: any
 }
 
 export default class NestedExtensionPoints extends PureComponent<Props> {
@@ -27,21 +28,33 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
   }
 
   public render() {
-    const {page, query} = this.props
+    const {page, query, breakPoint} = this.props
     const segments = page.split('/')
     const reverse = segments.slice().reverse()
     // Nest extension points for nested pages
     // a/b/c should render three extension points
     // <a><b><c></c></b></a>
     const getNestedExtensionPoints = (runtime: RenderContext) => {
-      return reverse.reduce((acc: JSX.Element | null, value: string, index: number) => (
-        <ExtensionPoint
-          id={value}
-          query={query}
-          params={this.getPageParams(runtime, segments.slice(0, segments.length - index).join('/'))}>
-          {acc}
-        </ExtensionPoint>
-      ), null as JSX.Element | null)
+      return reverse.reduce((acc: JSX.Element | null, value: string, index: number) => {
+        if (breakPoint && breakPoint.point === value && breakPoint.isLoading) {
+          return <div className="flex justify-center ma4">Loading...</div>
+        } else if (
+          breakPoint &&
+          breakPoint.point === value &&
+          !breakPoint.isLoading &&
+          !breakPoint.isVisible
+        ) {
+          return
+        }
+        return (
+          <ExtensionPoint
+            id={value}
+            query={query}
+            params={this.getPageParams(runtime, segments.slice(0, segments.length - index).join('/'))}>
+            {acc}
+          </ExtensionPoint>
+        )
+      }, null as JSX.Element | null)
     }
 
     return <RenderContext.Consumer>{getNestedExtensionPoints}</RenderContext.Consumer>

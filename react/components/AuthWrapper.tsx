@@ -1,26 +1,65 @@
+import axios from 'axios'
 import gql from 'graphql-tag'
 import PropTypes from 'prop-types'
-import React, {Component, ReactElement} from 'react'
-import {graphql} from 'react-apollo'
-import {Helmet} from 'react-helmet'
-
-import BuildStatus from './BuildStatus'
-import ExtensionPointComponent from './ExtensionPointComponent'
-import NestedExtensionPoints from './NestedExtensionPoints'
+import React, {PureComponent} from 'react'
 
 const LOGIN_PATH = '/login'
+const AUTH_STORE_URL = '/_v/private/authenticated/store'
 
-class AuthWrapper extends Component {
-  public static propTypes = {
-    children: PropTypes.element,
-    data: PropTypes.object,
-    navigate: PropTypes.func,
-    page: PropTypes.string,
-    pages: PropTypes.object
+interface Props {
+  fallBack: (loading?: boolean, logged?: boolean, point?: string) => {},
+  navigate: (navigateOptions: object) => {},
+  page: string,
+  pages: Record<string, Record<string, any>>
+}
+
+interface State {
+  loading: boolean
+  logged?: boolean
+}
+
+export default class AuthWrapper extends PureComponent<Props, State> {
+  public constructor(props: Props) {
+    super(props)
+    const url = 
+    this.state = { loading: false }
+    if (this.isAuthenticatedPage(props)) {
+      this.state = { loading:true, logged: false }
+      axios({ 
+        method: 'GET', 
+        url: AUTH_STORE_URL,
+      }).then(({ data: { authenticated } }) => {
+        this.setState({
+          loading: false,
+          logged: authenticated
+        })
+        if (!authenticated) {
+          this.redirectToLogin()
+        }
+      }, err => {
+        this.setState({
+          loading: false,
+          logged: false
+        })
+        this.redirectToLogin()
+      })
+    }
   }
 
-  public getLoginPage(pages: object) {
-    const pagesFiltered = Object.entries(pages).filter(entry => {
+  public isAuthenticatedPage(props: Props) {
+    return props.pages[props.page].login
+  }
+
+  public redirectToLogin() {
+    this.props.navigate({
+      fallbackToWindowLocation: false,
+      page: this.getLoginPage(),
+    })
+  }
+
+  public getLoginPage() {
+    const { pages } = this.props
+    const pagesFiltered = Object.entries(pages).filter((entry: Record<any, any>) => {
       const [value, ...rest] = entry.reverse()
       return value.path === LOGIN_PATH
     })
@@ -28,30 +67,17 @@ class AuthWrapper extends Component {
     return loginPage
   }
 
-  public componentDidMount() {
-    const { pages, page, data: { loading, profile }, navigate } = this.props
-    if (pages[page].login && !loading && !profile) {
-      const loginPage = this.getLoginPage(pages)
-      if (loginPage) {
-        navigate({
-          fallbackToWindowLocation: false,
-          page: loginPage,
-        })
-      }
-    }
+  public getBreakPoint() {
+    const { pages, page } = this.props
+    const [point] = page.split('/').slice(-1)
+    return point
   }
 
   public render() {
-    return this.props.children
+    const { logged, loading } = this.state
+    if (this.isAuthenticatedPage(this.props)) {
+      return this.props.fallBack(loading, logged, this.getBreakPoint())
+    }
+    return this.props.fallBack()
   }
 }
-
-export default graphql(gql`
-  query getProfile {
-    profile {
-      id
-    }
-  }
-`, {
-  options: { errorPolicy: 'all' },
-})(AuthWrapper)
