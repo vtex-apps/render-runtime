@@ -13,6 +13,7 @@ if (module.hot) {
     window.__RENDER_7_RUNTIME__.ExtensionContainer = hotGlobals.ExtensionContainer
     window.__RENDER_7_RUNTIME__.ExtensionPoint = hotGlobals.ExtensionPoint
     window.__RENDER_7_RUNTIME__.Link = hotGlobals.Link
+    window.__RENDER_7_RUNTIME__.Loading = hotGlobals.Loading
     runtimeGlobals.start()
   })
 }

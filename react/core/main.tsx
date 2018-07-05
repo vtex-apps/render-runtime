@@ -1,3 +1,4 @@
+import Spinner from '@vtex/styleguide/lib/Spinner'
 import {canUseDOM} from 'exenv'
 import createHistory from 'history/createBrowserHistory'
 import React, {ReactElement} from 'react'
@@ -121,6 +122,7 @@ function start() {
 
 const RenderContextConsumer = RenderContext.Consumer
 const TreePathContextConsumer = TreePathContext.Consumer
+const Loading = Spinner
 
 export {
   ExtensionContainer,
@@ -134,5 +136,6 @@ export {
   render,
   start,
   withHMR,
+  Loading
 }
 

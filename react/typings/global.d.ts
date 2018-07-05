@@ -188,6 +188,7 @@ interface RenderComponent<P={}, S={}> {
     ExtensionPoint: typeof ExtensionPoint
     Link: typeof Link
     NoSSR: any
+    Loading: any
     Helmet: any
     canUseDOM: boolean
     withHMR: any
