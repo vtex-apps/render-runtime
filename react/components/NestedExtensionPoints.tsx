@@ -11,8 +11,7 @@ const EMPTY_OBJECT = {}
 
 interface Props {
   page: string,
-  query?: Record<string, string>,
-  breakPoint?: any
+  query?: Record<string, string>
 }
 
 export default class NestedExtensionPoints extends PureComponent<Props> {
@@ -29,7 +28,7 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
   }
 
   public render() {
-    const {page, query, breakPoint} = this.props
+    const {page, query} = this.props
     const segments = page.split('/')
     const reverse = segments.slice().reverse()
     // Nest extension points for nested pages

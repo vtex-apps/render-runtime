@@ -344,8 +344,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ...messages,
       ...customMessages
     }
-    const component = children ?
-      React.cloneElement(children as ReactElement<any>, {query})
+    const component = children 
+      ? React.cloneElement(children as ReactElement<any>, {query})
       : (
         <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
