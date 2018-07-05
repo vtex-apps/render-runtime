@@ -345,15 +345,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
     
     const component = children 
-    ? React.cloneElement(children as ReactElement<any>, {query})
-    : (
-      <div className="render-provider">
+      ? React.cloneElement(children as ReactElement<any>, {query})
+      : (
+        <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
           {!production && <BuildStatus />}
           <NestedExtensionPoints page={page} query={query} />
         </div>
       )
-      
+
     const root = page.split('/')[0]
     const editorProvider = extensions[`${root}/__provider`]
     const context = this.getChildContext()

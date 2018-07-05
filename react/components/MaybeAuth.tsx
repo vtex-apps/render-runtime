@@ -22,23 +22,23 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   
   public componentDidMount() {
     if (this.isAuthenticatedPage()) {
-      fetch(AUTH_STORE_URL)
-      .then(response => response.json())
-      .then(({ authenticated }) => {
-        this.setState({
-          loading: false,
-          logged: authenticated
-        })
-        if (!authenticated) {
+      fetch(AUTH_STORE_URL, { credentials: 'same-origin' })
+        .then(response => response.json())
+        .then(({ authenticated }) => {
+          this.setState({
+            loading: false,
+            logged: authenticated
+          })
+          if (!authenticated) {
+            this.redirectToLogin()
+          }
+        }).catch(err => {
+          this.setState({
+            loading: false,
+            logged: false
+          })
           this.redirectToLogin()
-        }
-      }).catch(err => {
-        this.setState({
-          loading: false,
-          logged: false
         })
-        this.redirectToLogin()
-      })
     }
   }
 
