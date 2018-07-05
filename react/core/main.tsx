@@ -10,6 +10,7 @@ import Link from '../components/Link'
 import {RenderContext} from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
 import ExtensionContainer from '../ExtensionContainer'
+import LayoutContainer from '../LayoutContainer'
 import ExtensionPoint from '../ExtensionPoint'
 import PageCacheControl from '../utils/cacheControl'
 import {getState} from '../utils/client'
@@ -126,6 +127,7 @@ const TreePathContextConsumer = TreePathContext.Consumer
 export {
   ExtensionContainer,
   ExtensionPoint,
+  LayoutContainer,
   Helmet,
   Link,
   NoSSR,
