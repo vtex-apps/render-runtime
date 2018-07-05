@@ -46,15 +46,10 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       credentials: 'include',
     })
 
-    const persistedQueryLink = createPersistedQueryLink({
-      disable: () => true,
-      generateHash
-    })
-
     const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
     const link = cacheControl
-      ? ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, uriSwitchLink, cachingLink(cacheControl), persistedQueryLink, httpLink])
-      : ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, uriSwitchLink, persistedQueryLink, httpLink])
+      ? ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, uriSwitchLink, cachingLink(cacheControl), httpLink])
+      : ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, uriSwitchLink, httpLink])
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(window.__STATE__) : cache,
