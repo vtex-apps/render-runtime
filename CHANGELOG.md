@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Auth treatment and redirect to the login page.
+- Loading component to Render Exports
 
 ## [7.11.3] - 2018-6-21
 ### Removed
