@@ -1,6 +1,7 @@
 import {canUseDOM} from 'exenv'
 import PropTypes from 'prop-types'
 import React, {PureComponent} from 'react'
+import AuthWrapper from './AuthWrapper'
 
 import ExtensionPoint from '../ExtensionPoint'
 import {getPagePath, getParams} from '../utils/pages'
@@ -35,26 +36,16 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
     // a/b/c should render three extension points
     // <a><b><c></c></b></a>
     const getNestedExtensionPoints = (runtime: RenderContext) => {
-      return reverse.reduce((acc: JSX.Element | null, value: string, index: number) => {
-        if (breakPoint && breakPoint.point === value && breakPoint.isLoading) {
-          return <div className="flex justify-center ma4">Loading...</div>
-        } else if (
-          breakPoint &&
-          breakPoint.point === value &&
-          !breakPoint.isLoading &&
-          !breakPoint.isVisible
-        ) {
-          return
-        }
-        return (
+      return reverse.reduce((acc: JSX.Element | null, value: string, index: number) => (
+        <AuthWrapper pages={runtime.pages} page={page} navigate={runtime.navigate} segment={value}>
           <ExtensionPoint
             id={value}
             query={query}
             params={this.getPageParams(runtime, segments.slice(0, segments.length - index).join('/'))}>
             {acc}
           </ExtensionPoint>
-        )
-      }, null as JSX.Element | null)
+        </AuthWrapper>
+      ), null as JSX.Element | null)
     }
 
     return <RenderContext.Consumer>{getNestedExtensionPoints}</RenderContext.Consumer>

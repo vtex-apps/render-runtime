@@ -20,7 +20,6 @@ import {ApolloLink, NextLink, Operation} from 'apollo-link'
 import PageCacheControl from '../utils/cacheControl'
 import {traverseComponent} from '../utils/components'
 import {TreePathContext} from '../utils/treePath'
-import AuthWrapper from './AuthWrapper'
 import BuildStatus from './BuildStatus'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
@@ -345,36 +344,28 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ...messages,
       ...customMessages
     }
+    const component = children ?
+      React.cloneElement(children as ReactElement<any>, {query})
+      : (
+        <div className="render-provider">
+          <Helmet title={pages[page] && pages[page].title} />
+          {!production && <BuildStatus />}
+          <NestedExtensionPoints page={page} query={query} />
+        </div>
+      )
 
-    const fallBack = (isLoading, isAuth, point) => {
-      const component = children
-        ? React.cloneElement(children as ReactElement<any>, {query})
-        : (
-          <div className="render-provider">
-            <Helmet title={pages[page] && pages[page].title} />
-            {!production && <BuildStatus />}
-            <NestedExtensionPoints page={page} query={query} breakPoint={{
-              isLoading,
-              isVisible: isAuth,
-              point,
-            }}/>
-          </div>
-        )
-  
-      const root = page.split('/')[0]
-      const editorProvider = extensions[`${root}/__provider`]
-      const maybeEditable = !production && editorProvider
-        ? <ExtensionPointComponent component={editorProvider.component} props={{extensions, pages, page}} runtime={context} treePath="">{component}</ExtensionPointComponent>
-        : component
-        return maybeEditable
-    }
+    const root = page.split('/')[0]
+    const editorProvider = extensions[`${root}/__provider`]
+    const maybeEditable = !production && editorProvider
+      ? <ExtensionPointComponent component={editorProvider.component} props={{extensions, pages, page}} runtime={context} treePath="">{component}</ExtensionPointComponent>
+      : component
 
     return (
       <RenderContext.Provider value={context}>
         <TreePathContext.Provider value={{treePath: ''}}>
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider locale={locale} messages={mergedMessages}>
-              <AuthWrapper pages={pages} page={page} navigate={this.navigate} fallBack={fallBack} />
+              {maybeEditable}
             </IntlProvider>
           </ApolloProvider>
         </TreePathContext.Provider>
