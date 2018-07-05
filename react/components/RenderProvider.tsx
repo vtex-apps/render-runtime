@@ -339,23 +339,24 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {children, runtime} = this.props
     const {culture: {locale}, messages, pages, page, query, production, extensions} = this.state
     const customMessages = this.getCustomMessages(locale)
-    const context = this.getChildContext()
     const mergedMessages = {
       ...messages,
       ...customMessages
     }
+    
     const component = children 
-      ? React.cloneElement(children as ReactElement<any>, {query})
-      : (
-        <div className="render-provider">
+    ? React.cloneElement(children as ReactElement<any>, {query})
+    : (
+      <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
           {!production && <BuildStatus />}
           <NestedExtensionPoints page={page} query={query} />
         </div>
       )
-
+      
     const root = page.split('/')[0]
     const editorProvider = extensions[`${root}/__provider`]
+    const context = this.getChildContext()
     const maybeEditable = !production && editorProvider
       ? <ExtensionPointComponent component={editorProvider.component} props={{extensions, pages, page}} runtime={context} treePath="">{component}</ExtensionPointComponent>
       : component

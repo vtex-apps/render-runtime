@@ -17,7 +17,7 @@ interface State {
   logged?: boolean
 }
 
-export default class AuthWrapper extends PureComponent<Props, State> {
+export default class MaybeAuth extends PureComponent<Props, State> {
   public state = { loading: true, logged: false }
   
   public componentDidMount() {
