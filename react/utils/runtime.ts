@@ -4,8 +4,9 @@ import {canUseDOM} from 'exenv'
 import runtimeQuery from './runtime.graphql'
 
 const parsePageQueryResponse = (response: PageQueryResponse): ParsedPageQueryResponse => {
-  const {componentsJSON, extensionsJSON, messagesJSON, pagesJSON, appsSettingsJSON, appsEtag} = response
-  const [components, extensions, messages, pages, settings] = [
+  const {cacheHintsJSON, componentsJSON, extensionsJSON, messagesJSON, pagesJSON, appsSettingsJSON, appsEtag} = response
+  const [cacheHints, components, extensions, messages, pages, settings] = [
+    cacheHintsJSON,
     componentsJSON,
     extensionsJSON,
     messagesJSON,
@@ -15,6 +16,7 @@ const parsePageQueryResponse = (response: PageQueryResponse): ParsedPageQueryRes
 
   return {
     appsEtag,
+    cacheHints,
     components,
     extensions,
     messages,

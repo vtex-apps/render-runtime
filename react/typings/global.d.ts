@@ -128,6 +128,7 @@ interface RenderComponent<P={}, S={}> {
     pagesJSON: string
     appsSettingsJSON: string
     appsEtag: string
+    cacheHintsJSON: string
   }
 
   interface ParsedPageQueryResponse {
@@ -137,6 +138,7 @@ interface RenderComponent<P={}, S={}> {
     pages: RenderRuntime['pages']
     appsEtag: RenderRuntime['appsEtag']
     settings: RenderRuntime['settings']
+    cacheHints: RenderRuntime['cacheHints']
   }
 
   type Rendered = ClientRendered | Promise<NamedServerRendered>
@@ -178,6 +180,15 @@ interface RenderComponent<P={}, S={}> {
     start: boolean
     settings: {
       [app: string]: any;
+    }
+    cacheHints: CacheHints
+  }
+
+  interface CacheHints {
+    [hash: string]: {
+      scope: string
+      maxAge: string
+      version: number
     }
   }
 

@@ -1,33 +1,22 @@
-import {ApolloLink, NextLink, Observable, Operation, RequestHandler} from 'apollo-link'
+import {ApolloLink, NextLink, Operation} from 'apollo-link'
 import {canUseDOM} from 'exenv'
-import {ArgumentNode, DirectiveNode, DocumentNode, OperationDefinitionNode, visit} from 'graphql'
+import {ASTNode, DirectiveDefinitionNode, OperationDefinitionNode, visit} from 'graphql'
 
-const assetsVisitor = (assets: any) => ({
-  Directive (node: DirectiveNode) {
-    if (node.name.value === 'context' && node.arguments) {
-      node.arguments.forEach((argNode: ArgumentNode) => {
-        if (argNode.name.value === 'scope') {
-          assets.scope = argNode.value.value
+const assetsFromQuery = (query: ASTNode) => {
+  const assets = {operationType: 'mutation', queryScope: undefined}
+  visit(query, {
+    OperationDefinition (node: OperationDefinitionNode) {
+      assets.operationType = node.operation
+    },
+    Directive (node: DirectiveDefinitionNode) {
+      if (node.name.value === 'context') {
+        const scopeArg = node.arguments && node.arguments.find((argNode) => argNode.name.value === 'scope')
+        if (scopeArg) {
+          assets.queryScope = scopeArg.value.value
         }
-        else if (argNode.name.value === 'version') {
-          assets.version = argNode.value.value
-        }
-        else if (argNode.name.value === 'maxAge') {
-          assets.maxAge = argNode.value.value
-        }
-      })
+      }
     }
-  },
-  OperationDefinition (node: OperationDefinitionNode) {
-    if (!assets.operation) {
-      assets.operation = node.operation
-    }
-  }
-})
-
-const assetsFromQuery = (query: DocumentNode) => {
-  const assets = {version: '1', scope: 'public', maxAge: 'long', operation: undefined}
-  visit(query, assetsVisitor(assets))
+  })
   return assets
 }
 
@@ -36,17 +25,39 @@ interface OperationContext {
   runtime: RenderRuntime,
 }
 
+const hashFromExtensions = ext => ext && ext.persistedQuery && ext.persistedQuery.sha256Hash
+
+const equals = (a: string, b: string) => a && b && a.toLowerCase() === b.toLowerCase()
+
+const extractHints = (query: ASTNode, meta) => {
+  const {operationType, queryScope} = assetsFromQuery(query)
+
+  let hints
+  if (meta) {
+    hints = equals(operationType, 'query') ? meta : {...meta, scope: 'private'}
+  } else {
+    hints = {scope: queryScope}
+  }
+
+  const {maxAge = 'long', scope = 'public', version = 1} = hints
+  return {
+    maxAge: maxAge.toLowerCase(),
+    method: (equals(scope, 'public') && equals(operationType, 'query')) ? 'GET' : 'POST',
+    scope: scope.toLowerCase(),
+    version,
+  }
+}
+
 export const createUriSwitchLink = (baseURI: string, workspace: string) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
-    const {query} = operation
-    const assets = assetsFromQuery(operation.query)
-    const protocol = canUseDOM ? 'https:' : 'http:'
-    operation.setContext(({ fetchOptions = {}, runtime: {appsEtag} } : OperationContext) => {
-      const method = (assets.scope === 'public' && assets.operation === 'query') ? 'GET' : 'POST'
+    operation.setContext(({ fetchOptions = {}, runtime: {appsEtag, cacheHints} } : OperationContext) => {
+      const hash = hashFromExtensions(operation.extensions)
+      const protocol = canUseDOM ? 'https:' : 'http:'
+      const {maxAge, scope, version, method} = extractHints(operation.query, cacheHints[hash])
       return {
         ...operation.getContext(),
         fetchOptions: {...fetchOptions, method},
-        uri: `${protocol}//${baseURI}/_v/graphql/${assets.scope}/v${assets.version}?workspace=${workspace}&maxAge=${assets.maxAge}&appsEtag=${appsEtag}`,
+        uri: `${protocol}//${baseURI}/_v/graphql/${scope}/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
       }
     })
     return forward ? forward(operation) : null
