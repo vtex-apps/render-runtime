@@ -21,9 +21,8 @@ import PageCacheControl from '../utils/cacheControl'
 import {traverseComponent} from '../utils/components'
 import {TreePathContext} from '../utils/treePath'
 import BuildStatus from './BuildStatus'
-import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
-import {RenderContext} from './RenderContext'
+import {RenderContext, RenderContextProps} from './RenderContext'
 
 interface Props {
   children: ReactElement<any> | null
@@ -340,7 +339,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public render() {
-    const {children, runtime} = this.props
+    const {children} = this.props
     const {culture: {locale}, messages, pages, page, query, production, extensions} = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
@@ -361,8 +360,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const root = page.split('/')[0]
     const editorProvider = extensions[`${root}/__provider`]
     const context = this.getChildContext()
+    const EditorProvider = getImplementation<RenderContextProps>(editorProvider.component)
     const maybeEditable = !production && editorProvider
-      ? <ExtensionPointComponent component={editorProvider.component} props={{extensions, pages, page}} runtime={context} treePath="">{component}</ExtensionPointComponent>
+      ? <EditorProvider runtime={context}>{component}</EditorProvider>
       : component
 
     return (
