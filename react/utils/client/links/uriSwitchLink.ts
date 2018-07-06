@@ -33,10 +33,10 @@ const extractHints = (query: ASTNode, meta) => {
   const {operationType, queryScope} = assetsFromQuery(query)
 
   let hints
-  if (meta) {
-    hints = equals(operationType, 'query') ? meta : {...meta, scope: 'private'}
+  if (equals(operationType, 'query')) {
+    hints = meta ? meta : {scope: queryScope}
   } else {
-    hints = {scope: queryScope}
+    hints = {...meta, scope: 'private'}
   }
 
   const {maxAge = 'long', scope = 'public', version = 1} = hints
