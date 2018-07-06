@@ -27,11 +27,10 @@ class Container extends Component<ContainerProps> {
   public render() {
     const { isRow, elements } = this.props
 
-    const style: CSSProperties = isRow ? {} : { flexBasis: "1px" }
-    const className = `flex flex-grow-1 ${isRow ? "flex-row" : "flex-column"}`
+    const className = `flex flex-grow-1 w-100 ${isRow ? "flex-row" : "flex-column"}`
     if (typeof elements === "string") {
       return (
-        <div className={isRow ? "" : className} style={style}>
+        <div className={isRow ? "" : className}>
           <ExtensionPoint id={elements} />
         </div>
       )
@@ -42,7 +41,7 @@ class Container extends Component<ContainerProps> {
     })
 
     return (
-      <div className={className} style={style}>
+      <div className={className}>
         {returnValue}
       </div>
     )
