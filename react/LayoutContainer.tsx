@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { Component, CSSProperties } from 'react'
 
 import ExtensionPoint from './ExtensionPoint'
 
@@ -10,11 +10,13 @@ interface LayoutContainerProps {
 }
 
 interface ContainerProps {
-  elements: Element,
+  elements: Element
   isRow: boolean
 }
 
-const elementPropType = PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.array])).isRequired
+const elementPropType = PropTypes.arrayOf(
+  PropTypes.oneOfType([PropTypes.string, PropTypes.array])
+).isRequired
 
 class Container extends Component<ContainerProps> {
   static propTypes = {
@@ -25,27 +27,27 @@ class Container extends Component<ContainerProps> {
   public render() {
     const { isRow, elements } = this.props
 
-    let style = {
-      "flex-basis": "1px"
-    }
-    if (isRow) style = {}
-    const className = `flex-grow-1 ${isRow ? "flex-row items-stretch" : "flex-column"}`
+    const style: CSSProperties = isRow ? {} : { flexBasis: "1px" }
+    const className = `flex flex-grow-1 ${isRow ? "flex-row" : "flex-column"}`
     if (typeof elements === "string") {
       return (
-        <div className={className + (isRow ? "" : " flex")} style={style}>
+        <div className={isRow ? "" : className} style={style}>
           <ExtensionPoint id={elements} />
         </div>
       )
     }
 
     const returnValue: Array<JSX.Element> = elements.map((element: Element) => {
-      return (<Container elements={element} isRow={!isRow} />)
+      return <Container elements={element} isRow={!isRow} />
     })
 
-    return <div className={className + " flex"} style={style}>{returnValue}</div>
+    return (
+      <div className={className} style={style}>
+        {returnValue}
+      </div>
+    )
   }
 }
-
 
 class LayoutContainer extends Component<LayoutContainerProps> {
   static propTypes = {
