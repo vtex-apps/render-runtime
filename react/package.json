@@ -6,7 +6,6 @@
     "lint": "tsc --noEmit && tslint src/**/*.ts"
   },
   "dependencies": {
-    "@vtex/styleguide": "5.2.3",
     "apollo-cache-inmemory": "^1.1.5",
     "apollo-client": "^2.2.0",
     "apollo-link-http": "^1.3.2",
