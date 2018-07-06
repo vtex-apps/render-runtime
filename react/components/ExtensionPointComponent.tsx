@@ -12,9 +12,13 @@ interface Props {
   treePath: string
 }
 
+interface ErrorHandle {
+  component?: JSX.Element | null
+  recover?: () => void
+}
+
 interface State {
-  error?: Error | null
-  errorInfo?: ErrorInfo | null
+  error?: ErrorHandle | null
   lastUpdate?: number
 }
 
@@ -48,7 +52,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
       return false
     }
 
-    this.setState({error: null, errorInfo: null, lastUpdate: Date.now()})
+    this.setState({error: null, lastUpdate: Date.now()})
     const {component: mounted, treePath} = this.props
     console.log(`[render] Component updated. treePath=${treePath} ${mounted !== component ? `mounted=${mounted} ` : ''}updated=${component}`)
   }
@@ -65,14 +69,11 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
   }
 
   public clearError = () => {
-    this.setState({
-      error: null,
-      errorInfo: null,
-    })
+    this.setState({error: null})
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    const {treePath: path, runtime: {account, workspace}} = this.props
+    const {treePath, runtime: {account, workspace, production, page, pages}} = this.props
     const {message, stack} = error
     const {componentStack} = errorInfo
     const event = {
@@ -80,20 +81,26 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
         account,
         componentStack,
         message,
-        path,
+        path: treePath,
         stack,
         workspace
       },
       name: 'JSError'
     }
 
-    console.error('Failed to render extension point', path)
+    console.error('Failed to render extension point', treePath)
     logEvent(event)
 
-    this.setState({
-      error,
-      errorInfo,
-    })
+    // Only show errors in production if the entire page explodes. (Ignore nested extension points)
+    const muteError = production && !pages[treePath] && !page.startsWith('admin/')
+    const errorHandle = {
+      component: muteError
+        ? null
+        : <ExtensionPointError error={error} errorInfo={errorInfo} treePath={treePath} />,
+      recover: this.clearError,
+    }
+
+    this.setState({error: errorHandle})
   }
 
   public componentDidMount() {
@@ -110,29 +117,16 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
   }
 
   public render() {
-    const {component, props, children, treePath, runtime: {production, pages, page}} = this.props
-    const {error, errorInfo} = this.state
+    const {component, props, children, treePath, runtime: {production}} = this.props
+    const {error} = this.state
     const Component = component && getImplementation(component)
 
     // A children of this extension point throwed an uncaught error
-    // Only show errors in production if the entire page explodes. (Ignore nested extension points)
-    if (error) {
-      if (production && !pages[treePath] && !page.startsWith('admin/')) {
-        return null
-      }
-
-      const errorInstance = <ExtensionPointError error={error} errorInfo={errorInfo!} treePath={treePath} />
-      props.__errorInstance = errorInstance
-      props.__clearError = this.clearError
-
-      if (!(Component as any).hotReload) {
-        return errorInstance
-      }
-    } else {
-      delete props.__errorInstance
-      delete props.__clearError
+    if (error && !(Component as any).hotReload) {
+      return error.component
     }
 
+    const componentProps =  {...props, ...error && {__errorHandle: error}}
     const EmptyExtensionPoint = this.emptyExtensionPoint && getImplementation(this.emptyExtensionPoint.component)
     const EditableExtensionPoint = this.editableExtensionPoint && getImplementation<EditableExtensionPointProps>(this.editableExtensionPoint.component)
 
@@ -142,9 +136,9 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
     }
 
     const isEditable = Component && (Component.hasOwnProperty('schema') || Component.hasOwnProperty('getSchema'))
-    const configuredComponent = Component ? <Component {...props}>{children}</Component> : children || null
+    const configuredComponent = Component ? <Component {...componentProps}>{children}</Component> : children || null
     return this.editableExtensionPoint && isEditable
-      ? <EditableExtensionPoint treePath={treePath} component={component} props={props}>{configuredComponent}</EditableExtensionPoint>
+      ? <EditableExtensionPoint treePath={treePath} component={component} props={componentProps}>{configuredComponent}</EditableExtensionPoint>
       : configuredComponent
   }
 }
