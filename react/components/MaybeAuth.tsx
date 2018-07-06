@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
-import React, {Component, PureComponent} from 'react'
-import * as hotGlobals from '../core/main'
-import {getImplementation} from '../utils/assets'
+import React, {PureComponent} from 'react'
+import Loading from './Loading'
 
 const LOGIN_PATH = '/login'
 const AUTH_STORE_URL = '/_v/private/authenticated/store'
@@ -64,7 +63,6 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   public render() {
     if (this.isAuthenticatedPage()) {
       const { logged, loading } = this.state
-      const Loading = hotGlobals.Loading
       return <div className="flex justify-center ma4"><Loading /></div> 
     }
     return this.props.children

@@ -77,3 +77,8 @@ export function fetchAssets(assets: string[]) {
   styles.forEach(addStyleToPage)
   return Promise.all(scripts.map(addScriptToPage)).then(() => { return })
 }
+
+export function getComponentFromExtensions(name: string) {
+  const extension = window.__RUNTIME__.extensions[`store/__${name}`]
+  return extension ? getImplementation(extension.component) : null
+}
