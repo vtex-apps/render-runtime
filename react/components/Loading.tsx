@@ -7,9 +7,9 @@ interface Props {
 }
 
 export default class Loading extends PureComponent<Props> {
+  
   public render() {
     const LoadingExtension = getComponentFromExtensions('loading')
-    console.log('render', LoadingExtension)
     return LoadingExtension && !this.props.useDefault ? <LoadingExtension /> : (
       <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
         <circle cx="50" opacity="0.4" cy="50" fill="none" stroke="#F71963" strokeWidth="14" r="40"></circle>
