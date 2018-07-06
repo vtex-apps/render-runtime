@@ -144,7 +144,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
     const isEditable = Component && (Component.hasOwnProperty('schema') || Component.hasOwnProperty('getSchema'))
     const configuredComponent = Component ? <Component {...props}>{children}</Component> : children || null
     return this.editableExtensionPoint && isEditable
-      ? <EditableExtensionPoint treePath={treePath} component={component} props={props}>{configuredComponent}</EditableExtensionPoint>
+      ? <EditableExtensionPoint treePath={treePath} component={component}>{configuredComponent}</EditableExtensionPoint>
       : configuredComponent
   }
 }
