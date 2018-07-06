@@ -25,9 +25,16 @@ class Container extends Component<ContainerProps> {
   public render() {
     const { isRow, elements } = this.props
 
+    let style = {
+      "flex-basis": "1px"
+    }
+    if (isRow) style = {}
+    const className = `flex-grow-1 ${isRow ? "flex-row items-stretch" : "flex-column"}`
     if (typeof elements === "string") {
       return (
-        <ExtensionPoint id={elements} />
+        <div className={className + (isRow ? "" : " flex")} style={style}>
+          <ExtensionPoint id={elements} />
+        </div>
       )
     }
 
@@ -35,11 +42,7 @@ class Container extends Component<ContainerProps> {
       return (<Container elements={element} isRow={!isRow} />)
     })
 
-    const style = {
-      [`grid-template-${isRow ? "columns" : "rows"}`]: `repeat(${elements.length}, 1fr)`,
-      "display": "grid"
-    }
-    return <div style={style}>{returnValue}</div>
+    return <div className={className + " flex"} style={style}>{returnValue}</div>
   }
 }
 
