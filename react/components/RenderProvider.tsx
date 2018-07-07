@@ -1,7 +1,7 @@
 import {canUseDOM} from 'exenv'
 import PropTypes from 'prop-types'
 import {parse} from 'qs'
-import React, {Component, ReactElement} from 'react'
+import React, {Component, Fragment, ReactElement} from 'react'
 import {ApolloProvider} from 'react-apollo'
 import {Helmet} from 'react-helmet'
 import {IntlProvider} from 'react-intl'
@@ -352,7 +352,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       : (
         <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
-          {!production && <BuildStatus />}
           <NestedExtensionPoints page={page} query={query} />
         </div>
       )
@@ -370,7 +369,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         <TreePathContext.Provider value={{treePath: ''}}>
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider locale={locale} messages={mergedMessages}>
-              {maybeEditable}
+              <Fragment>
+                {!production && <BuildStatus />}
+                {maybeEditable}
+              </Fragment>
             </IntlProvider>
           </ApolloProvider>
         </TreePathContext.Provider>
