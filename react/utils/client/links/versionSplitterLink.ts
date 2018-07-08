@@ -96,13 +96,16 @@ const queriesByRuntimeMetaDirective = (query: DocumentNode) => {
 }
 
 const mergeRecursively = (accumulator: any, value: any) => {
-  Object.keys(value).forEach(key => {
-    if (accumulator[key] && typeof value[key] === 'object') {
-      accumulator[key] = mergeRecursively(accumulator[key], value[key])
-    } else {
-      accumulator[key] = value[key]
-    }
-  })
+  if (value) {
+    Object.keys(value).forEach(key => {
+      if (accumulator[key] && typeof value[key] === 'object') {
+        accumulator[key] = mergeRecursively(accumulator[key], value[key])
+      } else {
+        accumulator[key] = value[key]
+      }
+    })
+  }
+
   return accumulator
 }
 
