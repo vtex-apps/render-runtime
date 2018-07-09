@@ -24,6 +24,8 @@ import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
 import {RenderContext, RenderContextProps} from './RenderContext'
 
+import pageQuery from '../queries/page.gql'
+
 interface Props {
   children: ReactElement<any> | null
   history: History | null
@@ -193,7 +195,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onPageChanged = (location: Location) => {
-    const {pages} = this.state
+    const {runtime: {renderMajor, renderVersion}} = this.props
+    const {culture: {locale}, pages, production} = this.state
     const {pathname, state} = location
 
     // Make sure this is our navigation
@@ -210,9 +213,49 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const query = parse(location.search.substr(1))
 
-    this.setState({
-      page,
-      query,
+    // Retrieve the adequate assets for the new page. Naming will
+    // probably change (query will return something like routesJSON)
+    // as well as the fields that need to be retrieved, but the logic
+    // that the new state (extensions and assets) will be derived from
+    // the results of this query will probably remain the same.
+    this.apolloClient.query({
+      query: pageQuery,
+      variables: {
+        locale,
+        page,
+        params: {},
+        path: pathname,
+        production,
+        query,
+        renderMajor,
+        renderVersion,
+      }
+    }).then(result => {
+      const {
+        data: {
+          page: {
+            appsEtag,
+            appsSettingsJSON,
+            componentsJSON,
+            extensionsJSON,
+            messagesJSON,
+          }
+        }
+      } = result
+      const appsSettings = JSON.parse(appsSettingsJSON)
+      const components = JSON.parse(componentsJSON)
+      const extensions = JSON.parse(extensionsJSON)
+      const messages = JSON.parse(messagesJSON)
+
+      this.setState({
+        appsEtag,
+        appsSettings,
+        components,
+        extensions,
+        messages,
+        page,
+        query,
+      })
     })
   }
 
