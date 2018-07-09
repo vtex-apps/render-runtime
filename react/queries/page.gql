@@ -1,0 +1,27 @@
+query Pages(
+  $locale: String,
+  $page: String,
+  $params:String,
+  $path: String
+  $production: Boolean,
+  $query: String,
+  $renderMajor: Int,
+  $renderVersion: String,
+) {
+  page(
+    locale: $locale,
+    page: $page,
+    params: $params,
+    path: $path
+    production: $production,
+    query: $query,
+    renderMajor: $renderMajor,
+    renderVersion: $renderVersion,
+  ) {
+    appsEtag
+    appsSettingsJSON
+    componentsJSON
+    extensionsJSON
+    messagesJSON
+  }
+}
