@@ -3,10 +3,12 @@ import {ApolloClient} from 'apollo-client'
 import {ApolloLink} from 'apollo-link'
 import {createHttpLink} from 'apollo-link-http'
 import {createPersistedQueryLink} from 'apollo-link-persisted-queries'
+import {createUploadLink} from 'apollo-upload-client'
 import {canUseDOM} from 'exenv'
 import PageCacheControl from '../cacheControl'
 import {generateHash} from './generateHash'
 import {cachingLink} from './links/cachingLink'
+import {createIOFetchLink} from './links/ioFetchLink'
 import {omitTypenameLink} from './links/omitVariableTypenameLink'
 import {createUriSwitchLink} from './links/uriSwitchLink'
 import {versionSplitterLink} from './links/versionSplitterLink'
@@ -46,6 +48,12 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       credentials: 'include',
     })
 
+    const uploadLink = createUploadLink({
+      credentials: 'include',
+    })
+
+    const fetcherLink = createIOFetchLink(httpLink, uploadLink)
+
     const persistedQueryLink = createPersistedQueryLink({
       disable: () => true,
       generateHash
@@ -53,8 +61,8 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
 
     const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
     const link = cacheControl
-      ? ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, persistedQueryLink, uriSwitchLink, cachingLink(cacheControl), httpLink])
-      : ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, persistedQueryLink, uriSwitchLink, httpLink])
+      ? ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, persistedQueryLink, uriSwitchLink, cachingLink(cacheControl), fetcherLink])
+      : ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, persistedQueryLink, uriSwitchLink, fetcherLink])
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(window.__STATE__) : cache,
