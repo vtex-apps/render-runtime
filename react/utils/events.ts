@@ -16,9 +16,11 @@ interface EmittersRegistry {
   [key: string]: EventEmitter[]
 }
 
+const CONNECTION_CLOSED = 2
+
 const emittersByWorkspace: EmittersRegistry = {}
 
-export const initSSE = (account: string, workspace: string, baseURI: string) => {
+const initSSE = (account: string, workspace: string, baseURI: string) => {
   if (Object.keys(window.__RENDER_7_HOT__).length > 0) {
     require('eventsource-polyfill')
     const myvtexSSE = require('myvtex-sse')
@@ -73,6 +75,7 @@ export const initSSE = (account: string, workspace: string, baseURI: string) => 
     source.onmessage = handler
     source.onopen = () => console.log('[render] Connected to event server successfully')
     source.onerror = () => console.log('[render] Connection to event server failed')
+    return source
   }
 }
 
@@ -82,11 +85,16 @@ export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
   }
 
   const {account, workspace} = runtime
+  const hasNoEventSource = (!runtime.eventSource ||
+                            runtime.eventSource.readyState === CONNECTION_CLOSED)
 
   // Share SSE connections for same account and workspace
   if (!emittersByWorkspace[`${account}/${workspace}`]) {
     emittersByWorkspace[`${account}/${workspace}`] = []
-    initSSE(account, workspace, baseURI)
+  }
+
+  if (hasNoEventSource) {
+    runtime.eventSource = initSSE(account, workspace, baseURI) as EventSource
   }
 
   if (!runtime.emitter) {

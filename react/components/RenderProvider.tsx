@@ -9,7 +9,7 @@ import {IntlProvider} from 'react-intl'
 import {History, Location, LocationListener, UnregisterCallback} from 'history'
 import {fetchAssets, getImplementation} from '../utils/assets'
 import {getClient} from '../utils/client'
-import {initSSE} from '../utils/events'
+import {registerEmitter} from '../utils/events'
 import {getBaseURI} from '../utils/host'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
@@ -298,7 +298,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       const {runtime} = this.props
       const {account, workspace} = runtime
       const baseURI = getBaseURI(runtime)
-      initSSE(account, workspace, baseURI)
+      registerEmitter(runtime, baseURI)
     }
   }
 
