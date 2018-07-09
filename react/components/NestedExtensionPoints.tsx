@@ -1,6 +1,7 @@
 import {canUseDOM} from 'exenv'
 import PropTypes from 'prop-types'
 import React, {PureComponent} from 'react'
+import MaybeAuth from './MaybeAuth'
 
 import ExtensionPoint from '../ExtensionPoint'
 import {getPagePath, getParams} from '../utils/pages'
@@ -10,7 +11,7 @@ const EMPTY_OBJECT = {}
 
 interface Props {
   page: string,
-  query?: Record<string, string>,
+  query?: Record<string, string>
 }
 
 export default class NestedExtensionPoints extends PureComponent<Props> {
@@ -35,12 +36,14 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
     // <a><b><c></c></b></a>
     const getNestedExtensionPoints = (runtime: RenderContext) => {
       return reverse.reduce((acc: JSX.Element | null, value: string, index: number) => (
-        <ExtensionPoint
-          id={value}
-          query={query}
-          params={this.getPageParams(runtime, segments.slice(0, segments.length - index).join('/'))}>
-          {acc}
-        </ExtensionPoint>
+        <MaybeAuth pages={runtime.pages} page={page} navigate={runtime.navigate} segment={value}>
+          <ExtensionPoint
+            id={value}
+            query={query}
+            params={this.getPageParams(runtime, segments.slice(0, segments.length - index).join('/'))}>
+            {acc}
+          </ExtensionPoint>
+        </MaybeAuth>
       ), null as JSX.Element | null)
     }
 

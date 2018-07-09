@@ -4,6 +4,7 @@ import React, {ReactElement} from 'react'
 import {hydrate, render as renderDOM} from 'react-dom'
 import {Helmet} from 'react-helmet'
 import NoSSR from 'react-no-ssr'
+import Loading from '../components/Loading'
 
 import Link from '../components/Link'
 import {RenderContext} from '../components/RenderContext'
@@ -134,5 +135,6 @@ export {
   render,
   start,
   withHMR,
+  Loading
 }
 

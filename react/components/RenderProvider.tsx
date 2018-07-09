@@ -347,8 +347,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ...messages,
       ...customMessages
     }
-
-    const component = children
+    
+    const component = children 
       ? React.cloneElement(children as ReactElement<any>, {query})
       : (
         <div className="render-provider">
