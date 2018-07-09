@@ -9,6 +9,8 @@ import {IntlProvider} from 'react-intl'
 import {History, Location, LocationListener, UnregisterCallback} from 'history'
 import {fetchAssets, getImplementation} from '../utils/assets'
 import {getClient} from '../utils/client'
+import {initSSE} from '../utils/events'
+import {getBaseURI} from '../utils/host'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
 import {navigate as pageNavigate, NavigateOptions, pageNameFromPath} from '../utils/pages'
@@ -119,6 +121,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     if (!production) {
       emitter.addListener('localesUpdated', this.onLocalesUpdated)
       emitter.addListener('extensionsUpdated', this.updateRuntime)
+      document.addEventListener('visibilitychange', this.onVisibilityChanged)
     }
   }
 
@@ -286,6 +289,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         console.log('Failed to fetch new locale file.')
         console.error(e)
       })
+    }
+  }
+
+  public onVisibilityChanged = () => {
+    // Ensure SSE server connection
+    if (!document.hidden) {
+      const {runtime} = this.props
+      const {account, workspace} = runtime
+      const baseURI = getBaseURI(runtime)
+      initSSE(account, workspace, baseURI)
     }
   }
 

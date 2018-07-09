@@ -18,7 +18,7 @@ interface EmittersRegistry {
 
 const emittersByWorkspace: EmittersRegistry = {}
 
-const initSSE = (account: string, workspace: string, baseURI: string) => {
+export const initSSE = (account: string, workspace: string, baseURI: string) => {
   if (Object.keys(window.__RENDER_7_HOT__).length > 0) {
     require('eventsource-polyfill')
     const myvtexSSE = require('myvtex-sse')
