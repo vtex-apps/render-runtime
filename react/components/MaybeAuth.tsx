@@ -63,7 +63,12 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   public render() {
     if (this.isAuthenticatedPage()) {
       const { logged, loading } = this.state
-      return <div className="flex justify-center ma4"><Loading /></div> 
+      if (loading) {
+        return <div className="flex justify-center ma4"><Loading /></div>
+      } else if (logged) {
+        return this.props.children
+      }
+      return null
     }
     return this.props.children
   }
