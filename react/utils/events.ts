@@ -12,8 +12,12 @@ interface IOEvent {
   }
 }
 
+interface EventEmitterSource extends Array<EventEmitter> {
+  eventSource?: EventSource
+}
+
 interface EmittersRegistry {
-  [key: string]: EventEmitter[]
+  [key: string]: EventEmitterSource
 }
 
 const CONNECTION_CLOSED = 2
@@ -84,17 +88,22 @@ export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
     return
   }
 
-  const {account, workspace} = runtime
-  const hasNoEventSource = (!runtime.eventSource ||
-                            runtime.eventSource.readyState === CONNECTION_CLOSED)
+  const {account, production, workspace} = runtime
 
   // Share SSE connections for same account and workspace
   if (!emittersByWorkspace[`${account}/${workspace}`]) {
     emittersByWorkspace[`${account}/${workspace}`] = []
-  }
+    emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(account, workspace, baseURI)
 
-  if (hasNoEventSource) {
-    runtime.eventSource = initSSE(account, workspace, baseURI) as EventSource
+    if (!production) {
+      document.addEventListener('visibilitychange', () => {
+        const hasNoConnection = emittersByWorkspace[`${account}/${workspace}`].eventSource!.readyState === CONNECTION_CLOSED
+        // Ensure SSE server connection
+        if (!document.hidden && hasNoConnection) {
+          emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(account, workspace, baseURI)
+        }
+      })
+    }
   }
 
   if (!runtime.emitter) {

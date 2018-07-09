@@ -163,7 +163,6 @@ interface RenderComponent<P={}, S={}> {
     appsEtag: string
     customRouting?: boolean
     emitter: EventEmitter
-    eventSource: EventSource
     workspace: string
     disableSSR: boolean
     hints: any
