@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {ErrorInfo, PureComponent, ReactElement} from 'react'
+import React, { createRef, ErrorInfo, PureComponent, ReactElement, RefObject} from 'react'
 
 import {getImplementation} from '../utils/assets'
 import logEvent from '../utils/logger'
@@ -33,6 +33,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
   private _isMounted!: boolean
   private emptyExtensionPoint: Extension
   private editableExtensionPoint: Extension
+  private componentRef: RefObject<any>
 
   constructor(props: Props & RenderContextProps) {
     super(props)
@@ -41,6 +42,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
     this.emptyExtensionPoint = props.runtime.extensions[`${root}/__empty`]
     this.editableExtensionPoint = props.runtime.extensions[`${root}/__editable`]
     this.state = {}
+    this.componentRef = createRef()
   }
 
   public updateComponentsWithEvent = (component: string) => {
@@ -107,6 +109,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
 
   public componentWillUnmount() {
     this._isMounted = false
+    this.componentRef.componentWillUnmount()
   }
 
   public render() {
@@ -142,7 +145,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
     }
 
     const isEditable = Component && (Component.hasOwnProperty('schema') || Component.hasOwnProperty('getSchema'))
-    const configuredComponent = Component ? <Component {...props}>{children}</Component> : children || null
+    const configuredComponent = Component ? <Component ref={this.componentRef} {...props}>{children}</Component> : children || null
     return this.editableExtensionPoint && isEditable
       ? <EditableExtensionPoint treePath={treePath} component={component}>{configuredComponent}</EditableExtensionPoint>
       : configuredComponent
