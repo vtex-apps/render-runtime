@@ -359,8 +359,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const root = page.split('/')[0]
     const editorProvider = extensions[`${root}/__provider`]
     const context = this.getChildContext()
-    const EditorProvider = getImplementation<any>(editorProvider.component)
-    const maybeEditable = !production && editorProvider
+    const EditorProvider = editorProvider && getImplementation<any>(editorProvider.component)
+    const maybeEditable = !production && EditorProvider
       ? <EditorProvider runtime={context} extensions={extensions} pages={pages} page={page}>{component}</EditorProvider>
       : component
 
