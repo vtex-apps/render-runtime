@@ -66,6 +66,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     updateExtension: PropTypes.func,
     updateRuntime: PropTypes.func,
     workspace: PropTypes.string,
+    updateComponentAssets: PropTypes.func,
   }
 
   public static propTypes = {
@@ -168,6 +169,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
       workspace,
+      updateComponentAssets: this.updateComponentAssets,
     }
   }
 
@@ -218,6 +220,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {extensions} = this.state
     const component = extensions[pageName].component
     return this.fetchComponent(component)
+  }
+
+  public updateComponentAssets = (availableComponents: Components) => {
+    this.setState({ components: {
+        ...this.state.components,
+        ...availableComponents,
+      }
+    })
   }
 
   public fetchComponent = (component: string) => {
