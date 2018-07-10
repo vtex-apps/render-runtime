@@ -2,7 +2,7 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
 import PropTypes from 'prop-types'
 import React, {Component, ComponentType} from 'react'
 
-import {withContext} from '../components/RenderContext'
+import {withEmitter} from '../components/RenderContext'
 import {withTreePath} from './treePath'
 
 const isComponentType = (Arg: any): Arg is ComponentType => {
@@ -45,8 +45,8 @@ export default (module: Module, InitialImplementer: any) => {
     private static Implementer = InitialImplementer as ComponentType
 
     public updateComponent = () => {
-      const {runtime: {emitter}, treePath, __clearError, __errorInstance} = this.props
-      emitter.emit('build.status', 'hmr:success')
+      const {__emitter, treePath, __clearError, __errorInstance} = this.props
+      __emitter.emit('build.status', 'hmr:success')
 
       if (__clearError && __errorInstance) {
         __clearError()
@@ -66,9 +66,10 @@ export default (module: Module, InitialImplementer: any) => {
     }
 
     public render() {
-      return this.props.__errorInstance || <HMRComponent.Implementer {...this.props} />
+      const {__emitter, __clearError, __errorInstance, ...props} = this.props
+      return this.props.__errorInstance || <HMRComponent.Implementer {...props} />
     }
   }
 
-  return hoistNonReactStatics(withContext(withTreePath(HMRComponent)), InitialImplementer)
+  return hoistNonReactStatics(withEmitter(withTreePath(HMRComponent)), InitialImplementer)
 }

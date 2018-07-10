@@ -1,7 +1,7 @@
 import {canUseDOM} from 'exenv'
 import PropTypes from 'prop-types'
 import {parse} from 'qs'
-import React, {Component, ReactElement} from 'react'
+import React, {Component, Fragment, ReactElement} from 'react'
 import {ApolloProvider} from 'react-apollo'
 import {Helmet} from 'react-helmet'
 import {IntlProvider} from 'react-intl'
@@ -21,9 +21,8 @@ import PageCacheControl from '../utils/cacheControl'
 import {traverseComponent} from '../utils/components'
 import {TreePathContext} from '../utils/treePath'
 import BuildStatus from './BuildStatus'
-import ExtensionPointComponent from './ExtensionPointComponent'
 import NestedExtensionPoints from './NestedExtensionPoints'
-import {RenderContext} from './RenderContext'
+import {RenderContext, RenderContextProps} from './RenderContext'
 
 interface Props {
   children: ReactElement<any> | null
@@ -340,20 +339,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public render() {
-    const {children, runtime} = this.props
+    const {children} = this.props
     const {culture: {locale}, messages, pages, page, query, production, extensions} = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
       ...messages,
       ...customMessages
     }
-    
-    const component = children 
+
+    const component = children
       ? React.cloneElement(children as ReactElement<any>, {query})
       : (
         <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
-          {!production && <BuildStatus />}
           <NestedExtensionPoints page={page} query={query} />
         </div>
       )
@@ -361,8 +359,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const root = page.split('/')[0]
     const editorProvider = extensions[`${root}/__provider`]
     const context = this.getChildContext()
+    const EditorProvider = getImplementation<any>(editorProvider.component)
     const maybeEditable = !production && editorProvider
-      ? <ExtensionPointComponent component={editorProvider.component} props={{extensions, pages, page}} runtime={context} treePath="">{component}</ExtensionPointComponent>
+      ? <EditorProvider runtime={context} extensions={extensions} pages={pages} page={page}>{component}</EditorProvider>
       : component
 
     return (
@@ -370,7 +369,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         <TreePathContext.Provider value={{treePath: ''}}>
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider locale={locale} messages={mergedMessages}>
-              {maybeEditable}
+              <Fragment>
+                {!production && <BuildStatus />}
+                {maybeEditable}
+              </Fragment>
             </IntlProvider>
           </ApolloProvider>
         </TreePathContext.Provider>
