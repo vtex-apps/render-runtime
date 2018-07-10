@@ -12,7 +12,7 @@ import {getClient} from '../utils/client'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
 import {navigate as pageNavigate, NavigateOptions, pageNameFromPath} from '../utils/pages'
-import {fetchRuntime} from '../utils/runtime'
+import {fetchRoutes} from '../utils/routes'
 
 import {NormalizedCacheObject} from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
@@ -23,8 +23,6 @@ import {TreePathContext} from '../utils/treePath'
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
 import {RenderContext, RenderContextProps} from './RenderContext'
-
-import pageQuery from '../queries/page.gql'
 
 interface Props {
   children: ReactElement<any> | null
@@ -196,7 +194,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onPageChanged = (location: Location) => {
     const {runtime: {renderMajor, renderVersion}} = this.props
-    const {culture: {locale}, pages, production} = this.state
+    const {culture: {locale}, pages: pagesState, production} = this.state
     const {pathname, state} = location
 
     // Make sure this is our navigation
@@ -204,7 +202,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return
     }
 
-    const page = pageNameFromPath(pathname, pages)
+    const page = pageNameFromPath(pathname, pagesState)
 
     if (!page) {
       window.location.href = `${location.pathname}${location.search}`
@@ -214,47 +212,37 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const query = parse(location.search.substr(1))
 
     // Retrieve the adequate assets for the new page. Naming will
-    // probably change (query will return something like routesJSON)
-    // as well as the fields that need to be retrieved, but the logic
+    // probably change (query will return something like routes) as
+    // well as the fields that need to be retrieved, but the logic
     // that the new state (extensions and assets) will be derived from
     // the results of this query will probably remain the same.
-    this.apolloClient.query({
-      query: pageQuery,
-      variables: {
-        locale,
-        page,
-        params: {},
-        path: pathname,
-        production,
-        query,
-        renderMajor,
-        renderVersion,
-      }
-    }).then(result => {
-      const {
-        data: {
-          page: {
-            appsEtag,
-            appsSettingsJSON,
-            componentsJSON,
-            extensionsJSON,
-            messagesJSON,
-          }
-        }
-      } = result
-      const appsSettings = JSON.parse(appsSettingsJSON)
-      const components = JSON.parse(componentsJSON)
-      const extensions = JSON.parse(extensionsJSON)
-      const messages = JSON.parse(messagesJSON)
-
+    return fetchRoutes({
+      apolloClient: this.apolloClient,
+      locale,
+      page,
+      path: pathname,
+      production,
+      renderMajor,
+      renderVersion,
+    }).then(({
+      appsEtag,
+      cacheHints,
+      components,
+      extensions,
+      messages,
+      pages,
+      settings
+    }: ParsedPageQueryResponse) => {
       this.setState({
         appsEtag,
-        appsSettings,
+        cacheHints,
         components,
         extensions,
         messages,
         page,
+        pages,
         query,
+        settings,
       })
     })
   }
@@ -343,21 +331,36 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public updateRuntime = () => {
-    const {runtime: {renderMajor}} = this.props
+    const {runtime: {renderMajor, renderVersion}} = this.props
     const {page, production, culture: {locale}} = this.state
 
-    return fetchRuntime(this.apolloClient, page, production, locale, renderMajor)
-      .then(({appsEtag, cacheHints, components, extensions, messages, pages, settings}) => {
-        this.setState({
-          appsEtag,
-          cacheHints,
-          components,
-          extensions,
-          messages,
-          pages,
-          settings,
-        })
+    return fetchRoutes({
+      apolloClient: this.apolloClient,
+      locale,
+      page,
+      production,
+      renderMajor,
+      renderVersion,
+    }).then(({
+      appsEtag,
+      cacheHints,
+      components,
+      extensions,
+      messages,
+      pages,
+      settings
+    }: ParsedPageQueryResponse) => {
+      this.setState({
+        appsEtag,
+        cacheHints,
+        components,
+        extensions,
+        messages,
+        page,
+        pages,
+        settings,
       })
+    })
   }
 
   public createRuntimeContextLink() {
