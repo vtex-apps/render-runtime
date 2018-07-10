@@ -108,6 +108,16 @@ declare global {
     workspace: RenderRuntime['workspace'],
   }
 
+  interface FetchRoutesInput {
+    apolloClient: ApolloClient<NormalizedCacheObject>,
+    locale: string,
+    page: string,
+    path?: string,
+    production: boolean,
+    renderMajor: number,
+    renderVersion: string,
+  }
+
 interface RenderComponent<P={}, S={}> {
   new(): Component<P,S>
   getCustomMessages?: (locale: string) => any
@@ -119,6 +129,15 @@ interface RenderComponent<P={}, S={}> {
 
   interface HotEmitterRegistry {
     [appId: string]: EventEmitter
+  }
+
+  interface PageQueryResult {
+    data: PageQueryResultData,
+    errors: any,
+  }
+
+  interface PageQueryResultData {
+    page: PageQueryResponse,
   }
 
   interface PageQueryResponse {
@@ -176,6 +195,7 @@ interface RenderComponent<P={}, S={}> {
     messages: Record<string, string>
     components: Components
     renderMajor: number
+    renderVersion: string
     query?: Record<string, string>
     start: boolean
     settings: {

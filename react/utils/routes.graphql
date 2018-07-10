@@ -1,4 +1,4 @@
-query Pages(
+query Routes (
   $locale: String,
   $page: String,
   $params:String,
@@ -20,8 +20,10 @@ query Pages(
   ) {
     appsEtag
     appsSettingsJSON
+    cacheHintsJSON
     componentsJSON
     extensionsJSON
     messagesJSON
+    pagesJSON
   }
 }
