@@ -346,8 +346,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ...messages,
       ...customMessages
     }
-    
-    const component = children 
+
+    const component = children
       ? React.cloneElement(children as ReactElement<any>, {query})
       : (
         <div className="render-provider">
@@ -359,9 +359,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const root = page.split('/')[0]
     const editorProvider = extensions[`${root}/__provider`]
     const context = this.getChildContext()
-    const EditorProvider = getImplementation<RenderContextProps>(editorProvider.component)
+    const EditorProvider = getImplementation<any>(editorProvider.component)
     const maybeEditable = !production && editorProvider
-      ? <EditorProvider runtime={context}>{component}</EditorProvider>
+      ? <EditorProvider runtime={context} extensions={extensions} pages={pages} page={page}>{component}</EditorProvider>
       : component
 
     return (
