@@ -44,7 +44,16 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   }
 
   public isAuthenticatedPage() {
-    return this.props.pages[this.props.page].login && this.getBreakPoint() === this.props.segment
+    const pathValues = this.props.page.split('/')
+    for (let i = 0; i < pathValues.length; i++) {
+      const path = pathValues.slice(0, i + 1)
+      const pagesPath = this.props.pages[path.join('/')]
+      if (pagesPath && pagesPath.login &&
+        this.getBreakPoint(path.join('/')) === this.props.segment) {
+          return true
+      }
+    }
+    return false
   }
 
   public redirectToLogin() {
@@ -54,9 +63,8 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     })
   }
 
-  public getBreakPoint() {
-    const { pages, page } = this.props
-    const [point] = page.split('/').slice(-1)
+  public getBreakPoint(page: string) {
+    const [point] = this.props.page.split('/').slice(-1)
     return point
   }
 
