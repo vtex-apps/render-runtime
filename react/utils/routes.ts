@@ -1,4 +1,4 @@
-import routesQuery from './routes.graphql'
+import pageQuery from './Page.graphql'
 
 const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryResponse => {
   const {
@@ -33,21 +33,28 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
 
 export const fetchRoutes = ({
   apolloClient,
+  conditions,
+  device,
   locale,
   page,
   path,
   production,
   renderMajor,
-  renderVersion,
+  scope,
+  template,
 }: FetchRoutesInput) => apolloClient.query<{page: PageQueryResponse}>({
-  query: routesQuery,
+  fetchPolicy: 'network-only',
+  query: pageQuery,
   variables: {
-      locale,
-      page,
-      path,
-      production,
-      renderMajor,
-      renderVersion,
-    }
+    conditions,
+    device,
+    locale,
+    page,
+    path,
+    production,
+    renderMajor,
+    scope,
+    template,
+  }
 }).then<ParsedPageQueryResponse>(({data: {page: pageData}, errors}: PageQueryResult) =>
       errors ? Promise.reject(errors) : parsePageQueryResponse(pageData))

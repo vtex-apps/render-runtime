@@ -1,6 +1,7 @@
 import {ApolloLink, NextLink, Operation} from 'apollo-link'
 import {canUseDOM} from 'exenv'
 import {ASTNode, DirectiveDefinitionNode, OperationDefinitionNode, visit} from 'graphql'
+import {generateHash} from '../generateHash'
 
 const assetsFromQuery = (query: ASTNode) => {
   const assets = {operationType: 'mutation', queryScope: undefined}
@@ -24,8 +25,6 @@ interface OperationContext {
   fetchOptions: any,
   runtime: RenderRuntime,
 }
-
-const hashFromExtensions = ext => ext && ext.persistedQuery && ext.persistedQuery.sha256Hash
 
 const equals = (a: string, b: string) => a && b && a.toLowerCase() === b.toLowerCase()
 
@@ -51,7 +50,7 @@ const extractHints = (query: ASTNode, meta) => {
 export const createUriSwitchLink = (baseURI: string, workspace: string) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     operation.setContext(({ fetchOptions = {}, runtime: {appsEtag, cacheHints} } : OperationContext) => {
-      const hash = hashFromExtensions(operation.extensions)
+      const hash = generateHash(operation.query)
       const protocol = canUseDOM ? 'https:' : 'http:'
       const {maxAge, scope, version, method} = extractHints(operation.query, cacheHints[hash])
       return {

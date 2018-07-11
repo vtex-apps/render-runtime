@@ -1,3 +1,4 @@
+import {ApolloClient} from 'apollo-client'
 import {NormalizedCacheObject} from "apollo-cache-inmemory"
 import * as EventEmitter from 'eventemitter3'
 import {ReactElement, Component} from "react"
@@ -88,10 +89,13 @@ declare global {
     error: any
   }
 
+  type ConfigurationDevice = 'any' | 'desktop' | 'mobile'
+
   interface RenderContext {
     account: RenderRuntime['account'],
     components: RenderRuntime['components'],
     culture: RenderRuntime['culture'],
+    device: ConfigurationDevice,
     emitter: RenderRuntime['emitter'],
     extensions: RenderRuntime['extensions'],
     fetchComponent: (component: string) => Promise<void>,
@@ -103,19 +107,27 @@ declare global {
     pages: RenderRuntime['pages'],
     prefetchPage: (name: string) => Promise<void>,
     production: RenderRuntime['production'],
+    setDevice: (device: ConfigurationDevice) => void,
+    updateComponentAssets: (availableComponents: Components) => void,
     updateExtension: (name: string, extension: Extension) => void,
-    updateRuntime: () => Promise<void>,
+    updateRuntime: (options?: PageContextOptions) => Promise<void>,
     workspace: RenderRuntime['workspace'],
   }
 
-  interface FetchRoutesInput {
+  interface PageContextOptions {
+    scope?: string
+    device?: string
+    conditions?: string[]
+    template?: string
+  }
+
+  interface FetchRoutesInput extends PageContextOptions {
     apolloClient: ApolloClient<NormalizedCacheObject>,
     locale: string,
     page: string,
     path?: string,
     production: boolean,
     renderMajor: number,
-    renderVersion: string,
   }
 
 interface RenderComponent<P={}, S={}> {
@@ -133,7 +145,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface PageQueryResult {
     data: PageQueryResultData,
-    errors: any,
+    errors?: any,
   }
 
   interface PageQueryResultData {
@@ -195,7 +207,6 @@ interface RenderComponent<P={}, S={}> {
     messages: Record<string, string>
     components: Components
     renderMajor: number
-    renderVersion: string
     query?: Record<string, string>
     start: boolean
     settings: {

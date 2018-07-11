@@ -1,4 +1,6 @@
-query Routes (
+query Page (
+  $conditions: [String],
+  $device: String,
   $locale: String,
   $page: String,
   $params:String,
@@ -6,9 +8,12 @@ query Routes (
   $production: Boolean,
   $query: String,
   $renderMajor: Int,
-  $renderVersion: String,
+  $scope: String,
+  $template: String,
 ) {
   page(
+    conditions: $conditions,
+    device: $device,
     locale: $locale,
     page: $page,
     params: $params,
@@ -16,7 +21,8 @@ query Routes (
     production: $production,
     query: $query,
     renderMajor: $renderMajor,
-    renderVersion: $renderVersion,
+    scope: $scope,
+    template: $template,
   ) {
     appsEtag
     appsSettingsJSON
