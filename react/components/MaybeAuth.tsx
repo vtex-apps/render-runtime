@@ -48,9 +48,8 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     for (let i = 0; i < pathValues.length; i++) {
       const path = pathValues.slice(0, i + 1)
       const pagesPath = this.props.pages[path.join('/')]
-      if (pagesPath && pagesPath.login &&
-        this.getBreakPoint(path.join('/')) === this.props.segment) {
-          return true
+      if (pagesPath && pagesPath.login && path.pop() === this.props.segment) {
+        return true
       }
     }
     return false
@@ -61,11 +60,6 @@ export default class MaybeAuth extends PureComponent<Props, State> {
       fallbackToWindowLocation: false,
       to: LOGIN_PATH,
     })
-  }
-
-  public getBreakPoint(page: string) {
-    const [point] = page.split('/').slice(-1)
-    return point
   }
 
   public render() {
