@@ -64,7 +64,7 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   }
 
   public getBreakPoint(page: string) {
-    const [point] = this.props.page.split('/').slice(-1)
+    const [point] = page.split('/').slice(-1)
     return point
   }
 
