@@ -38,6 +38,7 @@ export interface RenderProviderState {
   cacheHints: RenderRuntime['cacheHints']
   components: RenderRuntime['components']
   culture: RenderRuntime['culture']
+  device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
   messages: RenderRuntime['messages']
   page: RenderRuntime['page']
@@ -52,6 +53,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     account: PropTypes.string,
     components: PropTypes.object,
     culture: PropTypes.object,
+    device: PropTypes.string,
     emitter: PropTypes.object,
     extensions: PropTypes.object,
     fetchComponent: PropTypes.func,
@@ -63,10 +65,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     pages: PropTypes.object,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
+    setDevice: PropTypes.func,
+    updateComponentAssets: PropTypes.func,
     updateExtension: PropTypes.func,
     updateRuntime: PropTypes.func,
     workspace: PropTypes.string,
-    updateComponentAssets: PropTypes.func,
   }
 
   public static propTypes = {
@@ -99,6 +102,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       cacheHints,
       components,
       culture,
+      device: 'any',
       extensions,
       messages,
       page,
@@ -148,13 +152,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public getChildContext() {
     const {history, runtime} = this.props
-    const {components, extensions, page, pages, settings, culture} = this.state
+    const {components, extensions, page, pages, settings, culture, device} = this.state
     const {account, emitter, production, workspace} = runtime
 
     return {
       account,
       components,
       culture,
+      device,
       emitter,
       extensions,
       fetchComponent: this.fetchComponent,
@@ -166,10 +171,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       prefetchPage: this.prefetchPage,
       production,
+      setDevice: this.handleSetDevice,
+      updateComponentAssets: this.updateComponentAssets,
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
       workspace,
-      updateComponentAssets: this.updateComponentAssets,
     }
   }
 
@@ -193,8 +199,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onPageChanged = (location: Location) => {
-    const {runtime: {renderMajor, renderVersion}} = this.props
-    const {culture: {locale}, pages: pagesState, production} = this.state
+    const {runtime: {renderMajor}} = this.props
+    const {culture: {locale}, pages: pagesState, production, device} = this.state
     const {pathname, state} = location
 
     // Make sure this is our navigation
@@ -218,12 +224,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // the results of this query will probably remain the same.
     return fetchRoutes({
       apolloClient: this.apolloClient,
+      device,
       locale,
       page,
       path: pathname,
       production,
       renderMajor,
-      renderVersion,
     }).then(({
       appsEtag,
       cacheHints,
@@ -330,17 +336,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public updateRuntime = () => {
-    const {runtime: {renderMajor, renderVersion}} = this.props
+  public updateRuntime = (options?: PageContextOptions) => {
+    const {runtime: {renderMajor}} = this.props
     const {page, production, culture: {locale}} = this.state
+    const {pathname} = window.location
 
     return fetchRoutes({
       apolloClient: this.apolloClient,
       locale,
       page,
+      path: pathname,
       production,
       renderMajor,
-      renderVersion,
+      ...options,
     }).then(({
       appsEtag,
       cacheHints,
@@ -392,6 +400,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         [name]: extension,
       },
     })
+  }
+
+  public handleSetDevice = (device: ConfigurationDevice) => {
+    this.setState({ device })
   }
 
   public render() {
