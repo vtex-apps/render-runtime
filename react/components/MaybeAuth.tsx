@@ -62,16 +62,27 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     })
   }
 
+  public getChildrenWithProps = () => {
+    const children = this.props.children
+    const containerProps = {...this.props}
+    delete containerProps.children
+    delete containerProps.navigate
+    delete containerProps.page
+    delete containerProps.pages
+    delete containerProps.segment
+    return React.Children.map(children, (child: any) => React.cloneElement(child, { ...containerProps }))
+  }
+
   public render() {
     if (this.isAuthenticatedPage()) {
       const { logged, loading } = this.state
       if (loading) {
         return <div className="flex justify-center ma4"><Loading /></div>
       } else if (logged) {
-        return this.props.children
+        return this.getChildrenWithProps()
       }
       return null
     }
-    return this.props.children
+    return this.getChildrenWithProps()
   }
 }
