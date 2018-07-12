@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import React, {PureComponent} from 'react'
-import Loading from './Loading'
 
 const LOGIN_PATH = '/login'
 const AUTH_STORE_URL = '/_v/private/authenticated/store'
@@ -9,8 +8,7 @@ interface Props {
   navigate: (navigateOptions: object) => {},
   page: string,
   pages: Record<string, Record<string, any>>,
-  segment: string,
-  children: JSX.Element
+  fallback: (logged?: boolean, loading?: boolean) => {}
 }
 
 interface State {
@@ -48,7 +46,7 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     for (let i = 0; i < pathValues.length; i++) {
       const path = pathValues.slice(0, i + 1)
       const pagesPath = this.props.pages[path.join('/')]
-      if (pagesPath && pagesPath.login && path.pop() === this.props.segment) {
+      if (pagesPath && pagesPath.login) {
         return true
       }
     }
@@ -62,27 +60,11 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     })
   }
 
-  public getChildrenWithProps = () => {
-    const children = this.props.children
-    const containerProps = {...this.props}
-    delete containerProps.children
-    delete containerProps.navigate
-    delete containerProps.page
-    delete containerProps.pages
-    delete containerProps.segment
-    return React.Children.map(children, (child: any) => React.cloneElement(child, { ...containerProps }))
-  }
-
   public render() {
     if (this.isAuthenticatedPage()) {
       const { logged, loading } = this.state
-      if (loading) {
-        return <div className="flex justify-center ma4"><Loading /></div>
-      } else if (logged) {
-        return this.getChildrenWithProps()
-      }
-      return null
+      return this.props.fallback(logged, loading)
     }
-    return this.getChildrenWithProps()
+    return this.props.fallback()
   }
 }

@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Updated
 - `MaybeAuth` to work Top-Down.
 
+### Fixed
+- Children with missing props in the `MaybeAuth` component.
+
 ## [7.12.0] - 2018-07-09
 ### Added
 - Auth treatment and redirect to the login page.

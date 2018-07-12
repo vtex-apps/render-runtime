@@ -13,6 +13,7 @@ import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
 import {navigate as pageNavigate, NavigateOptions, pageNameFromPath} from '../utils/pages'
 import {fetchRuntime} from '../utils/runtime'
+import MaybeAuth from './MaybeAuth'
 
 import {NormalizedCacheObject} from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
@@ -346,23 +347,27 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ...messages,
       ...customMessages
     }
+    const context = this.getChildContext()
 
-    const component = children
+    const fallback = (logged?: boolean, loading?: boolean) => {
+      const root = page.split('/')[0]
+      const editorProvider = extensions[`${root}/__provider`]
+      
+      const component = children
       ? React.cloneElement(children as ReactElement<any>, {query})
       : (
         <div className="render-provider">
-          <Helmet title={pages[page] && pages[page].title} />
-          <NestedExtensionPoints page={page} query={query} />
-        </div>
-      )
-
-    const root = page.split('/')[0]
-    const editorProvider = extensions[`${root}/__provider`]
-    const context = this.getChildContext()
-    const EditorProvider = editorProvider && getImplementation<any>(editorProvider.component)
-    const maybeEditable = !production && EditorProvider
+            <Helmet title={pages[page] && pages[page].title} />
+            <NestedExtensionPoints page={page} query={query} breakPoint={{
+              loading, logged, point: 'account',
+            }}/>
+          </div>
+        )
+      const EditorProvider = editorProvider && getImplementation<any>(editorProvider.component)
+      return !production && EditorProvider
       ? <EditorProvider runtime={context} extensions={extensions} pages={pages} page={page}>{component}</EditorProvider>
       : component
+    }
 
     return (
       <RenderContext.Provider value={context}>
@@ -371,7 +376,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             <IntlProvider locale={locale} messages={mergedMessages}>
               <Fragment>
                 {!production && <BuildStatus />}
-                {maybeEditable}
+                <MaybeAuth pages={pages} page={page} navigate={this.navigate} fallback={fallback} />
               </Fragment>
             </IntlProvider>
           </ApolloProvider>
