@@ -1,35 +1,21 @@
 import {ApolloLink, NextLink, Operation} from 'apollo-link'
+import {canUseDOM} from 'exenv'
 
-// Function extracted from https://gist.github.com/aurbano/383e691368780e7f5c98
-function removeKeys(obj, keys){
-  let index
-  for (const prop in obj) {
-      // important check that this is objects own property
-      // not from prototype prop inherited
-      if(obj.hasOwnProperty(prop)){
-          switch(typeof(obj[prop])){
-              case 'string':
-                  index = keys.indexOf(prop)
-                  if(index > -1){
-                      delete obj[prop]
-                  }
-                  break
-              case 'object':
-                  index = keys.indexOf(prop)
-                  if(index > -1){
-                      delete obj[prop]
-                  }else{
-                      removeKeys(obj[prop], keys)
-                  }
-                  break
-          }
-      }
+const deepCopyFiles = (src: any, dst: any) => src && typeof src === 'object' && Object.keys(src).forEach((key) => {
+  if (src[key] instanceof File || src[key] instanceof Blob || src[key] instanceof FileList) {
+    dst[key] = src[key]
+  } else {
+    deepCopyFiles(src[key], dst[key])
   }
-}
+})
+
+const omitTypename = (key: string, value: any) => (key === '__typename') ? undefined : value
 
 export const omitTypenameLink = new ApolloLink((operation: Operation, forward?:  NextLink) => {
-    if (operation.variables) {
-      removeKeys(operation.variables, ['__typename'])
-    }
-    return forward ? forward(operation) : null
+  const {variables} = operation
+  if (variables && canUseDOM) {
+    operation.variables = JSON.parse(JSON.stringify(operation.variables), omitTypename)
+    deepCopyFiles(variables, operation.variables)
+  }
+  return forward ? forward(operation) : null
 })
