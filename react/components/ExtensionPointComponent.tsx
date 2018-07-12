@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
-import React, {ErrorInfo, PureComponent, ReactElement} from 'react'
+import React, { ErrorInfo, PureComponent, ReactElement } from 'react'
 
-import {getImplementation} from '../utils/assets'
+import { getImplementation } from '../utils/assets'
 import logEvent from '../utils/logger'
 import ExtensionPointError from './ExtensionPointError'
-import {RenderContextProps} from './RenderContext'
+import { RenderContextProps } from './RenderContext'
 
 interface Props {
   component: string | null
@@ -142,7 +142,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
     }
 
     const isEditable = Component && (Component.hasOwnProperty('schema') || Component.hasOwnProperty('getSchema'))
-    const configuredComponent = Component ? <Component {...props}>{children}</Component> : children || null
+    const configuredComponent = Component ? <Component {...props} runtime={this.props.runtime}>{children}</Component> : children || null
     return this.editableExtensionPoint && isEditable
       ? <EditableExtensionPoint treePath={treePath} component={component}>{configuredComponent}</EditableExtensionPoint>
       : configuredComponent
