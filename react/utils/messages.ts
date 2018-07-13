@@ -13,8 +13,7 @@ export const fetchMessagesForApp = (apolloClient: ApolloClient<NormalizedCacheOb
     )
 
 export const fetchMessages = (apolloClient: ApolloClient<NormalizedCacheObject>, page: string, production: boolean, locale: string, renderMajor: number) => {
-  const renderVersion = `${renderMajor}.x`
-  return apolloClient.query<{page: PageQueryResponse}>({query: pageMessagesQuery, variables: {page, production, locale, renderVersion}})
+  return apolloClient.query<{page: PageQueryResponse}>({query: pageMessagesQuery, variables: {page, production, locale, renderMajor}})
     .then<RenderRuntime['messages']>(({data, errors}) =>
       errors ? Promise.reject(errors) : JSON.parse(data.page.messagesJSON)
     )

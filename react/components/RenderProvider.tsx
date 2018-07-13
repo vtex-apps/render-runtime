@@ -1,4 +1,8 @@
+import {NormalizedCacheObject} from 'apollo-cache-inmemory'
+import ApolloClient from 'apollo-client'
+import {ApolloLink, NextLink, Operation} from 'apollo-link'
 import {canUseDOM} from 'exenv'
+import {History, Location, UnregisterCallback} from 'history'
 import PropTypes from 'prop-types'
 import {parse} from 'qs'
 import React, {Component, Fragment, ReactElement} from 'react'
@@ -6,23 +10,20 @@ import {ApolloProvider} from 'react-apollo'
 import {Helmet} from 'react-helmet'
 import {IntlProvider} from 'react-intl'
 
-import {History, Location, LocationListener, UnregisterCallback} from 'history'
 import {fetchAssets, getImplementation} from '../utils/assets'
+import PageCacheControl from '../utils/cacheControl'
 import {getClient} from '../utils/client'
+import {traverseComponent} from '../utils/components'
+import {RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass} from '../utils/dom'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
-import {navigate as pageNavigate, NavigateOptions, pageNameFromPath} from '../utils/pages'
-import {fetchRuntime} from '../utils/runtime'
-
-import {NormalizedCacheObject} from 'apollo-cache-inmemory'
-import ApolloClient from 'apollo-client'
-import {ApolloLink, NextLink, Operation} from 'apollo-link'
-import PageCacheControl from '../utils/cacheControl'
-import {traverseComponent} from '../utils/components'
+import {navigate as pageNavigate, NavigateOptions, routeIdFromPath} from '../utils/pages'
+import {fetchRoutes} from '../utils/routes'
 import {TreePathContext} from '../utils/treePath'
+
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
-import {RenderContext, RenderContextProps} from './RenderContext'
+import {RenderContext} from './RenderContext'
 
 interface Props {
   children: ReactElement<any> | null
@@ -38,6 +39,7 @@ export interface RenderProviderState {
   cacheHints: RenderRuntime['cacheHints']
   components: RenderRuntime['components']
   culture: RenderRuntime['culture']
+  device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
   messages: RenderRuntime['messages']
   page: RenderRuntime['page']
@@ -52,6 +54,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     account: PropTypes.string,
     components: PropTypes.object,
     culture: PropTypes.object,
+    device: PropTypes.string,
     emitter: PropTypes.object,
     extensions: PropTypes.object,
     fetchComponent: PropTypes.func,
@@ -63,10 +66,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     pages: PropTypes.object,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
+    setDevice: PropTypes.func,
+    updateComponentAssets: PropTypes.func,
     updateExtension: PropTypes.func,
     updateRuntime: PropTypes.func,
     workspace: PropTypes.string,
-    updateComponentAssets: PropTypes.func,
   }
 
   public static propTypes = {
@@ -99,6 +103,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       cacheHints,
       components,
       culture,
+      device: 'any',
       extensions,
       messages,
       page,
@@ -148,13 +153,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public getChildContext() {
     const {history, runtime} = this.props
-    const {components, extensions, page, pages, settings, culture} = this.state
+    const {components, extensions, page, pages, settings, culture, device} = this.state
     const {account, emitter, production, workspace} = runtime
 
     return {
       account,
       components,
       culture,
+      device,
       emitter,
       extensions,
       fetchComponent: this.fetchComponent,
@@ -166,10 +172,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       prefetchPage: this.prefetchPage,
       production,
+      setDevice: this.handleSetDevice,
+      updateComponentAssets: this.updateComponentAssets,
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
       workspace,
-      updateComponentAssets: this.updateComponentAssets,
     }
   }
 
@@ -192,8 +199,24 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return pageNavigate(history, pages, options)
   }
 
+  public replaceRouteClass = (route: string) => {
+    try {
+      const containers = document.getElementsByClassName(RENDER_CONTAINER_CLASS)
+      const currentRouteClass = containers[0].className.split(' ').find(c => c.startsWith(ROUTE_CLASS_PREFIX))
+      const newRouteClass = routeClass(route)
+
+      Array.prototype.forEach.call(
+        containers,
+        (e: any) => e.classList.replace(currentRouteClass, newRouteClass),
+      )
+    } catch (e) {
+      console.error('Failed to set route class', routeClass(route))
+    }
+  }
+
   public onPageChanged = (location: Location) => {
-    const {pages} = this.state
+    const {runtime: {renderMajor}} = this.props
+    const {culture: {locale}, pages: pagesState, production, device} = this.state
     const {pathname, state} = location
 
     // Make sure this is our navigation
@@ -201,18 +224,57 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return
     }
 
-    const page = pageNameFromPath(pathname, pages)
+    const page = routeIdFromPath(pathname, pagesState)
 
     if (!page) {
       window.location.href = `${location.pathname}${location.search}`
       return
     }
 
+    const isConditional = pagesState[page] && pagesState[page].conditional
+
     const query = parse(location.search.substr(1))
 
-    this.setState({
+    if (!isConditional) {
+      return this.setState({
+        page,
+        query,
+      }, () => this.replaceRouteClass(page))
+    }
+
+    // Retrieve the adequate assets for the new page. Naming will
+    // probably change (query will return something like routes) as
+    // well as the fields that need to be retrieved, but the logic
+    // that the new state (extensions and assets) will be derived from
+    // the results of this query will probably remain the same.
+    return fetchRoutes({
+      apolloClient: this.apolloClient,
+      device,
+      locale,
       page,
-      query,
+      path: pathname,
+      production,
+      renderMajor,
+    }).then(({
+      appsEtag,
+      cacheHints,
+      components,
+      extensions,
+      messages,
+      pages,
+      settings
+    }: ParsedPageQueryResponse) => {
+      this.setState({
+        appsEtag,
+        cacheHints,
+        components,
+        extensions,
+        messages,
+        page,
+        pages,
+        query,
+        settings,
+      }, () => this.replaceRouteClass(page))
     })
   }
 
@@ -299,22 +361,39 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public updateRuntime = () => {
+  public updateRuntime = (options?: PageContextOptions) => {
     const {runtime: {renderMajor}} = this.props
     const {page, production, culture: {locale}} = this.state
+    const {pathname} = window.location
 
-    return fetchRuntime(this.apolloClient, page, production, locale, renderMajor)
-      .then(({appsEtag, cacheHints, components, extensions, messages, pages, settings}) => {
-        this.setState({
-          appsEtag,
-          cacheHints,
-          components,
-          extensions,
-          messages,
-          pages,
-          settings,
-        })
+    return fetchRoutes({
+      apolloClient: this.apolloClient,
+      locale,
+      page,
+      path: pathname,
+      production,
+      renderMajor,
+      ...options,
+    }).then(({
+      appsEtag,
+      cacheHints,
+      components,
+      extensions,
+      messages,
+      pages,
+      settings
+    }: ParsedPageQueryResponse) => {
+      this.setState({
+        appsEtag,
+        cacheHints,
+        components,
+        extensions,
+        messages,
+        page,
+        pages,
+        settings,
       })
+    })
   }
 
   public createRuntimeContextLink() {
@@ -346,6 +425,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         [name]: extension,
       },
     })
+  }
+
+  public handleSetDevice = (device: ConfigurationDevice) => {
+    this.setState({ device })
   }
 
   public render() {
