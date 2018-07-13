@@ -1,4 +1,8 @@
+import {NormalizedCacheObject} from 'apollo-cache-inmemory'
+import ApolloClient from 'apollo-client'
+import {ApolloLink, NextLink, Operation} from 'apollo-link'
 import {canUseDOM} from 'exenv'
+import {History, Location, UnregisterCallback} from 'history'
 import PropTypes from 'prop-types'
 import {parse} from 'qs'
 import React, {Component, Fragment, ReactElement} from 'react'
@@ -6,23 +10,20 @@ import {ApolloProvider} from 'react-apollo'
 import {Helmet} from 'react-helmet'
 import {IntlProvider} from 'react-intl'
 
-import {History, Location, LocationListener, UnregisterCallback} from 'history'
 import {fetchAssets, getImplementation} from '../utils/assets'
+import PageCacheControl from '../utils/cacheControl'
 import {getClient} from '../utils/client'
+import {traverseComponent} from '../utils/components'
+import {RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass} from '../utils/dom'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
-import {navigate as pageNavigate, NavigateOptions, pageNameFromPath} from '../utils/pages'
+import {navigate as pageNavigate, NavigateOptions, routeIdFromPath} from '../utils/pages'
 import {fetchRuntime} from '../utils/runtime'
-
-import {NormalizedCacheObject} from 'apollo-cache-inmemory'
-import ApolloClient from 'apollo-client'
-import {ApolloLink, NextLink, Operation} from 'apollo-link'
-import PageCacheControl from '../utils/cacheControl'
-import {traverseComponent} from '../utils/components'
 import {TreePathContext} from '../utils/treePath'
+
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
-import {RenderContext, RenderContextProps} from './RenderContext'
+import {RenderContext} from './RenderContext'
 
 interface Props {
   children: ReactElement<any> | null
@@ -63,10 +64,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     pages: PropTypes.object,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
+    updateComponentAssets: PropTypes.func,
     updateExtension: PropTypes.func,
     updateRuntime: PropTypes.func,
     workspace: PropTypes.string,
-    updateComponentAssets: PropTypes.func,
   }
 
   public static propTypes = {
@@ -166,10 +167,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       prefetchPage: this.prefetchPage,
       production,
+      updateComponentAssets: this.updateComponentAssets,
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
       workspace,
-      updateComponentAssets: this.updateComponentAssets,
     }
   }
 
@@ -192,6 +193,21 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return pageNavigate(history, pages, options)
   }
 
+  public replaceRouteClass = (route: string) => {
+    try {
+      const containers = document.getElementsByClassName(RENDER_CONTAINER_CLASS)
+      const currentRouteClass = containers[0].className.split(' ').find(c => c.startsWith(ROUTE_CLASS_PREFIX))
+      const newRouteClass = routeClass(route)
+
+      Array.prototype.forEach.call(
+        containers,
+        (e: any) => e.classList.replace(currentRouteClass, newRouteClass),
+      )
+    } catch (e) {
+      console.error('Failed to set route class', routeClass(route))
+    }
+  }
+
   public onPageChanged = (location: Location) => {
     const {pages} = this.state
     const {pathname, state} = location
@@ -201,7 +217,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return
     }
 
-    const page = pageNameFromPath(pathname, pages)
+    const page = routeIdFromPath(pathname, pages)
 
     if (!page) {
       window.location.href = `${location.pathname}${location.search}`
@@ -213,7 +229,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.setState({
       page,
       query,
-    })
+    }, () => this.replaceRouteClass(page))
   }
 
   public prefetchPage = (pageName: string) => {
