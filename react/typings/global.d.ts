@@ -67,6 +67,7 @@ declare global {
     declarer?: string
     name?: string
     title?: string
+    conditional?: boolean
   }
 
   interface Pages {

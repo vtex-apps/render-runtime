@@ -231,7 +231,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return
     }
 
+    const isConditional = pagesState[page] && pagesState[page].conditional
+
     const query = parse(location.search.substr(1))
+
+    if (!isConditional) {
+      return this.setState({
+        page,
+        query,
+      }, () => this.replaceRouteClass(page))
+    }
 
     // Retrieve the adequate assets for the new page. Naming will
     // probably change (query will return something like routes) as
