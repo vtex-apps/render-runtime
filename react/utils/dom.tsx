@@ -35,7 +35,7 @@ export const createPortal = (children: ReactElement<any>, name: string, hydrate:
     ssrPortalContainer.remove()
   }
 
-  const container = document.getElementsByClassName(routeClass(name))[0]
+  const container = document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0]
   if (!container) {
     console.warn(`Missing React Portal container div.${routeClass(name)}`)
     return null
@@ -69,7 +69,7 @@ export const getMarkups = (pageName: string, pageMarkup: string): NamedMarkup[] 
 
 
 export const getContainer = (name: string) => {
-  return canUseDOM ? document.getElementsByClassName(routeClass(name))[0] : null
+  return canUseDOM ? document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0] : null
 }
 
 export const ensureContainer = (name: string) => {
@@ -77,15 +77,14 @@ export const ensureContainer = (name: string) => {
     return false
   }
 
-  const existingContainer = document.getElementsByClassName(routeClass(name))[0]
+  const existingContainer = document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0]
   if (existingContainer) {
     return false
   }
 
   const containerDiv = document.createElement('div')
-  containerDiv.className = 'render-container'
+  containerDiv.className = `render-container ${routeClass(name)}`
   containerDiv.style.display = 'none'
-  containerDiv.id = routeClass(name)
   document.body.appendChild(containerDiv)
   return true
 }
