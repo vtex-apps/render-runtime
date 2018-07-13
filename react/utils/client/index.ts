@@ -1,4 +1,4 @@
-import {InMemoryCache, NormalizedCacheObject} from 'apollo-cache-inmemory'
+import {HeuristicFragmentMatcher, InMemoryCache, NormalizedCacheObject} from 'apollo-cache-inmemory'
 import {ApolloClient} from 'apollo-client'
 import {ApolloLink} from 'apollo-link'
 import {createHttpLink} from 'apollo-link-http'
@@ -17,12 +17,27 @@ interface ApolloClientsRegistry {
   [key: string]: ApolloClient<NormalizedCacheObject>
 }
 
-function getDataIdFromObject(value: any) {
-  if (!value) {
-    return null
+const buildCacheId = (
+  vendor: string,
+  app: string,
+  major: string,
+  type: string,
+  cacheId: string
+) => `${vendor}.${app}@${major}.x:${type}:${cacheId}`
+
+const dataIdFromObject = (value: any) => {
+  const {cacheId, __typename} = value || {} as any
+  if (value && __typename && cacheId) {
+    const [vendor, app, major, minor, patch, ...type] = __typename.split('_')
+    return buildCacheId(vendor, app, major, type, cacheId)
   }
-  const {id, __typename} = value
-  return id && __typename ? `${__typename}:${id}` : null
+  return null
+}
+
+export const buildCacheLocator = (app: string, type: string, cacheId: string) => {
+  const [vendor, appAndMajor, x] = app.replace(/-/g, '').split('.')
+  const [appName, major] = appAndMajor && appAndMajor.split('@')
+  return buildCacheId(vendor, appName, major, type, cacheId)
 }
 
 const clientsByWorkspace: ApolloClientsRegistry = {}
@@ -41,7 +56,8 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
     const cache = new InMemoryCache({
       addTypename: true,
-      dataIdFromObject: getDataIdFromObject,
+      dataIdFromObject,
+      fragmentMatcher: new HeuristicFragmentMatcher()
     })
 
     const httpLink = createHttpLink({
@@ -57,6 +73,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
     const persistedQueryLink = createPersistedQueryLink({generateHash})
 
     const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
+
     const link = cacheControl
       ? ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, persistedQueryLink, uriSwitchLink, cachingLink(cacheControl), fetcherLink])
       : ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, persistedQueryLink, uriSwitchLink, fetcherLink])

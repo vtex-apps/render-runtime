@@ -237,6 +237,7 @@ interface RenderComponent<P={}, S={}> {
     withHMR: any
     RenderContextConsumer: React.Consumer<RenderContext>
     TreePathContextConsumer: React.Consumer<TreePathProps>
+    buildCacheLocator: any
   }
 
   interface Window extends Window {

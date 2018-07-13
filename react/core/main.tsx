@@ -10,9 +10,10 @@ import Link from '../components/Link'
 import {RenderContext} from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
 import ExtensionContainer from '../ExtensionContainer'
-import LayoutContainer from '../LayoutContainer'
 import ExtensionPoint from '../ExtensionPoint'
+import LayoutContainer from '../LayoutContainer'
 import PageCacheControl from '../utils/cacheControl'
+import {buildCacheLocator} from '../utils/client'
 import {getState} from '../utils/client'
 import {ensureContainer, getContainer, getMarkups} from '../utils/dom'
 import {registerEmitter} from '../utils/events'
@@ -137,6 +138,7 @@ export {
   render,
   start,
   withHMR,
-  Loading
+  Loading,
+  buildCacheLocator
 }
 
