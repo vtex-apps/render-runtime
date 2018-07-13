@@ -13,6 +13,7 @@ import ExtensionContainer from '../ExtensionContainer'
 import ExtensionPoint from '../ExtensionPoint'
 import LayoutContainer from '../LayoutContainer'
 import PageCacheControl from '../utils/cacheControl'
+import {buildCacheLocator} from '../utils/client'
 import {getState} from '../utils/client'
 import {ensureContainer, getContainer, getMarkups} from '../utils/dom'
 import {registerEmitter} from '../utils/events'
@@ -138,6 +139,7 @@ export {
   start,
   withHMR,
   withRuntimeContext,
-  Loading
+  Loading,
+  buildCacheLocator
 }
 
