@@ -9,7 +9,6 @@ interface Props {
   navigate: (navigateOptions: object) => {},
   page: string,
   pages: Record<string, Record<string, any>>,
-  segment: string,
   children: JSX.Element
 }
 
@@ -20,7 +19,7 @@ interface State {
 
 export default class MaybeAuth extends PureComponent<Props, State> {
   public state = { loading: true, logged: false }
-  
+
   public componentDidMount() {
     if (this.isAuthenticatedPage()) {
       fetch(AUTH_STORE_URL, { credentials: 'same-origin' })
@@ -44,7 +43,7 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   }
 
   public isAuthenticatedPage() {
-    return this.props.pages[this.props.page].login && this.getBreakPoint() === this.props.segment
+    return this.props.pages[this.props.page].login
   }
 
   public redirectToLogin() {
@@ -52,12 +51,6 @@ export default class MaybeAuth extends PureComponent<Props, State> {
       fallbackToWindowLocation: false,
       to: LOGIN_PATH,
     })
-  }
-
-  public getBreakPoint() {
-    const { pages, page } = this.props
-    const [point] = page.split('/').slice(-1)
-    return point
   }
 
   public render() {
