@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component, CSSProperties } from 'react'
+import React, { Component, Fragment } from 'react'
 
 import ExtensionPoint from './ExtensionPoint'
 
@@ -29,6 +29,12 @@ class Container extends Component<ContainerProps> {
 
     const className = `flex flex-grow-1 w-100 ${isRow ? "flex-row" : "flex-column"}`
     if (typeof elements === "string") {
+      if (elements === "__children__")
+        return (
+          <Fragment>
+            <div>{this.props.children}</div>
+          </Fragment>
+        )
       return (
         <div className={isRow ? "" : className}>
           <ExtensionPoint id={elements} />
