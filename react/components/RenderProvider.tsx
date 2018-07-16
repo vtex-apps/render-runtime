@@ -214,6 +214,27 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
+  public scrollToTop = () => {
+    try {
+      const editModeContainer = document.getElementById('app-content')
+      const options: ScrollToOptions = { top: 0, left: 0, behavior: 'smooth' }
+      if (editModeContainer) {
+        editModeContainer.scrollTo(options)
+      } else {
+        window.scrollTo(options)
+      }
+    }
+    catch (e) {
+      console.log('Failed to scroll smoothly after page navigation.')
+      window.scrollTo(0, 0)
+    }
+  }
+
+  public afterPageChanged = (route: string) => {
+    this.replaceRouteClass(route)
+    this.scrollToTop()
+  }
+
   public onPageChanged = (location: Location) => {
     const {runtime: {renderMajor}} = this.props
     const {culture: {locale}, pages: pagesState, production, device} = this.state
@@ -239,7 +260,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return this.setState({
         page,
         query,
-      }, () => this.replaceRouteClass(page))
+      }, () => this.afterPageChanged(page))
     }
 
     // Retrieve the adequate assets for the new page. Naming will
@@ -274,7 +295,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         pages,
         query,
         settings,
-      }, () => this.replaceRouteClass(page))
+      }, () => this.afterPageChanged(page))
     })
   }
 
