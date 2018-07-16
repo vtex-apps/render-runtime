@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import React, {PureComponent} from 'react'
-import Loading from './Loading'
 
 const LOGIN_PATH = '/login'
 const AUTH_STORE_URL = '/_v/private/authenticated/store'
@@ -9,8 +8,7 @@ interface Props {
   navigate: (navigateOptions: object) => {},
   page: string,
   pages: Record<string, Record<string, any>>,
-  segment: string,
-  children: JSX.Element
+  fallback: (logged?: boolean, loading?: boolean, point?: string) => {}
 }
 
 interface State {
@@ -44,7 +42,19 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   }
 
   public isAuthenticatedPage() {
-    return this.props.pages[this.props.page].login && this.getBreakPoint() === this.props.segment
+    return !!this.getAuthPoint()
+  }
+
+  public getAuthPoint() {
+    const { page, pages } = this.props
+    const pathValues = this.props.page.split('/')
+    for (let i = 0; i < pathValues.length; i++) {
+      const path = pathValues.slice(0, i + 1)
+      const pagesPath = this.props.pages[path.join('/')]
+      if (pagesPath && pagesPath.login) {
+        return path.pop()
+      }
+    }
   }
 
   public redirectToLogin() {
@@ -54,22 +64,11 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     })
   }
 
-  public getBreakPoint() {
-    const { pages, page } = this.props
-    const [point] = page.split('/').slice(-1)
-    return point
-  }
-
   public render() {
     if (this.isAuthenticatedPage()) {
       const { logged, loading } = this.state
-      if (loading) {
-        return <div className="flex justify-center ma4"><Loading /></div>
-      } else if (logged) {
-        return this.props.children
-      }
-      return null
+      return this.props.fallback(logged, loading, this.getAuthPoint())
     }
-    return this.props.children
+    return this.props.fallback()
   }
 }

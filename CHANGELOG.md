@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Updated
+- `MaybeAuth` to work Top-Down.
+
+### Fixed
+- Children with missing props in the `MaybeAuth` component.
 
 ## [7.12.6] - 2018-07-10
 

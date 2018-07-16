@@ -20,6 +20,7 @@ import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/m
 import {navigate as pageNavigate, NavigateOptions, routeIdFromPath} from '../utils/pages'
 import {fetchRoutes} from '../utils/routes'
 import {TreePathContext} from '../utils/treePath'
+import MaybeAuth from './MaybeAuth'
 
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
@@ -461,22 +462,27 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ...customMessages
     }
 
-    const component = children
+    const context = this.getChildContext()
+
+    const fallback = (logged?: boolean, loading?: boolean, point?: string) => {
+      const root = page.split('/')[0]
+      const editorProvider = extensions[`${root}/__provider`]
+      
+      const component = children
       ? React.cloneElement(children as ReactElement<any>, {query})
       : (
         <div className="render-provider">
-          <Helmet title={pages[page] && pages[page].title} />
-          <NestedExtensionPoints page={page} query={query} />
-        </div>
-      )
-
-    const root = page.split('/')[0]
-    const editorProvider = extensions[`${root}/__provider`]
-    const context = this.getChildContext()
-    const EditorProvider = editorProvider && getImplementation<any>(editorProvider.component)
-    const maybeEditable = !production && EditorProvider
+            <Helmet title={pages[page] && pages[page].title} />
+            <NestedExtensionPoints page={page} query={query} breakPoint={{
+              loading, logged, point
+            }}/>
+          </div>
+        )
+      const EditorProvider = editorProvider && getImplementation<any>(editorProvider.component)
+      return !production && EditorProvider
       ? <EditorProvider runtime={context} extensions={extensions} pages={pages} page={page}>{component}</EditorProvider>
       : component
+    }
 
     return (
       <RenderContext.Provider value={context}>
@@ -485,7 +491,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             <IntlProvider locale={locale} messages={mergedMessages}>
               <Fragment>
                 {!production && <BuildStatus />}
-                {maybeEditable}
+                <MaybeAuth pages={pages} page={page} navigate={this.navigate} fallback={fallback} />
               </Fragment>
             </IntlProvider>
           </ApolloProvider>
