@@ -8,7 +8,7 @@ interface Props {
   navigate: (navigateOptions: object) => {},
   page: string,
   pages: Record<string, Record<string, any>>,
-  fallback: (logged?: boolean, loading?: boolean) => {}
+  fallback: (logged?: boolean, loading?: boolean, point?: string) => {}
 }
 
 interface State {
@@ -42,15 +42,19 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   }
 
   public isAuthenticatedPage() {
+    return !!this.getAuthPoint()
+  }
+
+  public getAuthPoint() {
+    const { page, pages } = this.props
     const pathValues = this.props.page.split('/')
     for (let i = 0; i < pathValues.length; i++) {
       const path = pathValues.slice(0, i + 1)
       const pagesPath = this.props.pages[path.join('/')]
       if (pagesPath && pagesPath.login) {
-        return true
+        return path.pop()
       }
     }
-    return false
   }
 
   public redirectToLogin() {
@@ -63,7 +67,7 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   public render() {
     if (this.isAuthenticatedPage()) {
       const { logged, loading } = this.state
-      return this.props.fallback(logged, loading)
+      return this.props.fallback(logged, loading, this.getAuthPoint())
     }
     return this.props.fallback()
   }

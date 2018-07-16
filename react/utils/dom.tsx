@@ -9,10 +9,14 @@ const hyphenate = (name: string) => name.replace(/\//g, '-')
 
 const portalWrapperId = (name: string) => `render-portal-ssr-${hyphenate(name)}`
 
-const containerId = (name: string) => `render-${hyphenate(name)}`
+export const RENDER_CONTAINER_CLASS = 'render-container'
+
+export const ROUTE_CLASS_PREFIX = 'render-route-'
+
+export const routeClass = (name: string) => `${ROUTE_CLASS_PREFIX}${hyphenate(name)}`
 
 const renderContainer = (name: string, markup: string) =>
-  `<div class="render-container" id="${containerId(name)}">${markup}</div>`
+  `<div class="${RENDER_CONTAINER_CLASS} ${routeClass(name)}">${markup}</div>`
 
 const portalWrapper = (name: string, markup: string) =>
   `<span id="${portalWrapperId(name)}">${markup}</span>`
@@ -31,9 +35,9 @@ export const createPortal = (children: ReactElement<any>, name: string, hydrate:
     ssrPortalContainer.remove()
   }
 
-  const container = document.getElementById(containerId(name))
+  const container = document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0]
   if (!container) {
-    console.warn(`Missing React Portal container div#${containerId(name)}`)
+    console.warn(`Missing React Portal container div.${routeClass(name)}`)
     return null
   }
 
@@ -65,7 +69,7 @@ export const getMarkups = (pageName: string, pageMarkup: string): NamedMarkup[] 
 
 
 export const getContainer = (name: string) => {
-  return canUseDOM ? document.getElementById(containerId(name)) : null
+  return canUseDOM ? document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0] : null
 }
 
 export const ensureContainer = (name: string) => {
@@ -73,15 +77,14 @@ export const ensureContainer = (name: string) => {
     return false
   }
 
-  const existingContainer = document.getElementById(containerId(name))
+  const existingContainer = document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0]
   if (existingContainer) {
     return false
   }
 
   const containerDiv = document.createElement('div')
-  containerDiv.className = 'render-container'
+  containerDiv.className = `render-container ${routeClass(name)}`
   containerDiv.style.display = 'none'
-  containerDiv.id = containerId(name)
   document.body.appendChild(containerDiv)
   return true
 }

@@ -1,5 +1,5 @@
-query Messages ($page: String!, $production: Boolean!, $locale: String!, $renderVersion: String!) {
-  page(page: $page, production: $production, locale: $locale, renderVersion: $renderVersion) {
+query Messages ($page: String!, $production: Boolean!, $locale: String!, $renderMajor: Int!) {
+  page(page: $page, production: $production, locale: $locale, renderMajor: $renderMajor) {
     messagesJSON
   }
 }

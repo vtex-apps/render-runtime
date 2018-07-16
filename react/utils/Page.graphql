@@ -1,0 +1,35 @@
+query Page (
+  $conditions: [String],
+  $device: String,
+  $locale: String,
+  $page: String,
+  $params:String,
+  $path: String
+  $production: Boolean,
+  $query: String,
+  $renderMajor: Int,
+  $scope: String,
+  $template: String,
+) {
+  page(
+    conditions: $conditions,
+    device: $device,
+    locale: $locale,
+    page: $page,
+    params: $params,
+    path: $path
+    production: $production,
+    query: $query,
+    renderMajor: $renderMajor,
+    scope: $scope,
+    template: $template,
+  ) {
+    appsEtag
+    appsSettingsJSON
+    cacheHintsJSON
+    componentsJSON
+    extensionsJSON
+    messagesJSON
+    pagesJSON
+  }
+}

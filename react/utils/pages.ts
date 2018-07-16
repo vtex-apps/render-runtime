@@ -86,7 +86,7 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
 
   if (history) {
     const location = createLocationDescriptor(path, {query})
-    history.push(location)
+    setTimeout(() => history.push(location), 0)
     return true
   }
 
@@ -98,14 +98,14 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
   return false
 }
 
-export function pageNameFromPath(path: string, pages: Pages) {
-  let pageName: string | undefined
+export function routeIdFromPath(path: string, routes: Pages) {
+  let routeId: string | undefined
   let score: number
   let highScore: number = Number.NEGATIVE_INFINITY
 
   // tslint:disable-next-line:forin
-  for (const name in pages) {
-    const pagePath = getPagePath(name, pages)
+  for (const name in routes) {
+    const pagePath = getPagePath(name, routes)
     if (pagePath) {
       const matches = !!getParams(pagePath, path)
       if (!matches) {
@@ -118,11 +118,11 @@ export function pageNameFromPath(path: string, pages: Pages) {
       }
 
       highScore = score
-      pageName = name
+      routeId = name
     }
   }
 
-  return pageName
+  return routeId
 }
 
 export interface NavigateOptions {

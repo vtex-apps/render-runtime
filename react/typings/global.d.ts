@@ -1,3 +1,4 @@
+import {ApolloClient} from 'apollo-client'
 import {NormalizedCacheObject} from "apollo-cache-inmemory"
 import * as EventEmitter from 'eventemitter3'
 import {ReactElement, Component} from "react"
@@ -66,6 +67,7 @@ declare global {
     declarer?: string
     name?: string
     title?: string
+    conditional?: boolean
   }
 
   interface Pages {
@@ -88,10 +90,13 @@ declare global {
     error: any
   }
 
+  type ConfigurationDevice = 'any' | 'desktop' | 'mobile'
+
   interface RenderContext {
     account: RenderRuntime['account'],
     components: RenderRuntime['components'],
     culture: RenderRuntime['culture'],
+    device: ConfigurationDevice,
     emitter: RenderRuntime['emitter'],
     extensions: RenderRuntime['extensions'],
     fetchComponent: (component: string) => Promise<void>,
@@ -103,9 +108,27 @@ declare global {
     pages: RenderRuntime['pages'],
     prefetchPage: (name: string) => Promise<void>,
     production: RenderRuntime['production'],
+    setDevice: (device: ConfigurationDevice) => void,
+    updateComponentAssets: (availableComponents: Components) => void,
     updateExtension: (name: string, extension: Extension) => void,
-    updateRuntime: () => Promise<void>,
+    updateRuntime: (options?: PageContextOptions) => Promise<void>,
     workspace: RenderRuntime['workspace'],
+  }
+
+  interface PageContextOptions {
+    scope?: string
+    device?: string
+    conditions?: string[]
+    template?: string
+  }
+
+  interface FetchRoutesInput extends PageContextOptions {
+    apolloClient: ApolloClient<NormalizedCacheObject>,
+    locale: string,
+    page: string,
+    path?: string,
+    production: boolean,
+    renderMajor: number,
   }
 
 interface RenderComponent<P={}, S={}> {
@@ -119,6 +142,15 @@ interface RenderComponent<P={}, S={}> {
 
   interface HotEmitterRegistry {
     [appId: string]: EventEmitter
+  }
+
+  interface PageQueryResult {
+    data: PageQueryResultData,
+    errors?: any,
+  }
+
+  interface PageQueryResultData {
+    page: PageQueryResponse,
   }
 
   interface PageQueryResponse {
@@ -174,7 +206,7 @@ interface RenderComponent<P={}, S={}> {
     production: boolean
     publicEndpoint: string
     messages: Record<string, string>
-    components: Components | Record<string, string[]>
+    components: Components
     renderMajor: number
     query?: Record<string, string>
     start: boolean
