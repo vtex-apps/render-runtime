@@ -54,10 +54,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
 
     const fetcherLink = createIOFetchLink(httpLink, uploadLink)
 
-    const persistedQueryLink = createPersistedQueryLink({
-      disable: () => true,
-      generateHash
-    })
+    const persistedQueryLink = createPersistedQueryLink({generateHash})
 
     const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
     const link = cacheControl
