@@ -3,10 +3,10 @@ import React, { Component, Fragment } from 'react'
 
 import ExtensionPoint from './ExtensionPoint'
 
-type Element = string | Array<any>
+type Element = string | any[]
 
 interface LayoutContainerProps {
-  elements: Array<Element>
+  elements: Element[]
 }
 
 interface ContainerProps {
@@ -19,7 +19,7 @@ const elementPropType = PropTypes.arrayOf(
 ).isRequired
 
 class Container extends Component<ContainerProps> {
-  static propTypes = {
+  public static propTypes = {
     elements: elementPropType,
     isRow: PropTypes.bool
   }
@@ -27,22 +27,19 @@ class Container extends Component<ContainerProps> {
   public render() {
     const { isRow, elements } = this.props
 
-    const className = `flex flex-grow-1 w-100 ${isRow ? "flex-row" : "flex-column"}`
-    if (typeof elements === "string") {
-      if (elements === "__children__")
-        return (
-          <Fragment>
-            <div>{this.props.children}</div>
-          </Fragment>
-        )
+    const className = `flex flex-grow-1 w-100 ${isRow ? 'flex-row' : 'flex-column'}`
+    if (typeof elements === 'string') {
+      if (elements === '__children__') {
+        return this.props.children
+      }
       return (
-        <div className={isRow ? "" : className}>
+        <div className={isRow ? '' : className}>
           <ExtensionPoint id={elements} />
         </div>
       )
     }
 
-    const returnValue: Array<JSX.Element> = elements.map((element: Element) => {
+    const returnValue: JSX.Element[] = elements.map((element: Element) => {
       return <Container elements={element} isRow={!isRow} />
     })
 
@@ -54,8 +51,9 @@ class Container extends Component<ContainerProps> {
   }
 }
 
+// tslint:disable-next-line
 class LayoutContainer extends Component<LayoutContainerProps> {
-  static propTypes = {
+  public static propTypes = {
     elements: elementPropType
   }
 
