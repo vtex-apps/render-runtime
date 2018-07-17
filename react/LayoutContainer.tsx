@@ -25,7 +25,7 @@ class Container extends Component<ContainerProps> {
   }
 
   public render() {
-    const { isRow, elements } = this.props
+    const { isRow, elements, ...props } = this.props
 
     const className = `flex flex-grow-1 w-100 ${isRow ? 'flex-row' : 'flex-column'}`
     if (typeof elements === 'string') {
@@ -34,14 +34,14 @@ class Container extends Component<ContainerProps> {
       }
       return (
         <div className={isRow ? '' : className}>
-          <ExtensionPoint id={elements} />
+          <ExtensionPoint id={elements} {...props} />
         </div>
       )
     }
 
     const returnValue: JSX.Element[] = elements.map((element: Element) => {
       return (
-        <Container elements={element} isRow={!isRow} >
+        <Container elements={element} isRow={!isRow} {...props} >
           {this.props.children}
         </Container>
       )
@@ -62,9 +62,7 @@ class LayoutContainer extends Component<LayoutContainerProps> {
   }
 
   public render() {
-    const { elements } = this.props
-
-    return <Container elements={elements} isRow={false}>{this.props.children}</Container>
+    return <Container {...this.props} isRow={false}>{this.props.children}</Container>
   }
 }
 
