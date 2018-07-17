@@ -1,22 +1,30 @@
 
 import React, {PureComponent} from 'react'
-import {getImplementation} from '../utils/assets'
+
+import ExtensionPointComponent from '../components/ExtensionPointComponent'
+
+import { RenderContextProps } from './RenderContext'
 
 interface Props {
   nestedPage: string
-  extensions: Extensions
   params?: any
   query?: any
 }
 
-export default class MaybeContext extends PureComponent<Props> {
+export default class MaybeContext extends PureComponent<Props & RenderContextProps> {
   public render() {
-    const {children, extensions, nestedPage, query, params} = this.props
-    const extension = extensions[`${nestedPage}/__context`]
-    const ContextProvider = extension ? getImplementation<any>(extension.component) : null
+    const {children, runtime, nestedPage, query, params} = this.props
+    const context = runtime.extensions[`${nestedPage}/__context`]
 
-    return ContextProvider
-      ? <ContextProvider query={query} params={params}>{children}</ContextProvider>
+    const props = context && {
+      nextTreePath: nestedPage,
+      params,
+      query,
+      ...context.props,
+    }
+
+    return context
+      ? <ExtensionPointComponent component={context.component} props={props} runtime={runtime} treePath={nestedPage}>{children}</ExtensionPointComponent>
       : children
   }
 }

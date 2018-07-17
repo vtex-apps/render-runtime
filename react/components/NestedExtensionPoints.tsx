@@ -42,7 +42,7 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
 
         return (
           <MaybeAuth pages={runtime.pages} page={page} navigate={runtime.navigate} segment={value}>
-            <MaybeContext nestedPage={nestedPage} query={query} params={params} extensions={runtime.extensions}>
+            <MaybeContext nestedPage={nestedPage} query={query} params={params} runtime={runtime}>
               <ExtensionPoint
                 id={value}
                 query={query}
