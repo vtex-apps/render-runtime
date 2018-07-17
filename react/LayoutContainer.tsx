@@ -60,7 +60,7 @@ class LayoutContainer extends Component<LayoutContainerProps> {
   public render() {
     const { elements } = this.props
 
-    return <Container elements={elements} isRow={false} />
+    return <Container elements={elements} isRow={false}>{this.props.children}</Container>
   }
 }
 

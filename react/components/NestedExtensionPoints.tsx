@@ -5,6 +5,7 @@ import MaybeAuth from './MaybeAuth'
 
 import ExtensionPoint from '../ExtensionPoint'
 import {getPagePath, getParams} from '../utils/pages'
+import MaybeContext from './MaybeContext'
 import {RenderContext} from './RenderContext'
 
 const EMPTY_OBJECT = {}
@@ -35,16 +36,23 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
     // a/b/c should render three extension points
     // <a><b><c></c></b></a>
     const getNestedExtensionPoints = (runtime: RenderContext) => {
-      return reverse.reduce((acc: JSX.Element | null, value: string, index: number) => (
-        <MaybeAuth pages={runtime.pages} page={page} navigate={runtime.navigate} segment={value}>
-          <ExtensionPoint
-            id={value}
-            query={query}
-            params={this.getPageParams(runtime, segments.slice(0, segments.length - index).join('/'))}>
-            {acc}
-          </ExtensionPoint>
-        </MaybeAuth>
-      ), null as JSX.Element | null)
+      return reverse.reduce((acc: JSX.Element | null, value: string, index: number) => {
+        const nestedPage = segments.slice(0, segments.length - index).join('/')
+        const params = this.getPageParams(runtime, nestedPage)
+
+        return (
+          <MaybeAuth pages={runtime.pages} page={page} navigate={runtime.navigate} segment={value}>
+            <MaybeContext nestedPage={nestedPage} query={query} params={params} extensions={runtime.extensions}>
+              <ExtensionPoint
+                id={value}
+                query={query}
+                params={params}>
+                {acc}
+              </ExtensionPoint>
+            </MaybeContext>
+          </MaybeAuth>
+        )
+      }, null as JSX.Element | null)
     }
 
     return <RenderContext.Consumer>{getNestedExtensionPoints}</RenderContext.Consumer>
