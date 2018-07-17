@@ -53,9 +53,9 @@ class Link extends Component<Props & RenderContextProps> {
   }
 
   public render() {
-    const {page, params, to, runtime: {pages}} = this.props
+    const {page, params, to, runtime: {pages}, ...linkProps} = this.props
     const href = to || page && pathFromPageName(page, pages, params) || '#'
-    return <a href={href} {...this.props} onClick={this.handleClick} />
+    return <a href={href} {...linkProps} onClick={this.handleClick} />
   }
 }
 
