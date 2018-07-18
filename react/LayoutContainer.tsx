@@ -41,7 +41,7 @@ class Container extends Component<ContainerProps> {
 
     const returnValue: JSX.Element[] = elements.map((element: Element) => {
       return (
-        <Container elements={element} isRow={!isRow} {...props} >
+        <Container key={element.toString()} elements={element} isRow={!isRow} {...props} >
           {children}
         </Container>
       )
