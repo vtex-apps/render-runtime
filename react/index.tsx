@@ -15,6 +15,7 @@ if (module.hot) {
     window.__RENDER_7_RUNTIME__.LayoutContainer = hotGlobals.LayoutContainer
     window.__RENDER_7_RUNTIME__.Link = hotGlobals.Link
     window.__RENDER_7_RUNTIME__.Loading = hotGlobals.Loading
+    window.__RENDER_7_RUNTIME__.buildCacheLocator = hotGlobals.buildCacheLocator
     runtimeGlobals.start()
   })
 }
