@@ -12,12 +12,8 @@ const absoluteRegex = /^https?:\/\/|^\/\//i
 
 const isAbsoluteUrl = (url: string) => absoluteRegex.test(url)
 
-interface Props {
-  onClick: () => void,
-  page?: string,
-  params?: any,
-  query?: string,
-  to?: string,
+interface Props extends NavigateOptions {
+  onClick: () => void
 }
 
 // eslint-disable-next-line
@@ -35,7 +31,7 @@ class Link extends Component<Props & RenderContextProps> {
   }
 
   public handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    const {page, params, query, to, runtime: {navigate}} = this.props
+    const {page, params, query, to, scrollOptions, runtime: {navigate}} = this.props
     if (
       isModifiedEvent(event) ||
       !isLeftClickEvent(event) ||
@@ -46,7 +42,7 @@ class Link extends Component<Props & RenderContextProps> {
 
     this.props.onClick()
 
-    const options: NavigateOptions = {page, params, query, to, fallbackToWindowLocation: false}
+    const options: NavigateOptions = {page, params, query, to, scrollOptions, fallbackToWindowLocation: false}
     if (navigate(options)) {
       event.preventDefault()
     }

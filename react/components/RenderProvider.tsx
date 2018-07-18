@@ -214,10 +214,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public scrollToTop = () => {
+  public scrollTo = (scrollOptions?: RenderScrollOptions) => {
     try {
+      if (scrollOptions === false) {
+        return
+      }
+
+      const options = scrollOptions || { top: 0, left: 0, behavior: 'smooth' }
       const editModeContainer = document.getElementById('app-content')
-      const options: ScrollToOptions = { top: 0, left: 0, behavior: 'smooth' }
       if (editModeContainer) {
         editModeContainer.scrollTo(options)
       } else {
@@ -225,17 +229,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }
     }
     catch (e) {
-      console.log('Failed to scroll smoothly after page navigation.')
-      window.scrollTo(0, 0)
+      console.warn('Failed to scroll after page navigation.')
     }
   }
 
-  public afterPageChanged = (route: string) => {
+  public afterPageChanged = (route: string, scrollOptions?: RenderScrollOptions) => {
     this.replaceRouteClass(route)
-    this.scrollToTop()
+    this.scrollTo(scrollOptions)
   }
 
-  public onPageChanged = (location: Location) => {
+  public onPageChanged = (location: RenderHistoryLocation) => {
     const {runtime: {renderMajor}} = this.props
     const {culture: {locale}, pages: pagesState, production, device} = this.state
     const {pathname, state} = location
@@ -260,7 +263,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return this.setState({
         page,
         query,
-      }, () => this.afterPageChanged(page))
+      }, () => this.afterPageChanged(page, state.scrollOptions))
     }
 
     // Retrieve the adequate assets for the new page. Naming will

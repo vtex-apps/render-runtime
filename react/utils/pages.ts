@@ -18,10 +18,13 @@ function trimEndingSlash(token: string) {
   return token.replace(/\/$/, '') || '/'
 }
 
-function createLocationDescriptor (path: string, {query}: {query: any}): LocationDescriptorObject {
+function createLocationDescriptor (path: string, {query, scrollOptions}: Pick<NavigateOptions, 'query' | 'scrollOptions'>): LocationDescriptorObject {
   return {
     pathname: path,
-    state: {renderRouting: true},
+    state: {
+      renderRouting: true,
+      scrollOptions,
+    },
     ...(query && {search: query}),
   }
 }
@@ -69,7 +72,7 @@ export function getPagePath(name: string, pages: Pages) {
 
 export function navigate(history: History | null, pages: Pages, options: NavigateOptions) {
   let path: string | null
-  const {page, params, query, to, fallbackToWindowLocation = true} = options
+  const {page, params, query, to, scrollOptions, fallbackToWindowLocation = true} = options
 
   if (page) {
     path = pathFromPageName(page, pages, params)
@@ -85,7 +88,7 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
   }
 
   if (history) {
-    const location = createLocationDescriptor(path, {query})
+    const location = createLocationDescriptor(path, {query, scrollOptions})
     setTimeout(() => history.push(location), 0)
     return true
   }
@@ -130,5 +133,6 @@ export interface NavigateOptions {
   params?: any
   query?: any
   to?: string
+  scrollOptions?: ScrollOptions
   fallbackToWindowLocation?: boolean
 }

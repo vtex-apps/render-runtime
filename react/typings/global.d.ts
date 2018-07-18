@@ -70,6 +70,15 @@ declare global {
     conditional?: boolean
   }
 
+  type RenderScrollOptions = ScrollToOptions | false
+
+  interface RenderHistoryLocation extends Location {
+    state?: {
+      renderRouting?: true
+      scrollOptions?: RenderScrollOptions
+    }
+  }
+
   interface Pages {
     [name: string]: Page
   }
@@ -103,7 +112,7 @@ declare global {
     getSettings: (app: string) => any,
     history: History | null,
     navigate: (options: NavigateOptions) => boolean,
-    onPageChanged: (location: Location) => void,
+    onPageChanged: (location: RenderHistoryLocation) => void,
     page: RenderRuntime['page'],
     pages: RenderRuntime['pages'],
     prefetchPage: (name: string) => Promise<void>,
