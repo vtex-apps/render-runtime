@@ -24,6 +24,7 @@ import {TreePathContext} from '../utils/treePath'
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
 import {RenderContext} from './RenderContext'
+import {DataLayerProvider} from './withDataLayer'
 
 interface Props {
   children: ReactElement<any> | null
@@ -452,6 +453,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.setState({ device })
   }
 
+  public pushToDataLayer = (data: object) => {
+    window.dataLayer.push(data)
+  }
+
   public render() {
     const {children} = this.props
     const {culture: {locale}, messages, pages, page, query, production, extensions} = this.state
@@ -483,10 +488,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         <TreePathContext.Provider value={{treePath: ''}}>
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider locale={locale} messages={mergedMessages}>
-              <Fragment>
-                {!production && <BuildStatus />}
-                {maybeEditable}
-              </Fragment>
+              <DataLayerProvider set={this.pushToDataLayer} dataLayer={window.dataLayer}>
+                <Fragment>
+                  {!production && <BuildStatus />}
+                  {maybeEditable}
+                </Fragment>
+              </DataLayerProvider>
             </IntlProvider>
           </ApolloProvider>
         </TreePathContext.Provider>

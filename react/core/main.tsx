@@ -9,9 +9,10 @@ import Loading from '../components/Loading'
 import Link from '../components/Link'
 import {RenderContext} from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
+import withDataLayer, { dataLayerProps } from '../components/withDataLayer'
 import ExtensionContainer from '../ExtensionContainer'
-import LayoutContainer from '../LayoutContainer'
 import ExtensionPoint from '../ExtensionPoint'
+import LayoutContainer from '../LayoutContainer'
 import PageCacheControl from '../utils/cacheControl'
 import {getState} from '../utils/client'
 import {ensureContainer, getContainer, getMarkups} from '../utils/dom'
@@ -28,6 +29,10 @@ if (window.IntlPolyfill) {
     window.Intl.NumberFormat = window.IntlPolyfill.NumberFormat
     window.Intl.DateTimeFormat = window.IntlPolyfill.DateTimeFormat
   }
+}
+
+if (!window.dataLayer) {
+  window.dataLayer = []
 }
 
 function renderToStringWithData(component: ReactElement<any>): Promise<ServerRendered> {
@@ -64,7 +69,13 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   const elem = element || getContainer(name)
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
-    <RenderProvider history={history} cacheControl={cacheControl} baseURI={baseURI} root={name} runtime={runtime}>
+    <RenderProvider
+      history={history}
+      cacheControl={cacheControl}
+      baseURI={baseURI}
+      root={name}
+      runtime={runtime}
+    >
       {!isPage ? <ExtensionPoint id={name} /> : null}
     </RenderProvider>
   )
@@ -137,6 +148,8 @@ export {
   render,
   start,
   withHMR,
+  withDataLayer,
+  dataLayerProps,
   Loading
 }
 

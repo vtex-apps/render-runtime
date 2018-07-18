@@ -225,8 +225,6 @@ interface RenderComponent<P={}, S={}> {
   }
 
   interface RuntimeExports {
-    start(): void
-    render(name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered
     ExtensionContainer: typeof ExtensionContainer
     ExtensionPoint: typeof ExtensionPoint
     Link: typeof Link
@@ -235,8 +233,12 @@ interface RenderComponent<P={}, S={}> {
     Helmet: any
     canUseDOM: boolean
     withHMR: any
+    withDataLayer: any
+    dataLayerProps: object
     RenderContextConsumer: React.Consumer<RenderContext>
     TreePathContextConsumer: React.Consumer<TreePathProps>
+    start(): void
+    render(name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered
   }
 
   interface Window extends Window {
@@ -255,5 +257,6 @@ interface RenderComponent<P={}, S={}> {
     Intl: any
     hrtime: NodeJS.Process['hrtime']
     rendered: Promise<RenderedSuccess> | RenderedFailure
+    dataLayer: any[]
   }
 }
