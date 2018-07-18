@@ -35,7 +35,7 @@ export const createPortal = (children: ReactElement<any>, name: string, hydrate:
     ssrPortalContainer.remove()
   }
 
-  const container = document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0]
+  const container = document.getElementsByClassName(routeClass(name))[0]
   if (!container) {
     console.warn(`Missing React Portal container div.${routeClass(name)}`)
     return null
