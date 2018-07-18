@@ -3,7 +3,7 @@ query Page (
   $device: String,
   $locale: String,
   $page: String,
-  $params:String,
+  $params: String,
   $path: String
   $production: Boolean,
   $query: String,

@@ -136,6 +136,7 @@ declare global {
     apolloClient: ApolloClient<NormalizedCacheObject>,
     locale: string,
     page: string,
+    params?: string,
     path?: string,
     production: boolean,
     renderMajor: number,
