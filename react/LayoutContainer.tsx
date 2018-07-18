@@ -14,9 +14,7 @@ interface ContainerProps {
   isRow: boolean
 }
 
-const elementPropType = PropTypes.arrayOf(
-  PropTypes.oneOfType([PropTypes.string, PropTypes.array])
-).isRequired
+const elementPropType = PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired
 
 class Container extends Component<ContainerProps> {
   public static propTypes = {
