@@ -220,7 +220,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         return
       }
 
-      const options = scrollOptions || { top: 0, left: 0, behavior: 'smooth' }
+      const options = scrollOptions || { top: 0, left: 0 }
       const editModeContainer = document.getElementById('app-content')
       if (editModeContainer) {
         editModeContainer.scrollTo(options)
