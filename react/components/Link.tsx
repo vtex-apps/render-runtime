@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, {Component, MouseEvent} from 'react'
 import {NavigateOptions, pathFromPageName} from '../utils/pages'
-import {RenderContextProps, withContext} from './RenderContext'
+import {RenderContextProps, withRuntimeContext} from './RenderContext'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) => event.button === 0
 
@@ -55,4 +55,4 @@ class Link extends Component<Props & RenderContextProps> {
   }
 }
 
-export default withContext<Props>(Link)
+export default withRuntimeContext<Props>(Link)

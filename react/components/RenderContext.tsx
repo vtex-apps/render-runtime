@@ -11,7 +11,7 @@ export interface EmitterProps {
 
 export const RenderContext = React.createContext<RenderContext>({} as any)
 
-export const withContext = <TOriginalProps extends {} = {}>(Component: ComponentType<TOriginalProps & RenderContextProps>): ComponentType<TOriginalProps> => {
+export const withRuntimeContext = <TOriginalProps extends {} = {}>(Component: ComponentType<TOriginalProps & RenderContextProps>): ComponentType<TOriginalProps> => {
   const ExtendedComponent = (props: TOriginalProps) => <RenderContext.Consumer>{runtime => <Component {...props} runtime={runtime} />}</RenderContext.Consumer>
   return hoistNonReactStatics<TOriginalProps, RenderContextProps>(ExtendedComponent, Component)
 }

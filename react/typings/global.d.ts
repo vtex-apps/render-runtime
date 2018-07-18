@@ -8,6 +8,7 @@ import Link from "../components/Link"
 import {History, Location} from "history"
 import {HelmetData} from "react-helmet"
 import {TreePathProps} from "../utils/treePath"
+import { LayoutContainer } from '../core/main';
 
 declare global {
   interface RenderMetric {
@@ -240,10 +241,12 @@ interface RenderComponent<P={}, S={}> {
     ExtensionPoint: typeof ExtensionPoint
     Link: typeof Link
     NoSSR: any
+    LayoutContainer: any
     Loading: any
     Helmet: any
     canUseDOM: boolean
     withHMR: any
+    withRuntimeContext: any
     RenderContextConsumer: React.Consumer<RenderContext>
     TreePathContextConsumer: React.Consumer<TreePathProps>
   }
