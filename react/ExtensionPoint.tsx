@@ -29,18 +29,22 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     treePath: PropTypes.string
   }
 
+  public static getDerivedStateFromProps(props: ExtendedProps) {
+    return {
+      newTreePath: ExtensionPoint.mountTreePath(props.id, props.treePath)
+    }
+  }
+
   private static mountTreePath (currentId: string, parentTreePath: string) {
     return [parentTreePath, currentId].filter(id => !!id).join('/')
   }
 
-  public componentWillMount() {
-    this.componentWillReceiveProps(this.props)
-  }
+  constructor (props: ExtendedProps) {
+    super(props)
 
-  public componentWillReceiveProps(nextProps: ExtendedProps) {
-    this.setState({
-      newTreePath: ExtensionPoint.mountTreePath(nextProps.id, nextProps.treePath)
-    })
+    this.state = {
+      newTreePath: ExtensionPoint.mountTreePath(props.id, props.treePath)
+    }
   }
 
   public getChildContext() {
