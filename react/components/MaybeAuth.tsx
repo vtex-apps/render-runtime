@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React, {PureComponent} from 'react'
 import Loading from './Loading'
 
@@ -9,8 +8,7 @@ interface Props {
   navigate: (navigateOptions: object) => {},
   page: string,
   pages: Record<string, Record<string, any>>,
-  segment: string,
-  children: JSX.Element
+  render: (props: any) => JSX.Element
 }
 
 interface State {
@@ -20,7 +18,7 @@ interface State {
 
 export default class MaybeAuth extends PureComponent<Props, State> {
   public state = { loading: true, logged: false }
-  
+
   public componentDidMount() {
     if (this.isAuthenticatedPage()) {
       fetch(AUTH_STORE_URL, { credentials: 'same-origin' })
@@ -44,7 +42,7 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   }
 
   public isAuthenticatedPage() {
-    return this.props.pages[this.props.page].login && this.getBreakPoint() === this.props.segment
+    return this.props.pages[this.props.page].login
   }
 
   public redirectToLogin() {
@@ -54,22 +52,22 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     })
   }
 
-  public getBreakPoint() {
-    const { pages, page } = this.props
-    const [point] = page.split('/').slice(-1)
-    return point
-  }
-
   public render() {
-    if (this.isAuthenticatedPage()) {
-      const { logged, loading } = this.state
-      if (loading) {
-        return <div className="flex justify-center ma4"><Loading /></div>
-      } else if (logged) {
-        return this.props.children
-      }
-      return null
+    const {render, navigate, page, pages, children, ...parentProps} = this.props
+    const {logged, loading} = this.state
+
+    if (!this.isAuthenticatedPage()) {
+      return render(parentProps)
     }
-    return this.props.children
+
+    if (loading) {
+      return <div className="flex justify-center ma4"><Loading /></div>
+    }
+
+    if (logged) {
+      return render(parentProps)
+    }
+
+    return null
   }
 }

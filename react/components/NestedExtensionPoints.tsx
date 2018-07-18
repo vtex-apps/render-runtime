@@ -41,16 +41,19 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
         const params = this.getPageParams(runtime, nestedPage)
 
         return (
-          <MaybeAuth pages={runtime.pages} page={page} navigate={runtime.navigate} segment={value}>
-            <MaybeContext nestedPage={nestedPage} query={query} params={params} runtime={runtime}>
-              <ExtensionPoint
-                id={value}
-                query={query}
-                params={params}>
-                {acc}
-              </ExtensionPoint>
-            </MaybeContext>
-          </MaybeAuth>
+          <MaybeAuth pages={runtime.pages} page={nestedPage} navigate={runtime.navigate} render={
+            (parentProps: any) => (
+              <MaybeContext nestedPage={nestedPage} query={query} params={params} runtime={runtime}>
+                <ExtensionPoint
+                  id={value}
+                  query={query}
+                  params={params}
+                  {...parentProps}>
+                  {acc}
+                </ExtensionPoint>
+              </MaybeContext>
+            )
+          }/>
         )
       }, null as JSX.Element | null)
     }
