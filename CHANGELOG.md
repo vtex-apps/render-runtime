@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.16.0] - 2018-7-18
+
 ## [7.15.2] - 2018-07-17
 ### Fixed
 - Fix link props being directly passed to `a` tag.
