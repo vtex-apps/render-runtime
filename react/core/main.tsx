@@ -7,11 +7,11 @@ import NoSSR from 'react-no-ssr'
 import Loading from '../components/Loading'
 
 import Link from '../components/Link'
-import {RenderContext} from '../components/RenderContext'
+import {RenderContext, withRuntimeContext} from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
 import ExtensionContainer from '../ExtensionContainer'
-import LayoutContainer from '../LayoutContainer'
 import ExtensionPoint from '../ExtensionPoint'
+import LayoutContainer from '../LayoutContainer'
 import PageCacheControl from '../utils/cacheControl'
 import {getState} from '../utils/client'
 import {ensureContainer, getContainer, getMarkups} from '../utils/dom'
@@ -137,6 +137,7 @@ export {
   render,
   start,
   withHMR,
+  withRuntimeContext,
   Loading
 }
 

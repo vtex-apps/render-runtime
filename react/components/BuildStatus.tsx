@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import Loading from './Loading'
-import {RenderContextProps, withContext} from './RenderContext'
+import {RenderContextProps, withRuntimeContext} from './RenderContext'
 
 interface State {
   animateOut: boolean
@@ -96,4 +96,4 @@ class BuildStatus extends Component<RenderContextProps, State> {
   }
 }
 
-export default withContext<{}>(BuildStatus)
+export default withRuntimeContext<{}>(BuildStatus)

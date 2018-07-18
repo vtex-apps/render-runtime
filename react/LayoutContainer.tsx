@@ -14,9 +14,7 @@ interface ContainerProps {
   isRow: boolean
 }
 
-const elementPropType = PropTypes.arrayOf(
-  PropTypes.oneOfType([PropTypes.string, PropTypes.array])
-).isRequired
+const elementPropType = PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired
 
 class Container extends Component<ContainerProps> {
   public static propTypes = {
@@ -41,7 +39,7 @@ class Container extends Component<ContainerProps> {
 
     const returnValue: JSX.Element[] = elements.map((element: Element) => {
       return (
-        <Container elements={element} isRow={!isRow} {...props} >
+        <Container key={element.toString()} elements={element} isRow={!isRow} {...props} >
           {children}
         </Container>
       )
