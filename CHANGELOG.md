@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.16.4] - 2018-7-19
+
 ## [7.16.1] - 2018-07-18
 ### Added
 - Uses cacheId to cache
