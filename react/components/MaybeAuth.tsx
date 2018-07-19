@@ -20,25 +20,11 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   public state = { loading: true, logged: false }
 
   public componentDidMount() {
-    if (this.isAuthenticatedPage()) {
-      fetch(AUTH_STORE_URL, { credentials: 'same-origin' })
-        .then(response => response.json())
-        .then(({ authenticated }) => {
-          this.setState({
-            loading: false,
-            logged: authenticated
-          })
-          if (!authenticated) {
-            this.redirectToLogin()
-          }
-        }).catch(err => {
-          this.setState({
-            loading: false,
-            logged: false
-          })
-          this.redirectToLogin()
-        })
-    }
+    this.onUpdate()
+  }
+
+  public componentDidUpdate() {
+    this.onUpdate()
   }
 
   public isAuthenticatedPage() {
@@ -69,5 +55,27 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     }
 
     return null
+  }
+
+  private onUpdate() {
+    if (this.isAuthenticatedPage()) {
+      fetch(AUTH_STORE_URL, { credentials: 'same-origin' })
+      .then(response => response.json())
+      .then(({ authenticated }) => {
+        this.setState({
+          loading: false,
+          logged: authenticated
+        })
+        if (!authenticated) {
+          this.redirectToLogin()
+        }
+      }).catch(err => {
+        this.setState({
+          loading: false,
+          logged: false
+        })
+        this.redirectToLogin()
+      })
+    }
   }
 }
