@@ -71,14 +71,14 @@ export function getImplementation<P={}, S={}>(component: string) {
   return window.__RENDER_7_COMPONENTS__[component] as RenderComponent<P, S>
 }
 
+export function getExtensionImplementation<P={}, S={}>(extensions: Extensions, name: string) {
+  const extension = extensions[name]
+  return extension && extension.component ? getImplementation<P, S>(extension.component) : null
+}
+
 export function fetchAssets(assets: string[]) {
   const scripts = assets.filter(shouldAddScriptToPage)
   const styles = assets.filter(shouldAddStyleToPage)
   styles.forEach(addStyleToPage)
   return Promise.all(scripts.map(addScriptToPage)).then(() => { return })
-}
-
-export function getComponentFromExtensions(name: string) {
-  const extension = window.__RUNTIME__.extensions[`store/__${name}`]
-  return extension ? getImplementation(extension.component) : null
 }
