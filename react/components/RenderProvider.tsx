@@ -17,7 +17,7 @@ import {traverseComponent} from '../utils/components'
 import {RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass} from '../utils/dom'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
-import {navigate as pageNavigate, NavigateOptions, routeIdFromPath} from '../utils/pages'
+import { getPagePath, getParams, navigate as pageNavigate, NavigateOptions, routeIdFromPath } from '../utils/pages'
 import {fetchRoutes} from '../utils/routes'
 import {TreePathContext} from '../utils/treePath'
 
@@ -256,7 +256,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     const isConditional = pagesState[page] && pagesState[page].conditional
-
     const query = parse(location.search.substr(1))
 
     if (!isConditional) {
@@ -265,6 +264,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         query,
       }, () => this.afterPageChanged(page, state.scrollOptions))
     }
+
+    const params = getParams(getPagePath(page, pagesState), pathname) || {}
+    const paramsJSON = JSON.stringify(params)
 
     // Retrieve the adequate assets for the new page. Naming will
     // probably change (query will return something like routes) as
@@ -276,6 +278,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       device,
       locale,
       page,
+      params: paramsJSON,
       path: pathname,
       production,
       renderMajor,
