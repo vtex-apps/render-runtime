@@ -10,7 +10,7 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     extensionsJSON,
     messagesJSON,
     pagesJSON,
-  } = page || {} as any
+  } = page
 
   const [cacheHints, components, extensions, messages, pages, settings] = [
     cacheHintsJSON,
@@ -19,7 +19,7 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     messagesJSON,
     pagesJSON,
     appsSettingsJSON,
-  ].map(json => json && JSON.parse(json))
+  ].map(json => JSON.parse(json))
 
   return {
     appsEtag,
