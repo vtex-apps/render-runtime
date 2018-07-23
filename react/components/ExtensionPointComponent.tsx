@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {ErrorInfo, PureComponent, ReactElement} from 'react'
+import React, {ErrorInfo, PureComponent} from 'react'
 
 import {getImplementation} from '../utils/assets'
 import logEvent from '../utils/logger'
@@ -32,14 +32,12 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
   // tslint:disable-next-line:variable-name
   private _isMounted!: boolean
   private emptyExtensionPoint: Extension
-  private editableExtensionPoint: Extension
 
   constructor(props: Props & RenderContextProps) {
     super(props)
 
     const root = props.treePath && props.treePath.split('/')[0]
     this.emptyExtensionPoint = props.runtime.extensions[`${root}/__empty`]
-    this.editableExtensionPoint = props.runtime.extensions[`${root}/__editable`]
     this.state = {}
   }
 
@@ -134,25 +132,14 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
     }
 
     const EmptyExtensionPoint = this.emptyExtensionPoint && getImplementation(this.emptyExtensionPoint.component)
-    const EditableExtensionPoint = this.editableExtensionPoint && getImplementation<EditableExtensionPointProps>(this.editableExtensionPoint.component)
 
     // This extension point is not configured.
     if (!component && !production && this.emptyExtensionPoint) {
-      return <EditableExtensionPoint treePath={treePath} component={this.emptyExtensionPoint.component}><EmptyExtensionPoint /></EditableExtensionPoint>
+      return <EmptyExtensionPoint />
     }
 
-    const isEditable = Component && (Component.hasOwnProperty('schema') || Component.hasOwnProperty('getSchema'))
-    const configuredComponent = Component ? <Component {...props}>{children}</Component> : children || null
-    return this.editableExtensionPoint && isEditable
-      ? <EditableExtensionPoint treePath={treePath} component={component}>{configuredComponent}</EditableExtensionPoint>
-      : configuredComponent
+    return Component ? <Component {...props}>{children}</Component> : children || null
   }
-}
-
-interface EditableExtensionPointProps {
-  treePath: string
-  component: string | null
-  props?: any
 }
 
 export default ExtensionPointComponent

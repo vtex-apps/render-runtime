@@ -1,5 +1,8 @@
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
+import ReactDOM from 'react-dom'
+
+import {getImplementation} from './utils/assets'
 import {TreePathContext, TreePathProps, withTreePath} from './utils/treePath'
 
 import ExtensionPointComponent from './components/ExtensionPointComponent'
@@ -39,6 +42,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     return [parentTreePath, currentId].filter(id => !!id).join('/')
   }
 
+  private component?: string
+
   constructor (props: ExtendedProps) {
     super(props)
 
@@ -49,6 +54,18 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
   public getChildContext() {
     return { treePath: this.state.newTreePath }
+  }
+
+  public componentDidMount() {
+    this.addDataToElementIfEditable()
+  }
+
+  public componentDidUpdate() {
+    this.addDataToElementIfEditable()
+  }
+
+  public componentWillUnmount() {
+    this.removeDataFromElement()
   }
 
   public render() {
@@ -66,6 +83,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const component = extension ? extension.component : null
     const extensionProps = extension ? extension.props : null
 
+    this.component = component || undefined
+
     const props = {
       ...parentProps,
       ...extensionProps,
@@ -78,6 +97,29 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
         <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
       </TreePathContext.Provider>
     )
+  }
+
+  private addDataToElementIfEditable = () => {
+    const ComponentImpl = this.component && getImplementation(this.component)
+    const isEditable = ComponentImpl && (ComponentImpl.hasOwnProperty('schema') || ComponentImpl.hasOwnProperty('getSchema'))
+
+    if (!isEditable) {
+      return
+    }
+
+    const element = ReactDOM.findDOMNode(this) as Element
+
+    if (element && element.setAttribute) {
+      element.setAttribute('data-extension-point', this.state.newTreePath)
+    }
+  }
+
+  private removeDataFromElement = () => {
+    const element = ReactDOM.findDOMNode(this) as Element
+
+    if (element && element.removeAttribute) {
+      element.removeAttribute('data-extension-point')
+    }
   }
 }
 
