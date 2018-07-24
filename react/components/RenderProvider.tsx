@@ -84,6 +84,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
 
+  private routesSubscription: any
+
   constructor(props: Props) {
     super(props)
     const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings} = props.runtime
@@ -148,6 +150,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     if (!production) {
       emitter.removeListener('localesUpdated', this.onLocalesUpdated)
       emitter.removeListener('extensionsUpdated', this.updateRuntime)
+    }
+    if (this.routesSubscription) {
+      this.routesSubscription.unsubscribe()
     }
   }
 
@@ -273,7 +278,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // well as the fields that need to be retrieved, but the logic
     // that the new state (extensions and assets) will be derived from
     // the results of this query will probably remain the same.
-    return fetchRoutes({
+    this.routesSubscription = fetchRoutes({
       apolloClient: this.apolloClient,
       device,
       locale,
@@ -393,7 +398,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {page, production, culture: {locale}} = this.state
     const {pathname} = window.location
 
-    return fetchRoutes({
+    this.routesSubscription = fetchRoutes({
       apolloClient: this.apolloClient,
       locale,
       page,
