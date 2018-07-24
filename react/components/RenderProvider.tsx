@@ -84,7 +84,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
 
-  private routesSubscription: any
+  private routesSubscription: any = []
 
   constructor(props: Props) {
     super(props)
@@ -151,9 +151,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       emitter.removeListener('localesUpdated', this.onLocalesUpdated)
       emitter.removeListener('extensionsUpdated', this.updateRuntime)
     }
-    if (this.routesSubscription) {
-      this.routesSubscription.unsubscribe()
-    }
+    this.routesSubscription.forEach((subscription: any) => subscription.unsubscribe())
   }
 
   public getChildContext() {
@@ -278,7 +276,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // well as the fields that need to be retrieved, but the logic
     // that the new state (extensions and assets) will be derived from
     // the results of this query will probably remain the same.
-    this.routesSubscription = fetchRoutes({
+    this.routesSubscription.push(fetchRoutes({
       apolloClient: this.apolloClient,
       device,
       locale,
@@ -307,7 +305,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         query,
         settings,
       }, () => this.afterPageChanged(page))
-    })
+    }))
   }
 
   public prefetchPage = (pageName: string) => {
@@ -398,7 +396,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {page, production, culture: {locale}} = this.state
     const {pathname} = window.location
 
-    this.routesSubscription = fetchRoutes({
+    this.routesSubscription.push(fetchRoutes({
       apolloClient: this.apolloClient,
       locale,
       page,
@@ -425,7 +423,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         pages,
         settings,
       })
-    })
+    }))
   }
 
   public createRuntimeContextLink() {
