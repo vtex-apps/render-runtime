@@ -13,7 +13,7 @@ const absoluteRegex = /^https?:\/\/|^\/\//i
 const isAbsoluteUrl = (url: string) => absoluteRegex.test(url)
 
 interface Props extends NavigateOptions {
-  onClick: () => void
+  onClick: (event: any) => void
 }
 
 // eslint-disable-next-line
@@ -40,7 +40,7 @@ class Link extends Component<Props & RenderContextProps> {
       return
     }
 
-    this.props.onClick()
+    this.props.onClick(event)
 
     const options: NavigateOptions = {page, params, query, to, scrollOptions, fallbackToWindowLocation: false}
     if (navigate(options)) {
