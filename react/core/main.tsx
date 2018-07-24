@@ -114,7 +114,7 @@ async function start() {
         }))
     } else {
       if (window.__RUNTIME__.page.startsWith('store')) {
-        const {account: accountName} = window.__RUNTIME__
+        const {account: accountName} = runtime
 
         const {tagManagerId} = await axios.get(
           '/api/portal/pvt/sites/default/configuration'
