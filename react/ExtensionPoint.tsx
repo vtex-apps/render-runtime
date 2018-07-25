@@ -42,7 +42,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     return [parentTreePath, currentId].filter(id => !!id).join('/')
   }
 
-  private component?: string
+  private component?: string | null
 
   constructor (props: ExtendedProps) {
     super(props)
@@ -83,7 +83,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const component = extension ? extension.component : null
     const extensionProps = extension ? extension.props : null
 
-    this.component = component || undefined
+    this.component = component
 
     const props = {
       ...parentProps,
@@ -103,7 +103,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const ComponentImpl = this.component && getImplementation(this.component)
     const isEditable = ComponentImpl && (ComponentImpl.hasOwnProperty('schema') || ComponentImpl.hasOwnProperty('getSchema'))
 
-    if (!isEditable) {
+    if (this.component && !isEditable) {
       return
     }
 
