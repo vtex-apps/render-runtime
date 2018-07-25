@@ -1,3 +1,4 @@
+import axios from 'axios'
 import {canUseDOM} from 'exenv'
 import createHistory from 'history/createBrowserHistory'
 import React, {ReactElement} from 'react'
@@ -91,7 +92,7 @@ function validateRootComponent(rootName: string, extensions: Extensions) {
   }
 }
 
-function start() {
+async function start() {
   try {
     const runtime = window.__RUNTIME__
     const rootName = runtime.page
@@ -112,7 +113,30 @@ function start() {
           state: getState(runtime),
         }))
     } else {
-      console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
+      if (window.__RUNTIME__.page.startsWith('store')) {
+        const {account: accountName} = runtime
+
+        const {tagManagerId} = await axios.get(
+          '/api/portal/pvt/sites/default/configuration'
+        ).then(res => res.data)
+
+        if (typeof tagManagerId === 'string' && tagManagerId !== '') {
+          const script = document.createElement('script')
+
+          script.async = true
+          script.src = `https://www.googletagmanager.com/gtm.js?id=${tagManagerId}`
+
+          const firstScriptTag = document.getElementsByTagName('script')[0]
+
+          if (firstScriptTag.parentNode) {
+            firstScriptTag.parentNode.insertBefore(script, firstScriptTag)
+          } else {
+            document.head.insertBefore(script, document.head.firstChild)
+          }
+        }
+      }
+
+      console.log('Welcome to Render! Want to look under the hood? https://careers.vtex.com/')
     }
   } catch (error) {
     console.error('Unexpected error rendering:', error)

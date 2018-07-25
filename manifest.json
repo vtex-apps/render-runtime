@@ -19,5 +19,13 @@
   "settingsSchema": {},
   "scripts": {
     "postreleasy": "vtex publish --verbose"
-  }
+  },
+  "policies": [
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "path": "api/portal/pvt/sites/default/configuration"
+      }
+    }
+  ]
 }
