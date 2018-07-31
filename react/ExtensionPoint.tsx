@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types'
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import {getImplementation} from './utils/assets'
-import {TreePathContext, TreePathProps, withTreePath} from './utils/treePath'
+import { getImplementation } from './utils/assets'
+import { TreePathContext, TreePathProps, withTreePath } from './utils/treePath'
 
 import ExtensionPointComponent from './components/ExtensionPointComponent'
-import {RenderContext} from './components/RenderContext'
+import { RenderContext } from './components/RenderContext'
 
 interface Props {
   id: string,
@@ -38,13 +38,13 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     }
   }
 
-  private static mountTreePath (currentId: string, parentTreePath: string) {
+  private static mountTreePath(currentId: string, parentTreePath: string) {
     return [parentTreePath, currentId].filter(id => !!id).join('/')
   }
 
   private component?: string | null
 
-  constructor (props: ExtendedProps) {
+  constructor(props: ExtendedProps) {
     super(props)
 
     this.state = {
@@ -77,8 +77,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   }
 
   private getExtensionPointComponent = (runtime: RenderContext) => {
-    const {newTreePath} = this.state
-    const {children, params, query, id, treePath, ...parentProps} = this.props
+    const { newTreePath } = this.state
+    const { children, params, query, id, treePath, ...parentProps } = this.props
     const extension = runtime.extensions[newTreePath]
     const component = extension ? extension.component : null
     const extensionProps = extension ? extension.props : null
@@ -92,18 +92,18 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       query,
     }
 
-    return (
-      <TreePathContext.Provider value={{treePath: newTreePath}}>
+    return component
+      ? <TreePathContext.Provider value={{ treePath: newTreePath }}>
         <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
       </TreePathContext.Provider>
-    )
+      : null
   }
 
   private addDataToElementIfEditable = () => {
     const ComponentImpl = this.component && getImplementation(this.component)
     const isEditable = ComponentImpl && (ComponentImpl.hasOwnProperty('schema') || ComponentImpl.hasOwnProperty('getSchema'))
 
-    if (this.component && !isEditable) {
+    if (!isEditable) {
       return
     }
 
