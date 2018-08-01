@@ -35,7 +35,6 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
   constructor(props: Props & RenderContextProps) {
     super(props)
 
-    const root = props.treePath && props.treePath.split('/')[0]
     this.state = {}
   }
 

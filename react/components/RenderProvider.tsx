@@ -2,7 +2,7 @@ import {NormalizedCacheObject} from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
 import {ApolloLink, NextLink, Operation} from 'apollo-link'
 import {canUseDOM} from 'exenv'
-import {History, Location, UnregisterCallback} from 'history'
+import {History, UnregisterCallback} from 'history'
 import PropTypes from 'prop-types'
 import {parse} from 'qs'
 import React, {Component, Fragment, ReactElement} from 'react'
@@ -476,13 +476,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         </div>
       )
 
-    const root = page.split('/')[0]
-    const editorProvider = extensions[`${root}/__provider`]
     const context = this.getChildContext()
-    const EditorProvider = editorProvider && getImplementation<any>(editorProvider.component)
-    const maybeEditable = !production && EditorProvider
-      ? <EditorProvider runtime={context} extensions={extensions} pages={pages} page={page}>{component}</EditorProvider>
-      : component
 
     return (
       <RenderContext.Provider value={context}>
@@ -491,7 +485,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             <IntlProvider locale={locale} messages={mergedMessages}>
               <Fragment>
                 {!production && <BuildStatus />}
-                {maybeEditable}
+                {component}
               </Fragment>
             </IntlProvider>
           </ApolloProvider>
