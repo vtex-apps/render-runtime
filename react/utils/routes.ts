@@ -1,4 +1,3 @@
-import {Observable} from 'apollo-link'
 import pageQuery from './Page.graphql'
 
 const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryResponse => {
@@ -44,34 +43,20 @@ export const fetchRoutes = ({
   renderMajor,
   scope,
   template,
-}: FetchRoutesInput) => new Observable((observer) => {
-  const subscription = apolloClient.watchQuery<{page: PageQueryResponse}>({
-    fetchPolicy: 'cache-and-network',
-    query: pageQuery,
-    variables: {
-      conditions,
-      device,
-      locale,
-      page,
-      params,
-      path,
-      production,
-      renderMajor,
-      scope,
-      template,
-    }
-  }).subscribe({
-    complete: () => observer.complete(),
-    error: (err) => observer.error(err),
-    next: ({data, errors}) => {
-      if (errors) {
-        observer.error(errors)
-      }
-      if (data && data.page) {
-        observer.next(parsePageQueryResponse(data.page))
-      }
-    }
-  })
-
-  return () => subscription.unsubscribe()
-})
+}: FetchRoutesInput) => apolloClient.query<{page: PageQueryResponse}>({
+  fetchPolicy: 'network-only',
+  query: pageQuery,
+  variables: {
+    conditions,
+    device,
+    locale,
+    page,
+    params,
+    path,
+    production,
+    renderMajor,
+    scope,
+    template,
+  }
+}).then<ParsedPageQueryResponse>(({data: {page: pageData}, errors}: PageQueryResult) =>
+      errors ? Promise.reject(errors) : parsePageQueryResponse(pageData))

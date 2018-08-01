@@ -282,7 +282,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       path: pathname,
       production,
       renderMajor,
-    }).subscribe(({
+    }).then(({
       appsEtag,
       cacheHints,
       components,
@@ -290,7 +290,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       messages,
       pages,
       settings
-    }: any) => {
+    }: ParsedPageQueryResponse) => {
       this.setState({
         appsEtag,
         cacheHints,
@@ -401,7 +401,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       production,
       renderMajor,
       ...options,
-    }).subscribe(({
+    }).then(({
       appsEtag,
       cacheHints,
       components,
@@ -409,7 +409,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       messages,
       pages,
       settings
-    }: any) => {
+    }: ParsedPageQueryResponse) => {
       this.setState({
         appsEtag,
         cacheHints,
