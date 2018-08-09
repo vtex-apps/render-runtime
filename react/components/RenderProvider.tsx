@@ -23,7 +23,7 @@ import {TreePathContext} from '../utils/treePath'
 
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
-import {RenderContext} from './RenderContext'
+import {RenderContext, RenderContextProps} from './RenderContext'
 
 interface Props {
   children: ReactElement<any> | null
@@ -42,6 +42,7 @@ export interface RenderProviderState {
   device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
   messages: RenderRuntime['messages']
+  iframeMessages?: RenderRuntime['iframeMessages']
   page: RenderRuntime['page']
   pages: RenderRuntime['pages']
   production: RenderRuntime['production']
@@ -112,6 +113,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query,
       settings,
     }
+
+    if (window.top === window.self) {
+      window.__provideMessages = (iframeMessages: Record<string, string>) => {
+        this.setState({
+          iframeMessages
+        })
+      }
+    }
   }
 
   public componentDidMount() {
@@ -126,6 +135,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       emitter.addListener('localesUpdated', this.onLocalesUpdated)
       emitter.addListener('extensionsUpdated', this.updateRuntime)
     }
+
+    this.sendInfoFromIframe()
   }
 
   public componentWillReceiveProps(nextProps: Props) {
@@ -135,6 +146,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       const {runtime: {extensions}} = nextProps
       this.setState({extensions})
     }
+  }
+
+  public componentDidUpdate() {
+    this.sendInfoFromIframe()
   }
 
   public componentWillUnmount() {
@@ -148,6 +163,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     if (!production) {
       emitter.removeListener('localesUpdated', this.onLocalesUpdated)
       emitter.removeListener('extensionsUpdated', this.updateRuntime)
+    }
+  }
+
+  public sendInfoFromIframe() {
+    const context = this.getChildContext()
+    if (canUseDOM && window.top !== window.self) {
+      const { messages } = this.state
+
+      window.top.__provideRuntime(context)
+      window.top.__provideMessages(messages)
     }
   }
 
@@ -460,11 +485,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public render() {
     const {children} = this.props
-    const {culture: {locale}, messages, pages, page, query, production, extensions} = this.state
+    const {culture: {locale}, messages, iframeMessages, pages, page, query, production } = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
       ...messages,
-      ...customMessages
+      ...customMessages,
+      ...iframeMessages,
     }
 
     const component = children

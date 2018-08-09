@@ -217,6 +217,7 @@ interface RenderComponent<P={}, S={}> {
     production: boolean
     publicEndpoint: string
     messages: Record<string, string>
+    iframeMessages?: Record<string, string>
     components: Components
     renderMajor: number
     query?: Record<string, string>
