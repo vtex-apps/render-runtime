@@ -71,6 +71,13 @@ declare global {
     conditional?: boolean
   }
 
+  interface Route {
+    canonical?: string
+    path?: string
+    params?: Record<string, any>
+    id: string
+  }
+
   type RenderScrollOptions = ScrollToOptions | false
 
   interface RenderHistoryLocation extends Location {
@@ -123,6 +130,7 @@ declare global {
     updateExtension: (name: string, extension: Extension) => void,
     updateRuntime: (options?: PageContextOptions) => Subscription,
     workspace: RenderRuntime['workspace'],
+    route: RenderRuntime['route']
   }
 
   interface PageContextOptions {
@@ -210,6 +218,7 @@ interface RenderComponent<P={}, S={}> {
     disableSSR: boolean
     hints: any
     page: string
+    route: Route
     version: string
     culture: Culture
     pages: Pages

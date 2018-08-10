@@ -49,6 +49,7 @@ export interface RenderProviderState {
   production: RenderRuntime['production']
   query: RenderRuntime['query']
   settings: RenderRuntime['settings']
+  route: RenderRuntime['route']
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
@@ -71,6 +72,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     pages: PropTypes.object,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
+    route: PropTypes.object,
     setDevice: PropTypes.func,
     updateComponentAssets: PropTypes.func,
     updateExtension: PropTypes.func,
@@ -98,7 +100,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings} = props.runtime
+    const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings, route} = props.runtime
     const {history, baseURI, cacheControl} = props
 
     if (history) {
@@ -122,6 +124,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       production,
       query,
+      route,
       settings,
     }
   }
@@ -168,7 +171,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public getChildContext() {
     const {history, runtime} = this.props
-    const {components, extensions, page, pages, settings, culture, device} = this.state
+    const {components, extensions, page, pages, settings, culture, device, route} = this.state
     const {account, emitter, production, workspace} = runtime
 
     return {
@@ -187,6 +190,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       prefetchPage: this.prefetchPage,
       production,
+      route,
       setDevice: this.handleSetDevice,
       updateComponentAssets: this.updateComponentAssets,
       updateExtension: this.updateExtension,
@@ -256,7 +260,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onPageChanged = (location: RenderHistoryLocation) => {
     const {runtime: {renderMajor}} = this.props
-    const {culture: {locale}, pages: pagesState, production, device} = this.state
+    const {culture: {locale}, pages: pagesState, production, device, route} = this.state
     const {pathname, state} = location
 
     // Make sure this is our navigation
@@ -316,6 +320,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         page,
         pages,
         query,
+        route,
         settings,
       }, () => this.afterPageChanged(page))
     })
@@ -407,7 +412,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public updateRuntime = (options?: PageContextOptions) => {
     const {runtime: {renderMajor}} = this.props
-    const {page, production, culture: {locale}} = this.state
+    const {page, production, culture: {locale}, route} = this.state
     const {pathname} = window.location
 
     return fetchRoutes({
@@ -435,6 +440,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         messages,
         page,
         pages,
+        route,
         settings,
       })
     })

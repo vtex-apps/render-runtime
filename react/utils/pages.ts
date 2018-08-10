@@ -102,7 +102,7 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
 }
 
 export function routeIdFromPath(path: string, routes: Pages) {
-  let routeId: string | undefined
+  let id: string | undefined
   let score: number
   let highScore: number = Number.NEGATIVE_INFINITY
 
@@ -121,11 +121,11 @@ export function routeIdFromPath(path: string, routes: Pages) {
       }
 
       highScore = score
-      routeId = name
+      id = name
     }
   }
 
-  return routeId
+  return id
 }
 
 export interface NavigateOptions {
