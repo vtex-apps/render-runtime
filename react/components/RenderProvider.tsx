@@ -484,9 +484,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public render() {
-    if (canUseDOM && (window.top !== window.self)) {
-      console.log('rendering iframe: ', this.getChildContext())
-    }
     const {children} = this.props
     const {culture: {locale}, messages, pages, page, query, production} = this.state
     const customMessages = this.getCustomMessages(locale)
