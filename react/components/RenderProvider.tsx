@@ -1,6 +1,7 @@
 import {NormalizedCacheObject} from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
 import {ApolloLink, NextLink, Operation} from 'apollo-link'
+import debounce from 'debounce'
 import {canUseDOM} from 'exenv'
 import {History, UnregisterCallback} from 'history'
 import PropTypes from 'prop-types'
@@ -10,6 +11,7 @@ import {ApolloProvider} from 'react-apollo'
 import {Helmet} from 'react-helmet'
 import {IntlProvider} from 'react-intl'
 
+import ExtensionPoint from '../ExtensionPoint'
 import {fetchAssets, getImplementation} from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import {getClient} from '../utils/client'
@@ -23,7 +25,7 @@ import {TreePathContext} from '../utils/treePath'
 
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
-import {RenderContext, RenderContextProps} from './RenderContext'
+import {RenderContext} from './RenderContext'
 
 interface Props {
   children: ReactElement<any> | null
@@ -42,13 +44,14 @@ export interface RenderProviderState {
   device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
   messages: RenderRuntime['messages']
-  iframeMessages?: RenderRuntime['iframeMessages']
   page: RenderRuntime['page']
   pages: RenderRuntime['pages']
   production: RenderRuntime['production']
   query: RenderRuntime['query']
   settings: RenderRuntime['settings']
 }
+
+const SEND_INFO_DEBOUNCE_MS = 100
 
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
@@ -80,6 +83,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     root: PropTypes.string,
     runtime: PropTypes.object,
   }
+
+  public sendInfoFromIframe = debounce(() => {
+    const context = this.getChildContext()
+    if (window.top !== window.self) {
+      const { messages } = this.state
+
+      window.top.__provideRuntime(context, messages)
+    }
+  }, SEND_INFO_DEBOUNCE_MS)
 
   private rendered!: boolean
   private unlisten!: UnregisterCallback | null
@@ -113,14 +125,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query,
       settings,
     }
-
-    if (window.top === window.self) {
-      window.__provideMessages = (iframeMessages: Record<string, string>) => {
-        this.setState({
-          iframeMessages
-        })
-      }
-    }
   }
 
   public componentDidMount() {
@@ -148,10 +152,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public componentDidUpdate() {
-    this.sendInfoFromIframe()
-  }
-
   public componentWillUnmount() {
     const {runtime} = this.props
     const {production, emitter} = runtime
@@ -166,15 +166,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public sendInfoFromIframe() {
-    const context = this.getChildContext()
-    if (canUseDOM && window.top !== window.self) {
-      const { messages } = this.state
-
-      window.top.__provideRuntime(context)
-      window.top.__provideMessages(messages)
-    }
-  }
 
   public getChildContext() {
     const {history, runtime} = this.props
@@ -261,6 +252,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public afterPageChanged = (route: string, scrollOptions?: RenderScrollOptions) => {
     this.replaceRouteClass(route)
     this.scrollTo(scrollOptions)
+    if (window.top !== window.self) {
+      window.top.__provideRuntime(null)
+    }
+    this.sendInfoFromIframe()
   }
 
   public onPageChanged = (location: RenderHistoryLocation) => {
@@ -358,6 +353,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const messagesPromises = Promise.all(unfetchedApps.map(app => fetchMessagesForApp(this.apolloClient, app, locale)))
     const assetsPromise = fetchAssets(assets)
+    assetsPromise.then(this.sendInfoFromIframe)
 
     return Promise.all([messagesPromises, assetsPromise]).then(([messages]) => {
       this.setState({
@@ -476,6 +472,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         ...extensions,
         [name]: extension,
       },
+    }, () => {
+      if (name !== 'store/__overlay') {
+        this.sendInfoFromIframe()
+      }
     })
   }
 
@@ -484,13 +484,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public render() {
+    if (canUseDOM && (window.top !== window.self)) {
+      console.log('rendering iframe: ', this.getChildContext())
+    }
     const {children} = this.props
-    const {culture: {locale}, messages, iframeMessages, pages, page, query, production } = this.state
+    const {culture: {locale}, messages, pages, page, query, production} = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
       ...messages,
       ...customMessages,
-      ...iframeMessages,
     }
 
     const component = children
@@ -503,6 +505,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
 
     const context = this.getChildContext()
+    const isIframe = window.top !== window.self
 
     return (
       <RenderContext.Provider value={context}>
@@ -510,8 +513,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider locale={locale} messages={mergedMessages}>
               <Fragment>
-                {!production && <BuildStatus />}
+                {!production && !isIframe && <BuildStatus />}
                 {component}
+                { isIframe ? <ExtensionPoint id="store/__overlay" /> : null}
               </Fragment>
             </IntlProvider>
           </ApolloProvider>

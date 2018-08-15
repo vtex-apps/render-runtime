@@ -217,7 +217,6 @@ interface RenderComponent<P={}, S={}> {
     production: boolean
     publicEndpoint: string
     messages: Record<string, string>
-    iframeMessages?: Record<string, string>
     components: Components
     renderMajor: number
     query?: Record<string, string>
@@ -264,6 +263,7 @@ interface RenderComponent<P={}, S={}> {
     __pathname__: string
     __STATE__: NormalizedCacheObject
     __hasPortals__: boolean
+    __provideRuntime: (runtime: RenderContext | null, messages?: Record<string, string>) => void
     browserHistory: History
     ReactIntlLocaleData: any
     IntlPolyfill: any
