@@ -252,9 +252,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public afterPageChanged = (route: string, scrollOptions?: RenderScrollOptions) => {
     this.replaceRouteClass(route)
     this.scrollTo(scrollOptions)
-    if (window.top !== window.self) {
-      window.top.__provideRuntime(null)
-    }
     this.sendInfoFromIframe()
   }
 
