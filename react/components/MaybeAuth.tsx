@@ -3,6 +3,7 @@ import Loading from './Loading'
 
 const LOGIN_PATH = '/login'
 const AUTH_STORE_URL = '/_v/private/authenticated/store'
+const API_SESSION_URL = '/api/sessions?items=*'
 
 interface Props {
   navigate: (navigateOptions: object) => {},
@@ -57,25 +58,32 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     return null
   }
 
-  private onUpdate() {
+  private async onUpdate() {
     if (this.isAuthenticatedPage()) {
-      fetch(AUTH_STORE_URL, { credentials: 'same-origin' })
-      .then(response => response.json())
-      .then(({ authenticated }) => {
+      const promiseSession = fetch(API_SESSION_URL, { credentials: 'same-origin' })
+        .then(response => response.json())
+        .catch(() => null)
+      const promiseAuth = fetch(AUTH_STORE_URL, { credentials: 'same-origin' })
+        .then(response => response.json())
+        .catch(() => null)
+      const [sessionRes, authRes] = await Promise.all([
+        promiseSession, promiseAuth
+      ])
+      if (
+        (sessionRes && sessionRes.namespaces.profile.isAuthenticated.value !== 'False') ||
+        (authRes && authRes.authenticated)
+      ) {
         this.setState({
           loading: false,
-          logged: authenticated
-        })
-        if (!authenticated) {
-          this.redirectToLogin()
-        }
-      }).catch(err => {
+          logged: true
+        })  
+      } else {
         this.setState({
           loading: false,
           logged: false
         })
-        this.redirectToLogin()
-      })
+        this.redirectToLogin()  
+      }
     }
   }
 }
