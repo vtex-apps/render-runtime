@@ -76,13 +76,13 @@ export default class MaybeAuth extends PureComponent<Props, State> {
         this.setState({
           loading: false,
           logged: true
-        })  
+        })
       } else {
         this.setState({
           loading: false,
           logged: false
         })
-        this.redirectToLogin()  
+        this.redirectToLogin()
       }
     }
   }
