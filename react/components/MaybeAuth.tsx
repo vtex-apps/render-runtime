@@ -23,8 +23,10 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     this.onUpdate()
   }
 
-  public componentDidUpdate() {
-    this.onUpdate()
+  public componentDidUpdate(prevProps: Props) {
+    if (prevProps.page !== this.props.page) {
+      this.onUpdate()
+    }
   }
 
   public isAuthenticatedPage() {
