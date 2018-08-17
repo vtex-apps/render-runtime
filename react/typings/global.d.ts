@@ -1,4 +1,4 @@
-import {ApolloClient} from 'apollo-client'
+import {ApolloClient, Subscription} from 'apollo-client'
 import {NormalizedCacheObject} from "apollo-cache-inmemory"
 import * as EventEmitter from 'eventemitter3'
 import {ReactElement, Component} from "react"
@@ -8,7 +8,7 @@ import Link from "../components/Link"
 import {History, Location} from "history"
 import {HelmetData} from "react-helmet"
 import {TreePathProps} from "../utils/treePath"
-import { LayoutContainer } from '../core/main';
+import { LayoutContainer } from '../core/main'
 
 declare global {
   interface RenderMetric {
@@ -121,7 +121,7 @@ declare global {
     setDevice: (device: ConfigurationDevice) => void,
     updateComponentAssets: (availableComponents: Components) => void,
     updateExtension: (name: string, extension: Extension) => void,
-    updateRuntime: (options?: PageContextOptions) => Promise<void>,
+    updateRuntime: (options?: PageContextOptions) => Subscription,
     workspace: RenderRuntime['workspace'],
   }
 
@@ -263,6 +263,7 @@ interface RenderComponent<P={}, S={}> {
     __pathname__: string
     __STATE__: NormalizedCacheObject
     __hasPortals__: boolean
+    __provideRuntime: (runtime: RenderContext | null, messages?: Record<string, string>) => void
     browserHistory: History
     ReactIntlLocaleData: any
     IntlPolyfill: any
