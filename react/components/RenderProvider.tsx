@@ -52,6 +52,7 @@ export interface RenderProviderState {
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
+const isStorefrontIframe = canUseDOM && window.top !== window.self && window.top.__provideRuntime
 
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
@@ -85,11 +86,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public sendInfoFromIframe = debounce(() => {
-    const context = this.getChildContext()
-    if (window.top !== window.self) {
+    if (isStorefrontIframe) {
       const { messages } = this.state
-
-      window.top.__provideRuntime(context, messages)
+      window.top.__provideRuntime(this.getChildContext(), messages)
     }
   }, SEND_INFO_DEBOUNCE_MS)
 
@@ -499,7 +498,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
 
     const context = this.getChildContext()
-    const isIframe = window.top !== window.self
 
     return (
       <RenderContext.Provider value={context}>
@@ -507,9 +505,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider locale={locale} messages={mergedMessages}>
               <Fragment>
-                {!production && !isIframe && <BuildStatus />}
+                {!production && !isStorefrontIframe && <BuildStatus />}
                 {component}
-                { isIframe ? <ExtensionPoint id="store/__overlay" /> : null}
+                {isStorefrontIframe ? <ExtensionPoint id="store/__overlay" /> : null}
               </Fragment>
             </IntlProvider>
           </ApolloProvider>
