@@ -4,11 +4,9 @@ import React, {PureComponent} from 'react'
 import MaybeAuth from './MaybeAuth'
 
 import ExtensionPoint from '../ExtensionPoint'
-import {getPagePath, getParams} from '../utils/pages'
+import {getPageParams} from '../utils/pages'
 import MaybeContext from './MaybeContext'
 import {RenderContext} from './RenderContext'
-
-const EMPTY_OBJECT = {}
 
 interface Props {
   page: string,
@@ -21,16 +19,6 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
     query: PropTypes.object,
   }
 
-  public getPageParams(runtime: RenderContext, name: string) {
-    const path = canUseDOM ? window.location.pathname : window.__pathname__
-    if (runtime.route.id === name && runtime.route.canonical === path) {
-      return runtime.route.params
-    }
-    const pagePath = getPagePath(name, runtime.pages)
-    const pagePathWithRest = pagePath && /\*\w+$/.test(pagePath) ? pagePath : pagePath.replace(/\/?$/, '*_rest')
-    return pagePath && getParams(pagePathWithRest, path) || EMPTY_OBJECT
-  }
-
   public render() {
     const {page, query} = this.props
     const segments = page.split('/')
@@ -41,7 +29,7 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
     const getNestedExtensionPoints = (runtime: RenderContext) => {
       return reverse.reduce((acc: JSX.Element | null, value: string, index: number) => {
         const nestedPage = segments.slice(0, segments.length - index).join('/')
-        const params = this.getPageParams(runtime, nestedPage)
+        const params = this.getNestedPageParams(runtime, nestedPage)
 
         return (
           <MaybeAuth pages={runtime.pages} page={nestedPage} navigate={runtime.navigate} render={
@@ -62,5 +50,12 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
     }
 
     return <RenderContext.Consumer>{getNestedExtensionPoints}</RenderContext.Consumer>
+  }
+
+  private getNestedPageParams(runtime: RenderContext, name: string) {
+    const {route: {id, params}} = runtime
+    const path = canUseDOM ? window.location.pathname : window.__pathname__
+
+    return id === name ? params : getPageParams(name, path, runtime.pages)
   }
 }

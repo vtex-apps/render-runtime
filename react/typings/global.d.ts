@@ -74,7 +74,7 @@ declare global {
   interface Route {
     canonical?: string
     path?: string
-    params?: Record<string, any>
+    params?: Record<string, string>
     id: string
   }
 
@@ -82,6 +82,7 @@ declare global {
 
   interface RenderHistoryLocation extends Location {
     state?: {
+      route: Route
       renderRouting?: true
       scrollOptions?: RenderScrollOptions
     }

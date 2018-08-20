@@ -2,6 +2,8 @@ import {canUseDOM} from 'exenv'
 import {History, LocationDescriptorObject} from 'history'
 import * as RouteParser from 'route-parser'
 
+const EMPTY_OBJECT = Object.freeze && Object.freeze({}) || {}
+
 function getScore(path: string) {
   const catchAll = (path.match(/\*/g) || []).length
   const catchOne = (path.match(/:/g) || []).length
@@ -18,11 +20,12 @@ function trimEndingSlash(token: string) {
   return token.replace(/\/$/, '') || '/'
 }
 
-function createLocationDescriptor (path: string, {query, scrollOptions}: Pick<NavigateOptions, 'query' | 'scrollOptions'>): LocationDescriptorObject {
+function createLocationDescriptor (route: Route, {query, scrollOptions}: Pick<NavigateOptions, 'query' | 'scrollOptions'>): LocationDescriptorObject {
   return {
-    pathname: path,
+    pathname: route.path!,
     state: {
       renderRouting: true,
+      route,
       scrollOptions,
     },
     ...(query && {search: query}),
@@ -51,13 +54,19 @@ export function pathFromPageName(page: string, pages: Pages, params: any) {
   return new RouteParser(properTemplate).reverse(params) || null
 }
 
-export function getParams(template: string, target: string) {
+export function getPageParams(name: string, path: string, pages: Pages) {
+  const pagePath = getPagePath(name, pages)
+  const pagePathWithRest = pagePath && /\*\w+$/.test(pagePath) ? pagePath : pagePath.replace(/\/?$/, '*_rest')
+  return pagePath && getParams(pagePathWithRest, path) || EMPTY_OBJECT
+}
+
+function getParams(template: string, target: string) {
   const properTemplate = adjustTemplate(template)
   const properTarget = trimEndingSlash(target)
   return new RouteParser(properTemplate).match(properTarget)
 }
 
-export function getPagePath(name: string, pages: Pages) {
+function getPagePath(name: string, pages: Pages) {
   const [rootName] = name.split('/')
   const {path: rootPath, cname} = pages[rootName]
   const {path: pagePath} = pages[name]
@@ -70,38 +79,48 @@ export function getPagePath(name: string, pages: Pages) {
   return pagePath
 }
 
+function getRouteFromPageName(id: string, pages: Pages, params: any) : Route | null {
+  const path = pathFromPageName(id, pages, params)
+  return path ? {id, path, params} : null
+}
+
+function getRouteFromPath(path: string, pages: Pages) : Route | null {
+  const id = routeIdFromPath(path, pages)
+  return id ? {id, path, params: getPageParams(id, path, pages)} : null
+}
+
 export function navigate(history: History | null, pages: Pages, options: NavigateOptions) {
-  let path: string | null
   const {page, params, query, to, scrollOptions, fallbackToWindowLocation = true} = options
 
-  if (page) {
-    path = pathFromPageName(page, pages, params)
-  } else if (to) {
-    path = to
-  } else {
+  if (!page && !to) {
     console.error(`Invalid navigation options. You should use 'page' or 'to' parameters`)
     return false
   }
 
-  if (!path) {
+  const route = page
+    ? getRouteFromPageName(page, pages, params)
+    : getRouteFromPath(to!, pages)
+
+  if (!route) {
+    console.warn(`Unable to find route for ${page ? `page '${page}'`: `path '${to}'`}`)
     return false
   }
 
   if (history) {
-    const location = createLocationDescriptor(path, {query, scrollOptions})
+    const location = createLocationDescriptor(route, {query, scrollOptions})
     setTimeout(() => history.push(location), 0)
     return true
   }
 
   if (fallbackToWindowLocation) {
-    window.location.href = `${path}${query}`
+    window.location.href = `${route.path}${query}`
     return true
   }
 
   return false
 }
 
-export function routeIdFromPath(path: string, routes: Pages) {
+function routeIdFromPath(path: string, routes: Pages) {
   let id: string | undefined
   let score: number
   let highScore: number = Number.NEGATIVE_INFINITY
