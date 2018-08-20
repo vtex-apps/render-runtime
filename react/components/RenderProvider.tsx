@@ -19,7 +19,7 @@ import {traverseComponent} from '../utils/components'
 import {RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass} from '../utils/dom'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
-import {navigate as pageNavigate, NavigateOptions} from '../utils/pages'
+import {getRouteFromPath, navigate as pageNavigate, NavigateOptions} from '../utils/pages'
 import {fetchRoutes} from '../utils/routes'
 import {TreePathContext} from '../utils/treePath'
 
@@ -100,8 +100,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings, route} = props.runtime
+    const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings} = props.runtime
     const {history, baseURI, cacheControl} = props
+    const path = canUseDOM ? window.location.pathname : window.__pathname__
+    const route = props.runtime.route || getRouteFromPath(path, pages)
 
     if (history) {
       const renderLocation = {...history.location, state: {renderRouting: true, route}}

@@ -84,7 +84,7 @@ function getRouteFromPageName(id: string, pages: Pages, params: any) : Route | n
   return path ? {id, path, params} : null
 }
 
-function getRouteFromPath(path: string, pages: Pages) : Route | null {
+export function getRouteFromPath(path: string, pages: Pages) : Route | null {
   const id = routeIdFromPath(path, pages)
   return id ? {id, path, params: getPageParams(id, path, pages)} : null
 }
