@@ -63,8 +63,9 @@ export default class MaybeAuth extends PureComponent<Props, State> {
         .then(response => response.json())
         .then(response => {
           if (
-            response.namespaces.authentication.storeUserId ||
-            response.namespaces.impersonate.storeUserId
+            response.namespaces &&
+            (response.namespaces.authentication.storeUserId ||
+            response.namespaces.impersonate.storeUserId)
           ) {
             this.setState({ loading: false, logged: true })
           } else {
