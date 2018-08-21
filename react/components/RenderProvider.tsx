@@ -19,7 +19,7 @@ import {traverseComponent} from '../utils/components'
 import {RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass} from '../utils/dom'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
-import { getPagePath, getParams, navigate as pageNavigate, NavigateOptions, routeIdFromPath } from '../utils/pages'
+import {getRouteFromPath, navigate as pageNavigate, NavigateOptions} from '../utils/pages'
 import {fetchRoutes} from '../utils/routes'
 import {TreePathContext} from '../utils/treePath'
 
@@ -49,6 +49,7 @@ export interface RenderProviderState {
   production: RenderRuntime['production']
   query: RenderRuntime['query']
   settings: RenderRuntime['settings']
+  route: RenderRuntime['route']
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
@@ -71,6 +72,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     pages: PropTypes.object,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
+    route: PropTypes.object,
     setDevice: PropTypes.func,
     updateComponentAssets: PropTypes.func,
     updateExtension: PropTypes.func,
@@ -100,9 +102,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     super(props)
     const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings} = props.runtime
     const {history, baseURI, cacheControl} = props
+    const path = canUseDOM ? window.location.pathname : window.__pathname__
+    const route = props.runtime.route || getRouteFromPath(path, pages)
 
     if (history) {
-      const renderLocation = {...history.location, state: {renderRouting: true}}
+      const renderLocation = {...history.location, state: {renderRouting: true, route}}
       history.replace(renderLocation)
       // backwards compatibility
       window.browserHistory = global.browserHistory = history
@@ -122,6 +126,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       production,
       query,
+      route,
       settings,
     }
   }
@@ -168,7 +173,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public getChildContext() {
     const {history, runtime} = this.props
-    const {components, extensions, page, pages, settings, culture, device} = this.state
+    const {components, extensions, page, pages, settings, culture, device, route} = this.state
     const {account, emitter, production, workspace} = runtime
 
     return {
@@ -187,6 +192,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       prefetchPage: this.prefetchPage,
       production,
+      route,
       setDevice: this.handleSetDevice,
       updateComponentAssets: this.updateComponentAssets,
       updateExtension: this.updateExtension,
@@ -264,13 +270,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return
     }
 
-    const page = routeIdFromPath(pathname, pagesState)
-
-    if (!page) {
-      window.location.href = `${location.pathname}${location.search}`
-      return
-    }
-
+    const {route} = state
+    const {id: page, params} = route
     const isConditional = pagesState[page] && pagesState[page].conditional
     const query = parse(location.search.substr(1))
 
@@ -280,9 +281,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         query,
       }, () => this.afterPageChanged(page, state.scrollOptions))
     }
-
-    const params = getParams(getPagePath(page, pagesState), pathname) || {}
-    const paramsJSON = JSON.stringify(params)
 
     // Retrieve the adequate assets for the new page. Naming will
     // probably change (query will return something like routes) as
@@ -294,7 +292,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       device,
       locale,
       page,
-      params: paramsJSON,
+      params: JSON.stringify(params),
       path: pathname,
       production,
       renderMajor,
@@ -316,6 +314,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         page,
         pages,
         query,
+        route,
         settings,
       }, () => this.afterPageChanged(page))
     })
@@ -407,7 +406,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public updateRuntime = (options?: PageContextOptions) => {
     const {runtime: {renderMajor}} = this.props
-    const {page, production, culture: {locale}} = this.state
+    const {page, production, culture: {locale}, route} = this.state
     const {pathname} = window.location
 
     return fetchRoutes({
@@ -435,6 +434,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         messages,
         page,
         pages,
+        route,
         settings,
       })
     })
