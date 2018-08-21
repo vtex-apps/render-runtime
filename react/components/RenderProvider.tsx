@@ -242,12 +242,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }
 
       const options = scrollOptions || { top: 0, left: 0 }
-      const editModeContainer = document.getElementById('app-content')
-      if (editModeContainer) {
-        editModeContainer.scrollTo(options)
-      } else {
-        window.scrollTo(options)
-      }
+      setTimeout(() => window.scrollTo(options), 0)
     }
     catch (e) {
       console.warn('Failed to scroll after page navigation.')
