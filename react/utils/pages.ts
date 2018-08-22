@@ -37,6 +37,11 @@ function adjustTemplate (template: string) {
   return trimEndingSlash(template).replace(/(\/\*\w+)$/, '($1)')
 }
 
+function adjustPath (path: string) {
+  const [pathname] = path.split('#')
+  return trimEndingSlash(pathname)
+}
+
 export function pathFromPageName(page: string, pages: Pages, params: any) {
   const pageDescriptor = pages[page]
   if (!pageDescriptor) {
@@ -62,7 +67,7 @@ export function getPageParams(name: string, path: string, pages: Pages) {
 
 function getParams(template: string, target: string) {
   const properTemplate = adjustTemplate(template)
-  const properTarget = trimEndingSlash(target)
+  const properTarget = adjustPath(target)
   return new RouteParser(properTemplate).match(properTarget)
 }
 
