@@ -120,7 +120,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
       props.__errorInstance = errorInstance
       props.__clearError = this.clearError
 
-      if (!(Component as any).hotReload) {
+      if (!Component || !(Component as any).hotReload) {
         return errorInstance
       }
     } else {
