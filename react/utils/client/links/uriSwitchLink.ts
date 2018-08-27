@@ -49,9 +49,9 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
 
 export const createUriSwitchLink = (baseURI: string, workspace: string) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
-    operation.setContext(({ fetchOptions = {}, runtime: {appsEtag, cacheHints} } : OperationContext) => {
-      const oldContext = operation.getContext()
-      const oldMethod = (oldContext.fetchOptions && oldContext.fetchOptions.method) || 'POST'
+    operation.setContext((oldContext: OperationContext) => {
+      const { fetchOptions = {}, runtime: {appsEtag, cacheHints} } = oldContext
+      const oldMethod = fetchOptions.method || 'POST'
       const hash = generateHash(operation.query)
       const protocol = canUseDOM ? 'https:' : 'http:'
       const {maxAge, scope, version, operationType} = extractHints(operation.query, cacheHints[hash])
