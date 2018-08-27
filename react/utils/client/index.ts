@@ -62,6 +62,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
 
     const httpLink = createHttpLink({
       credentials: 'include',
+      useGETForQueries: false,
     })
 
     const uploadLink = createUploadLink({
@@ -70,7 +71,10 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
 
     const fetcherLink = createIOFetchLink(httpLink, uploadLink)
 
-    const persistedQueryLink = createPersistedQueryLink({generateHash})
+    const persistedQueryLink = createPersistedQueryLink({
+      generateHash,
+      useGETForHashedQueries: true,
+    })
 
     const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
 

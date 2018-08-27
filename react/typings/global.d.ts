@@ -234,15 +234,17 @@ interface RenderComponent<P={}, S={}> {
     settings: {
       [app: string]: any;
     }
-    cacheHints: CacheHints
+    cacheHints: CacheHintsMap
   }
 
   interface CacheHints {
-    [hash: string]: {
-      scope: string
-      maxAge: string
-      version: number
-    }
+    scope?: string
+    maxAge?: string
+    version?: number
+  }
+
+  interface CacheHintsMap {
+    [hash: string]: CacheHints
   }
 
   interface RuntimeExports {
