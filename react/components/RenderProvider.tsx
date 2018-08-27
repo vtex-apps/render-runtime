@@ -23,6 +23,7 @@ import {getRouteFromPath, navigate as pageNavigate, NavigateOptions} from '../ut
 import {fetchRoutes} from '../utils/routes'
 import {TreePathContext} from '../utils/treePath'
 
+import {createSession, patchSession} from '../utils/session'
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
 import {RenderContext} from './RenderContext'
@@ -62,6 +63,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     culture: PropTypes.object,
     device: PropTypes.string,
     emitter: PropTypes.object,
+    ensureSession: PropTypes.func,
     extensions: PropTypes.object,
     fetchComponent: PropTypes.func,
     getSettings: PropTypes.func,
@@ -95,12 +97,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }, SEND_INFO_DEBOUNCE_MS)
 
   private rendered!: boolean
+  private sessionEnsured: boolean = false
+  private sessionPromise?: Promise<void>
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
 
   constructor(props: Props) {
     super(props)
-    const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings} = props.runtime
+    const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings, serverSessionToken, serverSegmentToken} = props.runtime
     const {history, baseURI, cacheControl} = props
     const path = canUseDOM ? window.location.pathname : window.__pathname__
     const route = props.runtime.route || getRouteFromPath(path, pages)
@@ -114,6 +118,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const runtimeContextLink = this.createRuntimeContextLink()
     this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, cacheControl)
+    this.sessionPromise = canUseDOM && (serverSessionToken || serverSegmentToken)
+      ? patchSession(serverSessionToken)
+      : undefined
+
     this.state = {
       appsEtag,
       cacheHints,
@@ -182,6 +190,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture,
       device,
       emitter,
+      ensureSession: this.ensureSession,
       extensions,
       fetchComponent: this.fetchComponent,
       getSettings: (app: string) => settings[app],
@@ -199,6 +208,24 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       updateRuntime: this.updateRuntime,
       workspace,
     }
+  }
+
+  public ensureSession = () => {
+    if (!canUseDOM) {
+      return Promise.resolve()
+    }
+
+    if (this.sessionEnsured) {
+      return Promise.resolve()
+    }
+
+    if (!this.sessionPromise) {
+      this.sessionPromise = createSession()
+    }
+
+    return this.sessionPromise.then(() => {
+      this.sessionEnsured = true
+    })
   }
 
   public getCustomMessages = (locale: string) => {
