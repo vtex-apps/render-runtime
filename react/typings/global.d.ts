@@ -210,6 +210,11 @@ interface RenderComponent<P={}, S={}> {
     [entrypoint: string]: ComponentEntry
   }
 
+  interface SessionMetadata {
+    clientAbsent?: boolean
+    serverInitialized?: boolean
+  }
+
   interface RenderRuntime {
     account: string
     accountId: string
@@ -236,8 +241,7 @@ interface RenderComponent<P={}, S={}> {
       [app: string]: any;
     }
     cacheHints: CacheHintsMap
-    serverSegmentToken: string
-    serverSessionToken: string
+    session: SessionMetadata
   }
 
   interface CacheHints {

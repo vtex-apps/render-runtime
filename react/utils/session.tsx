@@ -31,11 +31,8 @@ const fetchWithRetry = (url: string, init: RequestInit, maxRetries: number = 3):
   return callFetch()
 }
 
-export const patchSession = (sessionToken: string) => {
-  const path = sessionToken ? `/api/sessions/${sessionToken}` : `/api/sessions`
-  const url =  `${path}${window.location.search}`
-
-  return fetchWithRetry(url, {
+export const patchSession = () => {
+  return fetchWithRetry(`/api/sessions${window.location.search}`, {
     body: '{}',
     credentials: 'same-origin',
     headers: new Headers({'Content-Type': 'application/json'}),
@@ -44,9 +41,7 @@ export const patchSession = (sessionToken: string) => {
 }
 
 export const createSession = () => {
-  const url =  `/api/sessions${window.location.search}`
-
-  return fetchWithRetry(url, {
+  return fetchWithRetry(`/api/sessions${window.location.search}`, {
     body: '{}',
     credentials: 'same-origin',
     headers: new Headers({'Content-Type': 'application/json'}),

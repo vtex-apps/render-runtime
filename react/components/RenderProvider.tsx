@@ -104,7 +104,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings, serverSessionToken, serverSegmentToken} = props.runtime
+    const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings, session} = props.runtime
     const {history, baseURI, cacheControl} = props
     const path = canUseDOM ? window.location.pathname : window.__pathname__
     const route = props.runtime.route || getRouteFromPath(path, pages)
@@ -118,8 +118,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const runtimeContextLink = this.createRuntimeContextLink()
     this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, cacheControl)
-    this.sessionPromise = canUseDOM && (serverSessionToken || serverSegmentToken)
-      ? patchSession(serverSessionToken)
+    this.sessionPromise = canUseDOM && session.serverInitialized
+      ? session.clientAbsent ? createSession() : patchSession()
       : undefined
 
     this.state = {
