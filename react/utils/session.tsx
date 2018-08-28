@@ -1,6 +1,6 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { ComponentType } from 'react'
-import Session from '../components/Session'
+import Session, {SessionProps} from '../components/Session'
 
 const delay = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -49,24 +49,27 @@ export const createSession = () => {
   })
 }
 
-export function withSession <TOriginalProps>(Component: ComponentType<TOriginalProps>): ComponentType<TOriginalProps> {
-  class WithSession extends React.Component<TOriginalProps> {
-    public static get displayName(): string {
-      return `WithSession(${Component.displayName || Component.name || 'Component'})`
+export const withSession = (options: SessionProps) => {
+  // tslint:disable-next-line:only-arrow-functions
+  return function <TOriginalProps>(Component: ComponentType<TOriginalProps>): ComponentType<TOriginalProps> {
+    class WithSession extends React.Component<TOriginalProps> {
+      public static get displayName(): string {
+        return `WithSession(${Component.displayName || Component.name || 'Component'})`
+      }
+
+      public static get WrappedComponent() {
+        return Component
+      }
+
+      public render() {
+        return (
+          <Session {...options}>
+            <Component {...this.props} />
+          </Session>
+        )
+      }
     }
 
-    public static get WrappedComponent() {
-      return Component
-    }
-
-    public render() {
-      return (
-        <Session>
-          <Component {...this.props} />
-        </Session>
-      )
-    }
+    return hoistNonReactStatics<TOriginalProps, {}>(WithSession, Component)
   }
-
-  return hoistNonReactStatics<TOriginalProps, {}>(WithSession, Component)
 }
