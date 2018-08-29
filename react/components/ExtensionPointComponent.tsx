@@ -118,6 +118,12 @@ class ExtensionPointComponent extends PureComponent<
     this._isMounted = false
   }
 
+  public componentWillReceiveProps() {
+    if (this.state.error) {
+      this.clearError()
+    }
+  }
+
   public render() {
     const {
       component,
