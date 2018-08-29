@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
-import React, {ErrorInfo, PureComponent} from 'react'
+import React, { ErrorInfo, PureComponent } from 'react'
 
-import {getImplementation} from '../utils/assets'
+import { getImplementation } from '../utils/assets'
 import logEvent from '../utils/logger'
 import ExtensionPointError from './ExtensionPointError'
-import {RenderContextProps} from './RenderContext'
+import { RenderContextProps } from './RenderContext'
 
 interface Props {
   component: string | null
@@ -20,7 +20,10 @@ interface State {
 
 const componentPromiseMap: any = {}
 
-class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, State> {
+class ExtensionPointComponent extends PureComponent<
+  Props & RenderContextProps,
+  State
+> {
   public static propTypes = {
     children: PropTypes.node,
     component: PropTypes.string,
@@ -43,19 +46,27 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
       return false
     }
 
-    this.setState({error: null, errorInfo: null, lastUpdate: Date.now()})
-    const {component: mounted, treePath} = this.props
-    console.log(`[render] Component updated. treePath=${treePath} ${mounted !== component ? `mounted=${mounted} ` : ''}updated=${component}`)
+    this.setState({ error: null, errorInfo: null, lastUpdate: Date.now() })
+    const { component: mounted, treePath } = this.props
+    console.log(
+      `[render] Component updated. treePath=${treePath} ${
+        mounted !== component ? `mounted=${mounted} ` : ''
+      }updated=${component}`
+    )
   }
 
   public fetchAndRerender = () => {
-    const {component, runtime: {fetchComponent}} = this.props
+    const {
+      component,
+      runtime: { fetchComponent },
+    } = this.props
     const Component = component && getImplementation(component)
 
     // Let's fetch the assets and re-render.
     if (component && !Component && !componentPromiseMap[component]) {
-      componentPromiseMap[component] = fetchComponent(component)
-      .then(() => this.updateComponentsWithEvent(component))
+      componentPromiseMap[component] = fetchComponent(component).then(() =>
+        this.updateComponentsWithEvent(component)
+      )
     }
   }
 
@@ -67,9 +78,12 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    const {treePath: path, runtime: {account, workspace}} = this.props
-    const {message, stack} = error
-    const {componentStack} = errorInfo
+    const {
+      treePath: path,
+      runtime: { account, workspace },
+    } = this.props
+    const { message, stack } = error
+    const { componentStack } = errorInfo
     const event = {
       data: {
         account,
@@ -77,9 +91,9 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
         message,
         path,
         stack,
-        workspace
+        workspace,
       },
-      name: 'JSError'
+      name: 'JSError',
     }
 
     console.error('Failed to render extension point', path)
@@ -105,8 +119,14 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
   }
 
   public render() {
-    const {component, props, children, treePath, runtime: {production, pages, page}} = this.props
-    const {error, errorInfo} = this.state
+    const {
+      component,
+      props,
+      children,
+      treePath,
+      runtime: { production, pages, page },
+    } = this.props
+    const { error, errorInfo } = this.state
     const Component = component && getImplementation(component)
 
     // A children of this extension point throwed an uncaught error
@@ -116,7 +136,13 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
         return null
       }
 
-      const errorInstance = <ExtensionPointError error={error} errorInfo={errorInfo!} treePath={treePath} />
+      const errorInstance = (
+        <ExtensionPointError
+          error={error}
+          errorInfo={errorInfo!}
+          treePath={treePath}
+        />
+      )
       props.__errorInstance = errorInstance
       props.__clearError = this.clearError
 
@@ -128,7 +154,11 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
       delete props.__clearError
     }
 
-    return Component ? <Component {...props}>{children}</Component> : children || null
+    return Component ? (
+      <Component {...props}>{children}</Component>
+    ) : (
+      children || null
+    )
   }
 }
 
