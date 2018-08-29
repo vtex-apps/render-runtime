@@ -34,11 +34,13 @@ class ExtensionPointComponent extends PureComponent<
 
   // tslint:disable-next-line:variable-name
   private _isMounted!: boolean
+  private mountedError!: boolean
 
   constructor(props: Props & RenderContextProps) {
     super(props)
 
     this.state = {}
+    this.mountedError = false
   }
 
   public updateComponentsWithEvent = (component: string) => {
@@ -112,16 +114,17 @@ class ExtensionPointComponent extends PureComponent<
 
   public componentDidUpdate() {
     this.fetchAndRerender()
+    if (this.state.error) {
+      if (this.mountedError) {
+        this.clearError()
+      } else {
+        this.mountedError = true
+      }
+    }
   }
 
   public componentWillUnmount() {
     this._isMounted = false
-  }
-
-  public componentWillReceiveProps() {
-    if (this.state.error) {
-      this.clearError()
-    }
   }
 
   public render() {
