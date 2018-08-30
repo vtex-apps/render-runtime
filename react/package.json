@@ -48,6 +48,7 @@
     "tslint": "^5.2.0",
     "tslint-config-vtex": "^2.0.0",
     "tslint-eslint-rules": "^5.1.0",
-    "typescript": "^2.8.3"
+    "typescript": "^2.8.3",
+    "@vtex/styleguide": "^5.4.6"
   }
 }

@@ -105,7 +105,7 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
   }
 
   public render() {
-    const {component, props, children, treePath, runtime: {production, pages, page}} = this.props
+    const {component, props, children, treePath, runtime: {production, pages, page, workspace}} = this.props
     const {error, errorInfo} = this.state
     const Component = component && getImplementation(component)
 
@@ -116,7 +116,12 @@ class ExtensionPointComponent extends PureComponent<Props & RenderContextProps, 
         return null
       }
 
-      const errorInstance = <ExtensionPointError error={error} errorInfo={errorInfo!} treePath={treePath} />
+      const errorInstance = <ExtensionPointError
+        error={error}
+        errorInfo={errorInfo!}
+        treePath={treePath}
+        workspace={workspace}
+      />
       props.__errorInstance = errorInstance
       props.__clearError = this.clearError
 
