@@ -19,7 +19,7 @@ import {traverseComponent} from '../utils/components'
 import {RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass} from '../utils/dom'
 import {loadLocaleData} from '../utils/locales'
 import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
-import {getRouteFromPath, navigate as pageNavigate, NavigateOptions} from '../utils/pages'
+import {getRouteFromPath, IsRenderHistoryLocation, navigate as pageNavigate, NavigateOptions} from '../utils/pages'
 import {fetchRoutes} from '../utils/routes'
 import {TreePathContext} from '../utils/treePath'
 
@@ -249,23 +249,27 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public afterPageChanged = (route: string, scrollOptions?: RenderScrollOptions) => {
-    this.replaceRouteClass(route)
+  public afterPageChanged = (location: RenderHistoryLocation, scrollOptions?: RenderScrollOptions) => {
+    const {runtime: {emitter}} = this.props
+    const {state: {route: {id: routeId}}} = location
+
+    this.replaceRouteClass(routeId)
     this.scrollTo(scrollOptions)
     this.sendInfoFromIframe()
+    emitter.emit('afterPageChanged', location)
   }
 
-  public onPageChanged = (location: RenderHistoryLocation) => {
-    const {runtime: {renderMajor}} = this.props
+  public onPageChanged = (location: HistoryLocation) => {
+    const {runtime: {renderMajor, emitter}} = this.props
     const {culture: {locale}, pages: pagesState, production, device} = this.state
-    const {pathname, state} = location
 
     // Make sure this is our navigation
-    if (!state || !state.renderRouting) {
+    if (!IsRenderHistoryLocation(location)) {
       return
     }
 
-    const {route} = state
+    emitter.emit('onPageChanged', location)
+    const {pathname, state: {route, scrollOptions}} = location
     const {id: page, params} = route
     const isConditional = pagesState[page] && pagesState[page].conditional
     const query = parse(location.search.substr(1))
@@ -275,7 +279,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         page,
         query,
         route,
-      }, () => this.afterPageChanged(page, state.scrollOptions))
+      }, () => this.afterPageChanged(location, scrollOptions))
     }
 
     // Retrieve the adequate assets for the new page. Naming will
@@ -312,7 +316,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         query,
         route,
         settings,
-      }, () => this.afterPageChanged(page))
+      }, () => this.afterPageChanged(location))
     })
   }
 

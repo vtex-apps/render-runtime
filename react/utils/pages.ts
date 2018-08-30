@@ -1,5 +1,5 @@
 import {canUseDOM} from 'exenv'
-import {History, LocationDescriptorObject} from 'history'
+import {History, Location, LocationDescriptorObject} from 'history'
 import * as RouteParser from 'route-parser'
 
 const EMPTY_OBJECT = Object.freeze && Object.freeze({}) || {}
@@ -123,6 +123,10 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
   }
 
   return false
+}
+
+export function IsRenderHistoryLocation (arg: HistoryLocation): arg is RenderHistoryLocation {
+  return arg && arg.state && arg.state.renderRouting
 }
 
 function routeIdFromPath(path: string, routes: Pages) {

@@ -81,12 +81,14 @@ declare global {
   type RenderScrollOptions = ScrollToOptions | false
 
   interface RenderHistoryLocation extends Location {
-    state?: {
+    state: {
       route: Route
-      renderRouting?: true
+      renderRouting: true
       scrollOptions?: RenderScrollOptions
     }
   }
+
+  type HistoryLocation = RenderHistoryLocation | Location
 
   interface Pages {
     [name: string]: Page
