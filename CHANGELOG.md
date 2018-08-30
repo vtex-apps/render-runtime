@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.20.8] - 2018-08-30
+### Fixed
+- Allow route change to clear components errors.
+
 ## [7.20.7] - 2018-08-27
 
 ## [7.20.6] - 2018-8-24
