@@ -3,7 +3,7 @@
   "version": null,
   "license": "UNLICENSED",
   "scripts": {
-    "lint": "tsc --noEmit && tslint src/**/*.ts"
+    "lint": "tsc --noEmit --pretty && tslint src/**/*.ts"
   },
   "dependencies": {
     "apollo-cache-inmemory": "^1.2.5",

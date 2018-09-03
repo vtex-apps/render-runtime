@@ -1,6 +1,6 @@
 import {NormalizedCacheObject} from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
-import {ApolloLink, NextLink, Operation} from 'apollo-link'
+import {ApolloLink, NextLink, Observable, Operation} from 'apollo-link'
 import debounce from 'debounce'
 import {canUseDOM} from 'exenv'
 import {History, UnregisterCallback} from 'history'
@@ -23,6 +23,8 @@ import {getRouteFromPath, navigate as pageNavigate, NavigateOptions} from '../ut
 import {fetchRoutes} from '../utils/routes'
 import {TreePathContext} from '../utils/treePath'
 
+import {Subscription} from 'apollo-client/util/Observable'
+import {initializeSession} from '../utils/session'
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
 import {RenderContext} from './RenderContext'
@@ -62,6 +64,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     culture: PropTypes.object,
     device: PropTypes.string,
     emitter: PropTypes.object,
+    ensureSession: PropTypes.func,
     extensions: PropTypes.object,
     fetchComponent: PropTypes.func,
     getSettings: PropTypes.func,
@@ -95,6 +98,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }, SEND_INFO_DEBOUNCE_MS)
 
   private rendered!: boolean
+  private sessionPromise: Promise<void>
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
 
@@ -112,8 +116,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       window.browserHistory = global.browserHistory = history
     }
 
+    // todo: reload window if client-side created a segment different from server-side
+    this.sessionPromise = (canUseDOM && page.startsWith('store')) ? initializeSession() : Promise.resolve()
     const runtimeContextLink = this.createRuntimeContextLink()
-    this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, cacheControl)
+    const ensureSessionLink = this.createEnsureSessionLink()
+    this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, ensureSessionLink, cacheControl)
+
     this.state = {
       appsEtag,
       cacheHints,
@@ -173,7 +181,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public getChildContext() {
     const {history, runtime} = this.props
-    const {components, extensions, page, pages, settings, culture, device, route} = this.state
+    const {components, extensions, page, pages, culture, device, route} = this.state
     const {account, emitter, production, workspace} = runtime
 
     return {
@@ -182,9 +190,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture,
       device,
       emitter,
+      ensureSession: this.ensureSession,
       extensions,
       fetchComponent: this.fetchComponent,
-      getSettings: (app: string) => settings[app],
+      getSettings: this.getSettings,
       history,
       navigate: this.navigate,
       onPageChanged: this.onPageChanged,
@@ -199,6 +208,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       updateRuntime: this.updateRuntime,
       workspace,
     }
+  }
+
+  public getSettings = (app: string) => {
+    const {settings} = this.state
+    return settings[app]
+  }
+
+  public ensureSession = () => {
+    return this.sessionPromise
   }
 
   public getCustomMessages = (locale: string) => {
@@ -434,6 +452,27 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         settings,
       })
     })
+  }
+
+  public createEnsureSessionLink() {
+    return new ApolloLink((operation: Operation, forward?: NextLink) =>
+      new Observable(observer => {
+        let handle: Subscription | undefined
+        this.sessionPromise.then(() => {
+          handle = forward && forward(operation).subscribe({
+            complete: observer.complete.bind(observer),
+            error: observer.error.bind(observer),
+            next: observer.next.bind(observer),
+          })
+        }).catch(observer.error.bind(observer))
+
+        return () => {
+          if (handle) {
+            handle.unsubscribe()
+          }
+        }
+      })
+    )
   }
 
   public createRuntimeContextLink() {

@@ -50,7 +50,7 @@ export const getState = (runtime: RenderRuntime) => {
     : {}
 }
 
-export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContextLink: ApolloLink, cacheControl?: PageCacheControl) => {
+export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContextLink: ApolloLink, ensureSessionLink: ApolloLink, cacheControl?: PageCacheControl) => {
   const {account, workspace} = runtime
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
@@ -79,8 +79,8 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
     const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
 
     const link = cacheControl
-      ? ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, persistedQueryLink, uriSwitchLink, cachingLink(cacheControl), fetcherLink])
-      : ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, persistedQueryLink, uriSwitchLink, fetcherLink])
+      ? ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, ensureSessionLink, persistedQueryLink, uriSwitchLink, cachingLink(cacheControl), fetcherLink])
+      : ApolloLink.from([omitTypenameLink, versionSplitterLink, runtimeContextLink, ensureSessionLink, persistedQueryLink, uriSwitchLink, fetcherLink])
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(window.__STATE__) : cache,

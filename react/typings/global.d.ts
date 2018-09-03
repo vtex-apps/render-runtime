@@ -116,6 +116,7 @@ declare global {
     culture: RenderRuntime['culture'],
     device: ConfigurationDevice,
     emitter: RenderRuntime['emitter'],
+    ensureSession: () => Promise<void>,
     extensions: RenderRuntime['extensions'],
     fetchComponent: (component: string) => Promise<void>,
     getSettings: (app: string) => any,
@@ -235,6 +236,7 @@ interface RenderComponent<P={}, S={}> {
       [app: string]: any;
     }
     cacheHints: CacheHintsMap
+    segmentToken: string
   }
 
   interface CacheHints {
@@ -260,6 +262,7 @@ interface RenderComponent<P={}, S={}> {
     canUseDOM: boolean
     withHMR: any
     withRuntimeContext: any
+    withSession: any
     RenderContextConsumer: React.Consumer<RenderContext>
     TreePathContextConsumer: React.Consumer<TreePathProps>
     buildCacheLocator: any
