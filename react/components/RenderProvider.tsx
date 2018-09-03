@@ -117,7 +117,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     // todo: reload window if client-side created a segment different from server-side
-    this.sessionPromise = canUseDOM && page.startsWith('store') ? initializeSession() : Promise.resolve()
+    this.sessionPromise = (canUseDOM && page.startsWith('store')) ? initializeSession() : Promise.resolve()
     const runtimeContextLink = this.createRuntimeContextLink()
     const ensureSessionLink = this.createEnsureSessionLink()
     this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, ensureSessionLink, cacheControl)
