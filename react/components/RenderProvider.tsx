@@ -181,7 +181,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public getChildContext() {
     const {history, runtime} = this.props
-    const {components, extensions, page, pages, settings, culture, device, route} = this.state
+    const {components, extensions, page, pages, culture, device, route} = this.state
     const {account, emitter, production, workspace} = runtime
 
     return {
@@ -190,10 +190,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture,
       device,
       emitter,
-      ensureSession: () => this.sessionPromise,
+      ensureSession: this.ensureSession,
       extensions,
       fetchComponent: this.fetchComponent,
-      getSettings: (app: string) => settings[app],
+      getSettings: this.getSettings,
       history,
       navigate: this.navigate,
       onPageChanged: this.onPageChanged,
@@ -208,6 +208,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       updateRuntime: this.updateRuntime,
       workspace,
     }
+  }
+
+  public getSettings = (app: string) => {
+    const {settings} = this.state
+    return settings[app]
+  }
+
+  public ensureSession = () => {
+    return this.sessionPromise
   }
 
   public getCustomMessages = (locale: string) => {
