@@ -1,6 +1,6 @@
 import {ApolloLink, NextLink, Operation} from 'apollo-link'
 import {canUseDOM} from 'exenv'
-import {ASTNode, DirectiveDefinitionNode, OperationDefinitionNode, visit} from 'graphql'
+import {ASTNode, DirectiveDefinitionNode, OperationDefinitionNode, visit, DocumentNode} from 'graphql'
 import {generateHash} from '../generateHash'
 
 const assetsFromQuery = (query: ASTNode) => {
@@ -41,7 +41,6 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
   const {maxAge = 'long', scope = 'public', version = 1} = hints
   return {
     maxAge: maxAge.toLowerCase(),
-    operationType,
     scope: scope.toLowerCase(),
     version,
   }
@@ -54,11 +53,15 @@ export const createUriSwitchLink = (baseURI: string, workspace: string) =>
       const oldMethod = fetchOptions.method || 'POST'
       const hash = generateHash(operation.query)
       const protocol = canUseDOM ? 'https:' : 'http:'
-      const {maxAge, scope, version, operationType} = extractHints(operation.query, cacheHints[hash])
-      const method = (equals(scope, 'private') && equals(operationType, 'query')) ? 'POST' : oldMethod
+      const {maxAge, scope, version} = extractHints(operation.query, cacheHints[hash])
+      const newMethod = equals(scope, 'private') ? 'POST' : oldMethod
       return {
         ...oldContext,
-        fetchOptions: {...fetchOptions, method},
+        fetchOptions: {
+          ...fetchOptions,
+          method: 'POST',
+          useGetInBatch: equals(newMethod, 'GET')
+        },
         uri: `${protocol}//${baseURI}/_v/graphql/${scope}/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
       }
     })
