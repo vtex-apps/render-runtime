@@ -9,7 +9,7 @@ export const IOFetch = async (uri: string | Request, init?: RequestInit): Promis
     const parsedUri = parse(uri, true)
 
     delete parsedUri.search
-    parsedUri.query = {...parsedUri.query, query: body}
+    parsedUri.query = {...parsedUri.query, batch: body}
 
     delete formattedInit.body
     formattedInit.method = 'GET'
