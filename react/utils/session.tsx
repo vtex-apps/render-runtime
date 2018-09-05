@@ -14,12 +14,12 @@ const fetchWithRetry = (url: string, init: RequestInit, maxRetries: number = 3):
         : response.json()
           .then((error) => ({response, error}))
           .catch(() => ({response, error: {message: 'Unable to parse JSON'}}))
-    }).then(({response, error}: any) => {
+    }).then(({error}: any) => {
       if (error) {
         console.error(error)
 
         if (attempt >= maxRetries) {
-          throw new Error(error.message || `HTTP Error: status ${response.status}`)
+          return // no session is fine for now
         }
 
         const ms = (2 ** attempt) * 500
