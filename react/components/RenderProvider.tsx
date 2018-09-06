@@ -24,7 +24,7 @@ import {fetchRoutes} from '../utils/routes'
 import {TreePathContext} from '../utils/treePath'
 
 import {Subscription} from 'apollo-client/util/Observable'
-import {initializeSession} from '../utils/session'
+import {initializeSession, patchSession} from '../utils/session'
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
 import {RenderContext} from './RenderContext'
@@ -73,6 +73,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     onPageChanged: PropTypes.func,
     page: PropTypes.string,
     pages: PropTypes.object,
+    patchSession: PropTypes.func,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
     route: PropTypes.object,
@@ -199,6 +200,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       onPageChanged: this.onPageChanged,
       page,
       pages,
+      patchSession: this.patchSession,
       prefetchPage: this.prefetchPage,
       production,
       route,
@@ -217,6 +219,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public ensureSession = () => {
     return this.sessionPromise
+  }
+
+  public patchSession = (data?: any) => {
+    return this.sessionPromise.then(() => patchSession(data))
   }
 
   public getCustomMessages = (locale: string) => {

@@ -9,6 +9,7 @@ import {History, Location} from "history"
 import {HelmetData} from "react-helmet"
 import {TreePathProps} from "../utils/treePath"
 import { LayoutContainer } from '../core/main'
+import { patchSession } from '../utils/session';
 
 declare global {
   interface RenderMetric {
@@ -125,6 +126,7 @@ declare global {
     onPageChanged: (location: RenderHistoryLocation) => void,
     page: RenderRuntime['page'],
     pages: RenderRuntime['pages'],
+    patchSession: (data?: any) => Promise<void>,
     prefetchPage: (name: string) => Promise<void>,
     production: RenderRuntime['production'],
     setDevice: (device: ConfigurationDevice) => void,
