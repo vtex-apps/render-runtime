@@ -125,6 +125,7 @@ declare global {
     onPageChanged: (location: RenderHistoryLocation) => void,
     page: RenderRuntime['page'],
     pages: RenderRuntime['pages'],
+    patchSession: (data?: any) => Promise<void>,
     prefetchPage: (name: string) => Promise<void>,
     production: RenderRuntime['production'],
     setDevice: (device: ConfigurationDevice) => void,

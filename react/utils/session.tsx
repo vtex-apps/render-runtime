@@ -40,6 +40,15 @@ export const initializeSession = () => {
   })
 }
 
+export const patchSession = (data?: any) => {
+  return fetchWithRetry(`/api/sessions${window.location.search}`, {
+    body: data ? JSON.stringify(data) : '{}',
+    credentials: 'same-origin',
+    headers: new Headers({'Content-Type': 'application/json'}),
+    method: 'PATCH'
+  })
+}
+
 export const withSession = (options: SessionProps) => {
   // tslint:disable-next-line:only-arrow-functions
   return function <TOriginalProps>(Component: ComponentType<TOriginalProps>): ComponentType<TOriginalProps> {
