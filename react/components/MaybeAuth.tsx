@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react'
 import Loading from './Loading'
 
 const LOGIN_PATH = '/login'
-const AUTH_STORE_URL = '/_v/private/authenticated/store'
+const API_SESSION_URL = '/api/sessions?items=*'
 
 interface Props {
   navigate: (navigateOptions: object) => {},
@@ -32,10 +32,14 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   }
 
   public redirectToLogin() {
-    this.props.navigate({
-      fallbackToWindowLocation: false,
-      to: LOGIN_PATH,
-    })
+    if (this.props.page !== 'store/login') {
+      const pathName = window.location.pathname.replace(/\/$/, '')
+      this.props.navigate({
+        fallbackToWindowLocation: false,
+        to: LOGIN_PATH,
+        query: `returnUrl=${pathName}`
+      })
+    }
   }
 
   public render() {
@@ -59,23 +63,24 @@ export default class MaybeAuth extends PureComponent<Props, State> {
 
   private onUpdate() {
     if (this.isAuthenticatedPage()) {
-      fetch(AUTH_STORE_URL, { credentials: 'same-origin' })
-      .then(response => response.json())
-      .then(({ authenticated }) => {
-        this.setState({
-          loading: false,
-          logged: authenticated
+      fetch(API_SESSION_URL, { credentials: 'same-origin' })
+        .then(response => response.json())
+        .then(response => {
+          if (
+            response.namespaces &&
+            (response.namespaces.authentication.storeUserId ||
+            response.namespaces.impersonate.storeUserId)
+          ) {
+            this.setState({ loading: false, logged: true })
+          } else {
+            this.setState({ loading: false, logged: false })
+            this.redirectToLogin()
+          }
         })
-        if (!authenticated) {
+        .catch(() => {
+          this.setState({ loading: false, logged: false })
           this.redirectToLogin()
-        }
-      }).catch(err => {
-        this.setState({
-          loading: false,
-          logged: false
         })
-        this.redirectToLogin()
-      })
     }
   }
 }
