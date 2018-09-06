@@ -9,7 +9,6 @@ import {History, Location} from "history"
 import {HelmetData} from "react-helmet"
 import {TreePathProps} from "../utils/treePath"
 import { LayoutContainer } from '../core/main'
-import { patchSession } from '../utils/session';
 
 declare global {
   interface RenderMetric {
