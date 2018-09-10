@@ -1,12 +1,12 @@
 import {format, parse} from 'url'
 
-export const IOFetch = async (uri: string | Request, init?: RequestInit): Promise<Response> => {
+export const IOFetch = async (urlOrRequest: string | Request, init?: RequestInit): Promise<Response> => {
   const {useGetInBatch = false, body} = init || {} as any
-  const formattedInit = {...init}
-  let formattedUri = uri
+  const formattedInit: RequestInit = {...init}
+  let formattedUrl = (typeof urlOrRequest === 'string') ? urlOrRequest : urlOrRequest.url
 
-  if (useGetInBatch && typeof uri === 'string' && formattedInit) {
-    const parsedUri = parse(uri, true)
+  if (useGetInBatch && formattedInit) {
+    const parsedUri = parse(formattedUrl, true)
 
     delete parsedUri.search
     parsedUri.query = {...parsedUri.query, batch: body}
@@ -14,8 +14,8 @@ export const IOFetch = async (uri: string | Request, init?: RequestInit): Promis
     delete formattedInit.body
     formattedInit.method = 'GET'
 
-    formattedUri = format(parsedUri)
+    formattedUrl = format(parsedUri)
   }
 
-  return fetch(formattedUri, formattedInit)
+  return fetch(formattedUrl, formattedInit)
 }

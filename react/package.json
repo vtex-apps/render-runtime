@@ -29,8 +29,7 @@
     "react-hot-loader": "^4.1.2",
     "react-intl": "^2.4.0",
     "react-no-ssr": "^1.1.0",
-    "route-parser": "^0.0.5",
-    "url": "^0.11.0"
+    "route-parser": "^0.0.5"
   },
   "devDependencies": {
     "@types/debounce": "^1.0.0",
