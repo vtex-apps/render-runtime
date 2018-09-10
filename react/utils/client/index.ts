@@ -62,8 +62,8 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       fragmentMatcher: new HeuristicFragmentMatcher()
     })
 
-    const httpLink = new BatchHttpLink({
-      batchKey,
+    const httpLink: any = new BatchHttpLink({
+      batchKey: batchKey as any,
       credentials: 'include',
       fetch: IOFetch as any,
       includeExtensions: true,

@@ -1,6 +1,6 @@
 import {ApolloLink, createOperation, GraphQLRequest, NextLink, Observable, Operation} from 'apollo-link'
 import {transformOperation, validateOperation} from 'apollo-link/lib/linkUtils'
-import {BREAK, DirectiveNode, DocumentNode, OperationDefinitionNode, parse, print, SelectionNode, VariableDefinitionNode, VariableNode, visit} from 'graphql'
+import {BREAK, DefinitionNode, DirectiveNode, DocumentNode, OperationDefinitionNode, parse, print, SelectionNode, VariableDefinitionNode, VariableNode, visit} from 'graphql'
 
 interface Variables {
   [name: string]: VariableDefinitionNode
@@ -79,7 +79,7 @@ const isTypeQuery = (docNode: DocumentNode) => {
 }
 
 const assertSingleOperation = (query: DocumentNode) => {
-  const ops = query.definitions.filter(({operation}: OperationDefinitionNode) => operationWhiteList.includes(operation))
+  const ops = query.definitions.filter((node: DefinitionNode) => operationWhiteList.includes((node as OperationDefinitionNode).operation))
 
   if (ops.length > 1) {
     throw new Error('Only one operation definition is allowed per query. Please split your queries in two different files')
@@ -110,13 +110,13 @@ const mergeRecursively = (accumulator: any, value: any) => {
 }
 
 const createOperationForQuery = (operation: Operation) => (query: DocumentNode) => {
-  const graphQLRequest = {...operation, query} as GraphQLRequest
+  const graphQLRequest = {...operation, query} as any
   const op = validateOperation(transformOperation(graphQLRequest))
   return createOperation(operation.getContext(), op)
 }
 
 const operationByRuntimeMetaDirective = (operation: Operation) => {
-  const queries = queriesByRuntimeMetaDirective(operation.query)
+  const queries = queriesByRuntimeMetaDirective(operation.query as any)
   return queries.map(createOperationForQuery(operation))
 }
 
@@ -145,7 +145,7 @@ const observableFromOperations = (operations: Operation[], forward: NextLink) =>
 
 export const versionSplitterLink = new ApolloLink((operation: Operation, forward?: NextLink) => {
   if (forward) {
-    const query = operation.query
+    const query = operation.query as any
     const operations = operationByRuntimeMetaDirective(operation)
 
     if (operations.length && isTypeQuery(query)) {
