@@ -8,7 +8,7 @@
   "dependencies": {
     "apollo-cache-inmemory": "^1.2.5",
     "apollo-client": "^2.3.5",
-    "apollo-link-http": "^1.5.4",
+    "apollo-link-batch-http": "^1.2.2",
     "apollo-link-persisted-queries": "^0.2.1",
     "apollo-upload-client": "^8.1.0",
     "apollo-utilities": "^1.0.16",
@@ -29,9 +29,12 @@
     "react-hot-loader": "^4.1.2",
     "react-intl": "^2.4.0",
     "react-no-ssr": "^1.1.0",
-    "route-parser": "^0.0.5"
+    "route-parser": "^0.0.5",
+    "url": "^0.11.0",
+    "url-search-params": "^1.1.0"
   },
   "devDependencies": {
+    "@types/apollo-upload-client": "^8.1.0",
     "@types/debounce": "^1.0.0",
     "@types/graphql": "^0.13.3",
     "@types/history": "^4.6.2",
@@ -45,6 +48,7 @@
     "@types/react-hot-loader": "^4.1.0",
     "@types/react-intl": "^2.3.5",
     "@types/route-parser": "^0.1.1",
+    "@types/url-search-params": "^0.10.2",
     "tslint": "^5.2.0",
     "tslint-config-vtex": "^2.0.0",
     "tslint-eslint-rules": "^5.1.0",

@@ -1,23 +1,23 @@
-import {ApolloLink, NextLink, Operation} from 'apollo-link'
-import {canUseDOM} from 'exenv'
-import {ASTNode, DirectiveDefinitionNode, OperationDefinitionNode, visit} from 'graphql'
-import {generateHash} from '../generateHash'
+import { ApolloLink, NextLink, Operation } from 'apollo-link'
+import { canUseDOM } from 'exenv'
+import { ASTNode, DirectiveDefinitionNode, OperationDefinitionNode, visit } from 'graphql'
+import { generateHash } from '../generateHash'
 
 const assetsFromQuery = (query: ASTNode) => {
   const assets = {operationType: 'mutation', queryScope: undefined}
   visit(query, {
-    OperationDefinition (node: OperationDefinitionNode) {
-      assets.operationType = node.operation
-    },
     Directive (node: DirectiveDefinitionNode) {
       if (node.name.value === 'context') {
         const scopeArg = node.arguments && node.arguments.find((argNode) => argNode.name.value === 'scope')
         if (scopeArg) {
-          assets.queryScope = scopeArg.value.value
+          assets.queryScope = (scopeArg as any).value.value
         }
       }
-    }
-  })
+    },
+    OperationDefinition (node: OperationDefinitionNode) {
+      assets.operationType = node.operation
+    },
+  } as any)
   return assets
 }
 
@@ -41,7 +41,6 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
   const {maxAge = 'long', scope = 'public', version = 1} = hints
   return {
     maxAge: maxAge.toLowerCase(),
-    operationType,
     scope: scope.toLowerCase(),
     version,
   }
@@ -51,14 +50,19 @@ export const createUriSwitchLink = (baseURI: string, workspace: string) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     operation.setContext((oldContext: OperationContext) => {
       const { fetchOptions = {}, runtime: {appsEtag, cacheHints} } = oldContext
+      const {query} = operation as any
       const oldMethod = fetchOptions.method || 'POST'
-      const hash = generateHash(operation.query)
+      const hash = generateHash(query)
       const protocol = canUseDOM ? 'https:' : 'http:'
-      const {maxAge, scope, version, operationType} = extractHints(operation.query, cacheHints[hash])
-      const method = (equals(scope, 'private') && equals(operationType, 'query')) ? 'POST' : oldMethod
+      const {maxAge, scope, version} = extractHints(query, cacheHints[hash])
+      const newMethod = equals(scope, 'private') ? 'POST' : oldMethod
       return {
         ...oldContext,
-        fetchOptions: {...fetchOptions, method},
+        fetchOptions: {
+          ...fetchOptions,
+          method: 'POST',
+          useGetInBatch: equals(newMethod, 'GET')
+        },
         uri: `${protocol}//${baseURI}/_v/graphql/${scope}/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
       }
     })

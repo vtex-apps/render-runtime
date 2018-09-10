@@ -16,7 +16,7 @@ const parseCacheControl = (cacheControl: string) => {
 }
 
 const getMaxAge = (response: Response) => {
-  const cacheControlHeader = response.headers.get('cache-control')
+  const cacheControlHeader = response.headers && response.headers.get('cache-control')
   if (!cacheControlHeader) {
     return DEFAULT_MAX_AGE_S
   }
