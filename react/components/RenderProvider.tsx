@@ -76,6 +76,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     patchSession: PropTypes.func,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
+    publicEndpoint: PropTypes.string,
     route: PropTypes.object,
     setDevice: PropTypes.func,
     updateComponentAssets: PropTypes.func,
@@ -183,7 +184,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public getChildContext() {
     const {history, runtime} = this.props
     const {components, extensions, page, pages, culture, device, route} = this.state
-    const {account, emitter, production, workspace} = runtime
+    const {account, emitter, production, publicEndpoint, workspace} = runtime
 
     return {
       account,
@@ -203,6 +204,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       patchSession: this.patchSession,
       prefetchPage: this.prefetchPage,
       production,
+      publicEndpoint,
       route,
       setDevice: this.handleSetDevice,
       updateComponentAssets: this.updateComponentAssets,

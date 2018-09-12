@@ -128,6 +128,7 @@ declare global {
     patchSession: (data?: any) => Promise<void>,
     prefetchPage: (name: string) => Promise<void>,
     production: RenderRuntime['production'],
+    publicEndpoint: RenderRuntime['publicEndpoint'],
     setDevice: (device: ConfigurationDevice) => void,
     updateComponentAssets: (availableComponents: Components) => void,
     updateExtension: (name: string, extension: Extension) => void,
