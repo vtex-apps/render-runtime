@@ -17,6 +17,15 @@ export const withRuntimeContext = <TOriginalProps extends {} = {}>(Component: Co
 }
 
 export const withEmitter = <TOriginalProps extends {} = {}>(Component: ComponentType<TOriginalProps & EmitterProps>): ComponentType<TOriginalProps> => {
-  const ExtendedComponent = (props: TOriginalProps) => <RenderContext.Consumer>{runtime => <Component {...props} __emitter={runtime.emitter} />}</RenderContext.Consumer>
-  return hoistNonReactStatics<TOriginalProps, EmitterProps>(ExtendedComponent, Component)
+  class WithEmitter extends React.Component<TOriginalProps> {
+    public static get displayName(): string {
+      return `WithEmitter(${Component.displayName || Component.name || 'Component'})`
+    }
+
+    public render() {
+      return <RenderContext.Consumer>{runtime => <Component {...this.props} __emitter={runtime.emitter} />}</RenderContext.Consumer>
+    }
+  }
+
+  return hoistNonReactStatics<TOriginalProps, EmitterProps>(WithEmitter, Component)
 }
