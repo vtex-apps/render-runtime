@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.22.1] - 2018-9-17
+
 ## [7.22.0] - 2018-09-06
 ### Changed
 - Update `MaybeAuth` to work just by the session.
