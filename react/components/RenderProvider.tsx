@@ -68,6 +68,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     extensions: PropTypes.object,
     fetchComponent: PropTypes.func,
     getSettings: PropTypes.func,
+    hints: PropTypes.object,
     history: PropTypes.object,
     navigate: PropTypes.func,
     onPageChanged: PropTypes.func,
@@ -183,7 +184,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public getChildContext() {
     const {history, runtime} = this.props
     const {components, extensions, page, pages, culture, device, route} = this.state
-    const {account, emitter, production, workspace} = runtime
+    const {account, emitter, hints, production, workspace} = runtime
 
     return {
       account,
@@ -195,6 +196,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       extensions,
       fetchComponent: this.fetchComponent,
       getSettings: this.getSettings,
+      hints,
       history,
       navigate: this.navigate,
       onPageChanged: this.onPageChanged,
