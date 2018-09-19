@@ -110,6 +110,12 @@ declare global {
 
   type ConfigurationDevice = 'any' | 'desktop' | 'mobile'
 
+  interface RenderHints {
+    desktop: boolean
+    mobile: boolean
+    tablet: boolean
+  }
+
   interface RenderContext {
     account: RenderRuntime['account'],
     components: RenderRuntime['components'],
@@ -120,6 +126,7 @@ declare global {
     extensions: RenderRuntime['extensions'],
     fetchComponent: (component: string) => Promise<void>,
     getSettings: (app: string) => any,
+    hints: RenderHints,
     history: History | null,
     navigate: (options: NavigateOptions) => boolean,
     onPageChanged: (location: RenderHistoryLocation) => void,
