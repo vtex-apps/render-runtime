@@ -10,7 +10,7 @@ const fetchWithRetry = (url: string, init: RequestInit, maxRetries: number = 3):
   const callFetch = (attempt: number = 0): Promise<void> =>
     fetch(url, init).then((response) => {
       return response.status >= 200 && response.status < 300
-        ? { response, error: { message: "teste" } }
+        ? { response, error: null }
         : response.json()
           .then((error) => ({ response, error }))
           .catch(() => ({ response, error: { message: 'Unable to parse JSON' } }))
