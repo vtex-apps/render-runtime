@@ -79,7 +79,7 @@ const isTypeQuery = (docNode: DocumentNode) => {
 }
 
 const assertSingleOperation = (query: DocumentNode) => {
-  const ops = query.definitions.filter(({operation}: OperationDefinitionNode) => operationWhiteList.includes(operation))
+  const ops = query.definitions.filter(({operation}: any) => operationWhiteList.includes(operation))
 
   if (ops.length > 1) {
     throw new Error('Only one operation definition is allowed per query. Please split your queries in two different files')
