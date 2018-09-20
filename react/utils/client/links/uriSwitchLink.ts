@@ -1,17 +1,22 @@
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import { canUseDOM } from 'exenv'
-import { ASTNode, DirectiveNode, OperationDefinitionNode, visit } from 'graphql'
+import { ASTNode, DirectiveNode, OperationDefinitionNode, StringValueNode, visit } from 'graphql'
 
 import { generateHash } from '../generateHash'
 
+interface Assets {
+  operationType: string,
+  queryScope?: string
+}
+
 const assetsFromQuery = (query: ASTNode) => {
-  const assets = {operationType: 'mutation', queryScope: undefined}
+  const assets: Assets = {operationType: 'mutation'}
   visit(query, {
     Directive (node: DirectiveNode) {
       if (node.name.value === 'context') {
         const scopeArg = node.arguments && node.arguments.find((argNode) => argNode.name.value === 'scope')
         if (scopeArg) {
-          assets.queryScope = (scopeArg.value as any).value
+          assets.queryScope = (scopeArg.value as StringValueNode).value
         }
       }
     },

@@ -70,7 +70,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       credentials: 'include',
     })
 
-    const fetcherLink = createIOFetchLink(httpLink as any, uploadLink)
+    const fetcherLink = createIOFetchLink(httpLink, uploadLink)
 
     const persistedQueryLink = createPersistedQueryLink({
       generateHash,
