@@ -10,11 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [7.22.4] - 2018-09-21
 
 ## [7.22.3] - 2018-09-21
-<<<<<<< HEAD
 ### Fixed
 - Infinity calls when using `fetchWithRetry` in `initializeSession` and `patchSession`.
-=======
->>>>>>> Release v7.22.3
 
 ## [7.22.2] - 2018-9-19
 
