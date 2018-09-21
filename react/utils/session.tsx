@@ -16,17 +16,19 @@ const fetchWithRetry = (url: string, init: RequestInit, maxRetries: number = 3):
           .catch(() => ({ response, error: { message: 'Unable to parse JSON' } }))
     }).then(({ error }: any) => {
       if (error) {
-        console.error(error)
-
-        if (attempt >= maxRetries) {
-          return // no session is fine for now
-        }
-
-        const ms = (2 ** attempt) * 500
-        return delay(ms)
-          .then(() => callFetch(++attempt))
+        throw Error(error)
       }
-    }).catch((error) => console.error(error))
+    }).catch((error) => {
+      console.error(error)
+
+      if (attempt >= maxRetries) {
+        return // no session is fine for now
+      }
+
+      const ms = (2 ** attempt) * 500
+      return delay(ms)
+        .then(() => callFetch(++attempt))
+    })
 
   return callFetch()
 }
