@@ -1,7 +1,16 @@
-import {ArgumentNode, BREAK, DocumentNode, visit} from 'graphql'
+import {ArgumentNode, BREAK, DocumentNode, StringValueNode, visit} from 'graphql'
 
-export const generateHash = (query: DocumentNode) => {
-  if (query.documentId) {
+interface HashedDocumentNode extends DocumentNode {
+  documentId: string
+}
+
+const isHashedDocumentNode = (arg: any): arg is HashedDocumentNode => {
+  return arg && arg.documentId
+}
+
+export const generateHash = (query: HashedDocumentNode | DocumentNode) => {
+
+  if (isHashedDocumentNode(query)) {
     return query.documentId
   }
 
@@ -9,7 +18,7 @@ export const generateHash = (query: DocumentNode) => {
   visit(query, {
     Argument(node: ArgumentNode) {
       if (node.name.value === 'hash') {
-        asset.hash = node.value.value
+        asset.hash = (node.value as StringValueNode).value
         return BREAK
       }
     }
