@@ -485,7 +485,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public createRuntimeContextLink() {
     return new ApolloLink((operation: Operation, forward?: NextLink) => {
-      const {appsEtag, cacheHints, components, extensions, messages, pages} = this.state
+      const {appsEtag, cacheHints, components, extensions, messages, pages, culture} = this.state
       operation.setContext((currentContext: Record<string, any>) => {
         return {
           ...currentContext,
@@ -493,6 +493,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             appsEtag,
             cacheHints,
             components,
+            culture,
             extensions,
             messages,
             pages,
