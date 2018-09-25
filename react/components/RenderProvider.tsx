@@ -293,10 +293,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const { route } = state
     const { id: page, params } = route
-    const isConditional = pagesState[page] && pagesState[page].conditional
+    const shouldFetchNavigationData = page.startsWith('store') || pagesState[page] && pagesState[page].conditional
     const query = parse(location.search.substr(1))
 
-    if (!isConditional) {
+    if (!shouldFetchNavigationData) {
       return this.setState({
         page,
         query,
