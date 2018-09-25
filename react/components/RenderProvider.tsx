@@ -1,33 +1,33 @@
-import {NormalizedCacheObject} from 'apollo-cache-inmemory'
+import { NormalizedCacheObject } from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
-import {ApolloLink, NextLink, Observable, Operation} from 'apollo-link'
+import { ApolloLink, NextLink, Observable, Operation } from 'apollo-link'
 import debounce from 'debounce'
-import {canUseDOM} from 'exenv'
-import {History, UnregisterCallback} from 'history'
+import { canUseDOM } from 'exenv'
+import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import {parse} from 'qs'
-import React, {Component, Fragment, ReactElement} from 'react'
-import {ApolloProvider} from 'react-apollo'
-import {Helmet} from 'react-helmet'
-import {IntlProvider} from 'react-intl'
+import { parse } from 'qs'
+import React, { Component, Fragment, ReactElement } from 'react'
+import { ApolloProvider } from 'react-apollo'
+import { Helmet } from 'react-helmet'
+import { IntlProvider } from 'react-intl'
 
 import ExtensionPoint from '../ExtensionPoint'
-import {fetchAssets, getImplementation} from '../utils/assets'
+import { fetchAssets, getImplementation } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
-import {getClient} from '../utils/client'
-import {traverseComponent} from '../utils/components'
-import {RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass} from '../utils/dom'
-import {loadLocaleData} from '../utils/locales'
-import {createLocaleCookie, fetchMessages, fetchMessagesForApp} from '../utils/messages'
-import {getRouteFromPath, navigate as pageNavigate, NavigateOptions} from '../utils/pages'
-import {fetchRoutes} from '../utils/routes'
-import {TreePathContext} from '../utils/treePath'
+import { getClient } from '../utils/client'
+import { traverseComponent } from '../utils/components'
+import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils/dom'
+import { loadLocaleData } from '../utils/locales'
+import { createLocaleCookie, fetchMessages, fetchMessagesForApp } from '../utils/messages'
+import { getRouteFromPath, navigate as pageNavigate, NavigateOptions } from '../utils/pages'
+import { fetchRoutes } from '../utils/routes'
+import { TreePathContext } from '../utils/treePath'
 
-import {Subscription} from 'apollo-client/util/Observable'
-import {initializeSession, patchSession} from '../utils/session'
+import { Subscription } from 'apollo-client/util/Observable'
+import { initializeSession, patchSession } from '../utils/session'
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
-import {RenderContext} from './RenderContext'
+import { RenderContext } from './RenderContext'
 
 interface Props {
   children: ReactElement<any> | null
@@ -106,13 +106,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const {appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings} = props.runtime
-    const {history, baseURI, cacheControl} = props
+    const { appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings } = props.runtime
+    const { history, baseURI, cacheControl } = props
     const path = canUseDOM ? window.location.pathname : window.__pathname__
     const route = props.runtime.route || getRouteFromPath(path, pages)
 
     if (history) {
-      const renderLocation = {...history.location, state: {renderRouting: true, route}}
+      const renderLocation = { ...history.location, state: { renderRouting: true, route } }
       history.replace(renderLocation)
       // backwards compatibility
       window.browserHistory = global.browserHistory = history
@@ -143,8 +143,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public componentDidMount() {
     this.rendered = true
-    const {history, runtime} = this.props
-    const {production, emitter} = runtime
+    const { history, runtime } = this.props
+    const { production, emitter } = runtime
 
     this.unlisten = history && history.listen(this.onPageChanged)
     emitter.addListener('localesChanged', this.onLocaleSelected)
@@ -161,14 +161,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // If RenderProvider is being re-rendered, the global runtime might have changed
     // so we must update the all extensions.
     if (this.rendered) {
-      const {runtime: {extensions}} = nextProps
-      this.setState({extensions})
+      const { runtime: { extensions } } = nextProps
+      this.setState({ extensions })
     }
   }
 
   public componentWillUnmount() {
-    const {runtime} = this.props
-    const {production, emitter} = runtime
+    const { runtime } = this.props
+    const { production, emitter } = runtime
     if (this.unlisten) {
       this.unlisten()
     }
@@ -182,9 +182,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
 
   public getChildContext() {
-    const {history, runtime} = this.props
-    const {components, extensions, page, pages, culture, device, route} = this.state
-    const {account, emitter, hints, production, workspace} = runtime
+    const { history, runtime } = this.props
+    const { components, extensions, page, pages, culture, device, route } = this.state
+    const { account, emitter, hints, production, workspace } = runtime
 
     return {
       account,
@@ -215,7 +215,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public getSettings = (app: string) => {
-    const {settings} = this.state
+    const { settings } = this.state
     return settings[app]
   }
 
@@ -228,21 +228,21 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public getCustomMessages = (locale: string) => {
-    const {components} = this.state
+    const { components } = this.state
     const componentsArray = Object.keys(components)
 
     const customMessages = componentsArray
-          .map(getImplementation)
-          .filter(component => component && component.getCustomMessages)
-          .map(component => component.getCustomMessages!(locale))
-          .reduce(Object.assign, {})
+      .map(getImplementation)
+      .filter(component => component && component.getCustomMessages)
+      .map(component => component.getCustomMessages!(locale))
+      .reduce(Object.assign, {})
 
     return customMessages
   }
 
   public navigate = (options: NavigateOptions) => {
-    const {history} = this.props
-    const {pages} = this.state
+    const { history } = this.props
+    const { pages } = this.state
     return pageNavigate(history, pages, options)
   }
 
@@ -282,17 +282,17 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onPageChanged = (location: RenderHistoryLocation) => {
-    const {runtime: {renderMajor}} = this.props
-    const {culture: {locale}, pages: pagesState, production, device} = this.state
-    const {pathname, state} = location
+    const { runtime: { renderMajor } } = this.props
+    const { culture: { locale }, pages: pagesState, production, device } = this.state
+    const { pathname, state } = location
 
     // Make sure this is our navigation
     if (!state || !state.renderRouting) {
       return
     }
 
-    const {route} = state
-    const {id: page, params} = route
+    const { route } = state
+    const { id: page, params } = route
     const isConditional = pagesState[page] && pagesState[page].conditional
     const query = parse(location.search.substr(1))
 
@@ -343,13 +343,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public prefetchPage = (pageName: string) => {
-    const {extensions} = this.state
-    const component = extensions[pageName].component
-    return this.fetchComponent(component)
+    const { extensions } = this.state
+    const component = extensions[pageName] && extensions[pageName].component
+    return component && this.fetchComponent(component)
   }
 
   public updateComponentAssets = (availableComponents: Components) => {
-    this.setState({ components: {
+    this.setState({
+      components: {
         ...this.state.components,
         ...availableComponents,
       }
@@ -361,8 +362,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       throw new Error('Cannot fetch components during server side rendering.')
     }
 
-    const {components, culture: {locale}} = this.state
-    const {apps, assets} = traverseComponent(components, component)
+    const { components, culture: { locale } } = this.state
+    const { apps, assets } = traverseComponent(components, component)
     const unfetchedApps = apps.filter(app => !Object.keys(window.__RENDER_7_COMPONENTS__).some(c => c.startsWith(app)))
     if (unfetchedApps.length === 0) {
       return fetchAssets(assets)
@@ -383,14 +384,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onLocalesUpdated = (locales: string[]) => {
-    const {runtime: {renderMajor}} = this.props
-    const {page, production, culture: {locale}} = this.state
+    const { runtime: { renderMajor } } = this.props
+    const { page, production, culture: { locale } } = this.state
 
     // Current locale is one of the updated ones
     if (locales.indexOf(this.state.culture.locale) !== -1) {
       fetchMessages(this.apolloClient, page, production, locale, renderMajor)
         .then(messages => {
-          this.setState({messages})
+          this.setState({ messages })
         })
         .catch(e => {
           console.log('Failed to fetch new locale file.')
@@ -400,8 +401,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onLocaleSelected = (locale: string) => {
-    const {runtime: {renderMajor}} = this.props
-    const {page, production} = this.state
+    const { runtime: { renderMajor } } = this.props
+    const { page, production } = this.state
 
     if (locale !== this.state.culture.locale) {
       createLocaleCookie(locale)
@@ -409,27 +410,27 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         fetchMessages(this.apolloClient, page, production, locale, renderMajor),
         loadLocaleData(locale),
       ])
-      .then(([messages]) => {
-        this.setState({
-          culture: {
-            ...this.state.culture,
-            locale,
-          },
-          messages,
+        .then(([messages]) => {
+          this.setState({
+            culture: {
+              ...this.state.culture,
+              locale,
+            },
+            messages,
+          })
         })
-      })
-      .then(() => window.postMessage({key: 'cookie.locale', body: {locale}}, '*'))
-      .catch(e => {
-        console.log('Failed to fetch new locale file.')
-        console.error(e)
-      })
+        .then(() => window.postMessage({ key: 'cookie.locale', body: { locale } }, '*'))
+        .catch(e => {
+          console.log('Failed to fetch new locale file.')
+          console.error(e)
+        })
     }
   }
 
   public updateRuntime = (options?: PageContextOptions) => {
-    const {runtime: {renderMajor}} = this.props
-    const {page, production, culture: {locale}, route} = this.state
-    const {pathname} = window.location
+    const { runtime: { renderMajor } } = this.props
+    const { page, production, culture: { locale }, route } = this.state
+    const { pathname } = window.location
 
     return fetchRoutes({
       apolloClient: this.apolloClient,
@@ -485,7 +486,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public createRuntimeContextLink() {
     return new ApolloLink((operation: Operation, forward?: NextLink) => {
-      const {appsEtag, cacheHints, components, extensions, messages, pages} = this.state
+      const { appsEtag, cacheHints, components, extensions, messages, pages } = this.state
       operation.setContext((currentContext: Record<string, any>) => {
         return {
           ...currentContext,
@@ -504,7 +505,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public updateExtension = (name: string, extension: Extension) => {
-    const {extensions} = this.state
+    const { extensions } = this.state
 
     this.setState({
       extensions: {
@@ -523,8 +524,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public render() {
-    const {children} = this.props
-    const {culture: {locale}, messages, pages, page, query, production} = this.state
+    const { children } = this.props
+    const { culture: { locale }, messages, pages, page, query, production } = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
       ...messages,
@@ -532,7 +533,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     const component = children
-      ? React.cloneElement(children as ReactElement<any>, {query})
+      ? React.cloneElement(children as ReactElement<any>, { query })
       : (
         <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
@@ -544,7 +545,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     return (
       <RenderContext.Provider value={context}>
-        <TreePathContext.Provider value={{treePath: ''}}>
+        <TreePathContext.Provider value={{ treePath: '' }}>
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider locale={locale} messages={mergedMessages}>
               <Fragment>

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.22.5] - 2018-09-25
+### Fixed
+- Avoid making prefetch of a page that doesn't exist.
+
 ## [7.22.4] - 2018-09-21
 
 ## [7.22.3] - 2018-09-21
