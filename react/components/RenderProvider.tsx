@@ -344,8 +344,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public prefetchPage = (pageName: string) => {
     const { extensions } = this.state
-    const component = extensions[pageName].component
-    return this.fetchComponent(component)
+    const component = extensions[pageName] && extensions[pageName].component
+    return component && this.fetchComponent(component)
   }
 
   public updateComponentAssets = (availableComponents: Components) => {
