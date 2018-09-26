@@ -1,10 +1,12 @@
-import React, {PureComponent} from 'react'
+import React, {CSSProperties, PureComponent} from 'react'
 import {getExtensionImplementation} from '../utils/assets'
 import {RenderContextProps, withRuntimeContext} from './RenderContext'
 
 interface Props {
   useDefault?: boolean
 }
+
+const LOADING_TRESHOLD_MS = 1000
 
 const defaultLoading = (
   <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
@@ -16,13 +18,28 @@ const defaultLoading = (
 )
 
 class Loading extends PureComponent<Props & RenderContextProps> {
+  public state = {}
+
+  public componentDidMount() {
+    this.thresholdTimeout = setTimeout(() => {
+      this.setState({visible: true})
+    }, LOADING_TRESHOLD_MS)
+  }
+
+  public componentWillUnmount() {
+    clearTimeout(this.thresholdTimeout)
+  }
 
   public render() {
     const {useDefault, runtime: {extensions, page}} = this.props
+    const {visible} = this.state
+    const style: CSSProperties = { visibility: 'hidden' }
     const [root] = page.split('/')
     const LoadingExtension = getExtensionImplementation(extensions, `${root}/__loading`)
 
-    return LoadingExtension && !useDefault ? <LoadingExtension /> : defaultLoading
+    return <div style={visible ? undefined : style}>
+      { LoadingExtension && !useDefault ? <LoadingExtension /> : defaultLoading }
+    </div>
   }
 }
 

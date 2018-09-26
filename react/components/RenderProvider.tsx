@@ -55,7 +55,6 @@ export interface RenderProviderState {
   route: RenderRuntime['route']
 }
 
-const LOADING_TRESHOLD_MS = 50
 const SEND_INFO_DEBOUNCE_MS = 100
 const isStorefrontIframe = canUseDOM && window.top !== window.self && window.top.__provideRuntime
 
@@ -307,11 +306,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }, () => this.afterPageChanged(page, state.scrollOptions))
     }
 
-    const loadingThreshold = setTimeout(() => {
-      this.setState({
-        loadingRoute: page,
-      })
-    }, LOADING_TRESHOLD_MS)
+    this.setState({
+      loadingRoute: page,
+    })
 
     // Retrieve the adequate assets for the new page. Naming will
     // probably change (query will return something like routes) as
@@ -336,8 +333,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       settings
     }: ParsedPageQueryResponse) => {
-      clearTimeout(loadingThreshold)
-
       try {
         if (this.props.history && this.props.history.location.state.route.id !== page) {
           return
