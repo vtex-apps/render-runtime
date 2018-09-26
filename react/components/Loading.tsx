@@ -18,8 +18,9 @@ const defaultLoading = (
 class Loading extends PureComponent<Props & RenderContextProps> {
 
   public render() {
-    const {useDefault, runtime: {extensions}} = this.props
-    const LoadingExtension = getExtensionImplementation(extensions, 'store/__loading')
+    const {useDefault, runtime: {extensions, page}} = this.props
+    const [root] = page.split('/')
+    const LoadingExtension = getExtensionImplementation(extensions, `${root}/__loading`)
 
     return LoadingExtension && !useDefault ? <LoadingExtension /> : defaultLoading
   }

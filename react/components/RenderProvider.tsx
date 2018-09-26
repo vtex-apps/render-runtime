@@ -1,5 +1,6 @@
 import { NormalizedCacheObject } from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
+import { Subscription } from 'apollo-client/util/Observable'
 import { ApolloLink, NextLink, Observable, Operation } from 'apollo-link'
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
@@ -21,10 +22,9 @@ import { loadLocaleData } from '../utils/locales'
 import { createLocaleCookie, fetchMessages, fetchMessagesForApp } from '../utils/messages'
 import { getRouteFromPath, navigate as pageNavigate, NavigateOptions } from '../utils/pages'
 import { fetchRoutes } from '../utils/routes'
+import { initializeSession, patchSession } from '../utils/session'
 import { TreePathContext } from '../utils/treePath'
 
-import { Subscription } from 'apollo-client/util/Observable'
-import { initializeSession, patchSession } from '../utils/session'
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
 import { RenderContext } from './RenderContext'
@@ -45,6 +45,7 @@ export interface RenderProviderState {
   culture: RenderRuntime['culture']
   device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
+  loadingRoute: string | null
   messages: RenderRuntime['messages']
   page: RenderRuntime['page']
   pages: RenderRuntime['pages']
@@ -54,6 +55,7 @@ export interface RenderProviderState {
   route: RenderRuntime['route']
 }
 
+const LOADING_TRESHOLD_MS = 50
 const SEND_INFO_DEBOUNCE_MS = 100
 const isStorefrontIframe = canUseDOM && window.top !== window.self && window.top.__provideRuntime
 
@@ -131,6 +133,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture,
       device: 'any',
       extensions,
+      loadingRoute: null,
       messages,
       page,
       pages,
@@ -159,7 +162,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public componentWillReceiveProps(nextProps: Props) {
     // If RenderProvider is being re-rendered, the global runtime might have changed
-    // so we must update the all extensions.
+    // so we must update all extensions.
     if (this.rendered) {
       const { runtime: { extensions } } = nextProps
       this.setState({ extensions })
@@ -304,6 +307,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }, () => this.afterPageChanged(page, state.scrollOptions))
     }
 
+    const loadingThreshold = setTimeout(() => {
+      this.setState({
+        loadingRoute: page,
+      })
+    }, LOADING_TRESHOLD_MS)
+
     // Retrieve the adequate assets for the new page. Naming will
     // probably change (query will return something like routes) as
     // well as the fields that need to be retrieved, but the logic
@@ -327,11 +336,22 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       settings
     }: ParsedPageQueryResponse) => {
+      clearTimeout(loadingThreshold)
+
+      try {
+        if (this.props.history && this.props.history.location.state.route.id !== page) {
+          return
+        }
+      } catch (e) {
+        console.error('Failed to access history location state')
+      }
+
       this.setState({
         appsEtag,
         cacheHints,
         components,
         extensions,
+        loadingRoute: null,
         messages,
         page,
         pages,
@@ -345,7 +365,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public prefetchPage = (pageName: string) => {
     const { extensions } = this.state
     const component = extensions[pageName] && extensions[pageName].component
-    return component && this.fetchComponent(component)
+    if (component) {
+      this.fetchComponent(component)
+    }
   }
 
   public updateComponentAssets = (availableComponents: Components) => {
@@ -525,7 +547,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public render() {
     const { children } = this.props
-    const { culture: { locale }, messages, pages, page, query, production } = this.state
+    const { culture: { locale }, loadingRoute, messages, pages, page, query, production } = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
       ...messages,
@@ -537,7 +559,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       : (
         <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
-          <NestedExtensionPoints page={page} query={query} />
+          <NestedExtensionPoints page={page} query={query} loadingRoute={loadingRoute} />
         </div>
       )
 
