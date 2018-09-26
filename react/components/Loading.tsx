@@ -6,6 +6,10 @@ interface Props {
   useDefault?: boolean
 }
 
+interface State {
+  visible?: boolean
+}
+
 const LOADING_TRESHOLD_MS = 1000
 
 const defaultLoading = (
@@ -17,8 +21,9 @@ const defaultLoading = (
   </svg>
 )
 
-class Loading extends PureComponent<Props & RenderContextProps> {
-  public state = {}
+class Loading extends PureComponent<Props & RenderContextProps, State> {
+  public state: State = {}
+  private thresholdTimeout?: NodeJS.Timer
 
   public componentDidMount() {
     this.thresholdTimeout = setTimeout(() => {
@@ -27,7 +32,9 @@ class Loading extends PureComponent<Props & RenderContextProps> {
   }
 
   public componentWillUnmount() {
-    clearTimeout(this.thresholdTimeout)
+    if (this.thresholdTimeout) {
+      clearTimeout(this.thresholdTimeout)
+    }
   }
 
   public render() {
