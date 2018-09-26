@@ -122,7 +122,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.sessionPromise = (canUseDOM && page.startsWith('store')) ? initializeSession() : Promise.resolve()
     const runtimeContextLink = this.createRuntimeContextLink()
     const ensureSessionLink = this.createEnsureSessionLink()
-    this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, ensureSessionLink, cacheControl)
+    const outdatedQueryLink = this.createOutdatedQueryLink()
+    const links = {runtimeContextLink, ensureSessionLink, outdatedQueryLink}
+    this.apolloClient = getClient(props.runtime, baseURI, links, cacheControl)
 
     this.state = {
       appsEtag,
@@ -461,6 +463,21 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         settings,
       })
     })
+  }
+
+  public createOutdatedQueryLink() {
+    return new ApolloLink((operation: Operation, forward?: NextLink) => forward
+      ? forward(operation).map(response => {
+        const {errors = null} = response
+        const outdatedError = Array.isArray(errors) && errors.find(error =>
+            error && error.extensions && error.extensions.code === 'OUTDATED_QUERY'
+        )
+        if (outdatedError) {
+          this.updateRuntime()
+        }
+        return response
+      })
+      : null)
   }
 
   public createEnsureSessionLink() {

@@ -13,6 +13,7 @@ import {omitTypenameLink} from './links/omitVariableTypenameLink'
 import {persistedQueryVersionLink} from './links/persistedQueryVersionLink'
 import {createUriSwitchLink} from './links/uriSwitchLink'
 import {versionSplitterLink} from './links/versionSplitterLink'
+import { workspaceConsistencyLink } from './links/workspaceConsistencyLink'
 
 interface ApolloClientsRegistry {
   [key: string]: ApolloClient<NormalizedCacheObject>
@@ -51,7 +52,14 @@ export const getState = (runtime: RenderRuntime) => {
     : {}
 }
 
-export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContextLink: ApolloLink, ensureSessionLink: ApolloLink, cacheControl?: PageCacheControl) => {
+interface RuntimeLinks {
+  runtimeContextLink: ApolloLink
+  ensureSessionLink: ApolloLink
+  outdatedQueryLink: ApolloLink
+}
+
+export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeLinks: RuntimeLinks, cacheControl?: PageCacheControl) => {
+  const {runtimeContextLink, ensureSessionLink, outdatedQueryLink} = runtimeLinks
   const {account, workspace} = runtime
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
@@ -90,6 +98,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       persistedQueryVersionLink,
       uriSwitchLink,
       ...cacheLink,
+      outdatedQueryLink,
       fetcherLink
     ])
 
