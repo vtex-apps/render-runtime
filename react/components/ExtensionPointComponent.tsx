@@ -3,7 +3,9 @@ import React, { ErrorInfo, PureComponent } from 'react'
 
 import { getImplementation } from '../utils/assets'
 import logEvent from '../utils/logger'
+
 import ExtensionPointError from './ExtensionPointError'
+import Loading from './Loading'
 import { RenderContextProps } from './RenderContext'
 
 interface Props {
@@ -166,7 +168,7 @@ class ExtensionPointComponent extends PureComponent<
     return Component ? (
       <Component {...props}>{children}</Component>
     ) : (
-      children || null
+      children || <Loading />
     )
   }
 }

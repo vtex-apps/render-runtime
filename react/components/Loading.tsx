@@ -11,6 +11,9 @@ interface State {
 }
 
 const LOADING_TRESHOLD_MS = 1000
+// If a Loading component unmounts and remounts within this time, it should be visible from the start.
+const LOADING_UNMOUNT_TRESHOLD_MS = 1000
+let visible = false
 
 const defaultLoading = (
   <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
@@ -22,29 +25,38 @@ const defaultLoading = (
 )
 
 class Loading extends PureComponent<Props & RenderContextProps, State> {
-  public state: State = {}
+  public state: State = {
+    visible,
+  }
   private thresholdTimeout?: NodeJS.Timer
 
   public componentDidMount() {
-    this.thresholdTimeout = setTimeout(() => {
-      this.setState({visible: true})
-    }, LOADING_TRESHOLD_MS)
+    if (!this.state.visible) {
+      this.thresholdTimeout = setTimeout(() => {
+        visible = true
+        this.setState({visible: true})
+      }, LOADING_TRESHOLD_MS)
+    }
   }
 
   public componentWillUnmount() {
     if (this.thresholdTimeout) {
       clearTimeout(this.thresholdTimeout)
     }
+
+    setTimeout(() => {
+      visible = false
+    }, LOADING_UNMOUNT_TRESHOLD_MS)
   }
 
   public render() {
     const {useDefault, runtime: {extensions, page}} = this.props
-    const {visible} = this.state
+    const {visible: isVisible} = this.state
     const style: CSSProperties = { visibility: 'hidden' }
     const [root] = page.split('/')
     const LoadingExtension = getExtensionImplementation(extensions, `${root}/__loading`)
 
-    return <div style={visible ? undefined : style}>
+    return <div style={isVisible ? undefined : style}>
       { LoadingExtension && !useDefault ? <LoadingExtension /> : defaultLoading }
     </div>
   }
