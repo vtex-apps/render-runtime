@@ -133,7 +133,7 @@ declare global {
     page: RenderRuntime['page'],
     pages: RenderRuntime['pages'],
     patchSession: (data?: any) => Promise<void>,
-    prefetchPage: (name: string) => Promise<void>,
+    prefetchPage: (name: string) => void,
     production: RenderRuntime['production'],
     setDevice: (device: ConfigurationDevice) => void,
     updateComponentAssets: (availableComponents: Components) => void,
