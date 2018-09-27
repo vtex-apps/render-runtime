@@ -44,7 +44,7 @@ export const fetchRoutes = ({
   scope,
   template,
 }: FetchRoutesInput) => apolloClient.query<{page: PageQueryResponse}>({
-  fetchPolicy: 'network-only',
+  fetchPolicy: production ? 'cache-first' : 'network-only',
   query: pageQuery,
   variables: {
     conditions,
