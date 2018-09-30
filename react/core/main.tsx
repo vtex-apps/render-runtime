@@ -21,6 +21,7 @@ import {getBaseURI} from '../utils/host'
 import {addLocaleData} from '../utils/locales'
 import {withSession} from '../utils/session'
 import {TreePathContext} from '../utils/treePath'
+import {optimizeSrcForVtexImg, optimizeStyleForVtexImg} from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
 
 if (window.IntlPolyfill) {
@@ -98,6 +99,18 @@ function start() {
     const rootName = runtime.page
     validateRootComponent(rootName, runtime.extensions)
 
+    const ReactCreateElement = React.createElement
+    const vtexImgHost = `https://${runtime.account}.vteximg.com.br`
+    React.createElement = function patchedCreateElement (type: any, props: any) {
+      if (type === 'img') {
+        props.src = optimizeSrcForVtexImg(vtexImgHost, props.src)
+      }
+      if (props && props.style) {
+        props.style = optimizeStyleForVtexImg(vtexImgHost, props.style)
+      }
+      return ReactCreateElement.apply(React, arguments)
+    }
+
     const maybeRenderPromise = render(rootName, runtime)
     if (!canUseDOM) {
       // Expose render promise to global context.
@@ -113,7 +126,7 @@ function start() {
           state: getState(runtime),
         }))
     } else {
-      console.log('Welcome to Render! Want to look under the hood? http://lab.vtex.com/careers/')
+      console.log('Welcome to Render! Want to look under the hood? https://careers.vtex.com')
     }
   } catch (error) {
     console.error('Unexpected error rendering:', error)
