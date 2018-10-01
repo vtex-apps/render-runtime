@@ -77,7 +77,7 @@ export default class ErrorPage extends Component {
               </div>
             </div>
           </div>
-          {__ERROR__ && this.renderErrorDetails(__ERROR__)}
+          {window.__ERROR__ && this.renderErrorDetails(window.__ERROR__)}
         </div>
       </div>
     )
