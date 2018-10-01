@@ -6,7 +6,6 @@ import './error.global.css'
 
 const toSplunkLink = (rid: string) =>
   `https://splunk7.vtex.com/en-US/app/vtex_colossus/search?q=search%20index%3Dcolossus%20sender%3Dvtex.render-server%40*%20body.requestId%3D${rid}&display.page.search.mode=verbose&dispatch.sample_ratio=1&earliest=-5m%40m&latest=now`
-
 export default class ErrorPage extends Component {
   public state = { enabled: false }
   private splunk = 0
@@ -16,6 +15,7 @@ export default class ErrorPage extends Component {
   }
 
   public render() {
+    const date = new Date()
     return (
       <div className="h-100 flex flex-column justify-between mh6 mh0-ns">
         <div></div>
@@ -27,8 +27,11 @@ export default class ErrorPage extends Component {
                 <div>There was a techinical problem loading this page.</div>
                 <div> Try refreshing the page or come back in 5 minutes.</div>
               </div>
-              <div className="f7 pt5 ttu c-muted-2" style={{fontFamily: 'courier, code'}}>ID: 88FE 3a8f d3fe 4cfc 8478 5f625cb1d2a3</div>
-              <div className="pt8">
+              <div className="f6 pt5 c-muted-2" style={{fontFamily: 'courier, code'}}>
+                <div>ID: {window.__REQUEST_ID__}</div>
+                <div className="f6 c-muted-2 lh-copy fw7">{date.toUTCString()}</div>
+              </div>
+              <div className="pt7">
                 <button className={'bw1 ba fw5 ttu br2 fw4 v-mid relative pv4 ph6 f5 ' + (this.state.enabled ? 'bg-action-primary b--action-primary c-on-action-primary hover-bg-action-primary hover-b--action-primary hover-c-on-action-primary pointer' : 'bg-disabled b--disabled c-on-disabled')} disabled={!this.state.enabled} onClick={ ()=>{window.location.reload()}}>Refresh</button>
               </div>
             </div>
