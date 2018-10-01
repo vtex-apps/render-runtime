@@ -9,6 +9,7 @@ const toSplunkLink = (rid: string) =>
 
 export default class ErrorPage extends Component {
   public state = { enabled: false }
+  private splunk = 0
 
   public componentDidMount() {
     setTimeout(()=>{this.setState({enabled: true})} , 5000)
@@ -18,7 +19,6 @@ export default class ErrorPage extends Component {
     return (
       <div className="h-100 flex flex-column justify-between mh6 mh0-ns">
         <div></div>
-        <a href={toSplunkLink(__REQUEST_ID__)} target="_blank">Search for this error in Splunk</a>
         <div>
           <div className="flex justify-center-ns flex-row-ns flex-column-reverse h-auto-ns pt6 pt0-ns">
             <div className="mr9-ns mr0">
@@ -33,7 +33,7 @@ export default class ErrorPage extends Component {
               </div>
             </div>
             <div>
-              <img src={ErrorImg} className="img-height pb6 pb0-ns"></img>
+              <img src={ErrorImg} onClick={this.handleImageClick} className="img-height pb6 pb0-ns"></img>
             </div>
           </div>
         </div>
@@ -42,5 +42,14 @@ export default class ErrorPage extends Component {
         </div>
       </div>
     )
+  }
+
+  private handleImageClick = () => {
+    if (this.splunk < 2) {
+      this.splunk = this.splunk + 1
+    } else {
+      window.open(toSplunkLink(window.__REQUEST_ID__), '_blank')
+      this.splunk = 0
+    }
   }
 }
