@@ -67,10 +67,11 @@ class ExtensionPointComponent extends PureComponent<
     const Component = component && getImplementation(component)
 
     // Let's fetch the assets and re-render.
-    if (component && !Component && !componentPromiseMap[component]) {
-      componentPromiseMap[component] = fetchComponent(component).then(() =>
-        this.updateComponentsWithEvent(component)
-      )
+    if (component && !Component) {
+      if (!componentPromiseMap[component]) {
+        componentPromiseMap[component] = fetchComponent(component)
+      }
+      componentPromiseMap[component].then(() => this.updateComponentsWithEvent(component))
     }
   }
 
