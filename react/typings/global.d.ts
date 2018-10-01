@@ -285,6 +285,8 @@ interface RenderComponent<P={}, S={}> {
     __hostname__: string
     __pathname__: string
     __STATE__: NormalizedCacheObject
+    __REQUEST_ID__: string
+    __APP_ID__: string
     __hasPortals__: boolean
     __provideRuntime: (runtime: RenderContext | null, messages?: Record<string, string>) => void
     browserHistory: History

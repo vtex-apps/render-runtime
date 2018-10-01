@@ -1,0 +1,50 @@
+@import url(//io.vtex.com.br/fonts/fabriga/stylesheet.css);
+
+body,
+button,
+input,
+optgroup,
+select,
+textarea,
+span,
+h1,
+h2,
+h3,
+h4,
+p1 {
+  font-family: Fabriga, -apple-system, BlinkMacSystemFont, avenir next, avenir,
+    helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+.render-container, .render-provider {
+  height: 100%;
+}
+
+.vtex-searchbar__container {
+  min-width: 350px;
+}
+
+.img-height {
+  height: 80px;
+}
+
+/*
+  Media Query Extensions:
+  -s  = 20em
+  -ns  = 40em
+  -m  = 40em
+  -l  = 64em
+  -xl  = 80em
+*/
+
+
+@media only screen and (min-width: 40em) {
+  .img-height {
+    height: 225px;
+  }
+}
