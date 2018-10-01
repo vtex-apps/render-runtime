@@ -73,6 +73,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
     const fetcherLink = createIOFetchLink(httpLink, uploadLink)
 
     const persistedQueryLink = createPersistedQueryLink({
+      disable: () => false,
       generateHash,
       useGETForHashedQueries: true,
     })
