@@ -6,15 +6,16 @@ import {Helmet} from 'react-helmet'
 import NoSSR from 'react-no-ssr'
 import Loading from '../components/Loading'
 
+import ExtensionContainer from '../components/ExtensionContainer'
+import ExtensionPoint from '../components/ExtensionPoint'
+import LayoutContainer from '../components/LayoutContainer'
+import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
 import Link from '../components/Link'
 import {RenderContext, withRuntimeContext} from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
-import ExtensionContainer from '../ExtensionContainer'
-import ExtensionPoint from '../ExtensionPoint'
-import LayoutContainer from '../LayoutContainer'
 import PageCacheControl from '../utils/cacheControl'
-import {buildCacheLocator} from '../utils/client'
 import {getState} from '../utils/client'
+import {buildCacheLocator} from '../utils/client'
 import {ensureContainer, getContainer, getMarkups} from '../utils/dom'
 import {registerEmitter} from '../utils/events'
 import {getBaseURI} from '../utils/host'
@@ -143,6 +144,7 @@ export {
   ExtensionContainer,
   ExtensionPoint,
   LayoutContainer,
+  LegacyExtensionContainer,
   Helmet,
   Link,
   NoSSR,

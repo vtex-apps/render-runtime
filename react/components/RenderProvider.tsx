@@ -12,7 +12,6 @@ import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
 
-import ExtensionPoint from '../ExtensionPoint'
 import { fetchAssets, getImplementation } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
@@ -24,6 +23,7 @@ import { getRouteFromPath, navigate as pageNavigate, NavigateOptions } from '../
 import { fetchRoutes } from '../utils/routes'
 import { initializeSession, patchSession } from '../utils/session'
 import { TreePathContext } from '../utils/treePath'
+import ExtensionPoint from './ExtensionPoint'
 
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
