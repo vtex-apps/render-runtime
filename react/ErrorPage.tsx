@@ -61,7 +61,7 @@ export default class ErrorPage extends Component {
               <div className="mr9-ns mr0">
                 <div className="f2 c-on-base">Something went wrong</div>
                 <div className="f5 pt5 c-on-base lh-copy">
-                  <div>There was a techinical problem loading this page.</div>
+                  <div>There was a technical problem loading this page.</div>
                   <div> Try refreshing the page or come back in 5 minutes.</div>
                 </div>
                 <div className="f6 pt5 c-muted-2" style={{fontFamily: 'courier, code'}}>
