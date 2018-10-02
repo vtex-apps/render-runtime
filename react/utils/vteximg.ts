@@ -10,7 +10,7 @@ export function optimizeSrcForVtexImg (vtexImgHost: string, src?: any) {
       return src.replace(PROTOCOL_RELATIVE_PREFIX, SECURE_PROTOCOL)
     }
 
-    if (src && src.indexOf(ARQUIVOS_RELATIVE_PREFIX) === 0 || src.indexOf(ASSETS_RELATIVE_PREFIX) === 0) {
+    if (src && (src.indexOf(ARQUIVOS_RELATIVE_PREFIX) === 0 || src.indexOf(ASSETS_RELATIVE_PREFIX) === 0)) {
       return vtexImgHost + src
     }
 
