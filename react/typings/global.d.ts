@@ -265,6 +265,7 @@ interface RenderComponent<P={}, S={}> {
     Link: typeof Link
     NoSSR: any
     LayoutContainer: any
+    LegacyExtensionContainer: any
     Loading: any
     Helmet: any
     canUseDOM: boolean

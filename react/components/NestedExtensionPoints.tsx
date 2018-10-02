@@ -2,8 +2,8 @@ import {canUseDOM} from 'exenv'
 import PropTypes from 'prop-types'
 import React, {PureComponent} from 'react'
 
-import ExtensionPoint from '../ExtensionPoint'
 import {getPageParams} from '../utils/pages'
+import ExtensionPoint from './ExtensionPoint'
 
 import Loading from './Loading'
 import MaybeAuth from './MaybeAuth'
