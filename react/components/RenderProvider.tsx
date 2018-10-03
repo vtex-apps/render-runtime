@@ -480,11 +480,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { runtime: { renderMajor } } = this.props
     const { page, production, culture: { locale }, route } = this.state
     const { pathname } = window.location
+    const { params } = route
 
     return fetchRoutes({
       apolloClient: this.apolloClient,
       locale,
       page,
+      params: JSON.stringify(params),
       path: pathname,
       production,
       renderMajor,
