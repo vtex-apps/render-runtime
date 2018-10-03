@@ -119,6 +119,7 @@ declare global {
   interface RenderContext {
     account: RenderRuntime['account'],
     components: RenderRuntime['components'],
+    context: RenderRuntime['context']
     culture: RenderRuntime['culture'],
     device: ConfigurationDevice,
     emitter: RenderRuntime['emitter'],
@@ -144,7 +145,6 @@ declare global {
   }
 
   interface PageContextOptions {
-    scope?: string
     device?: string
     conditions?: string[]
     template?: string
@@ -184,6 +184,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface PageQueryResponse {
     componentsJSON: string
+    context: RenderRuntime['context']
     extensionsJSON: string
     messagesJSON: string
     pagesJSON: string
@@ -194,6 +195,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface ParsedPageQueryResponse {
     components: RenderRuntime['components']
+    context: RenderRuntime['context']
     extensions: RenderRuntime['extensions']
     messages: RenderRuntime['messages']
     pages: RenderRuntime['pages']
@@ -249,6 +251,7 @@ interface RenderComponent<P={}, S={}> {
     }
     cacheHints: CacheHintsMap
     segmentToken: string
+    context: PageContext
   }
 
   interface CacheHints {
@@ -300,5 +303,17 @@ interface RenderComponent<P={}, S={}> {
     Intl: any
     hrtime: NodeJS.Process['hrtime']
     rendered: Promise<RenderedSuccess> | RenderedFailure
+  }
+
+  interface PageContext {
+    id: string
+    type:
+      | 'brand'
+      | 'category'
+      | 'department'
+      | 'product'
+      | 'search'
+      | 'subcategory'
+      | 'url'
   }
 }

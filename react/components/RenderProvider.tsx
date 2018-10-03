@@ -42,6 +42,7 @@ export interface RenderProviderState {
   appsEtag: RenderRuntime['appsEtag']
   cacheHints: RenderRuntime['cacheHints']
   components: RenderRuntime['components']
+  context: RenderRuntime['context']
   culture: RenderRuntime['culture']
   device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
@@ -62,6 +63,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
     components: PropTypes.object,
+    context: PropTypes.object,
     culture: PropTypes.object,
     device: PropTypes.string,
     emitter: PropTypes.object,
@@ -107,7 +109,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const { appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings } = props.runtime
+    const {
+      appsEtag,
+      cacheHints,
+      context,
+      culture,
+      messages,
+      components,
+      extensions,
+      pages,
+      page,
+      query,
+      production,
+      settings,
+    } = props.runtime
     const { history, baseURI, cacheControl } = props
     const path = canUseDOM ? window.location.pathname : window.__pathname__
     const route = props.runtime.route || getRouteFromPath(path, pages)
@@ -129,6 +144,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       appsEtag,
       cacheHints,
       components,
+      context,
       culture,
       device: 'any',
       extensions,
@@ -182,15 +198,24 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-
   public getChildContext() {
     const { history, runtime } = this.props
-    const { components, extensions, page, pages, culture, device, route } = this.state
+    const {
+      components,
+      context,
+      extensions,
+      page,
+      pages,
+      culture,
+      device,
+      route,
+    } = this.state
     const { account, emitter, hints, production, workspace } = runtime
 
     return {
       account,
       components,
+      context,
       culture,
       device,
       emitter,
@@ -333,6 +358,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       appsEtag,
       cacheHints,
       components,
+      context,
       extensions,
       messages,
       pages,
@@ -350,6 +376,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         appsEtag,
         cacheHints,
         components,
+        context,
         extensions,
         loadingRoute: null,
         messages,
@@ -466,6 +493,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       appsEtag,
       cacheHints,
       components,
+      context,
       extensions,
       messages,
       pages,
@@ -475,6 +503,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         appsEtag,
         cacheHints,
         components,
+        context,
         extensions,
         messages,
         page,

@@ -6,6 +6,7 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     appsSettingsJSON,
     cacheHintsJSON,
     componentsJSON,
+    context,
     extensionsJSON,
     messagesJSON,
     pagesJSON,
@@ -24,6 +25,7 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     appsEtag,
     cacheHints,
     components,
+    context,
     extensions,
     messages,
     pages,
@@ -41,7 +43,6 @@ export const fetchRoutes = ({
   path,
   production,
   renderMajor,
-  scope,
   template,
 }: FetchRoutesInput) => apolloClient.query<{page: PageQueryResponse}>({
   fetchPolicy: production ? 'cache-first' : 'network-only',
@@ -55,7 +56,6 @@ export const fetchRoutes = ({
     path,
     production,
     renderMajor,
-    scope,
     template,
   }
 }).then<ParsedPageQueryResponse>(({data: {page: pageData}, errors}: PageQueryResult) =>

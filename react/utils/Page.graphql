@@ -8,7 +8,6 @@ query Page (
   $production: Boolean,
   $query: String,
   $renderMajor: Int,
-  $scope: String,
   $template: String,
 ) {
   page(
@@ -21,13 +20,16 @@ query Page (
     production: $production,
     query: $query,
     renderMajor: $renderMajor,
-    scope: $scope,
     template: $template,
   ) {
     appsEtag
     appsSettingsJSON
     cacheHintsJSON
     componentsJSON
+    context {
+      id
+      type
+    }
     extensionsJSON
     messagesJSON
     pagesJSON
