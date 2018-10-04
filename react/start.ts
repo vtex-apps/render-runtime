@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/browser'
 import {canUseDOM} from 'exenv'
 
 if (canUseDOM && window.__RUNTIME__.production) {
-  const { config, version } = window.__RUNTIME__.runtimeMeta
+  const { config = null, version = '' } = window.__RUNTIME__.runtimeMeta || {}
   const dsn = config && config.sentryDSN
   console.log('using dsn', dsn)
   Sentry.init({
