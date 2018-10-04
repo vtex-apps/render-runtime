@@ -240,6 +240,10 @@ interface RenderComponent<P={}, S={}> {
     renderMajor: number
     query?: Record<string, string>
     start: boolean
+    runtimeMeta: {
+      version: string
+      config?: any
+    }
     settings: {
       [app: string]: any;
     }

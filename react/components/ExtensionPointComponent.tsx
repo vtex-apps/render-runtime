@@ -1,8 +1,8 @@
+import * as Sentry from '@sentry/browser'
 import PropTypes from 'prop-types'
 import React, { ErrorInfo, PureComponent } from 'react'
 
 import { getImplementation } from '../utils/assets'
-import logEvent from '../utils/logger'
 
 import ExtensionPointError from './ExtensionPointError'
 import Loading from './Loading'
@@ -84,25 +84,28 @@ class ExtensionPointComponent extends PureComponent<
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     const {
+      component,
+      props,
+      runtime: {production, account, workspace},
+      runtime,
       treePath: path,
-      runtime: { account, workspace },
     } = this.props
-    const { message, stack } = error
-    const { componentStack } = errorInfo
-    const event = {
-      data: {
-        account,
-        componentStack,
-        message,
-        path,
-        stack,
-        workspace,
-      },
-      name: 'JSError',
-    }
+    const {children, __errorInstance, __clearError, ...componentProps} = props
 
-    console.error('Failed to render extension point', path)
-    logEvent(event)
+    console.error('Failed to render extension point', path, component)
+    // Only log 10 percent of the errors so we dont exceed our quota
+    if (production && Math.random() < 0.1) {
+      Sentry.configureScope(scope => {
+        scope.setExtra('runtime', runtime)
+        scope.setExtra('treePath', path)
+        scope.setExtra('props', componentProps)
+
+        scope.setTag('account', account)
+        scope.setTag('workspace', workspace)
+        scope.setTag('component', component || '')
+      })
+      Sentry.captureException(error)
+    }
 
     this.setState({
       error,
