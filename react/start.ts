@@ -2,11 +2,14 @@ import * as Sentry from '@sentry/browser'
 import {canUseDOM} from 'exenv'
 
 if (canUseDOM && window.__RUNTIME__.production) {
+  const { config, version } = window.__RUNTIME__.runtimeMeta
+  const dsn = config && config.sentryDSN
+  console.log('using dsn', dsn)
   Sentry.init({
     defaultIntegrations: true,
-    dsn: window.__RUNTIME__.sentryDSN,
+    dsn,
     environment: canUseDOM ? 'browser' : 'ssr',
-    release: window.__RUNTIME__.version
+    release: version
   })
 }
 
