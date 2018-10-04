@@ -90,12 +90,10 @@ class ExtensionPointComponent extends PureComponent<
       runtime,
       treePath: path,
     } = this.props
-    const componentProps = {...props}
-    delete componentProps.children
-    delete componentProps.__errorInstance
-    delete componentProps.__clearError
+    const {children, __errorInstance, __clearError, ...componentProps} = props
 
     console.error('Failed to render extension point', path, component)
+    // Only log 10 percent of the errors so we dont exceed our quota
     if (production && Math.random() < 0.1) {
       Sentry.configureScope(scope => {
         scope.setExtra('runtime', runtime)
