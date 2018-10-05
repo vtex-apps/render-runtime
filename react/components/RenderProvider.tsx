@@ -563,7 +563,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.setState({
       extensions: {
         ...extensions,
-        [name]: extension,
+        [name]: {
+          ...extensions[name],
+          component: extension.component,
+          props: extension.props,
+        },
       },
     }, () => {
       if (name !== 'store/__overlay') {
