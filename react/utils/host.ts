@@ -11,9 +11,10 @@ export const getBaseURI = (runtime: RenderRuntime) => {
   if (!canUseDOM) {
     return `${workspace}--${account}.${publicEndpoint}`
   } else {
-    const {location: {hostname}} = window
+    const {location: {hostname, port}} = window
+    const host = port ? `${hostname}:${port}` : hostname
     return hostname.endsWith(`.${publicEndpoint}`) || isRenderServedPage()
-      ? hostname
-      : `${hostname}/api/io`
+      ? host
+      : `${host}/api/io`
   }
 }
