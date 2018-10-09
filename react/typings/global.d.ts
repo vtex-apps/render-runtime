@@ -119,7 +119,6 @@ declare global {
   interface RenderContext {
     account: RenderRuntime['account'],
     components: RenderRuntime['components'],
-    context: RenderRuntime['context']
     culture: RenderRuntime['culture'],
     device: ConfigurationDevice,
     emitter: RenderRuntime['emitter'],
@@ -132,6 +131,7 @@ declare global {
     navigate: (options: NavigateOptions) => boolean,
     onPageChanged: (location: RenderHistoryLocation) => void,
     page: RenderRuntime['page'],
+    pageContext: RenderRuntime['pageContext']
     pages: RenderRuntime['pages'],
     patchSession: (data?: any) => Promise<void>,
     prefetchPage: (name: string) => void,
@@ -184,7 +184,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface PageQueryResponse {
     componentsJSON: string
-    context: RenderRuntime['context']
+    context: RenderRuntime['pageContext']
     extensionsJSON: string
     messagesJSON: string
     pagesJSON: string
@@ -195,7 +195,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface ParsedPageQueryResponse {
     components: RenderRuntime['components']
-    context: RenderRuntime['context']
+    context: RenderRuntime['pageContext']
     extensions: RenderRuntime['extensions']
     messages: RenderRuntime['messages']
     pages: RenderRuntime['pages']
@@ -251,7 +251,7 @@ interface RenderComponent<P={}, S={}> {
     }
     cacheHints: CacheHintsMap
     segmentToken: string
-    context: PageContext
+    pageContext: PageContext
   }
 
   interface CacheHints {

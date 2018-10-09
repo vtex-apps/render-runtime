@@ -42,13 +42,13 @@ export interface RenderProviderState {
   appsEtag: RenderRuntime['appsEtag']
   cacheHints: RenderRuntime['cacheHints']
   components: RenderRuntime['components']
-  context: RenderRuntime['context']
   culture: RenderRuntime['culture']
   device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
   loadingRoute: string | null
   messages: RenderRuntime['messages']
   page: RenderRuntime['page']
+  pageContext: RenderRuntime['pageContext']
   pages: RenderRuntime['pages']
   production: RenderRuntime['production']
   query: RenderRuntime['query']
@@ -63,7 +63,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
     components: PropTypes.object,
-    context: PropTypes.object,
     culture: PropTypes.object,
     device: PropTypes.string,
     emitter: PropTypes.object,
@@ -76,6 +75,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     navigate: PropTypes.func,
     onPageChanged: PropTypes.func,
     page: PropTypes.string,
+    pageContext: PropTypes.object,
     pages: PropTypes.object,
     patchSession: PropTypes.func,
     prefetchPage: PropTypes.func,
@@ -112,13 +112,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {
       appsEtag,
       cacheHints,
-      context,
       culture,
       messages,
       components,
       extensions,
-      pages,
       page,
+      pageContext,
+      pages,
       query,
       production,
       settings,
@@ -144,13 +144,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       appsEtag,
       cacheHints,
       components,
-      context,
       culture,
       device: 'any',
       extensions,
       loadingRoute: null,
       messages,
       page,
+      pageContext,
       pages,
       production,
       query,
@@ -202,9 +202,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { history, runtime } = this.props
     const {
       components,
-      context,
       extensions,
       page,
+      pageContext,
       pages,
       culture,
       device,
@@ -215,7 +215,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return {
       account,
       components,
-      context,
       culture,
       device,
       emitter,
@@ -228,6 +227,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       navigate: this.navigate,
       onPageChanged: this.onPageChanged,
       page,
+      pageContext,
       pages,
       patchSession: this.patchSession,
       prefetchPage: this.prefetchPage,
@@ -376,11 +376,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         appsEtag,
         cacheHints,
         components,
-        context,
         extensions,
         loadingRoute: null,
         messages,
         page,
+        pageContext: context,
         pages,
         query,
         route,
@@ -505,10 +505,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         appsEtag,
         cacheHints,
         components,
-        context,
         extensions,
         messages,
         page,
+        pageContext: context,
         pages,
         route,
         settings,
