@@ -358,9 +358,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       appsEtag,
       cacheHints,
       components,
-      context,
       extensions,
       messages,
+      pageContext,
       pages,
       settings
     }: ParsedPageQueryResponse) => {
@@ -380,7 +380,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         loadingRoute: null,
         messages,
         page,
-        pageContext: context,
+        pageContext,
         pages,
         query,
         route,
@@ -495,9 +495,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       appsEtag,
       cacheHints,
       components,
-      context,
       extensions,
       messages,
+      pageContext,
       pages,
       settings
     }: ParsedPageQueryResponse) => {
@@ -508,7 +508,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         extensions,
         messages,
         page,
-        pageContext: context,
+        pageContext,
         pages,
         route,
         settings,

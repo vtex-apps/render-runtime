@@ -6,9 +6,9 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     appsSettingsJSON,
     cacheHintsJSON,
     componentsJSON,
-    context,
     extensionsJSON,
     messagesJSON,
+    pageContext,
     pagesJSON,
   } = page
 
@@ -25,9 +25,9 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     appsEtag,
     cacheHints,
     components,
-    context,
     extensions,
     messages,
+    pageContext,
     pages,
     settings
   }

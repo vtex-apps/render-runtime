@@ -26,12 +26,12 @@ query Page (
     appsSettingsJSON
     cacheHintsJSON
     componentsJSON
-    context {
+    extensionsJSON
+    messagesJSON
+    pageContext {
       id
       type
     }
-    extensionsJSON
-    messagesJSON
     pagesJSON
   }
 }

@@ -184,7 +184,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface PageQueryResponse {
     componentsJSON: string
-    context: RenderRuntime['pageContext']
+    pageContext: RenderRuntime['pageContext']
     extensionsJSON: string
     messagesJSON: string
     pagesJSON: string
@@ -195,7 +195,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface ParsedPageQueryResponse {
     components: RenderRuntime['components']
-    context: RenderRuntime['pageContext']
+    pageContext: RenderRuntime['pageContext']
     extensions: RenderRuntime['extensions']
     messages: RenderRuntime['messages']
     pages: RenderRuntime['pages']
