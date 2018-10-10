@@ -13,6 +13,7 @@ import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
 import Link from '../components/Link'
 import {RenderContext, withRuntimeContext} from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
+import {getVTEXImgHost} from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import {getState} from '../utils/client'
 import {buildCacheLocator} from '../utils/client'
@@ -101,7 +102,7 @@ function start() {
     validateRootComponent(rootName, runtime.extensions)
 
     const ReactCreateElement = React.createElement
-    const vtexImgHost = `https://${runtime.account}.vteximg.com.br`
+    const vtexImgHost = getVTEXImgHost(runtime.account)
     React.createElement = function patchedCreateElement (type: any, props: any) {
       if (type === 'img') {
         props.src = optimizeSrcForVtexImg(vtexImgHost, props.src)

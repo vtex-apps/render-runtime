@@ -447,15 +447,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       throw new Error('Cannot fetch components during server side rendering.')
     }
 
+    const {runtime: {account}} = this.props
     const { components, culture: { locale } } = this.state
     const { apps, assets } = traverseComponent(components, component)
     const unfetchedApps = apps.filter(app => !Object.keys(window.__RENDER_7_COMPONENTS__).some(c => c.startsWith(app)))
     if (unfetchedApps.length === 0) {
-      return fetchAssets(assets)
+      return fetchAssets(account, assets)
     }
 
     const messagesPromises = Promise.all(unfetchedApps.map(app => fetchMessagesForApp(this.apolloClient, app, locale)))
-    const assetsPromise = fetchAssets(assets)
+    const assetsPromise = fetchAssets(account, assets)
     assetsPromise.then(() => {
       this.sendInfoFromIframe(true)
     })
