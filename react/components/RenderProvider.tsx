@@ -256,7 +256,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
       Array.prototype.forEach.call(
         containers,
-        (e: any) => e.classList.replace(currentRouteClass, newRouteClass),
+        (e: Element) => {
+          e.classList.add(newRouteClass)
+          if (currentRouteClass) {
+            e.classList.remove(currentRouteClass)
+          }
+        }
       )
     } catch (e) {
       console.error('Failed to set route class', routeClass(route))
