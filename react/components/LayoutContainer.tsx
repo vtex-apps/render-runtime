@@ -3,27 +3,49 @@ import React, { Component } from 'react'
 
 import ExtensionPoint from './ExtensionPoint'
 
-type Element = string | any[]
+type Element = string | ElementArray
+interface ElementArray extends Array<Element> {}
 
 interface LayoutContainerProps {
-  elements: Element[]
+  aboveTheFold?: number
+  elements: Element
 }
 
 interface ContainerProps {
+  aboveTheFold?: number
   elements: Element
   isRow: boolean
 }
 
+interface ContainerState {
+  elementsToRender: number
+}
+
 const elementPropType = PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired
 
-class Container extends Component<ContainerProps> {
+class Container extends Component<ContainerProps, ContainerState> {
   public static propTypes = {
+    aboveTheFold: PropTypes.number,
     elements: elementPropType,
     isRow: PropTypes.bool
   }
 
+  public constructor(props: ContainerProps) {
+    super(props)
+    const { aboveTheFold } = this.props
+    this.state = {
+      elementsToRender: aboveTheFold != null
+        ? aboveTheFold
+        : this.props.elements.length
+    }
+  }
+
+  public componentDidMount() {
+    this.setState({ elementsToRender: this.props.elements.length })
+  }
+
   public render() {
-    const { isRow, elements, children, ...props } = this.props
+    const { isRow, elements, children, aboveTheFold, ...props } = this.props
 
     const className = `flex flex-grow-1 w-100 ${isRow ? 'flex-row' : 'flex-column'}`
     if (typeof elements === 'string') {
@@ -37,9 +59,9 @@ class Container extends Component<ContainerProps> {
       )
     }
 
-    const returnValue: JSX.Element[] = elements.map((element: Element) => {
+    const returnValue: JSX.Element[] = elements.slice(0, this.state.elementsToRender).map((element: Element) => {
       return (
-        <Container key={element.toString()} elements={element} isRow={!isRow} {...props} >
+        <Container key={element.toString()} elements={element} isRow={!isRow} {...props}>
           {children}
         </Container>
       )
@@ -56,7 +78,8 @@ class Container extends Component<ContainerProps> {
 // tslint:disable-next-line
 class LayoutContainer extends Component<LayoutContainerProps> {
   public static propTypes = {
-    elements: elementPropType
+    aboveTheFold: PropTypes.number,
+    elements: elementPropType,
   }
 
   public render() {
