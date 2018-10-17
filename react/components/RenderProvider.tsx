@@ -413,9 +413,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { runtime: { renderMajor } } = this.props
     const { page, production, culture: { locale } } = this.state
 
-    // Current locale is one of the updated ones
-    if (locales.indexOf(this.state.culture.locale) !== -1) {
-      fetchMessages(this.apolloClient, page, production, locale, renderMajor)
+    // Current locale is one or a subset of the updated ones
+    if (locales.indexOf(locale) !== -1 || locales.indexOf(locale.split('-')[0]) !== -1) {
+      fetchMessages(this.apolloClient, page, production, locale, renderMajor, true)
         .then(newMessages => {
           this.setState(prevState => ({
             ...prevState,
