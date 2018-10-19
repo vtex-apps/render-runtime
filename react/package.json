@@ -14,6 +14,7 @@
     "apollo-upload-client": "^8.1.0",
     "apollo-utilities": "^1.0.16",
     "classnames": "^2.2.5",
+    "core-js": "^2.5.7",
     "debounce": "^1.2.0",
     "eventemitter3": "^3.0.0",
     "exenv": "^1.2.2",

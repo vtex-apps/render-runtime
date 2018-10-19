@@ -1,3 +1,5 @@
+import 'core-js/es6/symbol'
+import 'core-js/fn/symbol/iterator'
 import * as runtimeGlobals from './core/main'
 
 window.__RENDER_7_RUNTIME__ = {...runtimeGlobals}
