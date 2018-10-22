@@ -257,10 +257,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       Array.prototype.forEach.call(
         containers,
         (e: Element) => {
-          e.classList.add(newRouteClass)
           if (currentRouteClass) {
             e.classList.remove(currentRouteClass)
           }
+          e.classList.add(newRouteClass)
         }
       )
     } catch (e) {
