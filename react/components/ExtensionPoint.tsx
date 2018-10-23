@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom'
 import { getImplementation } from '../utils/assets'
 import { TreePathContext, TreePathProps, withTreePath } from '../utils/treePath'
 
+import { Loading } from '../core/main'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import { RenderContext } from './RenderContext'
 
@@ -79,7 +80,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   private getExtensionPointComponent = (runtime: RenderContext) => {
     const { newTreePath } = this.state
     const { children, params, query, id, treePath, ...parentProps } = this.props
-    const extension = runtime.extensions[newTreePath]
+    const extension = runtime.extensions && runtime.extensions[newTreePath]
     const component = extension ? extension.component : null
     const extensionProps = extension ? extension.props : null
 
@@ -96,7 +97,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       ? <TreePathContext.Provider value={{ treePath: newTreePath }}>
         <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
       </TreePathContext.Provider>
-      : null
+      : <Loading runtime={runtime}/>
   }
 
   private addDataToElementIfEditable = () => {

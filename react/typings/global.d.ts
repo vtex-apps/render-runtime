@@ -145,6 +145,7 @@ declare global {
     updateRuntime: (options?: PageContextOptions) => Subscription,
     workspace: RenderRuntime['workspace'],
     route: RenderRuntime['route']
+    defaultExtensions: RenderRuntime['defaultExtensions']
   }
 
   interface PageContextOptions {
@@ -162,6 +163,12 @@ declare global {
     path?: string,
     production: boolean,
     renderMajor: number,
+  }
+
+  interface FetchDefaultPages {
+    apolloClient: ApolloClient<NormalizedCacheObject>,
+    locale: string,
+    routeIds: string[]
   }
 
 interface RenderComponent<P={}, S={}> {
@@ -183,8 +190,17 @@ interface RenderComponent<P={}, S={}> {
     errors?: any,
   }
 
+  interface DefaultPagesQueryResult {
+    data: DefaultPagesQueryResultData,
+    errors?: any,
+  }
+
   interface PageQueryResultData {
     page: PageQueryResponse,
+  }
+
+  interface DefaultPagesQueryResultData {
+    defaultPages: DefaultPagesQueryResponse,
   }
 
   interface PageQueryResponse {
@@ -197,6 +213,12 @@ interface RenderComponent<P={}, S={}> {
     cacheHintsJSON: string
   }
 
+  interface DefaultPagesQueryResponse {
+    componentsJSON: string
+    extensionsJSON: string
+    messagesJSON: string
+  }
+
   interface ParsedPageQueryResponse {
     components: RenderRuntime['components']
     extensions: RenderRuntime['extensions']
@@ -205,6 +227,12 @@ interface RenderComponent<P={}, S={}> {
     appsEtag: RenderRuntime['appsEtag']
     settings: RenderRuntime['settings']
     cacheHints: RenderRuntime['cacheHints']
+  }
+
+  interface ParsedDefaultPagesQueryResponse {
+    components: RenderRuntime['components']
+    extensions: RenderRuntime['extensions']
+    messages: RenderRuntime['messages']
   }
 
   type Rendered = ClientRendered | Promise<NamedServerRendered>
@@ -254,6 +282,7 @@ interface RenderComponent<P={}, S={}> {
     }
     cacheHints: CacheHintsMap
     segmentToken: string
+    defaultExtensions: Extensions
   }
 
   interface CacheHints {
