@@ -9,12 +9,14 @@ interface ElementArray extends Array<Element> {}
 interface LayoutContainerProps {
   aboveTheFold?: number
   elements: Element
+  preview?: boolean
 }
 
 interface ContainerProps {
   aboveTheFold?: number
   elements: Element
   isRow: boolean
+  preview?: boolean
 }
 
 interface ContainerState {
@@ -27,7 +29,8 @@ class Container extends Component<ContainerProps, ContainerState> {
   public static propTypes = {
     aboveTheFold: PropTypes.number,
     elements: elementPropType,
-    isRow: PropTypes.bool
+    isRow: PropTypes.bool,
+    preview: PropTypes.bool,
   }
 
   public constructor(props: ContainerProps) {
@@ -41,11 +44,13 @@ class Container extends Component<ContainerProps, ContainerState> {
   }
 
   public componentDidMount() {
-    this.setState({ elementsToRender: this.props.elements.length })
+    if (!this.props.preview) {
+      this.setState({ elementsToRender: this.props.elements.length })
+    }
   }
 
   public render() {
-    const { isRow, elements, children, aboveTheFold, ...props } = this.props
+    const { isRow, elements, children, aboveTheFold, preview, ...props } = this.props
 
     const className = `flex flex-grow-1 w-100 ${isRow ? 'flex-row' : 'flex-column'}`
     if (typeof elements === 'string') {
@@ -80,6 +85,7 @@ class LayoutContainer extends Component<LayoutContainerProps> {
   public static propTypes = {
     aboveTheFold: PropTypes.number,
     elements: elementPropType,
+    preview: PropTypes.bool,
   }
 
   public render() {
