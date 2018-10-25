@@ -5,7 +5,6 @@ import React, {PureComponent} from 'react'
 import {getPageParams} from '../utils/pages'
 import ExtensionPoint from './ExtensionPoint'
 
-// import Loading from './Loading'
 import MaybeAuth from './MaybeAuth'
 import MaybeContext from './MaybeContext'
 import {RenderContext} from './RenderContext'
