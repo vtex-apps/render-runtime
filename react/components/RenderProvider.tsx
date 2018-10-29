@@ -412,8 +412,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // Current locale is one of the updated ones
     if (locales.indexOf(this.state.culture.locale) !== -1) {
       fetchMessages(this.apolloClient, page, production, locale, renderMajor)
-        .then(messages => {
-          this.setState({ messages })
+        .then(newMessages => {
+          this.setState(prevState => ({
+            ...prevState,
+            messages: { ...prevState.messages, ...newMessages },
+          }), () => {
+            this.sendInfoFromIframe()
+          })
         })
         .catch(e => {
           console.log('Failed to fetch new locale file.')
@@ -432,13 +437,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         fetchMessages(this.apolloClient, page, production, locale, renderMajor),
         loadLocaleData(locale),
       ])
-        .then(([messages]) => {
-          this.setState({
+        .then(([newMessages]) => {
+          this.setState(prevState => ({
+            ...prevState,
             culture: {
               ...this.state.culture,
               locale,
             },
-            messages,
+            messages: { ...prevState.messages, ...newMessages },
+          }), () => {
+            this.sendInfoFromIframe()
           })
         })
         .then(() => window.postMessage({ key: 'cookie.locale', body: { locale } }, '*'))
