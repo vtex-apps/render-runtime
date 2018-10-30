@@ -7,6 +7,7 @@ import {createUploadLink} from 'apollo-upload-client'
 import {canUseDOM} from 'exenv'
 import PageCacheControl from '../cacheControl'
 import {generateHash} from './generateHash'
+import {toBase64Link} from './links/base64Link'
 import {cachingLink} from './links/cachingLink'
 import {createIOFetchLink} from './links/ioFetchLink'
 import {omitTypenameLink} from './links/omitVariableTypenameLink'
@@ -61,10 +62,13 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       fragmentMatcher: new HeuristicFragmentMatcher()
     })
 
-    const httpLink = createHttpLink({
-      credentials: 'include',
-      useGETForQueries: false,
-    })
+    const httpLink = ApolloLink.from([
+      toBase64Link,
+      createHttpLink({
+        credentials: 'include',
+        useGETForQueries: false,
+      })
+    ])
 
     const uploadLink = createUploadLink({
       credentials: 'include',
