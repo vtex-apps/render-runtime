@@ -358,7 +358,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         query,
         route,
         settings,
-      }, () => this.afterPageChanged(page))
+      }, () => this.afterPageChanged(page, state.scrollOptions))
     })
   }
 
