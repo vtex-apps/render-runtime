@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.28.1] - 2018-11-07
+### Added
+- **`RenderProvider`**
+ - Add `this.sendInfoFromIframe` call to `setState` callbacks after locale update.
+
+### Fixed
+- **`RenderProvider#getCustomMessage`**
+  - Considers `WrappedComponent` when getting custom message.
+
 ## [7.28.0] - 2018-11-07
 
 ## [7.27.4] - 2018-10-22

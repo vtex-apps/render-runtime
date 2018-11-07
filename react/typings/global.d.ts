@@ -163,6 +163,7 @@ declare global {
 interface RenderComponent<P={}, S={}> {
   new(): Component<P,S>
   getCustomMessages?: (locale: string) => any
+  WrappedComponent?: RenderComponent
 }
 
   interface ComponentsRegistry {
