@@ -125,6 +125,17 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
   return false
 }
 
+export function scrollTo(options: ScrollToOptions) {
+  try {
+    window.scrollTo(options)
+  }
+  catch (e) {
+    const x = options.left == null ? window.scrollX : options.left
+    const y = options.top == null ? window.scrollY : options.top
+    window.scrollTo(x,y)
+  }
+}
+
 function routeIdFromPath(path: string, routes: Pages) {
   let id: string | undefined
   let score: number
