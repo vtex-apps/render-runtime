@@ -57,6 +57,8 @@ export interface RenderProviderState {
 
 const SEND_INFO_DEBOUNCE_MS = 100
 const isStorefrontIframe = canUseDOM && window.top !== window.self && window.top.__provideRuntime
+// tslint:disable-next-line:no-empty
+const noop = (() => {})
 
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
@@ -182,7 +184,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-
   public getChildContext() {
     const { history, runtime } = this.props
     const { components, extensions, page, pages, culture, device, route } = this.state
@@ -235,9 +236,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const customMessages = componentsArray
       .map(getImplementation)
-      .filter(component => component && component.getCustomMessages)
-      .map(component => component.getCustomMessages!(locale))
-      .reduce(Object.assign, {})
+      .filter(component => component && (component.getCustomMessages || component.WrappedComponent))
+      .map(component => {
+        const getCustomMessages = component.getCustomMessages || (component.WrappedComponent && component.WrappedComponent.getCustomMessages) || noop
+        return getCustomMessages(locale)
+      })
+      .reduce((acc, strings) => ({...acc, ...strings}), {})
 
     return customMessages
   }
