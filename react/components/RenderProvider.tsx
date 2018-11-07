@@ -19,7 +19,7 @@ import { traverseComponent } from '../utils/components'
 import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils/dom'
 import { loadLocaleData } from '../utils/locales'
 import { createLocaleCookie, fetchMessages, fetchMessagesForApp } from '../utils/messages'
-import { getRouteFromPath, navigate as pageNavigate, NavigateOptions } from '../utils/pages'
+import { getRouteFromPath, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
 import { fetchRoutes } from '../utils/routes'
 import { initializeSession, patchSession } from '../utils/session'
 import { TreePathContext } from '../utils/treePath'
@@ -275,7 +275,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }
 
       const options = scrollOptions || { top: 0, left: 0 }
-      setTimeout(() => window.scrollTo(options), 0)
+      setTimeout(() => pageScrollTo(options), 0)
     }
     catch (e) {
       console.warn('Failed to scroll after page navigation.')
@@ -358,7 +358,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         query,
         route,
         settings,
-      }, () => this.afterPageChanged(page))
+      }, () => this.afterPageChanged(page, state.scrollOptions))
     })
   }
 
