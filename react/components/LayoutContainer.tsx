@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
+import {RenderContextProps, withRuntimeContext} from './RenderContext'
 
 import ExtensionPoint from './ExtensionPoint'
 
@@ -9,7 +10,6 @@ interface ElementArray extends Array<Element> {}
 interface LayoutContainerProps {
   aboveTheFold?: number
   elements: Element
-  preview?: boolean
 }
 
 interface ContainerProps {
@@ -19,13 +19,9 @@ interface ContainerProps {
   preview?: boolean
 }
 
-interface ContainerState {
-  elementsToRender: number
-}
-
 const elementPropType = PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired
 
-class Container extends Component<ContainerProps, ContainerState> {
+class Container extends Component<ContainerProps> {
   public static propTypes = {
     aboveTheFold: PropTypes.number,
     elements: elementPropType,
@@ -33,24 +29,8 @@ class Container extends Component<ContainerProps, ContainerState> {
     preview: PropTypes.bool,
   }
 
-  public constructor(props: ContainerProps) {
-    super(props)
-    const { aboveTheFold } = this.props
-    this.state = {
-      elementsToRender: aboveTheFold != null
-        ? aboveTheFold
-        : this.props.elements.length
-    }
-  }
-
-  public componentDidMount() {
-    if (!this.props.preview) {
-      this.setState({ elementsToRender: this.props.elements.length })
-    }
-  }
-
   public render() {
-    const { isRow, elements, children, aboveTheFold, preview, ...props } = this.props
+    const { isRow, elements, children, ...props } = this.props
 
     const className = `flex flex-grow-1 w-100 ${isRow ? 'flex-row' : 'flex-column'}`
     if (typeof elements === 'string') {
@@ -64,7 +44,12 @@ class Container extends Component<ContainerProps, ContainerState> {
       )
     }
 
-    const returnValue: JSX.Element[] = elements.slice(0, this.state.elementsToRender).map((element: Element) => {
+    let elementsToRender = this.props.elements.length
+    if (this.props.preview && this.props.aboveTheFold != null) {
+      elementsToRender = this.props.aboveTheFold
+    }
+
+    const returnValue: JSX.Element[] = elements.slice(0, elementsToRender).map((element: Element) => {
       return (
         <Container key={element.toString()} elements={element} isRow={!isRow} {...props}>
           {children}
@@ -81,16 +66,16 @@ class Container extends Component<ContainerProps, ContainerState> {
 }
 
 // tslint:disable-next-line
-class LayoutContainer extends Component<LayoutContainerProps> {
+class LayoutContainer extends Component<LayoutContainerProps & RenderContextProps> {
   public static propTypes = {
     aboveTheFold: PropTypes.number,
     elements: elementPropType,
-    preview: PropTypes.bool,
   }
 
   public render() {
-    return <Container {...this.props} isRow={false} />
+    const {runtime: {preview}} = this.props
+    return <Container {...this.props} preview={preview} isRow={false} />
   }
 }
 
-export default LayoutContainer
+export default withRuntimeContext(LayoutContainer)
