@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.28.3] - 2018-11-14
+### Fixed
+- Avoid `MaybeAuth` navigate to the login page when it is already navigating to it.
+
 ## [7.28.2] - 2018-11-08
 
 ## [7.28.1] - 2018-11-07
