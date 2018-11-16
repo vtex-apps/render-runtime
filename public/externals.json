@@ -22,8 +22,7 @@
       {
         "global": "ReactDOMServer",
         "import": "react-dom/server",
-        "path": "https://unpkg.com/react-dom@16.4.2/umd/react-dom-server.browser.development.js",
-        "serverOnly": true
+        "path": "https://unpkg.com/react-dom@16.4.2/umd/react-dom-server.browser.development.js"
       },
       {
         "path": "https://unpkg.com/intl@1.2.5/dist/Intl.js",
@@ -63,8 +62,7 @@
       {
         "global": "ReactDOMServer",
         "import": "react-dom/server",
-        "path": "https://unpkg.com/react-dom@16.4.2/umd/react-dom-server.browser.production.min.js",
-        "serverOnly": true
+        "path": "https://unpkg.com/react-dom@16.4.2/umd/react-dom-server.browser.production.min.js"
       },
       {
         "path": "https://unpkg.com/intl@1.2.5/dist/Intl.min.js",
