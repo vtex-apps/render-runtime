@@ -95,10 +95,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     runtime: PropTypes.object,
   }
 
-  public sendInfoFromIframe = debounce(() => {
+  public sendInfoFromIframe = debounce((shouldUpdateRuntime?: boolean) => {
     if (isStorefrontIframe) {
       const { messages } = this.state
-      window.top.__provideRuntime(this.getChildContext(), messages)
+      window.top.__provideRuntime(this.getChildContext(), messages, shouldUpdateRuntime)
     }
   }, SEND_INFO_DEBOUNCE_MS)
 
@@ -397,7 +397,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const messagesPromises = Promise.all(unfetchedApps.map(app => fetchMessagesForApp(this.apolloClient, app, locale)))
     const assetsPromise = fetchAssets(assets)
-    assetsPromise.then(this.sendInfoFromIframe)
+    assetsPromise.then(() => {
+      this.sendInfoFromIframe(true)
+    })
 
     return Promise.all([messagesPromises, assetsPromise]).then(([messages]) => {
       this.setState({
@@ -421,7 +423,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             ...prevState,
             messages: { ...prevState.messages, ...newMessages },
           }), () => {
-            this.sendInfoFromIframe()
+            this.sendInfoFromIframe(true)
           })
         })
         .catch(e => {
@@ -450,7 +452,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             },
             messages: { ...prevState.messages, ...newMessages },
           }), () => {
-            this.sendInfoFromIframe()
+            this.sendInfoFromIframe(true)
           })
         })
         .then(() => window.postMessage({ key: 'cookie.locale', body: { locale } }, '*'))
