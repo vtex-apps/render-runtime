@@ -2,6 +2,10 @@
   "commons": {
     "dev": [
       {
+        "path": "https://unpkg.com/bluebird@3.5.1/js/browser/bluebird.js",
+        "serverOnly": true
+      },
+      {
         "path": "https://unpkg.com/regenerator-runtime@0.11.1/runtime.js"
       },
       {
@@ -41,6 +45,10 @@
       }
     ],
     "prod": [
+      {
+        "path": "https://unpkg.com/bluebird@3.5.1/js/browser/bluebird.min.js",
+        "serverOnly": true
+      },
       {
         "path": "https://unpkg.com/regenerator-runtime@0.11.1/runtime.js"
       },
