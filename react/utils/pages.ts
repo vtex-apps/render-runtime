@@ -1,6 +1,7 @@
 import {canUseDOM} from 'exenv'
 import {History, LocationDescriptorObject} from 'history'
 import * as RouteParser from 'route-parser'
+import { element } from 'prop-types';
 
 const EMPTY_OBJECT = Object.freeze && Object.freeze({}) || {}
 
@@ -125,7 +126,16 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
   return false
 }
 
-export function scrollTo(options: ScrollToOptions) {
+export function scrollTo(options: RenderScrollToOptions) {
+  const { elementId } = options
+  if (elementId) {
+    const scrollAnchor = document.querySelector(`#${elementId}`)
+    if (scrollAnchor) {
+      scrollAnchor.scrollIntoView()
+      return
+    }
+  }
+
   try {
     window.scrollTo(options)
   }
