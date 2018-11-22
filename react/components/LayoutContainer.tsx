@@ -25,7 +25,7 @@ class Container extends Component<ContainerProps> {
   public render() {
     const { isRow, elements, children, ...props } = this.props
 
-    const className = `flex flex-grow-1 w-100 ${isRow ? 'flex-row' : 'flex-column'}`
+    const className = `flex flex-grow-1 w-100 min-vh-100 ${isRow ? 'flex-row' : 'flex-column'}`
     if (typeof elements === 'string') {
       if (elements === '__children__') {
         return children
