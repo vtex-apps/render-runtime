@@ -126,7 +126,7 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
 }
 
 export function scrollTo(options: RelativeScrollToOptions) {
-  const { baseElementId } = options
+  const { baseElementId = null } = options || {}
   const scrollAnchor = baseElementId && document.querySelector(`#${baseElementId}`)
 
   if (!scrollAnchor) {
