@@ -80,5 +80,5 @@ export function fetchAssets(assets: string[]) {
   const scripts = assets.filter(shouldAddScriptToPage)
   const styles = assets.filter(shouldAddStyleToPage)
   styles.forEach(addStyleToPage)
-  return Promise.all(scripts.map(addScriptToPage)).then(() => { return })
+  return Promise.all(scripts.map(addScriptToPage)).then(() => scripts.length !== 0)
 }

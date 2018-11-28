@@ -124,7 +124,7 @@ declare global {
     emitter: RenderRuntime['emitter'],
     ensureSession: () => Promise<void>,
     extensions: RenderRuntime['extensions'],
-    fetchComponent: (component: string) => Promise<void>,
+    fetchComponent: (component: string) => Promise<boolean>,
     getSettings: (app: string) => any,
     hints: RenderHints,
     history: History | null,

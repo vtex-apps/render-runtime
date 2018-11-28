@@ -399,13 +399,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const assetsPromise = fetchAssets(assets)
     assetsPromise.then(this.sendInfoFromIframe)
 
-    return Promise.all([messagesPromises, assetsPromise]).then(([messages]) => {
+    return Promise.all([messagesPromises, assetsPromise]).then(([messages, fetched]) => {
       this.setState({
         messages: {
           ...this.state.messages,
           ...Object.assign({}, ...messages),
         },
       })
+
+      return fetched
     })
   }
 

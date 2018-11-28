@@ -20,7 +20,7 @@ interface State {
   lastUpdate?: number
 }
 
-const componentPromiseMap: any = {}
+const componentPromiseMap: Record<string, Promise<boolean>> = {}
 
 class ExtensionPointComponent extends PureComponent<
   Props & RenderContextProps,
@@ -71,7 +71,13 @@ class ExtensionPointComponent extends PureComponent<
       if (!componentPromiseMap[component]) {
         componentPromiseMap[component] = fetchComponent(component)
       }
-      componentPromiseMap[component].then(() => this.updateComponentsWithEvent(component))
+      componentPromiseMap[component].then(fetched => {
+        if (!fetched) {
+          throw new Error(`Scripts for '${component}' already added to page but no implementation registered`)
+        }
+
+        this.updateComponentsWithEvent(component)
+      })
     }
   }
 
