@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Fix infinite loop when component has failed to register
+
 ## [7.29.1] - 2018-11-22
 
 ## [7.29.0] - 2018-11-22
