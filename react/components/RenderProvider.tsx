@@ -413,7 +413,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             ...Object.assign({}, ...messages),
           },
         })
-        resolve([messagesPromises, assetsPromise])
+        resolve([messages, assets])
       })
     })
   }
