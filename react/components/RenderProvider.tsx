@@ -406,6 +406,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         if (assets == null) {
           console.log(`Failed to fetch ${component}`)
           reject()
+          return
         }
         this.setState({
           messages: {
