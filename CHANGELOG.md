@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.29.1] - 2018-11-22
+
+## [7.29.0] - 2018-11-22
+### Added
+- Add `baseElementId` to navigate to allow scroll relative to an element.
+
 ## [7.28.5] - 2018-11-16
 
 ## [7.28.4] - 2018-11-16

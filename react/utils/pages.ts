@@ -125,14 +125,29 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
   return false
 }
 
-export function scrollTo(options: ScrollToOptions) {
+export function scrollTo(options: RelativeScrollToOptions) {
+  const { baseElementId = null } = options || {}
+  const scrollAnchor = baseElementId && document.querySelector(`#${baseElementId}`)
+
+  if (!scrollAnchor) {
+    return polyfillScrollTo(options)
+  }
+
+  const { top, left } = scrollAnchor.getBoundingClientRect()
+  polyfillScrollTo({
+    left: left + window.scrollX + (options.left || 0),
+    top: top + window.scrollY + (options.top || 0)
+  })
+}
+
+function polyfillScrollTo(options: ScrollToOptions) {
   try {
     window.scrollTo(options)
   }
   catch (e) {
     const x = options.left == null ? window.scrollX : options.left
     const y = options.top == null ? window.scrollY : options.top
-    window.scrollTo(x,y)
+    window.scrollTo(x, y)
   }
 }
 
@@ -168,6 +183,6 @@ export interface NavigateOptions {
   params?: any
   query?: any
   to?: string
-  scrollOptions?: ScrollOptions
+  scrollOptions?: RenderScrollOptions
   fallbackToWindowLocation?: boolean
 }

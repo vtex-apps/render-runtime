@@ -78,7 +78,11 @@ declare global {
     id: string
   }
 
-  type RenderScrollOptions = ScrollToOptions | false
+  interface RelativeScrollToOptions extends ScrollToOptions {
+    baseElementId?: string
+  }
+
+  type RenderScrollOptions = RelativeScrollToOptions | false
 
   interface RenderHistoryLocation extends Location {
     state?: {
