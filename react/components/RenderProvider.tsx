@@ -401,12 +401,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       this.sendInfoFromIframe(true)
     })
 
-    return Promise.all([messagesPromises, assetsPromise]).then(([messages]) => {
-      this.setState({
-        messages: {
-          ...this.state.messages,
-          ...Object.assign({}, ...messages),
-        },
+    return new Promise((resolve, reject) => {
+      Promise.all([messagesPromises, assetsPromise]).then(([messages, assets]) => {
+        if (assets == null) {
+          console.log(`Failed to fetch ${component}`)
+          reject()
+        }
+        this.setState({
+          messages: {
+            ...this.state.messages,
+            ...Object.assign({}, ...messages),
+          },
+        })
+        resolve([messagesPromises, assetsPromise])
       })
     })
   }
