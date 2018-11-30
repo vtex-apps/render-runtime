@@ -101,6 +101,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     prefetchPage: PropTypes.func,
     preview: PropTypes.bool,
     production: PropTypes.bool,
+    publicEndpoint: PropTypes.string,
     route: PropTypes.object,
     setDevice: PropTypes.func,
     updateComponentAssets: PropTypes.func,
@@ -209,7 +210,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public getChildContext() {
     const { history, runtime } = this.props
     const { components, extensions, page, pages, preview, culture, device, route, defaultExtensions } = this.state
-    const { account, emitter, hints, production, workspace } = runtime
+    const { account, emitter, hints, production, publicEndpoint, workspace } = runtime
 
     return {
       account,
@@ -233,6 +234,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       prefetchPage: this.prefetchPage,
       preview,
       production,
+      publicEndpoint,
       route,
       setDevice: this.handleSetDevice,
       updateComponentAssets: this.updateComponentAssets,
