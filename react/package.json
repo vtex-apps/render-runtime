@@ -51,6 +51,7 @@
     "@types/react-hot-loader": "^4.1.0",
     "@types/react-intl": "^2.3.5",
     "@types/route-parser": "^0.1.1",
+    "eventsource-polyfill": "^0.9.6",
     "tslint": "^5.2.0",
     "tslint-config-vtex": "^2.0.0",
     "tslint-eslint-rules": "^5.1.0",
