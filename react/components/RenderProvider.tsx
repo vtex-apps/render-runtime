@@ -20,7 +20,7 @@ import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils
 import { loadLocaleData } from '../utils/locales'
 import { createLocaleCookie, fetchMessages, fetchMessagesForApp } from '../utils/messages'
 import { getRouteFromPath, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
-import { fetchRoutes } from '../utils/routes'
+import { fetchDefaultPages, fetchRoutes } from '../utils/routes'
 import { initializeSession, patchSession } from '../utils/session'
 import { TreePathContext } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
@@ -43,9 +43,9 @@ export interface RenderProviderState {
   cacheHints: RenderRuntime['cacheHints']
   components: RenderRuntime['components']
   culture: RenderRuntime['culture']
+  defaultExtensions: RenderRuntime['defaultExtensions']
   device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
-  loadingRoute: string | null
   messages: RenderRuntime['messages']
   page: RenderRuntime['page']
   pages: RenderRuntime['pages']
@@ -60,11 +60,29 @@ const isStorefrontIframe = canUseDOM && window.top !== window.self && window.top
 // tslint:disable-next-line:no-empty
 const noop = (() => {})
 
+const unionKeys = (record1: any, record2: any) => [...new Set([...Object.keys(record1), ...Object.keys(record2)])]
+
+const isChildOrSelf = (child: string, parent: string) =>
+  child === parent || (child.startsWith(`${parent}/`) && child !== `${parent}/__context`)
+
+const replaceExtensionsWithDefault = (extensions: Extensions, page: string, defaultExtensions: Extensions) =>
+  unionKeys(extensions, defaultExtensions)
+  .reduce((acc, key) => {
+    const maybeExtension = isChildOrSelf(key, page)
+      ? defaultExtensions[key]
+      : extensions[key]
+    if (maybeExtension) {
+      acc[key] = maybeExtension
+    }
+    return acc
+  }, {} as Extensions)
+
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
     components: PropTypes.object,
     culture: PropTypes.object,
+    defaultExtensions: PropTypes.object,
     device: PropTypes.string,
     emitter: PropTypes.object,
     ensureSession: PropTypes.func,
@@ -78,6 +96,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     page: PropTypes.string,
     pages: PropTypes.object,
     patchSession: PropTypes.func,
+    prefetchDefaultPages: PropTypes.func,
     prefetchPage: PropTypes.func,
     production: PropTypes.bool,
     route: PropTypes.object,
@@ -132,9 +151,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       cacheHints,
       components,
       culture,
+      defaultExtensions: {},
       device: 'any',
       extensions,
-      loadingRoute: null,
       messages,
       page,
       pages,
@@ -186,13 +205,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public getChildContext() {
     const { history, runtime } = this.props
-    const { components, extensions, page, pages, culture, device, route } = this.state
+    const { components, extensions, page, pages, culture, device, route, defaultExtensions } = this.state
     const { account, emitter, hints, production, workspace } = runtime
 
     return {
       account,
       components,
       culture,
+      defaultExtensions,
       device,
       emitter,
       ensureSession: this.ensureSession,
@@ -206,6 +226,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       page,
       pages,
       patchSession: this.patchSession,
+      prefetchDefaultPages: this.prefetchDefaultPages,
       prefetchPage: this.prefetchPage,
       production,
       route,
@@ -294,7 +315,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onPageChanged = (location: RenderHistoryLocation) => {
     const { runtime: { renderMajor } } = this.props
-    const { culture: { locale }, pages: pagesState, production, device } = this.state
+    const { culture: { locale }, pages: pagesState, production, device, defaultExtensions } = this.state
     const { pathname, state } = location
 
     // Make sure this is our navigation
@@ -316,7 +337,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     this.setState({
-      loadingRoute: page,
+      extensions: replaceExtensionsWithDefault(this.state.extensions, page, defaultExtensions),
+      page,
+      query,
+      route
+    }, () => {
+      this.replaceRouteClass(page)
+      this.scrollTo(state.scrollOptions)
     })
 
     // Retrieve the adequate assets for the new page. Naming will
@@ -355,14 +382,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         cacheHints,
         components,
         extensions,
-        loadingRoute: null,
         messages,
         page,
         pages,
         query,
         route,
         settings,
-      }, () => this.afterPageChanged(page, state.scrollOptions))
+      }, () => this.sendInfoFromIframe())
     })
   }
 
@@ -372,6 +398,31 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     if (component) {
       this.fetchComponent(component)
     }
+  }
+
+  public prefetchDefaultPages = async (routeIds: string[]) => {
+    const { culture: { locale } } = this.state
+
+    const {
+      components: defaultComponents,
+      extensions: defaultExtensions,
+      messages: defaultMessages,
+    } = await fetchDefaultPages({
+      apolloClient: this.apolloClient,
+      locale,
+      routeIds
+    })
+
+    await Promise.all(Object.keys(defaultComponents).map((component: string) => {
+      const { assets } = traverseComponent(defaultComponents, component)
+      return fetchAssets(assets)
+    }))
+
+    this.setState(({components, messages}) => ({
+      components: {...defaultComponents, ...components},
+      defaultExtensions,
+      messages: {...defaultMessages, ...messages}
+    }))
   }
 
   public updateComponentAssets = (availableComponents: Components) => {
@@ -561,7 +612,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public render() {
     const { children } = this.props
-    const { culture: { locale }, loadingRoute, messages, pages, page, query, production } = this.state
+    const { culture: { locale }, messages, pages, page, query, production } = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
       ...messages,
@@ -573,7 +624,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       : (
         <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
-          <NestedExtensionPoints page={page} query={query} loadingRoute={loadingRoute} />
+          <NestedExtensionPoints page={page} query={query} />
         </div>
       )
 

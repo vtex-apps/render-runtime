@@ -1,0 +1,10 @@
+query DefaultPages($locale: String!, $routeIds: [String]!) {
+  defaultPages (
+    locale: $locale,
+    routeIds: $routeIds
+  ) {
+    componentsJSON
+    extensionsJSON
+    messagesJSON
+  }
+}

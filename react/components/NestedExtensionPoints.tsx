@@ -5,13 +5,11 @@ import React, {PureComponent} from 'react'
 import {getPageParams} from '../utils/pages'
 import ExtensionPoint from './ExtensionPoint'
 
-import Loading from './Loading'
 import MaybeAuth from './MaybeAuth'
 import MaybeContext from './MaybeContext'
 import {RenderContext} from './RenderContext'
 
 interface Props {
-  loadingRoute: string | null,
   page: string,
   query?: Record<string, string>
 }
@@ -31,16 +29,14 @@ const commonRouteId = (a: string, b: string) => {
 
 export default class NestedExtensionPoints extends PureComponent<Props> {
   public static propTypes = {
-    loadingRoute: PropTypes.string,
     page: PropTypes.string.isRequired,
     query: PropTypes.object,
   }
 
   public render() {
-    const {loadingRoute, page, query} = this.props
+    const {page, query} = this.props
     const segments = page.split('/')
     const reverse = segments.slice().reverse()
-    const loadingCommon = loadingRoute && commonRouteId(page, loadingRoute)
 
     // Nest extension points for nested pages
     // a/b/c should render three extension points
@@ -49,15 +45,6 @@ export default class NestedExtensionPoints extends PureComponent<Props> {
       return reverse.reduce((acc: JSX.Element | null, value: string, index: number) => {
         const nestedPage = segments.slice(0, segments.length - index).join('/')
         const params = this.getNestedPageParams(runtime, nestedPage)
-
-        if (loadingCommon) {
-          if (loadingCommon.indexOf(nestedPage) === -1) {
-            return null
-          }
-          if (nestedPage === loadingCommon) {
-            acc = <Loading />
-          }
-        }
 
         return (
           <MaybeAuth pages={runtime.pages} page={nestedPage} navigate={runtime.navigate} render={

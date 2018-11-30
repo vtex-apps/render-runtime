@@ -1,3 +1,4 @@
+import defaultPage from './defaultPage.graphql'
 import pageQuery from './Page.graphql'
 
 const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryResponse => {
@@ -31,6 +32,26 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
   }
 }
 
+const parseDefaultPagesQueryResponse = (defaultPages: DefaultPagesQueryResponse): ParsedDefaultPagesQueryResponse => {
+  const {
+    componentsJSON,
+    extensionsJSON,
+    messagesJSON,
+  } = defaultPages
+
+  const [components, extensions, messages] = [
+    componentsJSON,
+    extensionsJSON,
+    messagesJSON,
+  ].map(json => JSON.parse(json))
+
+  return {
+    components,
+    extensions,
+    messages,
+  }
+}
+
 export const fetchRoutes = ({
   apolloClient,
   conditions,
@@ -60,3 +81,16 @@ export const fetchRoutes = ({
   }
 }).then<ParsedPageQueryResponse>(({data: {page: pageData}, errors}: PageQueryResult) =>
       errors ? Promise.reject(errors) : parsePageQueryResponse(pageData))
+
+export const fetchDefaultPages = ({
+  apolloClient,
+  locale,
+  routeIds,
+}: FetchDefaultPages) => apolloClient.query<{defaultPages: DefaultPagesQueryResponse}>({
+  query: defaultPage,
+  variables: {
+    locale,
+    routeIds
+  }
+}).then<ParsedDefaultPagesQueryResponse>(({data: {defaultPages}, errors}: DefaultPagesQueryResult) =>
+  errors ? Promise.reject(errors) : parseDefaultPagesQueryResponse(defaultPages))
