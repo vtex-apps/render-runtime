@@ -140,6 +140,7 @@ declare global {
     prefetchPage: (name: string) => void,
     preview: RenderRuntime['preview'],
     production: RenderRuntime['production'],
+    publicEndpoint: RenderRuntime['publicEndpoint'],
     setDevice: (device: ConfigurationDevice) => void,
     updateComponentAssets: (availableComponents: Components) => void,
     updateExtension: (name: string, extension: Extension) => void,
