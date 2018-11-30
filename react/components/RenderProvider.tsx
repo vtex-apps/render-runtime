@@ -49,6 +49,7 @@ export interface RenderProviderState {
   messages: RenderRuntime['messages']
   page: RenderRuntime['page']
   pages: RenderRuntime['pages']
+  preview: RenderRuntime['preview']
   production: RenderRuntime['production']
   query: RenderRuntime['query']
   settings: RenderRuntime['settings']
@@ -98,6 +99,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     patchSession: PropTypes.func,
     prefetchDefaultPages: PropTypes.func,
     prefetchPage: PropTypes.func,
+    preview: PropTypes.bool,
     production: PropTypes.bool,
     route: PropTypes.object,
     setDevice: PropTypes.func,
@@ -157,6 +159,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       messages,
       page,
       pages,
+      preview: false,
       production,
       query,
       route,
@@ -205,7 +208,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public getChildContext() {
     const { history, runtime } = this.props
-    const { components, extensions, page, pages, culture, device, route, defaultExtensions } = this.state
+    const { components, extensions, page, pages, preview, culture, device, route, defaultExtensions } = this.state
     const { account, emitter, hints, production, workspace } = runtime
 
     return {
@@ -228,6 +231,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       patchSession: this.patchSession,
       prefetchDefaultPages: this.prefetchDefaultPages,
       prefetchPage: this.prefetchPage,
+      preview,
       production,
       route,
       setDevice: this.handleSetDevice,
@@ -339,6 +343,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.setState({
       extensions: replaceExtensionsWithDefault(this.state.extensions, page, defaultExtensions),
       page,
+      preview: true,
       query,
       route
     }, () => {
@@ -385,6 +390,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         messages,
         page,
         pages,
+        preview: false,
         query,
         route,
         settings,

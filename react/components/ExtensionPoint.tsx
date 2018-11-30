@@ -93,11 +93,16 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       query,
     }
 
+    let loading = null
+    if (runtime.preview) {
+      loading = <Loading runtime={runtime} />
+    }
+
     return component
       ? <TreePathContext.Provider value={{ treePath: newTreePath }}>
         <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
       </TreePathContext.Provider>
-      : <Loading runtime={runtime}/>
+      : loading
   }
 
   private addDataToElementIfEditable = () => {

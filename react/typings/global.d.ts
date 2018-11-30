@@ -138,6 +138,7 @@ declare global {
     pages: RenderRuntime['pages'],
     patchSession: (data?: any) => Promise<void>,
     prefetchPage: (name: string) => void,
+    preview: RenderRuntime['preview'],
     production: RenderRuntime['production'],
     setDevice: (device: ConfigurationDevice) => void,
     updateComponentAssets: (availableComponents: Components) => void,
@@ -266,6 +267,7 @@ interface RenderComponent<P={}, S={}> {
     culture: Culture
     pages: Pages
     extensions: Extensions
+    preview: boolean
     production: boolean
     publicEndpoint: string
     messages: Record<string, string>
