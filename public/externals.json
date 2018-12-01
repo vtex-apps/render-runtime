@@ -36,7 +36,7 @@
         "path": "https://unpkg.com/animate.css@3.7.0/animate.css"
       },
       {
-        "path": "https://unpkg.com/vtex-tachyons@2.8.0/tachyons.css"
+        "path": "https://unpkg.com/vtex-tachyons@2.9.0/tachyons.css"
       },
       {
         "clientOnly": true,
@@ -80,7 +80,7 @@
         "path": "https://unpkg.com/animate.css@3.7.0/animate.min.css"
       },
       {
-        "path": "https://unpkg.com/vtex-tachyons@2.8.0/tachyons.min.css"
+        "path": "https://unpkg.com/vtex-tachyons@2.9.0/tachyons.min.css"
       },
       {
         "clientOnly": true,
@@ -90,16 +90,5 @@
     ]
   },
   "vtex": {},
-  "gocommerce": {
-    "dev": [
-      {
-        "path": "https://unpkg.com/@gocommerce/tachyons/tachyons.css"
-      }
-    ],
-    "prod": [
-      {
-        "path": "https://unpkg.com/@gocommerce/tachyons/tachyons.min.css"
-      }
-    ]
-  }
+  "gocommerce": {}
 }
