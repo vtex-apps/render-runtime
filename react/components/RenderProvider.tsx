@@ -12,7 +12,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
 
-import { fetchAssets, getImplementation } from '../utils/assets'
+import { fetchAssets, getImplementation, preloadAssets } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { traverseComponent } from '../utils/components'
@@ -404,7 +404,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { extensions } = this.state
     const component = extensions[pageName] && extensions[pageName].component
     if (component) {
-      this.fetchComponent(component)
+      const { components } = this.state
+      const { assets } = traverseComponent(components, component)
+      return preloadAssets(assets)
     }
   }
 
@@ -423,7 +425,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     await Promise.all(Object.keys(defaultComponents).map((component: string) => {
       const { assets } = traverseComponent(defaultComponents, component)
-      return fetchAssets(assets)
+      return preloadAssets(assets)
     }))
 
     this.setState(({components, messages}) => ({
