@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Changed
 - Update React & React DOM to `v16.6.1`.
+- Defer rc script to avoid blocking assets (last one!).
 
 ### Added
 - Fetch components assets from `vteximg`.
