@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [7.34.0] - 2018-12-02
+
+## [7.34.0-beta.1] - 2018-12-02
+
+## [7.34.0-beta.0] - 2018-12-02
 ### Changed
 - Update React & React DOM to `v16.6.1`.
 - Defer rc script to avoid blocking assets (last one!).
@@ -13,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Fetch components assets from `vteximg`.
 - Make sure links with target="_blank" have rel="noopener"
+
+## [7.34.0-beta] - 2018-12-02
 
 ## [7.33.0] - 2018-12-01
 

@@ -17,8 +17,17 @@ const getAbsoluteURL = (account: string, url: string) => {
     : url
 }
 
+class ServerSideAssetLoadingError extends Error {
+  constructor() {
+    super('Loading assets on server side rendering is not supported')
+  }
+}
+
 export function addScriptToPage(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
+    if (!document || !document.head) {
+      throw new ServerSideAssetLoadingError()
+    }
     const script = document.createElement('script')
     script.onload = () => resolve()
     script.onerror = () => reject()
@@ -29,6 +38,9 @@ export function addScriptToPage(src: string): Promise<void> {
 }
 
 function addStyleToPage(href: string) {
+  if (!document || !document.head) {
+    throw new ServerSideAssetLoadingError()
+  }
   const link = document.createElement('link')
   link.href = href
   link.type = 'text/css'
@@ -36,10 +48,32 @@ function addStyleToPage(href: string) {
   document.head.appendChild(link)
 }
 
+function preloadStyle(href: string) {
+  if (!document || !document.head) {
+    throw new ServerSideAssetLoadingError()
+  }
+  const link = document.createElement('link')
+  link.href = href
+  link.as = 'style'
+  link.rel = 'preload'
+  document.head.appendChild(link)
+}
+
+function preloadScript(href: string) {
+  if (!document || !document.head) {
+    throw new ServerSideAssetLoadingError()
+  }
+  const link = document.createElement('link')
+  link.href = href
+  link.as = 'script'
+  link.rel = 'preload'
+  document.head.appendChild(link)
+}
+
 function getExistingScriptSrcs() {
   const paths: string[] = []
   for (let i = 0; i < document.scripts.length; i++) {
-    paths.push(document.scripts.item(i).src)
+    paths.push(document.scripts.item(i)!.src)
   }
   return paths
 }
@@ -55,12 +89,20 @@ function getExistingStyleHrefs() {
   return hrefs
 }
 
-function scriptOnPage(path: string) {
-  return getExistingScriptSrcs().some(src => src.indexOf(path) !== -1)
+function getExistingPreloadLinks() {
+  const paths: string[] = []
+  const links = document.getElementsByTagName('link')
+  for (let i = 0; i < links.length; i++) {
+    const item = links.item(i)
+    if (item && item.rel === 'preload') {
+      paths.push(item.href)
+    }
+  }
+  return paths
 }
 
-function styleOnPage(path: string) {
-  return getExistingStyleHrefs().some(href => href.indexOf(path) !== -1)
+function assetOnList(path: string, assets: string[]) {
+  return assets.some(asset => asset.indexOf(path) !== -1)
 }
 
 function isScript(path: string) {
@@ -71,12 +113,12 @@ function isStyle(path: string) {
   return getExtension(path) === '.css'
 }
 
-export function shouldAddScriptToPage(path: string) {
-  return isScript(path) && !scriptOnPage(path)
+export function shouldAddScriptToPage(path: string, scripts: string[] = getExistingScriptSrcs()) {
+  return isScript(path) && !assetOnList(path, scripts)
 }
 
-function shouldAddStyleToPage(path: string) {
-  return isStyle(path) && !styleOnPage(path)
+function shouldAddStyleToPage(path: string, styles: string[] = getExistingStyleHrefs()) {
+  return isStyle(path) && !assetOnList(path, styles)
 }
 
 export function getImplementation<P={}, S={}>(component: string) {
@@ -90,8 +132,21 @@ export function getExtensionImplementation<P={}, S={}>(extensions: Extensions, n
 
 export function fetchAssets(account: string, assets: string[]) {
   const absoluteAssets = assets.map(url => getAbsoluteURL(account, url))
-  const scripts = absoluteAssets.filter(shouldAddScriptToPage)
-  const styles = absoluteAssets.filter(shouldAddStyleToPage)
+  const existingScripts = getExistingScriptSrcs()
+  const existingStyles = getExistingStyleHrefs()
+  const scripts = absoluteAssets.filter((a) => shouldAddScriptToPage(a, existingScripts))
+  const styles = absoluteAssets.filter((a) => shouldAddStyleToPage(a, existingStyles))
   styles.forEach(addStyleToPage)
   return Promise.all(scripts.map(addScriptToPage)).then(() => { return })
+}
+
+export function preloadAssets(account: string, assets: string[]) {
+  const absoluteAssets = assets.map(url => getAbsoluteURL(account, url))
+  const existingScripts = getExistingScriptSrcs()
+  const existingStyles = getExistingStyleHrefs()
+  const existingPreloads = getExistingPreloadLinks()
+  const scripts = absoluteAssets.filter((a) => shouldAddScriptToPage(a, [...existingScripts, ...existingPreloads]))
+  const styles = absoluteAssets.filter((a) => shouldAddStyleToPage(a, [...existingStyles, ...existingPreloads]))
+  scripts.forEach(preloadScript)
+  styles.forEach(preloadStyle)
 }
