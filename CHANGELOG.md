@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Fetch components assets from `vteximg`.
+- Make sure links with target="_blank" have rel="noopener"
 
 ## [7.33.0] - 2018-12-01
 
