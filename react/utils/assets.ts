@@ -77,8 +77,9 @@ function getExistingStyleHrefs() {
 
 function getExistingPreloadLinks() {
   const paths: string[] = []
-  for (let i = 0; i < document.links.length; i++) {
-    const item = document.links.item(i)
+  const links = document.getElementsByTagName('link')
+  for (let i = 0; i < links.length; i++) {
+    const item = links.item(i)
     if (item && item.rel === 'preload') {
       paths.push(item.href)
     }
@@ -86,16 +87,8 @@ function getExistingPreloadLinks() {
   return paths
 }
 
-function scriptOnPage(path: string) {
-  return getExistingScriptSrcs().some(src => src.indexOf(path) !== -1)
-}
-
-function styleOnPage(path: string) {
-  return getExistingStyleHrefs().some(href => href.indexOf(path) !== -1)
-}
-
-function assetPreloaded(path: string) {
-  return getExistingPreloadLinks().some(href => href.indexOf(path) !== -1)
+function assetOnList(path: string, assets: string[]) {
+  return assets.some(asset => asset.indexOf(path) !== -1)
 }
 
 function isScript(path: string) {
@@ -106,20 +99,12 @@ function isStyle(path: string) {
   return getExtension(path) === '.css'
 }
 
-export function shouldAddScriptToPage(path: string) {
-  return isScript(path) && !scriptOnPage(path)
+export function shouldAddScriptToPage(path: string, scripts: string[] = getExistingScriptSrcs()) {
+  return isScript(path) && !assetOnList(path, scripts)
 }
 
-function shouldAddStyleToPage(path: string) {
-  return isStyle(path) && !styleOnPage(path)
-}
-
-function shouldPreloadScript(path: string) {
-  return isScript(path) && !scriptOnPage(path) && !assetPreloaded(path)
-}
-
-function shouldPreloadStyle(path: string) {
-  return isStyle(path) && !styleOnPage(path) && !assetPreloaded(path)
+function shouldAddStyleToPage(path: string, styles: string[] = getExistingStyleHrefs()) {
+  return isStyle(path) && !assetOnList(path, styles)
 }
 
 export function getImplementation<P={}, S={}>(component: string) {
@@ -132,15 +117,20 @@ export function getExtensionImplementation<P={}, S={}>(extensions: Extensions, n
 }
 
 export function fetchAssets(assets: string[]) {
-  const scripts = assets.filter(shouldAddScriptToPage)
-  const styles = assets.filter(shouldAddStyleToPage)
+  const existingScripts = getExistingScriptSrcs()
+  const existingStyles = getExistingStyleHrefs()
+  const scripts = assets.filter((a) => shouldAddScriptToPage(a, existingScripts))
+  const styles = assets.filter((a) => shouldAddStyleToPage(a, existingStyles))
   styles.forEach(addStyleToPage)
   return Promise.all(scripts.map(addScriptToPage)).then(() => { return })
 }
 
 export function preloadAssets(assets: string[]) {
-  const scripts = assets.filter(shouldPreloadScript)
-  const styles = assets.filter(shouldPreloadStyle)
+  const existingScripts = getExistingScriptSrcs()
+  const existingStyles = getExistingStyleHrefs()
+  const existingPreloads = getExistingPreloadLinks()
+  const scripts = assets.filter((a) => shouldAddScriptToPage(a, [...existingScripts, ...existingPreloads]))
+  const styles = assets.filter((a) => shouldAddStyleToPage(a, [...existingStyles, ...existingPreloads]))
   scripts.forEach(preloadScript)
   styles.forEach(preloadStyle)
 }
