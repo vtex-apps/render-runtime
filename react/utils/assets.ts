@@ -1,8 +1,20 @@
-import {Component, ReactElement} from 'react'
-
 function getExtension(path: string) {
   const result = /\.\w+$/.exec(path)
   return result ? result[0] : ''
+}
+
+const isRelative = (path: string) => {
+  return path && path[0] === '/' && path[1] !== '/'
+}
+
+export const getVTEXImgHost = (account: string) => {
+  return `https://${account}.vteximg.com.br`
+}
+
+const getAbsoluteURL = (account: string, url: string) => {
+  return isRelative(url)
+    ? `${getVTEXImgHost(account)}${url}`
+    : url
 }
 
 export function addScriptToPage(src: string): Promise<void> {
@@ -76,9 +88,10 @@ export function getExtensionImplementation<P={}, S={}>(extensions: Extensions, n
   return extension && extension.component ? getImplementation<P, S>(extension.component) : null
 }
 
-export function fetchAssets(assets: string[]) {
-  const scripts = assets.filter(shouldAddScriptToPage)
-  const styles = assets.filter(shouldAddStyleToPage)
+export function fetchAssets(account: string, assets: string[]) {
+  const absoluteAssets = assets.map(url => getAbsoluteURL(account, url))
+  const scripts = absoluteAssets.filter(shouldAddScriptToPage)
+  const styles = absoluteAssets.filter(shouldAddStyleToPage)
   styles.forEach(addStyleToPage)
   return Promise.all(scripts.map(addScriptToPage)).then(() => { return })
 }

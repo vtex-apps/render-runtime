@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- Fetch components assets from `vteximg`.
+
 ## [7.33.0] - 2018-12-01
 
 ## [7.32.0] - 2018-11-30
