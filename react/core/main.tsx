@@ -104,6 +104,16 @@ function start() {
     const ReactCreateElement = React.createElement
     const vtexImgHost = getVTEXImgHost(runtime.account)
     React.createElement = function patchedCreateElement (type: any, props: any) {
+      if (type === 'a') {
+        if (props.target && !props.href) {
+          props.target = undefined
+        }
+        // Follow Google's security recommendations concerning target blank
+        // https://developers.google.com/web/tools/lighthouse/audits/noopener
+        if (props.target === '_blank' && !(props.rel === 'noopener' || props.rel === 'noreferrer')) {
+          props.rel = 'noopener'
+        }
+      }
       if (type === 'img') {
         props.src = optimizeSrcForVtexImg(vtexImgHost, props.src)
       }
