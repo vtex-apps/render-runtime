@@ -11,9 +11,9 @@ export const getVTEXImgHost = (account: string) => {
   return `https://${account}.vteximg.com.br`
 }
 
-const getAbsoluteURL = (account: string, url: string) => {
-  return isRelative(url)
-    ? `${getVTEXImgHost(account)}${url}`
+const getAbsoluteURL = (account: string, url: string, workspace: string, production: boolean) => {
+  return isRelative(url) && production
+    ? `${getVTEXImgHost(account)}${url}?workspace=${workspace}`
     : url
 }
 
@@ -130,8 +130,9 @@ export function getExtensionImplementation<P={}, S={}>(extensions: Extensions, n
   return extension && extension.component ? getImplementation<P, S>(extension.component) : null
 }
 
-export function fetchAssets(account: string, assets: string[]) {
-  const absoluteAssets = assets.map(url => getAbsoluteURL(account, url))
+export function fetchAssets(runtime: RenderRuntime, assets: string[]) {
+  const { account, workspace, production } = runtime
+  const absoluteAssets = assets.map(url => getAbsoluteURL(account, url, workspace, production))
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
   const scripts = absoluteAssets.filter((a) => shouldAddScriptToPage(a, existingScripts))
@@ -140,8 +141,9 @@ export function fetchAssets(account: string, assets: string[]) {
   return Promise.all(scripts.map(addScriptToPage)).then(() => { return })
 }
 
-export function preloadAssets(account: string, assets: string[]) {
-  const absoluteAssets = assets.map(url => getAbsoluteURL(account, url))
+export function preloadAssets(runtime: RenderRuntime, assets: string[]) {
+  const { account, workspace, production } = runtime
+  const absoluteAssets = assets.map(url => getAbsoluteURL(account, url, workspace, production))
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
   const existingPreloads = getExistingPreloadLinks()
