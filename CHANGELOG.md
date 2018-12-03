@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.34.3] - 2018-12-03
+### Fixed
+- Fix workspace not being passed when changing url host to vteximg
+
 ## [7.34.2] - 2018-12-03
 
 ### Changed
