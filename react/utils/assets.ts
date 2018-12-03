@@ -13,7 +13,7 @@ export const getVTEXImgHost = (account: string) => {
 
 const getAbsoluteURL = (account: string, url: string, workspace: string, production: boolean) => {
   return isRelative(url) && production
-    ? `${getVTEXImgHost(account)}${url}` + `?workspace=${workspace}`
+    ? `${getVTEXImgHost(account)}${url}?workspace=${workspace}`
     : url
 }
 
