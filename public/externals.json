@@ -44,6 +44,11 @@
         "path": "https://unpkg.com/@sentry/browser@4.4.1/build/bundle.js"
       },
       {
+        "global": "R",
+        "import": "ramda",
+        "path": "https://unpkg.com/ramda@0.26.1/dist/ramda.js"
+      },
+      {
         "path": "https://unpkg.com/intl@1.2.5/dist/Intl.js",
         "serverOnly": true
       },
@@ -104,6 +109,11 @@
         "global": "Sentry",
         "import": "@sentry/browser",
         "path": "https://unpkg.com/@sentry/browser@4.4.1/build/bundle.min.js"
+      },
+      {
+        "global": "R",
+        "import": "ramda",
+        "path": "https://unpkg.com/ramda@0.26.1/dist/ramda.min.js"
       },
       {
         "path": "https://unpkg.com/intl@1.2.5/dist/Intl.min.js",
