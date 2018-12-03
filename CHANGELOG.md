@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.34.2] - 2018-12-03
+
 ### Changed
 - Upgrade vtex-tachyons to 2.10.0, to include size tokens
 
