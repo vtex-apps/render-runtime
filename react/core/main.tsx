@@ -1,8 +1,17 @@
-import { canUseDOM } from 'exenv'
+import 'apollo-cache-inmemory'
+import 'apollo-client'
+import 'apollo-link-http'
+import 'apollo-link-persisted-queries'
+import 'apollo-upload-client'
+import 'apollo-utilities'
+import 'classnames'
+import {canUseDOM} from 'exenv'
+import 'graphql'
 import createHistory from 'history/createBrowserHistory'
-import React, { ReactElement } from 'react'
-import { hydrate, render as renderDOM } from 'react-dom'
-import { Helmet } from 'react-helmet'
+import React, {ReactElement} from 'react'
+import {getDataFromTree} from 'react-apollo'
+import {hydrate, render as renderDOM} from 'react-dom'
+import {Helmet} from 'react-helmet'
 import NoSSR from 'react-no-ssr'
 import Loading from '../components/Loading'
 
@@ -38,7 +47,7 @@ if (window.IntlPolyfill) {
 function renderToStringWithData(component: ReactElement<any>): Promise<ServerRendered> {
   window.__APOLLO_SSR__ = true
   const startGetDataFromTree = window.hrtime()
-  return require('react-apollo').getDataFromTree(component).then(() => {
+  return getDataFromTree(component).then(() => {
     const endGetDataFromTree = window.hrtime(startGetDataFromTree)
 
     window.__APOLLO_SSR__ = false

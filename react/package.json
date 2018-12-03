@@ -52,7 +52,7 @@
     "react": "^16.4.0",
     "react-intl": "^2.4.0",
     "react-dom": "^16.4.0",
-    "react-hot-loader": "^4.1.2",
+    "react-hot-loader": "^4.3.12",
     "tslint": "^5.2.0",
     "tslint-config-vtex": "^2.0.0",
     "tslint-eslint-rules": "^5.1.0",
