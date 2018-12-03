@@ -131,7 +131,7 @@ export function getExtensionImplementation<P={}, S={}>(extensions: Extensions, n
 }
 
 export function fetchAssets(runtime: RenderRuntime, assets: string[]) {
-  const absoluteAssets = assets.map(url => getAbsoluteURL(runtime.account, url, runtime.workspace, runtime.production))
+  const { account, workspace, production } = runtime
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
   const scripts = absoluteAssets.filter((a) => shouldAddScriptToPage(a, existingScripts))
