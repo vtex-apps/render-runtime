@@ -322,7 +322,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public onPageChanged = (location: RenderHistoryLocation) => {
     const { runtime: { renderMajor } } = this.props
     const { culture: { locale }, pages: pagesState, production, device, defaultExtensions } = this.state
-    const { pathname, state } = location
+    const { state } = location
 
     // Make sure this is our navigation
     if (!state || !state.renderRouting) {
@@ -330,7 +330,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     const { route } = state
-    const { id: page, params } = route
+    const { id: page, params, path } = route
     const shouldFetchNavigationData = page.startsWith('store') || pagesState[page] && pagesState[page].conditional
     const query = parse(location.search.substr(1))
 
@@ -364,7 +364,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       locale,
       page,
       params: JSON.stringify(params),
-      path: pathname,
+      path,
       production,
       renderMajor,
     }).then(({
