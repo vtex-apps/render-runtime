@@ -404,15 +404,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { extensions } = this.state
     const component = extensions[pageName] && extensions[pageName].component
     if (component) {
-      const { runtime: { account, workspace, production } } = this.props
+      const { runtime } = this.props
       const { components } = this.state
       const { assets } = traverseComponent(components, component)
-      return preloadAssets(account, assets, workspace, production)
+      return preloadAssets(runtime, assets)
     }
   }
 
   public prefetchDefaultPages = async (routeIds: string[]) => {
-    const { runtime: { account, workspace, production } } = this.props
+    const { runtime } = this.props
     const { culture: { locale } } = this.state
 
     const {
@@ -427,7 +427,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     await Promise.all(Object.keys(defaultComponents).map((component: string) => {
       const { assets } = traverseComponent(defaultComponents, component)
-      return preloadAssets(account, assets, workspace, production)
+      return preloadAssets(runtime, assets)
     }))
 
     this.setState(({components, messages}) => ({
@@ -451,16 +451,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       throw new Error('Cannot fetch components during server side rendering.')
     }
 
-    const { runtime: { account, workspace, production } } = this.props
+    const { runtime } = this.props
     const { components, culture: { locale } } = this.state
     const { apps, assets } = traverseComponent(components, component)
     const unfetchedApps = apps.filter(app => !Object.keys(window.__RENDER_7_COMPONENTS__).some(c => c.startsWith(app)))
     if (unfetchedApps.length === 0) {
-      return fetchAssets(account, assets, workspace, production)
+      return fetchAssets(runtime, assets)
     }
 
     const messagesPromises = Promise.all(unfetchedApps.map(app => fetchMessagesForApp(this.apolloClient, app, locale)))
-    const assetsPromise = fetchAssets(account, assets, workspace, production)
+    const assetsPromise = fetchAssets(runtime, assets)
     assetsPromise.then(() => {
       this.sendInfoFromIframe(true)
     })
