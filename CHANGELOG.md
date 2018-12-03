@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Fix workspace not being passed when changing url host to vteximg
 
+## [7.34.2] - 2018-12-03
+
+### Changed
+- Upgrade vtex-tachyons to 2.10.0, to include size tokens
+
 ## [7.34.1] - 2018-12-02
 
 ## [7.34.0] - 2018-12-02
