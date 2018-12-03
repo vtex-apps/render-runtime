@@ -130,8 +130,8 @@ export function getExtensionImplementation<P={}, S={}>(extensions: Extensions, n
   return extension && extension.component ? getImplementation<P, S>(extension.component) : null
 }
 
-export function fetchAssets(account: string, assets: string[], workspace: string, production: boolean) {
-  const absoluteAssets = assets.map(url => getAbsoluteURL(account, url, workspace, production))
+export function fetchAssets(runtime: RenderRuntime, assets: string[]) {
+  const absoluteAssets = assets.map(url => getAbsoluteURL(runtime.account, url, runtime.workspace, runtime.production))
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
   const scripts = absoluteAssets.filter((a) => shouldAddScriptToPage(a, existingScripts))
@@ -140,8 +140,8 @@ export function fetchAssets(account: string, assets: string[], workspace: string
   return Promise.all(scripts.map(addScriptToPage)).then(() => { return })
 }
 
-export function preloadAssets(account: string, assets: string[], workspace: string, production: boolean) {
-  const absoluteAssets = assets.map(url => getAbsoluteURL(account, url, workspace, production))
+export function preloadAssets(runtime: RenderRuntime, assets: string[]) {
+  const absoluteAssets = assets.map(url => getAbsoluteURL(runtime.account, url, runtime.workspace, runtime.production))
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
   const existingPreloads = getExistingPreloadLinks()
