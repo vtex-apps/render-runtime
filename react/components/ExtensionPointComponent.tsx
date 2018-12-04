@@ -21,6 +21,8 @@ interface State {
 }
 
 const componentPromiseMap: any = {}
+const componentPromiseResolvedMap: any = {}
+
 
 class ExtensionPointComponent extends PureComponent<
   Props & RenderContextProps,
@@ -68,12 +70,18 @@ class ExtensionPointComponent extends PureComponent<
 
     // Let's fetch the assets and re-render.
     if (component && !Component) {
-      // Prevent looping indefinitely after failing to fetch assets
-      if (component in componentPromiseMap) {
-        throw new Error(`Unable to fetch component ${component}`)
-      } else {
+      if (!(component in componentPromiseMap)){
         componentPromiseMap[component] = fetchComponent(component)
-        componentPromiseMap[component].then(() => this.updateComponentsWithEvent(component))
+        componentPromiseMap[component]
+          .then(() => {
+            componentPromiseResolvedMap[component] = true
+          })
+          .then(() => this.updateComponentsWithEvent(component))
+          .catch(() => {
+            componentPromiseResolvedMap[component] = true
+          })
+      } else if (componentPromiseResolvedMap[component]) {
+        throw new Error(`Unable to fetch component ${component}`)
       }
     }
   }
