@@ -1,5 +1,6 @@
 function getExtension(path: string) {
-  const result = /\.\w+$/.exec(path)
+  const adjPath = path.split('?')[0]
+  const result = /\.\w+$/.exec(adjPath)
   return result ? result[0] : ''
 }
 
