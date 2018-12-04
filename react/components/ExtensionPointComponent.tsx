@@ -68,10 +68,15 @@ class ExtensionPointComponent extends PureComponent<
 
     // Let's fetch the assets and re-render.
     if (component && !Component) {
-      if (!componentPromiseMap[component]) {
-        componentPromiseMap[component] = fetchComponent(component)
+      // Prevent looping indefinitely after failing to fetch assets
+      if (componentPromiseMap.hasOwnProperty(component)) {
+        throw new Error(`Unable to fetch component ${component}`)
+      } else {
+        if (!componentPromiseMap[component]) {
+          componentPromiseMap[component] = fetchComponent(component)
+        }
+        componentPromiseMap[component].then(() => this.updateComponentsWithEvent(component))
       }
-      componentPromiseMap[component].then(() => this.updateComponentsWithEvent(component))
     }
   }
 
