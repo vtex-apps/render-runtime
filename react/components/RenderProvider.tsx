@@ -387,7 +387,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       this.setState({
         appsEtag,
         cacheHints,
-        components,
+        components: {...this.state.components, ...components},
         extensions,
         messages,
         page,
@@ -431,7 +431,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }))
 
     this.setState(({components, messages}) => ({
-      components: {...defaultComponents, ...components},
+      components: {...defaultComponents, ...this.state.components, ...components},
       defaultExtensions,
       messages: {...defaultMessages, ...messages}
     }))
