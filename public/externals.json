@@ -44,7 +44,7 @@
       },
       {
         "clientOnly": true,
-        "path": "https://unpkg.com/vtex-render-session@0.1.0/dist/index.min.js"
+        "path": "https://unpkg.com/vtex-render-session@0.1.1/dist/index.js"
       }
     ],
     "prod": [
@@ -91,7 +91,7 @@
       },
       {
         "clientOnly": true,
-        "path": "https://unpkg.com/vtex-render-session@0.1.0/dist/index.min.js"
+        "path": "https://unpkg.com/vtex-render-session@0.1.1/dist/index.min.js"
       }
     ]
   },
