@@ -21,7 +21,6 @@ import { loadLocaleData } from '../utils/locales'
 import { createLocaleCookie, fetchMessages, fetchMessagesForApp } from '../utils/messages'
 import { getRouteFromPath, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
 import { fetchDefaultPages, fetchRoutes } from '../utils/routes'
-import { initializeSession, patchSession } from '../utils/session'
 import { TreePathContext } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 
@@ -144,7 +143,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     // todo: reload window if client-side created a segment different from server-side
-    this.sessionPromise = (canUseDOM && page.startsWith('store')) ? initializeSession() : Promise.resolve()
+    this.sessionPromise = canUseDOM ? window.__RENDER_7_SESSION__.sessionPromise : Promise.resolve()
     const runtimeContextLink = this.createRuntimeContextLink()
     const ensureSessionLink = this.createEnsureSessionLink()
     this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, ensureSessionLink, cacheControl)
@@ -254,7 +253,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public patchSession = (data?: any) => {
-    return this.sessionPromise.then(() => patchSession(data))
+    return this.sessionPromise.then(() => canUseDOM ? window.__RENDER_7_SESSION__.patchSession(data) : undefined)
   }
 
   public getCustomMessages = (locale: string) => {
