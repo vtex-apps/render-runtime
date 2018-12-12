@@ -116,6 +116,9 @@ function start() {
       }
       if (type === 'img') {
         props.src = optimizeSrcForVtexImg(vtexImgHost, props.src)
+        if (props.src && !props.src.startsWith('/')) {
+          props.crossOrigin = props.crossOrigin || 'anonymous'
+        }
       }
       if (props && props.style) {
         props.style = optimizeStyleForVtexImg(vtexImgHost, props.style)
