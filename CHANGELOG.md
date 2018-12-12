@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Changed
-- Add the `crossorigin` prop to the `img` tags with absolute path
+- Add the `crossorigin` attribute to the `img` tags with absolute source path
 
 ## [7.37.0] - 2018-12-13
 ### Changed
