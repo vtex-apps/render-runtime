@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.37.0] - 2018-12-13
+### Changed
+- Session related functions as runtime externals [check this repo](https://github.com/vtex-apps/render-session)
+
+## [7.36.3-beta.0] - 2018-12-12
+
+## [7.36.3-beta] - 2018-12-12
+
 ## [7.36.2] - 2018-12-10
 
 ## [7.36.2-beta.0] - 2018-12-06

@@ -41,6 +41,10 @@
       {
         "clientOnly": true,
         "path": "https://io.vtex.com.br/rc/rc.js"
+      },
+      {
+        "clientOnly": true,
+        "path": "https://unpkg.com/vtex-render-session@0.1.2/dist/index.js"
       }
     ],
     "prod": [
@@ -84,6 +88,10 @@
       {
         "clientOnly": true,
         "path": "https://io.vtex.com.br/rc/rc.js"
+      },
+      {
+        "clientOnly": true,
+        "path": "https://unpkg.com/vtex-render-session@0.1.2/dist/index.min.js"
       }
     ]
   },

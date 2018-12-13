@@ -318,8 +318,14 @@ interface RenderComponent<P={}, S={}> {
     buildCacheLocator: any
   }
 
+  interface RenderSession {
+    patchSession: (data: any) => Promise<void>
+    sessionPromise: Promise<void>
+  }
+
   interface Window extends Window {
     __APOLLO_SSR__: boolean
+    __RENDER_7_SESSION__: RenderSession
     __RENDER_7_RUNTIME__: RuntimeExports
     __RENDER_7_COMPONENTS__: ComponentsRegistry
     __RENDER_7_HOT__: HotEmitterRegistry
