@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.37.2] - 2018-12-13
+### Fixed
+- Remove crossOrigin attribute from img
+
 ## [7.37.1] - 2018-12-13
 ### Changed
 - Add the `crossorigin` attribute to the `img` tags with absolute source path

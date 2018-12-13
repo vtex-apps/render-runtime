@@ -1,8 +1,8 @@
-import {canUseDOM} from 'exenv'
+import { canUseDOM } from 'exenv'
 import createHistory from 'history/createBrowserHistory'
-import React, {ReactElement} from 'react'
-import {hydrate, render as renderDOM} from 'react-dom'
-import {Helmet} from 'react-helmet'
+import React, { ReactElement } from 'react'
+import { hydrate, render as renderDOM } from 'react-dom'
+import { Helmet } from 'react-helmet'
 import NoSSR from 'react-no-ssr'
 import Loading from '../components/Loading'
 
@@ -11,19 +11,19 @@ import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
 import Link from '../components/Link'
-import {RenderContext, withRuntimeContext} from '../components/RenderContext'
+import { RenderContext, withRuntimeContext } from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
-import {getVTEXImgHost} from '../utils/assets'
+import { getVTEXImgHost } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
-import {getState} from '../utils/client'
-import {buildCacheLocator} from '../utils/client'
-import {ensureContainer, getContainer, getMarkups} from '../utils/dom'
-import {registerEmitter} from '../utils/events'
-import {getBaseURI} from '../utils/host'
-import {addLocaleData} from '../utils/locales'
-import {withSession} from '../utils/session'
-import {TreePathContext} from '../utils/treePath'
-import {optimizeSrcForVtexImg, optimizeStyleForVtexImg} from '../utils/vteximg'
+import { getState } from '../utils/client'
+import { buildCacheLocator } from '../utils/client'
+import { ensureContainer, getContainer, getMarkups } from '../utils/dom'
+import { registerEmitter } from '../utils/events'
+import { getBaseURI } from '../utils/host'
+import { addLocaleData } from '../utils/locales'
+import { withSession } from '../utils/session'
+import { TreePathContext } from '../utils/treePath'
+import { optimizeSrcForVtexImg, optimizeStyleForVtexImg } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
 
 if (window.IntlPolyfill) {
@@ -57,7 +57,7 @@ function renderToStringWithData(component: ReactElement<any>): Promise<ServerRen
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered => {
-  const {customRouting, disableSSR, page, pages, extensions, culture: {locale}} = runtime
+  const { customRouting, disableSSR, page, pages, extensions, culture: { locale } } = runtime
 
   const cacheControl = canUseDOM ? undefined : new PageCacheControl()
   const baseURI = getBaseURI(runtime)
@@ -76,13 +76,13 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
 
   return canUseDOM
     ? (disableSSR || created ? renderDOM(root, elem) : hydrate(root, elem)) as Element
-    : renderToStringWithData(root).then(({markup, renderTimeMetric}) => ({
+    : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
       markups: getMarkups(name, markup),
       maxAge: cacheControl!.maxAge,
       page,
       renderTimeMetric
     })
-  )
+    )
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
@@ -103,7 +103,7 @@ function start() {
 
     const ReactCreateElement = React.createElement
     const vtexImgHost = getVTEXImgHost(runtime.account)
-    React.createElement = function patchedCreateElement (type: any, props: any) {
+    React.createElement = function patchedCreateElement(type: any, props: any) {
       if (type === 'a' && props) {
         if (props.target && !props.href) {
           props.target = undefined
@@ -116,9 +116,6 @@ function start() {
       }
       if (type === 'img') {
         props.src = optimizeSrcForVtexImg(vtexImgHost, props.src)
-        if (props.src && !props.src.startsWith('/')) {
-          props.crossOrigin = props.crossOrigin || 'anonymous'
-        }
       }
       if (props && props.style) {
         props.style = optimizeStyleForVtexImg(vtexImgHost, props.style)
@@ -130,14 +127,14 @@ function start() {
     if (!canUseDOM) {
       // Expose render promise to global context.
       window.rendered = (maybeRenderPromise as Promise<NamedServerRendered>)
-        .then(({markups, maxAge, page, renderTimeMetric}) => ({
+        .then(({ markups, maxAge, page, renderTimeMetric }) => ({
           extensions: markups.reduce(
-            (acc, {name, markup}) => (acc[name] = markup, acc),
+            (acc, { name, markup }) => (acc[name] = markup, acc),
             {} as RenderedSuccess['extensions'],
           ),
           head: Helmet.rewind(),
           maxAge,
-          renderMetrics: {[page]: renderTimeMetric},
+          renderMetrics: { [page]: renderTimeMetric },
           state: getState(runtime),
         }))
     } else {
@@ -146,7 +143,7 @@ function start() {
   } catch (error) {
     console.error('Unexpected error rendering:', error)
     if (!canUseDOM) {
-      window.rendered = {error}
+      window.rendered = { error }
     }
   }
 }
