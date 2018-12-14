@@ -65,7 +65,7 @@ export const createUriSwitchLink = (baseURI: string, workspace: string) =>
       return {
         ...oldContext,
         fetchOptions: {...fetchOptions, method},
-        uri: `${protocol}//${baseURI}/_v/graphql/${scope}/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
+        uri: `${protocol}//${baseURI}/_v/${scope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
       }
     })
     return forward ? forward(operation) : null
