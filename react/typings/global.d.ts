@@ -9,6 +9,7 @@ import {History, Location} from "history"
 import {HelmetData} from "react-helmet"
 import {TreePathProps} from "../utils/treePath"
 import { LayoutContainer } from '../core/main'
+import { any } from 'prop-types';
 
 declare global {
   interface RenderMetric {
@@ -36,6 +37,7 @@ declare global {
   type ClientRendered = Element
 
   interface Extension {
+    wrappers?: string[]
     component: string
     props?: any
     shouldRender?: boolean
@@ -132,6 +134,7 @@ declare global {
     getSettings: (app: string) => any,
     hints: RenderHints,
     history: History | null,
+    joinTreePath: (treepath: string, id: string) => string,
     navigate: (options: NavigateOptions) => boolean,
     onPageChanged: (location: RenderHistoryLocation) => void,
     page: RenderRuntime['page'],
@@ -161,7 +164,7 @@ declare global {
     apolloClient: ApolloClient<NormalizedCacheObject>,
     locale: string,
     page: string,
-    params?: string,
+    paramsJSON?: string,
     path?: string,
     production: boolean,
     renderMajor: number,
@@ -170,7 +173,20 @@ declare global {
   interface FetchDefaultPages {
     apolloClient: ApolloClient<NormalizedCacheObject>,
     locale: string,
-    routeIds: string[]
+    pages: Pages,
+    routeIds: string[],
+    pagesProtocol: number,
+    renderMajor: number,
+  }
+
+  interface FetchNavigationDataInput {
+    apolloClient: ApolloClient<NormalizedCacheObject>
+    production: boolean
+    locale: string
+    routeId: string
+    declarer?: string
+    paramsJSON?: string
+    renderMajor: number
   }
 
 interface RenderComponent<P={}, S={}> {
@@ -187,18 +203,14 @@ interface RenderComponent<P={}, S={}> {
     [appId: string]: EventEmitter
   }
 
-  interface PageQueryResult {
-    data: PageQueryResultData,
-    errors?: any,
+  interface GraphQLResult<T extends string, U> {
+    data: Record<T, U>
+    errors?: any
   }
 
   interface DefaultPagesQueryResult {
     data: DefaultPagesQueryResultData,
     errors?: any,
-  }
-
-  interface PageQueryResultData {
-    page: PageQueryResponse,
   }
 
   interface DefaultPagesQueryResultData {
@@ -277,6 +289,7 @@ interface RenderComponent<P={}, S={}> {
     query?: Record<string, string>
     start: boolean
     runtimeMeta: {
+      pagesProtocol?: number
       version: string
       config?: any
     }

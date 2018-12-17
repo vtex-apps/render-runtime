@@ -1,8 +1,8 @@
 import { NormalizedCacheObject } from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
 import {canUseDOM} from 'exenv'
-import appMessagesQuery from './appMessages.graphql'
-import pageMessagesQuery from './messages.graphql'
+import appMessagesQuery from '../queries/appMessages.graphql'
+import pageMessagesQuery from '../queries/messages.graphql'
 
 const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
 

@@ -20,13 +20,14 @@ import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils
 import { loadLocaleData } from '../utils/locales'
 import { createLocaleCookie, fetchMessages, fetchMessagesForApp } from '../utils/messages'
 import { getRouteFromPath, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
-import { fetchDefaultPages, fetchRoutes } from '../utils/routes'
+import { fetchDefaultPages, fetchNavigationPage, fetchRoutes } from '../utils/routes'
 import { TreePathContext } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 
 import BuildStatus from './BuildStatus'
 import NestedExtensionPoints from './NestedExtensionPoints'
 import { RenderContext } from './RenderContext'
+import RenderPage from './RenderPage'
 
 interface Props {
   children: ReactElement<any> | null
@@ -62,21 +63,6 @@ const noop = (() => {})
 
 const unionKeys = (record1: any, record2: any) => [...new Set([...Object.keys(record1), ...Object.keys(record2)])]
 
-const isChildOrSelf = (child: string, parent: string) =>
-  child === parent || (child.startsWith(`${parent}/`) && child !== `${parent}/__context`)
-
-const replaceExtensionsWithDefault = (extensions: Extensions, page: string, defaultExtensions: Extensions) =>
-  unionKeys(extensions, defaultExtensions)
-  .reduce((acc, key) => {
-    const maybeExtension = isChildOrSelf(key, page)
-      ? defaultExtensions[key]
-      : extensions[key]
-    if (maybeExtension) {
-      acc[key] = maybeExtension
-    }
-    return acc
-  }, {} as Extensions)
-
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
@@ -91,6 +77,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     getSettings: PropTypes.func,
     hints: PropTypes.object,
     history: PropTypes.object,
+    joinTreePath: PropTypes.func,
     navigate: PropTypes.func,
     onPageChanged: PropTypes.func,
     page: PropTypes.string,
@@ -127,6 +114,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private sessionPromise: Promise<void>
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
+
+  private get extensionsNestingConnector() {
+    const {runtime: {runtimeMeta: {pagesProtocol = 1}}} = this.props
+    return pagesProtocol >= 2 ? ' ' : '/'
+  }
 
   constructor(props: Props) {
     super(props)
@@ -192,6 +184,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
+  public joinTreePath = (treePath: string, id: string) => {
+    const { runtime: {runtimeMeta: {pagesProtocol = 1}} } = this.props
+    const separator = pagesProtocol >= 2 ? ' ' : '/'
+
+    return [treePath, id].filter(each => !!each).join(separator)
+  }
+
   public componentWillUnmount() {
     const { runtime } = this.props
     const { production, emitter } = runtime
@@ -224,6 +223,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       getSettings: this.getSettings,
       hints,
       history,
+      joinTreePath: this.joinTreePath,
       navigate: this.navigate,
       onPageChanged: this.onPageChanged,
       page,
@@ -319,8 +319,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onPageChanged = (location: RenderHistoryLocation) => {
-    const { runtime: { renderMajor } } = this.props
-    const { culture: { locale }, pages: pagesState, production, device, defaultExtensions } = this.state
+    const { runtime: { renderMajor, runtimeMeta: {pagesProtocol = 1} } } = this.props
+    const { culture: { locale }, pages: pagesState, production, device } = this.state
     const { state } = location
 
     // Make sure this is our navigation
@@ -331,6 +331,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { route } = state
     const { id: page, params, path } = route
     const shouldFetchNavigationData = page.startsWith('store') || pagesState[page] && pagesState[page].conditional
+    const declarer = pagesState[page] && pagesState[page].declarer
     const query = parse(location.search.substr(1))
 
     if (!shouldFetchNavigationData) {
@@ -342,7 +343,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     this.setState({
-      extensions: replaceExtensionsWithDefault(this.state.extensions, page, defaultExtensions),
+      extensions: this.replaceExtensionsWithDefault(page),
       page,
       preview: true,
       query,
@@ -352,21 +353,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       this.scrollTo(state.scrollOptions)
     })
 
+    const paramsJSON = JSON.stringify(params)
+    const apolloClient = this.apolloClient
+    const routeId = page
     // Retrieve the adequate assets for the new page. Naming will
     // probably change (query will return something like routes) as
     // well as the fields that need to be retrieved, but the logic
     // that the new state (extensions and assets) will be derived from
     // the results of this query will probably remain the same.
-    return fetchRoutes({
-      apolloClient: this.apolloClient,
-      device,
-      locale,
-      page,
-      params: JSON.stringify(params),
-      path,
-      production,
-      renderMajor,
-    }).then(({
+    const fetchPromise = pagesProtocol >= 2
+      ? fetchNavigationPage({apolloClient, locale, routeId, declarer, production, paramsJSON, renderMajor})
+      : fetchRoutes({apolloClient, device, locale, page, paramsJSON, path, production, renderMajor})
+
+    return fetchPromise.then(({
       appsEtag,
       cacheHints,
       components,
@@ -411,8 +410,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public prefetchDefaultPages = async (routeIds: string[]) => {
-    const { runtime } = this.props
-    const { culture: { locale } } = this.state
+    const { runtime, runtime: {runtimeMeta: {pagesProtocol = 1}, renderMajor}} = this.props
+    const { culture: { locale }, pages } = this.state
 
     const {
       components: defaultComponents,
@@ -421,7 +420,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = await fetchDefaultPages({
       apolloClient: this.apolloClient,
       locale,
-      routeIds
+      pages,
+      pagesProtocol,
+      renderMajor,
+      routeIds,
     })
 
     await Promise.all(Object.keys(defaultComponents).map((component: string) => {
@@ -623,7 +625,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public render() {
-    const { children } = this.props
+    const { children, runtime: {runtimeMeta: {pagesProtocol = 1}} } = this.props
     const { culture: { locale }, messages, pages, page, query, production } = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
@@ -636,7 +638,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       : (
         <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
-          <NestedExtensionPoints page={page} query={query} />
+          {
+            pagesProtocol >= 2
+              ? <RenderPage page={page} query={query} />
+              : <NestedExtensionPoints page={page} query={query} />
+          }
         </div>
       )
 
@@ -657,6 +663,24 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         </TreePathContext.Provider>
       </RenderContext.Provider>
     )
+  }
+
+  private isChildOrSelf = (child: string, parent: string) => {
+    return child === parent || (child.startsWith(`${parent}${this.extensionsNestingConnector}`) && child !== this.joinTreePath(parent, '__context'))
+  }
+
+  private replaceExtensionsWithDefault = (page: string) => {
+    const {extensions, defaultExtensions} = this.state
+    return unionKeys(extensions, defaultExtensions)
+      .reduce((acc, key) => {
+        const maybeExtension = this.isChildOrSelf(key, page)
+          ? defaultExtensions[key]
+          : extensions[key]
+        if (maybeExtension) {
+          acc[key] = maybeExtension
+        }
+        return acc
+      }, {} as Extensions)
   }
 }
 

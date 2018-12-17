@@ -72,7 +72,8 @@ function getParams(template: string, target: string) {
 }
 
 function getPagePath(name: string, pages: Pages) {
-  const [rootName] = name.split('/')
+  const [domain] = name.split('/')
+  const rootName = pages[domain] ? domain : name
   const {path: rootPath, cname} = pages[rootName]
   const {path: pagePath} = pages[name]
 

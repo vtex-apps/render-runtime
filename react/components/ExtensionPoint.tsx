@@ -5,9 +5,9 @@ import ReactDOM from 'react-dom'
 import { getImplementation } from '../utils/assets'
 import { TreePathContext, TreePathProps, withTreePath } from '../utils/treePath'
 
-import { Loading } from '../core/main'
 import ExtensionPointComponent from './ExtensionPointComponent'
-import { RenderContext } from './RenderContext'
+import Loading from './Loading'
+import { RenderContextProps, withRuntimeContext } from './RenderContext'
 
 interface Props {
   id: string,
@@ -15,7 +15,7 @@ interface Props {
   query?: any,
 }
 
-type ExtendedProps = Props & TreePathProps
+type ExtendedProps = Props & TreePathProps & RenderContextProps
 
 interface State {
   newTreePath: string
@@ -35,12 +35,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
   public static getDerivedStateFromProps(props: ExtendedProps) {
     return {
-      newTreePath: ExtensionPoint.mountTreePath(props.id, props.treePath)
+      newTreePath: props.runtime.joinTreePath(props.treePath, props.id)
     }
-  }
-
-  private static mountTreePath(currentId: string, parentTreePath: string) {
-    return [parentTreePath, currentId].filter(id => !!id).join('/')
   }
 
   private component?: string | null
@@ -49,7 +45,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     super(props)
 
     this.state = {
-      newTreePath: ExtensionPoint.mountTreePath(props.id, props.treePath)
+      newTreePath: props.runtime.joinTreePath(props.treePath, props.id)
     }
   }
 
@@ -70,19 +66,10 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   }
 
   public render() {
-    return (
-      <RenderContext.Consumer>
-        {this.getExtensionPointComponent}
-      </RenderContext.Consumer>
-    )
-  }
-
-  private getExtensionPointComponent = (runtime: RenderContext) => {
     const { newTreePath } = this.state
-    const { children, params, query, id, treePath, ...parentProps } = this.props
+    const { runtime, children, params, query, id, treePath, ...parentProps } = this.props
     const extension = runtime.extensions && runtime.extensions[newTreePath]
-    const component = extension ? extension.component : null
-    const extensionProps = extension ? extension.props : null
+    const { component = null, wrappers = [], props: extensionProps = null } = extension || {}
 
     this.component = component
 
@@ -100,9 +87,28 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
     return component
       ? <TreePathContext.Provider value={{ treePath: newTreePath }}>
-        <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
+        {
+          this.withWrappers(
+          wrappers,
+          treePath,
+          props,
+          runtime,
+          <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
+        )}
       </TreePathContext.Provider>
       : loading
+  }
+
+  private withWrappers(wrappers: string[], treePath: string, props: any, runtime: RenderContext, element: JSX.Element) {
+    if (wrappers.length === 0) {
+      return element
+    }
+
+    return wrappers.slice().reverse().reduce((acc, wrapper) => (
+      <ExtensionPointComponent component={wrapper} props={props} runtime={runtime} treePath={treePath}>
+        {acc}
+      </ExtensionPointComponent>
+    ), element)
   }
 
   private addDataToElementIfEditable = () => {
@@ -129,4 +135,4 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   }
 }
 
-export default withTreePath(ExtensionPoint)
+export default withRuntimeContext(withTreePath(ExtensionPoint))
