@@ -1,15 +1,12 @@
 import PropTypes from 'prop-types'
-import React, {Component, Fragment} from 'react'
+import React, {Component} from 'react'
 
 import {getDirectChildren, TreePathContext} from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 import {RenderContext} from './RenderContext'
 
-const join = (p: string | null, c: string | null): string =>
-  [p, c].filter(id => !!id).join('/')
-
 interface Props {
-  id: string | null,
+  id: string,
 }
 
 class ExtensionContainer extends Component<Props> {
@@ -24,9 +21,14 @@ class ExtensionContainer extends Component<Props> {
       <RenderContext.Consumer>
         {runtime =>
           <TreePathContext.Consumer>
-            {({treePath}) =>
-              getDirectChildren(runtime.extensions, join(treePath, id))
-                .map(cid => <ExtensionPoint {...this.props} key={join(id, cid)} id={join(id, cid)} />)
+            {({treePath}) => {
+                const containerTreePath = runtime.joinTreePath(treePath, id)
+                return getDirectChildren(runtime.extensions, containerTreePath)
+                  .map(cid => {
+                    const childTreePath = runtime.joinTreePath(id, cid)
+                    return <ExtensionPoint {...this.props} key={childTreePath} id={childTreePath} />
+                  })
+              }
             }
           </TreePathContext.Consumer>
         }

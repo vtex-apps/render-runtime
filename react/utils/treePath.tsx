@@ -5,7 +5,7 @@ import React, {ComponentType} from 'react'
 const relative = (parent: string, id: string) => id.replace(`${parent}/`, '')
 
 const isDirectChild = (id: string, parent: string) => {
-  return id !== parent && (new RegExp(`^${parent}/[a-zA-Z0-9-]+$`)).test(id)
+  return id !== parent && (new RegExp(`^${parent}(/|\s)[a-zA-Z0-9-]+$`)).test(id)
 }
 
 const parseId = (id: string) => {

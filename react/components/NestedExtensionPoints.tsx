@@ -5,7 +5,6 @@ import React, {PureComponent} from 'react'
 import {getPageParams} from '../utils/pages'
 import ExtensionPoint from './ExtensionPoint'
 
-import Loading from './Loading'
 import MaybeAuth from './MaybeAuth'
 import MaybeContext from './MaybeContext'
 import {RenderContext} from './RenderContext'
@@ -13,19 +12,6 @@ import {RenderContext} from './RenderContext'
 interface Props {
   page: string,
   query?: Record<string, string>
-}
-
-// Returns `store` for `store/home` and `store/product`.
-const commonRouteId = (a: string, b: string) => {
-  if (a === b) {
-    const parent = a.split('/').slice(0, -1).join('/')
-    return parent === '' ? null : parent
-  }
-  let i = 0
-  while(i < a.length && a.charAt(i) === b.charAt(i)) {
-    i++
-  }
-  return a.substring(0, i).split('/').filter(Boolean).join('/')
 }
 
 export default class NestedExtensionPoints extends PureComponent<Props> {

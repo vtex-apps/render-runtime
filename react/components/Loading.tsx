@@ -67,4 +67,4 @@ class Loading extends PureComponent<RenderContextProps, State> {
   }
 }
 
-export default withRuntimeContext(Loading)
+export default withRuntimeContext<{}>(Loading)
