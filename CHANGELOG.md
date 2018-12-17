@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.38.0] - 2018-12-17
+### Changed
+- Changes graphql routing pattern from `/graphql/public` to `/public/graphql`
+
 ## [7.37.3] - 2018-12-14
 ### Fixed
 - Add again the `crossorigin` attribute now that the store service worker cleans old opaque responses.
