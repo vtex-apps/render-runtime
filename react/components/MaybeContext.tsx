@@ -11,8 +11,7 @@ interface Props {
 export default class MaybeContext extends PureComponent<Props & RenderContextProps> {
   public render() {
     const {children, runtime, nestedPage, query, params} = this.props
-    const contextEp = runtime.joinTreePath(nestedPage, '__context')
-    const context = runtime.extensions[contextEp]
+    const context = runtime.extensions[`${nestedPage}/__context`]
 
     const props = context && {
       nextTreePath: nestedPage,

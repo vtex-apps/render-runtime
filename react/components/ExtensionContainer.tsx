@@ -5,8 +5,11 @@ import {getDirectChildren, TreePathContext} from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 import {RenderContext} from './RenderContext'
 
+const join = (p: string | null, c: string | null): string =>
+  [p, c].filter(id => !!id).join('/')
+
 interface Props {
-  id: string,
+  id: string | null,
 }
 
 class ExtensionContainer extends Component<Props> {
@@ -22,10 +25,10 @@ class ExtensionContainer extends Component<Props> {
         {runtime =>
           <TreePathContext.Consumer>
             {({treePath}) => {
-                const containerTreePath = runtime.joinTreePath(treePath, id)
+                const containerTreePath = join(treePath, id)
                 return getDirectChildren(runtime.extensions, containerTreePath)
                   .map(cid => {
-                    const childTreePath = runtime.joinTreePath(id, cid)
+                    const childTreePath = join(id, cid)
                     return <ExtensionPoint {...this.props} key={childTreePath} id={childTreePath} />
                   })
               }
