@@ -134,7 +134,6 @@ declare global {
     getSettings: (app: string) => any,
     hints: RenderHints,
     history: History | null,
-    joinTreePath: (treepath: string, id: string) => string,
     navigate: (options: NavigateOptions) => boolean,
     onPageChanged: (location: RenderHistoryLocation) => void,
     page: RenderRuntime['page'],

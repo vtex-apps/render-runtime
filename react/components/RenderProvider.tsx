@@ -63,6 +63,21 @@ const noop = (() => {})
 
 const unionKeys = (record1: any, record2: any) => [...new Set([...Object.keys(record1), ...Object.keys(record2)])]
 
+const isChildOrSelf = (child: string, parent: string) =>
+  child === parent || (child.startsWith(`${parent}/`) && child !== `${parent}/__context`)
+
+const replaceExtensionsWithDefault = (extensions: Extensions, page: string, defaultExtensions: Extensions) =>
+  unionKeys(extensions, defaultExtensions)
+  .reduce((acc, key) => {
+    const maybeExtension = isChildOrSelf(key, page)
+      ? defaultExtensions[key]
+      : extensions[key]
+    if (maybeExtension) {
+      acc[key] = maybeExtension
+    }
+    return acc
+  }, {} as Extensions)
+
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
@@ -77,7 +92,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     getSettings: PropTypes.func,
     hints: PropTypes.object,
     history: PropTypes.object,
-    joinTreePath: PropTypes.func,
     navigate: PropTypes.func,
     onPageChanged: PropTypes.func,
     page: PropTypes.string,
@@ -114,11 +128,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private sessionPromise: Promise<void>
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
-
-  private get extensionsNestingConnector() {
-    const {runtime: {runtimeMeta: {pagesProtocol = 1}}} = this.props
-    return pagesProtocol >= 2 ? ' ' : '/'
-  }
 
   constructor(props: Props) {
     super(props)
@@ -184,13 +193,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public joinTreePath = (treePath: string, id: string) => {
-    const { runtime: {runtimeMeta: {pagesProtocol = 1}} } = this.props
-    const separator = pagesProtocol >= 2 ? ' ' : '/'
-
-    return [treePath, id].filter(each => !!each).join(separator)
-  }
-
   public componentWillUnmount() {
     const { runtime } = this.props
     const { production, emitter } = runtime
@@ -223,7 +225,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       getSettings: this.getSettings,
       hints,
       history,
-      joinTreePath: this.joinTreePath,
       navigate: this.navigate,
       onPageChanged: this.onPageChanged,
       page,
@@ -320,7 +321,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onPageChanged = (location: RenderHistoryLocation) => {
     const { runtime: { renderMajor, runtimeMeta: {pagesProtocol = 1} } } = this.props
-    const { culture: { locale }, pages: pagesState, production, device } = this.state
+    const { culture: { locale }, pages: pagesState, production, device, defaultExtensions } = this.state
     const { state } = location
 
     // Make sure this is our navigation
@@ -343,7 +344,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     this.setState({
-      extensions: this.replaceExtensionsWithDefault(page),
+      extensions: replaceExtensionsWithDefault(this.state.extensions, page, defaultExtensions),
       page,
       preview: true,
       query,
@@ -663,24 +664,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         </TreePathContext.Provider>
       </RenderContext.Provider>
     )
-  }
-
-  private isChildOrSelf = (child: string, parent: string) => {
-    return child === parent || (child.startsWith(`${parent}${this.extensionsNestingConnector}`) && child !== this.joinTreePath(parent, '__context'))
-  }
-
-  private replaceExtensionsWithDefault = (page: string) => {
-    const {extensions, defaultExtensions} = this.state
-    return unionKeys(extensions, defaultExtensions)
-      .reduce((acc, key) => {
-        const maybeExtension = this.isChildOrSelf(key, page)
-          ? defaultExtensions[key]
-          : extensions[key]
-        if (maybeExtension) {
-          acc[key] = maybeExtension
-        }
-        return acc
-      }, {} as Extensions)
   }
 }
 

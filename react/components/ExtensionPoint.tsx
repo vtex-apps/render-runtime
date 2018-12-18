@@ -7,7 +7,7 @@ import { TreePathContext, TreePathProps, withTreePath } from '../utils/treePath'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
 import Loading from './Loading'
-import { RenderContextProps, withRuntimeContext } from './RenderContext'
+import { RenderContext } from './RenderContext'
 
 interface Props {
   id: string,
@@ -15,7 +15,7 @@ interface Props {
   query?: any,
 }
 
-type ExtendedProps = Props & TreePathProps & RenderContextProps
+type ExtendedProps = Props & TreePathProps
 
 interface State {
   newTreePath: string
@@ -35,8 +35,12 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
   public static getDerivedStateFromProps(props: ExtendedProps) {
     return {
-      newTreePath: props.runtime.joinTreePath(props.treePath, props.id)
+      newTreePath: ExtensionPoint.mountTreePath(props.id, props.treePath)
     }
+  }
+
+  private static mountTreePath(currentId: string, parentTreePath: string) {
+    return [parentTreePath, currentId].filter(id => !!id).join('/')
   }
 
   private component?: string | null
@@ -45,7 +49,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     super(props)
 
     this.state = {
-      newTreePath: props.runtime.joinTreePath(props.treePath, props.id)
+      newTreePath: ExtensionPoint.mountTreePath(props.id, props.treePath)
     }
   }
 
@@ -66,8 +70,16 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   }
 
   public render() {
+    return (
+      <RenderContext.Consumer>
+        {this.getExtensionPointComponent}
+      </RenderContext.Consumer>
+    )
+  }
+
+  private getExtensionPointComponent = (runtime: RenderContext) => {
     const { newTreePath } = this.state
-    const { runtime, children, params, query, id, treePath, ...parentProps } = this.props
+    const { children, params, query, id, treePath, ...parentProps } = this.props
     const extension = runtime.extensions && runtime.extensions[newTreePath]
     const { component = null, wrappers = [], props: extensionProps = null } = extension || {}
 
@@ -135,4 +147,4 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   }
 }
 
-export default withRuntimeContext(withTreePath(ExtensionPoint))
+export default withTreePath(ExtensionPoint)
