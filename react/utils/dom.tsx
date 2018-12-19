@@ -5,7 +5,7 @@ import {createPortal as reactCreatePortal} from 'react-dom'
 const portalPattern = /START_SERVER_PORTAL_([^!]+)!((\n|.)+)END_SERVER_PORTAL_\1!/g
 
 // Map `placeholder/with/slashes` to `render-placeholder-with-slashes`.
-const hyphenate = (name: string) => name.replace(/\//g, '-')
+const hyphenate = (name: string) => name.replace(/[^\w]/g, '-')
 
 const portalWrapperId = (name: string) => `render-portal-ssr-${hyphenate(name)}`
 
