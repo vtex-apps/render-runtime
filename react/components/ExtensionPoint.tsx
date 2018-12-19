@@ -116,7 +116,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       return element
     }
 
-    return wrappers.slice().reverse().reduce((acc, wrapper) => (
+    return wrappers.reduceRight((acc, wrapper) => (
       <ExtensionPointComponent component={wrapper} props={props} runtime={runtime} treePath={treePath}>
         {acc}
       </ExtensionPointComponent>
