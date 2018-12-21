@@ -34,6 +34,9 @@ export function addScriptToPage(src: string): Promise<void> {
     script.onerror = () => reject()
     script.async = false
     script.src = src
+    if (src && !src.startsWith('/')) {
+      script.crossOrigin = 'anonymous'
+    }
     document.head.appendChild(script)
   })
 }

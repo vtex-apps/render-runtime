@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.38.2] - 2018-12-21
+### Fixed
+- Add the `crossOrigin` attribute to scripts added to the page.
+
 ## [7.38.1] - 2018-12-21
 ### Fixed
 - Removed invalid property on anchor tag.
