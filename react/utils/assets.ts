@@ -24,6 +24,10 @@ class ServerSideAssetLoadingError extends Error {
   }
 }
 
+function isAbsolute(path: string) {
+  return path && path.startsWith('/')
+}
+
 export function addScriptToPage(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
     if (!document || !document.head) {
@@ -34,7 +38,7 @@ export function addScriptToPage(src: string): Promise<void> {
     script.onerror = () => reject()
     script.async = false
     script.src = src
-    if (src && !src.startsWith('/')) {
+    if (isAbsolute(src)) {
       script.crossOrigin = 'anonymous'
     }
     document.head.appendChild(script)
@@ -49,6 +53,9 @@ function addStyleToPage(href: string) {
   link.href = href
   link.type = 'text/css'
   link.rel = 'stylesheet'
+  if (isAbsolute(href)) {
+    link.crossOrigin = 'anonymous'
+  }
   document.head.appendChild(link)
 }
 
@@ -60,6 +67,9 @@ function preloadStyle(href: string) {
   link.href = href
   link.as = 'style'
   link.rel = 'preload'
+  if (isAbsolute(href)) {
+    link.crossOrigin = 'anonymous'
+  }
   document.head.appendChild(link)
 }
 
@@ -71,6 +81,9 @@ function preloadScript(href: string) {
   link.href = href
   link.as = 'script'
   link.rel = 'preload'
+  if (isAbsolute(href)) {
+    link.crossOrigin = 'anonymous'
+  }
   document.head.appendChild(link)
 }
 
