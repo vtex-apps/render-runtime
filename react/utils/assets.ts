@@ -25,7 +25,7 @@ class ServerSideAssetLoadingError extends Error {
 }
 
 function isAbsolute(path: string) {
-  return path && path.startsWith('/')
+  return path && !path.startsWith('/')
 }
 
 export function addScriptToPage(src: string): Promise<void> {
