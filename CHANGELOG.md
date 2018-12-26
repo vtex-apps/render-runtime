@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.38.5] - 2018-12-26
+
 ### Changed
 - Upgraded vtex-render-session to fix error messages.
 
