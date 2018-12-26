@@ -72,17 +72,18 @@ class ExtensionPointComponent extends PureComponent<
     if (component && !Component) {
       if (!(component in componentPromiseMap)){
         componentPromiseMap[component] = fetchComponent(component)
-        componentPromiseMap[component]
-          .then(() => {
-            componentPromiseResolvedMap[component] = true
-          })
-          .then(() => this.updateComponentsWithEvent(component))
-          .catch(() => {
-            componentPromiseResolvedMap[component] = true
-          })
       } else if (componentPromiseResolvedMap[component]) {
         throw new Error(`Unable to fetch component ${component}`)
       }
+
+      componentPromiseMap[component]
+        .then(() => {
+          componentPromiseResolvedMap[component] = true
+          this.updateComponentsWithEvent(component)
+        })
+        .catch(() => {
+          componentPromiseResolvedMap[component] = true
+        })
     }
   }
 
