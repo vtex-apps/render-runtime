@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.38.7] - 2018-12-26
+### Fixed
+- Unable to render multiple instances of the same component when navigating client-side.
+
 ## [7.38.6] - 2018-12-26
 ### Fixed
 - Stop doing CORS for every image.
