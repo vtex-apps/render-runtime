@@ -28,12 +28,12 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   }
 
   public isAuthenticatedPage() {
-    return this.props.pages[this.props.page].login
+    return this.props.pages[this.props.page].login || this.props.pages[this.props.page].auth
   }
 
   public redirectToLogin() {
     const pathName = window.location.pathname.replace(/\/$/, '')
-    if (this.props.page !== 'store/login' && pathName !== LOGIN_PATH) {
+    if (this.props.page !== 'store.login' && pathName !== LOGIN_PATH) {
       this.props.navigate({
         fallbackToWindowLocation: false,
         to: LOGIN_PATH,
