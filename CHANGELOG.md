@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.38.1-blocks] - 2018-12-28
+
 ## [7.38.0] - 2018-12-17
 ### Changed
 - Changes graphql routing pattern from `/graphql/public` to `/public/graphql`
