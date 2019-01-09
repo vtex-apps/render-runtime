@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.39.0-blocks] - 2019-1-9
+
 ## [7.38.7] - 2018-12-26
 ### Fixed
 - Unable to render multiple instances of the same component when navigating client-side.
