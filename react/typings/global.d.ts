@@ -36,6 +36,7 @@ declare global {
   type ClientRendered = Element
 
   interface Extension {
+    wrappers?: string[]
     component: string
     props?: any
     shouldRender?: boolean
@@ -161,7 +162,7 @@ declare global {
     apolloClient: ApolloClient<NormalizedCacheObject>,
     locale: string,
     page: string,
-    params?: string,
+    paramsJSON?: string,
     path?: string,
     production: boolean,
     renderMajor: number,
@@ -170,7 +171,20 @@ declare global {
   interface FetchDefaultPages {
     apolloClient: ApolloClient<NormalizedCacheObject>,
     locale: string,
-    routeIds: string[]
+    pages: Pages,
+    routeIds: string[],
+    renderMajor: number,
+  }
+
+  interface FetchNavigationDataInput {
+    apolloClient: ApolloClient<NormalizedCacheObject>
+    production: boolean
+    locale: string
+    routeId: string
+    declarer?: string
+    paramsJSON?: string
+    path?: string
+    renderMajor: number
   }
 
 interface RenderComponent<P={}, S={}> {
@@ -187,18 +201,14 @@ interface RenderComponent<P={}, S={}> {
     [appId: string]: EventEmitter
   }
 
-  interface PageQueryResult {
-    data: PageQueryResultData,
-    errors?: any,
+  interface GraphQLResult<T extends string, U> {
+    data: Record<T, U>
+    errors?: any
   }
 
   interface DefaultPagesQueryResult {
     data: DefaultPagesQueryResultData,
     errors?: any,
-  }
-
-  interface PageQueryResultData {
-    page: PageQueryResponse,
   }
 
   interface DefaultPagesQueryResultData {
@@ -325,6 +335,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface Window extends Window {
     __APOLLO_SSR__: boolean
+    __ERROR__: any
     __RENDER_7_SESSION__: RenderSession
     __RENDER_7_RUNTIME__: RuntimeExports
     __RENDER_7_COMPONENTS__: ComponentsRegistry
@@ -342,6 +353,7 @@ interface RenderComponent<P={}, S={}> {
     IntlPolyfill: any
     Intl: any
     hrtime: NodeJS.Process['hrtime']
+    myvtexSSE: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
   }
 }

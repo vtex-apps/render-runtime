@@ -1,8 +1,5 @@
-
 import React, {PureComponent} from 'react'
-
 import ExtensionPointComponent from '../components/ExtensionPointComponent'
-
 import { RenderContextProps } from './RenderContext'
 
 interface Props {

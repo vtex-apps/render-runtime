@@ -5,8 +5,8 @@ import ReactDOM from 'react-dom'
 import { getImplementation } from '../utils/assets'
 import { TreePathContext, TreePathProps, withTreePath } from '../utils/treePath'
 
-import { Loading } from '../core/main'
 import ExtensionPointComponent from './ExtensionPointComponent'
+import Loading from './Loading'
 import { RenderContext } from './RenderContext'
 
 interface Props {
@@ -81,8 +81,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const { newTreePath } = this.state
     const { children, params, query, id, treePath, ...parentProps } = this.props
     const extension = runtime.extensions && runtime.extensions[newTreePath]
-    const component = extension ? extension.component : null
-    const extensionProps = extension ? extension.props : null
+    const { component = null, wrappers = [], props: extensionProps = null } = extension || {}
 
     this.component = component
 
@@ -95,14 +94,33 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
     let loading = null
     if (runtime.preview) {
-      loading = <Loading runtime={runtime} />
+      loading = <Loading />
     }
 
     return component
       ? <TreePathContext.Provider value={{ treePath: newTreePath }}>
-        <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
+        {
+          this.withWrappers(
+          wrappers,
+          treePath,
+          props,
+          runtime,
+          <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
+        )}
       </TreePathContext.Provider>
       : loading
+  }
+
+  private withWrappers(wrappers: string[], treePath: string, props: any, runtime: RenderContext, element: JSX.Element) {
+    if (wrappers.length === 0) {
+      return element
+    }
+
+    return wrappers.reduceRight((acc, wrapper) => (
+      <ExtensionPointComponent component={wrapper} props={props} runtime={runtime} treePath={treePath}>
+        {acc}
+      </ExtensionPointComponent>
+    ), element)
   }
 
   private addDataToElementIfEditable = () => {

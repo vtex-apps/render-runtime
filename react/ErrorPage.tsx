@@ -48,7 +48,7 @@ export default class ErrorPage extends Component {
   private splunk = 0
 
   public componentDidMount() {
-    setTimeout(()=>{this.setState({enabled: true})} , 5000)
+    window.setTimeout(()=>{this.setState({enabled: true})} , 5000)
   }
 
   public render() {
@@ -86,7 +86,7 @@ export default class ErrorPage extends Component {
   private renderErrorDetails = (error: any) => {
     return (
       <div>
-        <RedBoxError error={error} style={redboxStyle}/>
+        <RedBoxError error={error} style={redboxStyle as any}/>
         <div className="bg-warning--faded pa6 mt4 br3 f6 lh-copy" style={{fontFamily: 'courier, code', maxWidth: '620px', margin: '0 auto', wordWrap: 'break-word' }}>
           {JSON.stringify(error.details)}
         </div>

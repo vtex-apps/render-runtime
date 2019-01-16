@@ -41,7 +41,7 @@ if (module.hot) {
   function initSSE () {
     const hasNoSSE = !eventSource || eventSource.readyState === CLOSED
     if (!document.hidden && hasNoSSE) {
-      eventSource = myvtexSSE(global.__RUNTIME__.account, global.__RUNTIME__.workspace, 'vtex.builder-hub:*:build.status', {verbose: true}, function (event: any) {
+      eventSource = window.myvtexSSE(global.__RUNTIME__.account, global.__RUNTIME__.workspace, 'vtex.builder-hub:*:build.status', {verbose: true}, (event: any) => {
         if (event.body && event.body.code === 'success') {
           window.location.reload()
         }

@@ -1,0 +1,11 @@
+query RoutePreviews($routes: [RouteInput], $locale: String, $renderMajor: Int) {
+  defaultPages: routePreviews (
+    locale: $locale,
+    routes: $routes,
+    renderMajor: $renderMajor,
+  ) {
+    componentsJSON
+    extensionsJSON
+    messagesJSON
+  }
+}

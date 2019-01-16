@@ -20,13 +20,13 @@ import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils
 import { loadLocaleData } from '../utils/locales'
 import { createLocaleCookie, fetchMessages, fetchMessagesForApp } from '../utils/messages'
 import { getRouteFromPath, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
-import { fetchDefaultPages, fetchRoutes } from '../utils/routes'
+import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
 import { TreePathContext } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 
 import BuildStatus from './BuildStatus'
-import NestedExtensionPoints from './NestedExtensionPoints'
 import { RenderContext } from './RenderContext'
+import RenderPage from './RenderPage'
 
 interface Props {
   children: ReactElement<any> | null
@@ -305,7 +305,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }
 
       const options = scrollOptions || { top: 0, left: 0 }
-      setTimeout(() => pageScrollTo(options), 0)
+      window.setTimeout(() => pageScrollTo(options), 0)
     }
     catch (e) {
       console.warn('Failed to scroll after page navigation.')
@@ -331,6 +331,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { route } = state
     const { id: page, params, path } = route
     const shouldFetchNavigationData = page.startsWith('store') || pagesState[page] && pagesState[page].conditional
+    const declarer = pagesState[page] && pagesState[page].declarer
     const query = parse(location.search.substr(1))
 
     if (!shouldFetchNavigationData) {
@@ -352,20 +353,22 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       this.scrollTo(state.scrollOptions)
     })
 
+    const paramsJSON = JSON.stringify(params)
+    const apolloClient = this.apolloClient
+    const routeId = page
     // Retrieve the adequate assets for the new page. Naming will
     // probably change (query will return something like routes) as
     // well as the fields that need to be retrieved, but the logic
     // that the new state (extensions and assets) will be derived from
     // the results of this query will probably remain the same.
-    return fetchRoutes({
-      apolloClient: this.apolloClient,
-      device,
+    return fetchNavigationPage({
+      apolloClient,
+      declarer,
       locale,
-      page,
-      params: JSON.stringify(params),
-      path,
+      paramsJSON,
       production,
       renderMajor,
+      routeId,
     }).then(({
       appsEtag,
       cacheHints,
@@ -411,8 +414,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public prefetchDefaultPages = async (routeIds: string[]) => {
-    const { runtime } = this.props
-    const { culture: { locale } } = this.state
+    const { runtime, runtime: {renderMajor}} = this.props
+    const { culture: { locale }, pages } = this.state
 
     const {
       components: defaultComponents,
@@ -421,7 +424,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = await fetchDefaultPages({
       apolloClient: this.apolloClient,
       locale,
-      routeIds
+      pages,
+      renderMajor,
+      routeIds,
     })
 
     await Promise.all(Object.keys(defaultComponents).map((component: string) => {
@@ -528,16 +533,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public updateRuntime = (options?: PageContextOptions) => {
     const { runtime: { renderMajor } } = this.props
-    const { page, production, culture: { locale }, route } = this.state
+    const { page, pages: pagesState, production, culture: { locale }, route } = this.state
+    const declarer = pagesState[page] && pagesState[page].declarer
     const { pathname } = window.location
+    const paramsJSON = JSON.stringify(pagesState[page] && pagesState[page].params || {})
 
-    return fetchRoutes({
+    return fetchNavigationPage({
       apolloClient: this.apolloClient,
+      declarer,
       locale,
-      page,
+      paramsJSON,
       path: pathname,
       production,
       renderMajor,
+      routeId: page,
       ...options,
     }).then(({
       appsEtag,
@@ -636,7 +645,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       : (
         <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
-          <NestedExtensionPoints page={page} query={query} />
+          <RenderPage page={page} query={query} />
         </div>
       )
 
