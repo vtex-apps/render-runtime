@@ -9,7 +9,6 @@ import {History, Location} from "history"
 import {HelmetData} from "react-helmet"
 import {TreePathProps} from "../utils/treePath"
 import { LayoutContainer } from '../core/main'
-import { any } from 'prop-types';
 
 declare global {
   interface RenderMetric {
@@ -174,7 +173,6 @@ declare global {
     locale: string,
     pages: Pages,
     routeIds: string[],
-    pagesProtocol: number,
     renderMajor: number,
   }
 
@@ -185,6 +183,7 @@ declare global {
     routeId: string
     declarer?: string
     paramsJSON?: string
+    path?: string
     renderMajor: number
   }
 
@@ -288,7 +287,6 @@ interface RenderComponent<P={}, S={}> {
     query?: Record<string, string>
     start: boolean
     runtimeMeta: {
-      pagesProtocol?: number
       version: string
       config?: any
     }

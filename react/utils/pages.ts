@@ -72,17 +72,8 @@ function getParams(template: string, target: string) {
 }
 
 function getPagePath(name: string, pages: Pages) {
-  const [domain] = name.split('/')
-  const rootName = pages[domain] ? domain : name
-  const {path: rootPath, cname} = pages[rootName]
-  const {path: pagePath} = pages[name]
-
-  if (cname && isHost(cname)) {
-    const rootStart = rootPath.endsWith('/') ? rootPath.length - 1 : rootPath.length
-    return pagePath && pagePath.substr(rootStart)
-  }
-
-  return pagePath
+  const {path: pagePath, cname} = pages[name]
+  return cname && isHost(cname) ? '/' : pagePath
 }
 
 function getRouteFromPageName(id: string, pages: Pages, params: any) : Route | null {

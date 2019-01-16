@@ -1,6 +1,4 @@
-import defaultPage from '../queries/defaultPage.graphql'
 import navigationPageQuery from '../queries/navigationPage.graphql'
-import pageQuery from '../queries/Page.graphql'
 import routePreviews from '../queries/routePreviews.graphql'
 
 const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryResponse => {
@@ -54,36 +52,6 @@ const parseDefaultPagesQueryResponse = (defaultPages: DefaultPagesQueryResponse)
   }
 }
 
-export const fetchRoutes = ({
-  apolloClient,
-  conditions,
-  device,
-  locale,
-  page,
-  paramsJSON,
-  path,
-  production,
-  renderMajor,
-  scope,
-  template,
-}: FetchRoutesInput) => apolloClient.query<{page: PageQueryResponse}>({
-  fetchPolicy: production ? 'cache-first' : 'network-only',
-  query: pageQuery,
-  variables: {
-    conditions,
-    device,
-    locale,
-    page,
-    params: paramsJSON,
-    path,
-    production,
-    renderMajor,
-    scope,
-    template,
-  }
-}).then<ParsedPageQueryResponse>(({data: {page: pageData}, errors}: GraphQLResult<'page', PageQueryResponse>) =>
-      errors ? Promise.reject(errors) : parsePageQueryResponse(pageData))
-
 export const fetchNavigationPage = ({
   apolloClient,
   locale,
@@ -123,21 +91,12 @@ export const fetchDefaultPages = ({
   locale,
   pages,
   routeIds,
-  pagesProtocol,
   renderMajor,
 }: FetchDefaultPages) => {
-
-  const queryPromise = pagesProtocol >= 2
-    ? apolloClient.query<{defaultPages: DefaultPagesQueryResponse}>({
-        query: routePreviews,
-        variables: {locale, renderMajor, routes: getRoutesParam(routeIds, pages)}
-      })
-    : apolloClient.query<{defaultPages: DefaultPagesQueryResponse}>({
-        query: defaultPage,
-        variables: {locale, routeIds}
-      })
-
-  return queryPromise.then<ParsedDefaultPagesQueryResponse>(
+  return apolloClient.query<{defaultPages: DefaultPagesQueryResponse}>({
+    query: routePreviews,
+    variables: {locale, renderMajor, routes: getRoutesParam(routeIds, pages)}
+  }).then<ParsedDefaultPagesQueryResponse>(
     ({data: {defaultPages}, errors}: DefaultPagesQueryResult) => {
       return errors ? Promise.reject(errors) : parseDefaultPagesQueryResponse(defaultPages)
     }
