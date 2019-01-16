@@ -16,8 +16,6 @@ interface State {
   logged?: boolean
 }
 
-const loginPages = ['store/login', 'store.login']
-
 export default class MaybeAuth extends PureComponent<Props, State> {
   public state = { loading: true, logged: false }
 
@@ -30,16 +28,16 @@ export default class MaybeAuth extends PureComponent<Props, State> {
   }
 
   public isAuthenticatedPage() {
-    return this.props.pages[this.props.page].login || this.props.pages[this.props.page].auth
+    return this.props.pages[this.props.page].auth
   }
 
   public redirectToLogin() {
     const pathName = window.location.pathname.replace(/\/$/, '')
-    if (!loginPages.includes(this.props.page) && pathName !== LOGIN_PATH) {
+    if (this.props.page !== 'store.login' && pathName !== LOGIN_PATH) {
       this.props.navigate({
         fallbackToWindowLocation: false,
+        query: `returnUrl=${pathName}`,
         to: LOGIN_PATH,
-        query: `returnUrl=${pathName}`
       })
     }
   }

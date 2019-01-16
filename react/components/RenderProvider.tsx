@@ -20,12 +20,11 @@ import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils
 import { loadLocaleData } from '../utils/locales'
 import { createLocaleCookie, fetchMessages, fetchMessagesForApp } from '../utils/messages'
 import { getRouteFromPath, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
-import { fetchDefaultPages, fetchNavigationPage, fetchRoutes } from '../utils/routes'
+import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
 import { TreePathContext } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 
 import BuildStatus from './BuildStatus'
-import NestedExtensionPoints from './NestedExtensionPoints'
 import { RenderContext } from './RenderContext'
 import RenderPage from './RenderPage'
 
@@ -320,7 +319,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public onPageChanged = (location: RenderHistoryLocation) => {
-    const { runtime: { renderMajor, runtimeMeta: {pagesProtocol = 1} } } = this.props
+    const { runtime: { renderMajor } } = this.props
     const { culture: { locale }, pages: pagesState, production, device, defaultExtensions } = this.state
     const { state } = location
 
@@ -362,11 +361,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // well as the fields that need to be retrieved, but the logic
     // that the new state (extensions and assets) will be derived from
     // the results of this query will probably remain the same.
-    const fetchPromise = pagesProtocol >= 2
-      ? fetchNavigationPage({apolloClient, locale, routeId, declarer, production, paramsJSON, renderMajor})
-      : fetchRoutes({apolloClient, device, locale, page, paramsJSON, path, production, renderMajor})
-
-    return fetchPromise.then(({
+    return fetchNavigationPage({
+      apolloClient,
+      declarer,
+      locale,
+      paramsJSON,
+      production,
+      renderMajor,
+      routeId,
+    }).then(({
       appsEtag,
       cacheHints,
       components,
@@ -411,7 +414,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public prefetchDefaultPages = async (routeIds: string[]) => {
-    const { runtime, runtime: {runtimeMeta: {pagesProtocol = 1}, renderMajor}} = this.props
+    const { runtime, runtime: {renderMajor}} = this.props
     const { culture: { locale }, pages } = this.state
 
     const {
@@ -422,7 +425,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       apolloClient: this.apolloClient,
       locale,
       pages,
-      pagesProtocol,
       renderMajor,
       routeIds,
     })
@@ -531,16 +533,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public updateRuntime = (options?: PageContextOptions) => {
     const { runtime: { renderMajor } } = this.props
-    const { page, production, culture: { locale }, route } = this.state
+    const { page, pages: pagesState, production, culture: { locale }, route } = this.state
+    const declarer = pagesState[page] && pagesState[page].declarer
     const { pathname } = window.location
+    const paramsJSON = JSON.stringify(pagesState[page] && pagesState[page].params || {})
 
-    return fetchRoutes({
+    return fetchNavigationPage({
       apolloClient: this.apolloClient,
+      declarer,
       locale,
-      page,
+      paramsJSON,
       path: pathname,
       production,
       renderMajor,
+      routeId: page,
       ...options,
     }).then(({
       appsEtag,
@@ -626,7 +632,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public render() {
-    const { children, runtime: {runtimeMeta: {pagesProtocol = 1}} } = this.props
+    const { children } = this.props
     const { culture: { locale }, messages, pages, page, query, production } = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
@@ -639,11 +645,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       : (
         <div className="render-provider">
           <Helmet title={pages[page] && pages[page].title} />
-          {
-            pagesProtocol >= 2
-              ? <RenderPage page={page} query={query} />
-              : <NestedExtensionPoints page={page} query={query} />
-          }
+          <RenderPage page={page} query={query} />
         </div>
       )
 
