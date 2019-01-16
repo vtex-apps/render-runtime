@@ -18,8 +18,8 @@ const buildStatusLoading = (
 )
 
 class BuildStatus extends Component<RenderContextProps, State> {
-  private animateOutHandle!: NodeJS.Timer
-  private hideHandle!: NodeJS.Timer
+  private animateOutHandle!: number
+  private hideHandle!: number
 
   constructor(props: RenderContextProps) {
     super(props)
@@ -36,8 +36,8 @@ class BuildStatus extends Component<RenderContextProps, State> {
   }
 
   public hideWithDelay = (delayMillis: number) => {
-    this.animateOutHandle = setTimeout(() => this.setState({ animateOut: true }), delayMillis)
-    this.hideHandle = setTimeout(() => this.setState({ status: null, animateOut: false }), delayMillis + 300)
+    this.animateOutHandle = window.setTimeout(() => this.setState({ animateOut: true }), delayMillis)
+    this.hideHandle = window.setTimeout(() => this.setState({ status: null, animateOut: false }), delayMillis + 300)
   }
 
   public updateStatus = (status: string) => {
