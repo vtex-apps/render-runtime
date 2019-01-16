@@ -13,4 +13,9 @@ declare module '*.graphql' {
   export default value;
 }
 
+declare module '*.png' {
+  var url: string
+  export = url
+}
+
 declare var vtex: any

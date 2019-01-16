@@ -325,6 +325,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface Window extends Window {
     __APOLLO_SSR__: boolean
+    __ERROR__: any
     __RENDER_7_SESSION__: RenderSession
     __RENDER_7_RUNTIME__: RuntimeExports
     __RENDER_7_COMPONENTS__: ComponentsRegistry
@@ -342,6 +343,7 @@ interface RenderComponent<P={}, S={}> {
     IntlPolyfill: any
     Intl: any
     hrtime: NodeJS.Process['hrtime']
+    myvtexSSE: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
   }
 }

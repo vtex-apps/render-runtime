@@ -18,6 +18,7 @@
   ],
   "settingsSchema": {},
   "scripts": {
+    "prereleasy": "bash lint.sh",
     "postreleasy": "vtex publish --verbose"
   }
 }

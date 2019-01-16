@@ -123,7 +123,7 @@ function start() {
       if (props && props.style) {
         props.style = optimizeStyleForVtexImg(vtexImgHost, props.style)
       }
-      return ReactCreateElement.apply(React, arguments)
+      return ReactCreateElement.apply<typeof React, any, any>(React, arguments)
     }
 
     const maybeRenderPromise = render(rootName, runtime)
