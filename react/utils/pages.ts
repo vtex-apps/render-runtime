@@ -105,7 +105,7 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
 
   if (history) {
     const location = createLocationDescriptor(route, {query, scrollOptions})
-    setTimeout(() => history.push(location), 0)
+    window.setTimeout(() => history.push(location), 0)
     return true
   }
 

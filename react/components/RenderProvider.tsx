@@ -305,7 +305,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }
 
       const options = scrollOptions || { top: 0, left: 0 }
-      setTimeout(() => pageScrollTo(options), 0)
+      window.setTimeout(() => pageScrollTo(options), 0)
     }
     catch (e) {
       console.warn('Failed to scroll after page navigation.')

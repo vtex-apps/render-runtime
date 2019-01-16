@@ -48,7 +48,7 @@ export default class ErrorPage extends Component {
   private splunk = 0
 
   public componentDidMount() {
-    setTimeout(()=>{this.setState({enabled: true})} , 5000)
+    window.setTimeout(()=>{this.setState({enabled: true})} , 5000)
   }
 
   public render() {

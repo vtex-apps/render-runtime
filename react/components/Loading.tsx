@@ -33,11 +33,11 @@ class Loading extends PureComponent<RenderContextProps, State> {
   public state: State = {
     visible,
   }
-  private thresholdTimeout?: NodeJS.Timer
+  private thresholdTimeout?: number
 
   public componentDidMount() {
     if (!this.state.visible) {
-      this.thresholdTimeout = setTimeout(() => {
+      this.thresholdTimeout = window.setTimeout(() => {
         visible = true
         this.setState({visible: true})
       }, LOADING_TRESHOLD_MS)
@@ -49,7 +49,7 @@ class Loading extends PureComponent<RenderContextProps, State> {
       clearTimeout(this.thresholdTimeout)
     }
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       visible = false
     }, LOADING_UNMOUNT_TRESHOLD_MS)
   }
