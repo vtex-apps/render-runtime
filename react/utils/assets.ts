@@ -139,7 +139,7 @@ function shouldAddStyleToPage(path: string, styles: string[] = getExistingStyleH
 }
 
 export function getImplementation<P={}, S={}>(component: string) {
-  return window.__RENDER_7_COMPONENTS__[component] as RenderComponent<P, S>
+  return window.__RENDER_8_COMPONENTS__[component] as RenderComponent<P, S>
 }
 
 export function getExtensionImplementation<P={}, S={}>(extensions: Extensions, name: string) {
