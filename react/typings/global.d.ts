@@ -336,10 +336,10 @@ interface RenderComponent<P={}, S={}> {
   interface Window extends Window {
     __APOLLO_SSR__: boolean
     __ERROR__: any
-    __RENDER_7_SESSION__: RenderSession
-    __RENDER_7_RUNTIME__: RuntimeExports
-    __RENDER_7_COMPONENTS__: ComponentsRegistry
-    __RENDER_7_HOT__: HotEmitterRegistry
+    __RENDER_8_SESSION__: RenderSession
+    __RENDER_8_RUNTIME__: RuntimeExports
+    __RENDER_8_COMPONENTS__: ComponentsRegistry
+    __RENDER_8_HOT__: HotEmitterRegistry
     __RUNTIME__: RenderRuntime
     __hostname__: string
     __pathname__: string
