@@ -25,7 +25,7 @@ const CONNECTION_CLOSED = 2
 const emittersByWorkspace: EmittersRegistry = {}
 
 const initSSE = (account: string, workspace: string, baseURI: string) => {
-  if (Object.keys(window.__RENDER_7_HOT__).length === 0) {
+  if (Object.keys(window.__RENDER_8_HOT__).length === 0) {
     return undefined
   }
 
@@ -59,8 +59,8 @@ const initSSE = (account: string, workspace: string, baseURI: string) => {
     switch (type) {
       case 'hmr':
         console.log(`[react2] Received update. app=${subject} hash=${hash}`)
-        if (window.__RENDER_7_HOT__[subject]) {
-          window.__RENDER_7_HOT__[subject].emit('webpackHotUpdate', hash)
+        if (window.__RENDER_8_HOT__[subject]) {
+          window.__RENDER_8_HOT__[subject].emit('webpackHotUpdate', hash)
         }
         break
       case 'reload':

@@ -14,5 +14,5 @@ if (canUseDOM && window.__RUNTIME__.production) {
 }
 
 if (window.__RUNTIME__.start) {
-  window.__RENDER_7_RUNTIME__.start()
+  window.__RENDER_8_RUNTIME__.start()
 }

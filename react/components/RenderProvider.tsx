@@ -143,7 +143,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     // todo: reload window if client-side created a segment different from server-side
-    this.sessionPromise = canUseDOM ? window.__RENDER_7_SESSION__.sessionPromise : Promise.resolve()
+    this.sessionPromise = canUseDOM ? window.__RENDER_8_SESSION__.sessionPromise : Promise.resolve()
     const runtimeContextLink = this.createRuntimeContextLink()
     const ensureSessionLink = this.createEnsureSessionLink()
     this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, ensureSessionLink, cacheControl)
@@ -253,7 +253,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public patchSession = (data?: any) => {
-    return this.sessionPromise.then(() => canUseDOM ? window.__RENDER_7_SESSION__.patchSession(data) : undefined)
+    return this.sessionPromise.then(() => canUseDOM ? window.__RENDER_8_SESSION__.patchSession(data) : undefined)
   }
 
   public getCustomMessages = (locale: string) => {
@@ -458,7 +458,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { runtime } = this.props
     const { components, culture: { locale } } = this.state
     const { apps, assets } = traverseComponent(components, component)
-    const unfetchedApps = apps.filter(app => !Object.keys(window.__RENDER_7_COMPONENTS__).some(c => c.startsWith(app)))
+    const unfetchedApps = apps.filter(app => !Object.keys(window.__RENDER_8_COMPONENTS__).some(c => c.startsWith(app)))
     if (unfetchedApps.length === 0) {
       return fetchAssets(runtime, assets)
     }
