@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [7.38.9] - 2019-01-24
-### Fixed
-- Bumping version to fix vivavinho account
+## [8.0.1] - 2019-1-17
+
+## [8.0.0] - 2019-1-16
 
 ## [7.38.8] - 2019-01-21
 ### Fixed
