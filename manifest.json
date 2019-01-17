@@ -6,10 +6,10 @@
   "description": "The VTEX Render framework runtime",
   "defaultLocale": "pt-BR",
   "builders": {
-    "react": "2.x"
+    "react": "3.x"
   },
   "dependencies": {
-    "vtex.pages-graphql": "1.x"
+    "vtex.pages-graphql": "2.x"
   },
   "mustUpdateAt": "2018-09-05",
   "categories": [],
