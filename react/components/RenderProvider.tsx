@@ -69,7 +69,10 @@ const replaceExtensionsWithDefault = (extensions: Extensions, page: string, defa
   unionKeys(extensions, defaultExtensions)
   .reduce((acc, key) => {
     const maybeExtension = isChildOrSelf(key, page)
-      ? defaultExtensions[key]
+      ? defaultExtensions[key] || {
+        ...extensions[key],
+        component: null,
+      }
       : extensions[key]
     if (maybeExtension) {
       acc[key] = maybeExtension
@@ -347,7 +350,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       page,
       preview: true,
       query,
-      route
+      route,
     }, () => {
       this.replaceRouteClass(page)
       this.scrollTo(state.scrollOptions)
