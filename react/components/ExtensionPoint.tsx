@@ -94,7 +94,13 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
     let loading = null
     if (runtime.preview) {
-      loading = <Loading />
+      loading = this.withWrappers(
+        wrappers,
+        treePath,
+        props,
+        runtime,
+        <Loading />,
+      )
     }
 
     return component
