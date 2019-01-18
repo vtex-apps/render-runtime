@@ -18,7 +18,7 @@ export default class MaybeContext extends PureComponent<Props & RenderContextPro
       nextTreePath: nestedPage,
       params,
       query,
-      ...context.props
+      ...context!.props
     }
 
     return contextComponent
