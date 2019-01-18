@@ -63,7 +63,7 @@ const noop = (() => {})
 const unionKeys = (record1: any, record2: any) => [...new Set([...Object.keys(record1), ...Object.keys(record2)])]
 
 const isChildOrSelf = (child: string, parent: string) =>
-  child === parent || (child.startsWith(`${parent}/`) && child !== `${parent}/__context`)
+  child === parent || child.startsWith(`${parent}/`)
 
 const replaceExtensionsWithDefault = (extensions: Extensions, page: string, defaultExtensions: Extensions) =>
   unionKeys(extensions, defaultExtensions)
