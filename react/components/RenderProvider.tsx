@@ -330,11 +330,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const { route } = state
     const { id: page, params, path } = route
-    const shouldFetchNavigationData = page.startsWith('store') || pagesState[page] && pagesState[page].conditional
+    const shouldSkipFetchNavigationData = page.startsWith('admin')
     const declarer = pagesState[page] && pagesState[page].declarer
     const query = parse(location.search.substr(1))
 
-    if (!shouldFetchNavigationData) {
+    if (shouldSkipFetchNavigationData) {
       return this.setState({
         page,
         query,
