@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Loading svg is loaded by Icon Pack. 
 
 ## [8.0.5] - 2019-1-21
 
@@ -14,14 +16,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add the `crossOrigin` attribute **only to img tags with src from vteximg**.
 
 ## [8.0.3] - 2019-1-18
+### Changed
+- Get context as extension property instead of `__context`.
+- Add wrappers when loading preview
 
 ## [8.0.2] - 2019-01-18
+### Changed
+- Now, import from `render` is `vtex.render-runtime`.
 
 ## [8.0.1] - 2019-1-17
 
 ## [8.0.0] - 2019-1-16
-
-## [7.39.0-blocks] - 2019-1-9
+### Changed
+- Adapt to use new blocks language to build pages.
+- Remove support to legacy extensions.
+- Remove support for old pages protocol.
 
 ## [7.38.7] - 2018-12-26
 ### Fixed
