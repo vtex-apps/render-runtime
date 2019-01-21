@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.0.5] - 2019-1-21
+
 ## [8.0.4] - 2019-01-21
 ### Fixed
 - Add the `crossOrigin` attribute **only to img tags with src from vteximg**.
