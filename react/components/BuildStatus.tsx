@@ -6,6 +6,7 @@ import {RenderContextProps, withRuntimeContext} from './RenderContext'
 interface State {
   animateOut: boolean
   status: string | null
+  anchor: 'left' | 'right'
 }
 
 const buildStatusLoading = (
@@ -27,6 +28,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
     this.state = {
       animateOut: false,
       status: null,
+      anchor: 'left',
     }
   }
 
@@ -38,6 +40,16 @@ class BuildStatus extends Component<RenderContextProps, State> {
   public hideWithDelay = (delayMillis: number) => {
     this.animateOutHandle = window.setTimeout(() => this.setState({ animateOut: true }), delayMillis)
     this.hideHandle = window.setTimeout(() => this.setState({ status: null, animateOut: false }), delayMillis + 300)
+  }
+
+  private toggleAnchor = () => {
+    this.setState(state => ({
+      anchor: state.anchor === 'left' ? 'right' : 'left'
+    }))
+  }
+
+  private handleMouseOver = () => {
+    this.toggleAnchor()
   }
 
   public updateStatus = (status: string) => {
@@ -75,7 +87,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
   }
 
   public render() {
-    const {status, animateOut} = this.state
+    const {status, animateOut, anchor} = this.state
 
     if (status === null) {
       return null
@@ -94,7 +106,10 @@ class BuildStatus extends Component<RenderContextProps, State> {
     )
 
     return (
-      <div className={className} style={{ top: '12px', left: '12px', animationDuration: '0.2s'}}>
+      <div
+        className={className}
+        style={{ top: '12px', [anchor]: '12px', animationDuration: '0.2s', opacity: 0.8 }}
+        onMouseOver={this.toggleAnchor}>
         {status === 'fail'
           ? fail
           : status === 'reload'
