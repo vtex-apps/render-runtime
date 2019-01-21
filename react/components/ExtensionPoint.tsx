@@ -95,7 +95,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
     let loading = null
     if (runtime.preview) {
-      loading = <Loading runtime={runtime} />
+      loading = <Loading />
     }
 
     return component
