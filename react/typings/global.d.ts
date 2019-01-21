@@ -36,11 +36,13 @@ declare global {
   type ClientRendered = Element
 
   interface Extension {
+    after?: string[]
+    around?: string[]
+    before?: string[]
     context?: {
       component: string
       props?: any
     }
-    wrappers?: string[]
     component: string
     props?: any
     shouldRender?: boolean

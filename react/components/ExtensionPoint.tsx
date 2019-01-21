@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import ReactDOM from 'react-dom'
 
 import { getImplementation } from '../utils/assets'
@@ -81,7 +81,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const { newTreePath } = this.state
     const { children, params, query, id, treePath, ...parentProps } = this.props
     const extension = runtime.extensions && runtime.extensions[newTreePath]
-    const { component = null, wrappers = [], props: extensionProps = null } = extension || {}
+    const { component = null, after = [], around = [], before = [], props: extensionProps = null } = extension || {}
 
     this.component = component
 
@@ -94,39 +94,62 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
     let loading = null
     if (runtime.preview) {
-      loading = this.withWrappers(
-        wrappers,
-        treePath,
+      loading = this.withOuterExtensions(
+        after,
+        around,
+        before,
+        newTreePath,
         props,
-        runtime,
         <Loading />,
       )
     }
 
     return component
-      ? <TreePathContext.Provider value={{ treePath: newTreePath }}>
-        {
-          this.withWrappers(
-          wrappers,
-          treePath,
+      ? this.withOuterExtensions(
+          after,
+          around,
+          before,
+          newTreePath,
           props,
-          runtime,
-          <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
-        )}
-      </TreePathContext.Provider>
+          (
+            <TreePathContext.Provider value={{ treePath: newTreePath }}>
+              <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
+            </TreePathContext.Provider>
+          )
+        )
       : loading
   }
 
-  private withWrappers(wrappers: string[], treePath: string, props: any, runtime: RenderContext, element: JSX.Element) {
-    if (wrappers.length === 0) {
-      return element
-    }
+  private withOuterExtensions(after: string[], around: string[], before: string[], treePath: string, props: any, element: JSX.Element) {
+    const beforeElements = (
+      <Fragment>
+        {before.map(beforeId => (
+          <ExtensionPoint id={beforeId} treePath={treePath} />
+        ))}
+      </Fragment>
+    )
 
-    return wrappers.reduceRight((acc, wrapper) => (
-      <ExtensionPointComponent component={wrapper} props={props} runtime={runtime} treePath={treePath}>
+    const afterElements = (
+      <Fragment>
+        {after.map(afterId => (
+          <ExtensionPoint id={afterId} treePath={treePath} />
+        ))}
+      </Fragment>
+    )
+
+    const wrapped = (
+      <Fragment>
+        {beforeElements}
+        {element}
+        {afterElements}
+      </Fragment>
+    )
+
+    return around.reduce((acc, aroundId) => (
+      <ExtensionPoint id={aroundId} treePath={treePath} {...props}>
         {acc}
-      </ExtensionPointComponent>
-    ), element)
+      </ExtensionPoint>
+    ), wrapped)
   }
 
   private addDataToElementIfEditable = () => {
