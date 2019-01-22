@@ -58,7 +58,7 @@ class Loading extends PureComponent<RenderContextProps, State> {
       <TreePathContext.Consumer>
         {(value: TreePathProps) => {
           const t = value.treePath
-          const loadingType = value.treePath && extensions[t] && extensions[t].preview && extensions[t].preview.type
+          const loadingType = value.treePath && extensions[t] && extensions[t].preview && extensions[t].preview!.type
           const loadingComponent = loadingType
             ? loadingType === 'text' ? List : Instagram
             : defaultLoading
