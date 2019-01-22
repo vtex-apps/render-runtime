@@ -51,7 +51,7 @@ export default class MaybeAuth extends PureComponent<Props, State> {
     }
 
     if (loading) {
-      return <div className="flex justify-center ma4"><Loading treePath={page} /></div>
+      return <div className="flex justify-center ma4"><Loading /></div>
     }
 
     if (logged) {
