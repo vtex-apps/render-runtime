@@ -184,7 +184,7 @@ class ExtensionPointComponent extends PureComponent<
     return Component ? (
       <Component {...props}>{children}</Component>
     ) : (
-      children || <Loading treePath={treePath} />
+      children || <Loading />
     )
   }
 }

@@ -19,7 +19,7 @@ class Session extends Component<RenderContextProps, State> {
   }
 
   public render() {
-    const {children, runtime: {page}} = this.props
+    const {children} = this.props
     const {ensured, error} = this.state
 
     if (ensured) {
@@ -39,7 +39,7 @@ class Session extends Component<RenderContextProps, State> {
       )
     }
 
-    return <Loading treePath={page} />
+    return <Loading />
   }
 
   private onUpdate() {

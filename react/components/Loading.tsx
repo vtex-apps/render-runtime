@@ -1,6 +1,8 @@
 import React, {CSSProperties, PureComponent} from 'react'
 import {Instagram, List} from 'react-content-loader'
 
+import { TreePathContext, TreePathProps } from '../utils/treePath'
+
 import {RenderContextProps, withRuntimeContext} from './RenderContext'
 
 interface State {
@@ -22,11 +24,7 @@ const defaultLoading = (
   </div>
 )
 
-interface LoadingProps {
-  treePath?: string
-}
-
-class Loading extends PureComponent<LoadingProps & RenderContextProps, State> {
+class Loading extends PureComponent<RenderContextProps, State> {
   public state: State = {
     visible,
   }
@@ -52,19 +50,26 @@ class Loading extends PureComponent<LoadingProps & RenderContextProps, State> {
   }
 
   public render() {
-    const { runtime: { extensions }, treePath } = this.props
+    const { runtime: { extensions } } = this.props
     const { visible: isVisible } = this.state
     const style: CSSProperties = { visibility: 'hidden' }
 
-    const loadingType = treePath && extensions[treePath] && extensions[treePath].preview && extensions[treePath].preview.type
-    const loadingComponent = loadingType
-      ? loadingType === 'text' ? List : Instagram
-      : defaultLoading
-
     return (
-      <div style={isVisible ? undefined : style}>
-        { loadingComponent }
-      </div>
+      <TreePathContext.Consumer>
+        {(value: TreePathProps) => {
+          const t = value.treePath
+          const loadingType = value.treePath && extensions[t] && extensions[t].preview && extensions[t].preview.type
+          const loadingComponent = loadingType
+            ? loadingType === 'text' ? List : Instagram
+            : defaultLoading
+
+          return (
+            <div style={isVisible ? undefined : style}>
+              { loadingComponent }
+            </div>
+          )
+        }}
+      </TreePathContext.Consumer>
     )
   }
 }
