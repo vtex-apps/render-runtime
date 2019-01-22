@@ -45,12 +45,10 @@ if (window.IntlPolyfill) {
 }
 
 function renderToStringWithData(component: ReactElement<any>): Promise<ServerRendered> {
-  window.__APOLLO_SSR__ = true
   const startGetDataFromTree = window.hrtime()
   return getDataFromTree(component).then(() => {
     const endGetDataFromTree = window.hrtime(startGetDataFromTree)
 
-    window.__APOLLO_SSR__ = false
     const startRenderToString = window.hrtime()
     const markup = require('react-dom/server').renderToString(component)
     const endRenderToString = window.hrtime(startRenderToString)
