@@ -1,4 +1,6 @@
 import React, {CSSProperties, PureComponent} from 'react'
+import {Instagram, List} from 'react-content-loader'
+
 import {RenderContextProps, withRuntimeContext} from './RenderContext'
 
 interface State {
@@ -12,15 +14,19 @@ let visible = false
 
 const defaultLoading = (
   <div className="flex justify-center w-100 pa4">
-    <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"   
+    <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"
           xmlns="http://www.w3.org/2000/svg"
           xmlnsXlink="http://www.w3.org/1999/xlink">
       <use xlinkHref="#sti-loading" />
-    </svg> 
+    </svg>
   </div>
 )
 
-class Loading extends PureComponent<RenderContextProps, State> {
+interface LoadingProps {
+  treePath?: string
+}
+
+class Loading extends PureComponent<LoadingProps & RenderContextProps, State> {
   public state: State = {
     visible,
   }
@@ -46,12 +52,18 @@ class Loading extends PureComponent<RenderContextProps, State> {
   }
 
   public render() {
+    const { runtime: { extensions }, treePath } = this.props
     const { visible: isVisible } = this.state
     const style: CSSProperties = { visibility: 'hidden' }
 
+    const loadingType = treePath && extensions[treePath] && extensions[treePath].preview && extensions[treePath].preview.type
+    const loadingComponent = loadingType
+      ? loadingType === 'text' ? List : Instagram
+      : defaultLoading
+
     return (
       <div style={isVisible ? undefined : style}>
-        { defaultLoading }
+        { loadingComponent }
       </div>
     )
   }

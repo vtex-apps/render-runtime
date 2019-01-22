@@ -35,6 +35,12 @@ declare global {
 
   type ClientRendered = Element
 
+  interface Preview {
+    type: 'block' | 'text' | 'circle'
+    width: number
+    height: number
+  }
+
   interface Extension {
     after?: string[]
     around?: string[]
@@ -46,6 +52,7 @@ declare global {
     component: string
     props?: any
     shouldRender?: boolean
+    preview: Preview
   }
 
   interface Extensions {
