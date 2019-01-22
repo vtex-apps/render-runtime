@@ -52,7 +52,7 @@ declare global {
     component: string
     props?: any
     shouldRender?: boolean
-    preview: Preview
+    preview?: Preview
   }
 
   interface Extensions {
