@@ -37,10 +37,6 @@ export interface TreePathProps {
 
 export function withTreePath <TOriginalProps>(Component: ComponentType<TOriginalProps & TreePathProps>): ComponentType<TOriginalProps> {
   class TreePath extends React.Component<TOriginalProps, TreePathProps> {
-    public static contextTypes = {
-      treePath: PropTypes.string
-    }
-
     public static get displayName(): string {
       return `TreePath(${Component.displayName || Component.name || 'Component'})`
     }
@@ -52,14 +48,7 @@ export function withTreePath <TOriginalProps>(Component: ComponentType<TOriginal
     public render() {
       return (
         <TreePathContext.Consumer>
-          {
-            context => {
-              // get treePath from old react context during apollo's getDataFromTree
-              // it is buggy when dealing with contexts that are overwritten, like treePath
-              const treePath = window.__APOLLO_SSR__ ? this.context.treePath : context.treePath
-              return <Component {...this.props} treePath={treePath}/>
-            }
-          }
+        {({treePath}) => <Component {...this.props} treePath={treePath}/>}
         </TreePathContext.Consumer>
       )
     }
