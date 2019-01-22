@@ -100,7 +100,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
         before,
         newTreePath,
         props,
-        <Loading />,
+        <Loading treePath={newTreePath} />,
       )
     }
 
