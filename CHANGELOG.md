@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Apollo Link State support.
 
+## [8.0.6] - 2019-1-22
 ### Changed
 - Loading svg is loaded by Icon Pack. 
 - Change position of the building indicator when it is hovered.
