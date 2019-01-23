@@ -52,7 +52,7 @@ declare global {
     component: string
     props?: any
     shouldRender?: boolean
-    preview: Preview
+    preview?: Preview
   }
 
   interface Extensions {
@@ -347,7 +347,6 @@ interface RenderComponent<P={}, S={}> {
   }
 
   interface Window extends Window {
-    __APOLLO_SSR__: boolean
     __ERROR__: any
     __RENDER_8_SESSION__: RenderSession
     __RENDER_8_RUNTIME__: RuntimeExports
