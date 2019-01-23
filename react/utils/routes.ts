@@ -1,5 +1,6 @@
 import navigationPageQuery from '../queries/navigationPage.graphql'
 import routePreviews from '../queries/routePreviews.graphql'
+import { parseMessages } from './messages'
 
 const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryResponse => {
   const {
@@ -8,15 +9,14 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     cacheHintsJSON,
     componentsJSON,
     extensionsJSON,
-    messagesJSON,
+    messages,
     pagesJSON,
   } = page
 
-  const [cacheHints, components, extensions, messages, pages, settings] = [
+  const [cacheHints, components, extensions, pages, settings] = [
     cacheHintsJSON,
     componentsJSON,
     extensionsJSON,
-    messagesJSON,
     pagesJSON,
     appsSettingsJSON,
   ].map(json => JSON.parse(json))
@@ -26,7 +26,7 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     cacheHints,
     components,
     extensions,
-    messages,
+    messages: parseMessages(messages),
     pages,
     settings
   }
@@ -36,19 +36,18 @@ const parseDefaultPagesQueryResponse = (defaultPages: DefaultPagesQueryResponse)
   const {
     componentsJSON,
     extensionsJSON,
-    messagesJSON,
+    messages,
   } = defaultPages
 
-  const [components, extensions, messages] = [
+  const [components, extensions] = [
     componentsJSON,
     extensionsJSON,
-    messagesJSON,
   ].map(json => JSON.parse(json))
 
   return {
     components,
     extensions,
-    messages,
+    messages: parseMessages(messages),
   }
 }
 

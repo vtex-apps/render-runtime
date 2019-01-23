@@ -1,10 +1,14 @@
 import { NormalizedCacheObject } from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
-import {canUseDOM} from 'exenv'
+import { pluck, zipObj } from 'ramda'
 import appMessagesQuery from '../queries/appMessages.graphql'
 import pageMessagesQuery from '../queries/messages.graphql'
 
 const YEAR_IN_MS = 12 * 30 * 24 * 60 * 60 * 1000
+
+export const parseMessages = (messages: KeyedString[]) => {
+  return zipObj(pluck('key', messages), pluck('message', messages))
+}
 
 export const fetchMessagesForApp = (apolloClient: ApolloClient<NormalizedCacheObject>, app: string, locale: string) =>
   apolloClient.query<{messages: string}>({query: appMessagesQuery, variables: {app, locale}})
@@ -15,7 +19,7 @@ export const fetchMessagesForApp = (apolloClient: ApolloClient<NormalizedCacheOb
 export const fetchMessages = (apolloClient: ApolloClient<NormalizedCacheObject>, page: string, production: boolean, locale: string, renderMajor: number, ignoreCache : boolean = false) => {
   return apolloClient.query<{ page: PageQueryResponse }>({ query: pageMessagesQuery, variables: { page, production, locale, renderMajor }, fetchPolicy: ignoreCache ? 'no-cache' : 'cache-first' })
     .then<RenderRuntime['messages']>(({data, errors}) =>
-      errors ? Promise.reject(errors) : JSON.parse(data.page.messagesJSON)
+      errors ? Promise.reject(errors) : data.page.messages
     )
 }
 

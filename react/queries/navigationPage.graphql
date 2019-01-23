@@ -21,7 +21,10 @@ query NavigationPage (
     cacheHintsJSON
     componentsJSON
     extensionsJSON
-    messagesJSON
+    messages {
+      key
+      message
+    }
     pagesJSON
   }
 }
