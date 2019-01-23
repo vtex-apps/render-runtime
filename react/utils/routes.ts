@@ -53,7 +53,6 @@ const parseDefaultPagesQueryResponse = (defaultPages: DefaultPagesQueryResponse)
 
 export const fetchNavigationPage = ({
   apolloClient,
-  locale,
   routeId,
   declarer,
   production,
@@ -64,7 +63,6 @@ export const fetchNavigationPage = ({
   query: navigationPageQuery,
   variables: {
     declarer,
-    locale,
     params: paramsJSON,
     production,
     renderMajor,
