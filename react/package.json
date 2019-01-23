@@ -29,6 +29,8 @@
     "ramda": "^0.26.1",
     "react-apollo": "^2.1.6",
     "react-apollo": "^2.4.0",
+    "ramda": "^0.26.1",
+    "react-apollo": "^2.1.6",
     "react-content-loader": "^3.4.2",
     "react-helmet": "^5.2.0",
     "react-no-ssr": "^1.1.0",
