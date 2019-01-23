@@ -1,6 +1,4 @@
 import {HeuristicFragmentMatcher, InMemoryCache, NormalizedCacheObject} from 'apollo-cache-inmemory'
-import {ApolloClient} from 'apollo-client'
-import {ApolloLink} from 'apollo-link'
 import {createHttpLink} from 'apollo-link-http'
 import {createPersistedQueryLink} from 'apollo-link-persisted-queries'
 import {createUploadLink} from 'apollo-upload-client'
@@ -14,6 +12,8 @@ import {omitTypenameLink} from './links/omitVariableTypenameLink'
 import {persistedQueryVersionLink} from './links/persistedQueryVersionLink'
 import {createUriSwitchLink} from './links/uriSwitchLink'
 import {versionSplitterLink} from './links/versionSplitterLink'
+import { createStateLink } from './links/stateLink'
+import { getGlobalLinkState } from '../linkState'
 
 interface ApolloClientsRegistry {
   [key: string]: ApolloClient<NormalizedCacheObject>
@@ -86,11 +86,16 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
 
     const cacheLink = cacheControl ? [cachingLink(cacheControl)] : []
 
+    const { initialState = {}, reducers = {}} = getGlobalLinkState()
+
+    const stateLink = createStateLink(initialState, reducers, cache)
+    
     const link = ApolloLink.from([
       omitTypenameLink,
       versionSplitterLink,
       runtimeContextLink,
       ensureSessionLink,
+      stateLink,
       persistedQueryLink,
       persistedQueryVersionLink,
       uriSwitchLink,

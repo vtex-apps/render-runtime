@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Apollo Link State support.
+
 ### Changed
 - Loading svg is loaded by Icon Pack. 
 - Change position of the building indicator when it is hovered.
