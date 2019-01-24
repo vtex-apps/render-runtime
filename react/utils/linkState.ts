@@ -14,18 +14,20 @@ import {
 
 type LinkStateDeclaration = {
   initialState: any
-  reducers: any
+  resolvers: any
 }
 
 const mergeReducer = (
   acc: LinkStateDeclaration,
-  { initialState, reducers }: LinkStateDeclaration
+  { initialState, resolvers }: LinkStateDeclaration
 ) => ({
   initialState: { ...acc.initialState, ...initialState },
-  reducers: { ...acc.reducers, ...reducers },
+  resolvers: { Mutation: { ...acc.resolvers.Mutation, ...resolvers.Mutation }},
 })
 
 const GLOBAL_MAP = window.__RENDER_8_COMPONENTS__
+
+const peak = msg => i => {console.log(msg, ' =>>', i); return i}
 
 export const getGlobalLinkState = () =>
   pipe(
@@ -33,5 +35,8 @@ export const getGlobalLinkState = () =>
       filter(endsWith('LinkState')),
       uniqBy(id => head(split('@', id))),
       map(flip(prop)(GLOBAL_MAP)),
-      reduce(mergeReducer, {initialState: {}, reducers: {}}),
+      peak('Depois do filter'),
+      reduce(mergeReducer, {initialState: {}, resolvers: { Mutation: {} }}),
+      peak('Depois do reduce'),
+
   )(GLOBAL_MAP)
