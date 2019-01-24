@@ -34,5 +34,4 @@ export const getGlobalLinkState = () =>
       uniqBy(id => head(split('@', id))),
       map(flip(prop)(GLOBAL_MAP)),
       reduce(mergeReducer, {initialState: {}, resolvers: { Mutation: {} }}),
-
   )(GLOBAL_MAP)
