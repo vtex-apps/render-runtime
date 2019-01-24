@@ -88,7 +88,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
 
     const cacheLink = cacheControl ? [cachingLink(cacheControl)] : []
 
-    const { initialState = {}, resolvers = {}} = getGlobalLinkState()
+    const {initialState = {}, resolvers = {}} = getGlobalLinkState()
 
     const stateLink = createStateLink(initialState, resolvers, cache)
 
