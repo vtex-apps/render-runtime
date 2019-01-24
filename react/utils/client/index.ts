@@ -88,9 +88,9 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
 
     const cacheLink = cacheControl ? [cachingLink(cacheControl)] : []
 
-    const { initialState = {}, reducers = {}} = getGlobalLinkState()
+    const { initialState = {}, resolvers = {}} = getGlobalLinkState()
 
-    const stateLink = createStateLink(initialState, reducers, cache)
+    const stateLink = createStateLink(initialState, resolvers, cache)
 
     const link = ApolloLink.from([
       omitTypenameLink,
