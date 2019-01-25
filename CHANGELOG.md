@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.1.0] - 2019-01-25
+### Added
+- Apollo Link State support.
+- 
 ## [8.0.6] - 2019-1-22
 ### Changed
 - Loading svg is loaded by Icon Pack. 
