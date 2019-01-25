@@ -1,18 +1,18 @@
 import {
-  keys,
-  reduce,
-  pipe,
-  filter,
   endsWith,
-  map,
+  filter,
   flip,
-  prop,
-  uniqBy,
   head,
+  keys,
+  map,
+  pipe,
+  prop,
+  reduce,
   split,
+  uniqBy,
 } from 'ramda'
 
-type LinkStateDeclaration = {
+interface LinkStateDeclaration {
   initialState: any
   resolvers: any
 }
@@ -28,10 +28,10 @@ const mergeReducer = (
 const GLOBAL_MAP = window.__RENDER_8_COMPONENTS__
 
 export const getGlobalLinkState = () =>
-  pipe(
+  pipe<ComponentsRegistry, string[], string[], any, any, LinkStateDeclaration>(
       keys,
       filter(endsWith('LinkState')),
-      uniqBy(id => head(split('@', id))),
+      uniqBy((id: string) => head(split('@', id))),
       map(flip(prop)(GLOBAL_MAP)),
       reduce(mergeReducer, {initialState: {}, resolvers: { Mutation: {} }}),
   )(GLOBAL_MAP)
