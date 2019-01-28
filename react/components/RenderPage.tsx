@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import ExtensionPoint from './ExtensionPoint'
-import MaybeAuth from './MaybeAuth'
 import MaybeContext from './MaybeContext'
 import { RenderContext } from './RenderContext'
 
