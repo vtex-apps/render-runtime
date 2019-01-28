@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import ExtensionPoint from './ExtensionPoint'
-import MaybeAuth from './MaybeAuth'
 import MaybeContext from './MaybeContext'
 import { RenderContext } from './RenderContext'
 
@@ -18,21 +17,14 @@ export default class RenderPage extends PureComponent<Props> {
           const {route: {params}} = runtime
           const {page, query} = this.props
           return (
-            <MaybeAuth
-              pages={runtime.pages}
-              page={page}
-              navigate={runtime.navigate}
-              render={(parentProps: any) => (
-                <MaybeContext nestedPage={page} query={query} params={params} runtime={runtime}>
-                  <ExtensionPoint
-                    id={page}
-                    query={query}
-                    params={params}
-                    {...parentProps}>
-                  </ExtensionPoint>
-                </MaybeContext>
-              )
-            }/>
+            <MaybeContext nestedPage={page} query={query} params={params} runtime={runtime}>
+              <ExtensionPoint
+                id={page}
+                query={query}
+                params={params}
+                {...this.props}
+              />
+            </MaybeContext>
           )
         }
       }

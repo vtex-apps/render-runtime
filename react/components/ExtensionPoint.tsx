@@ -124,7 +124,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const beforeElements = (
       <Fragment>
         {before.map(beforeId => (
-          <ExtensionPoint id={beforeId} treePath={treePath} />
+          <ExtensionPoint id={beforeId} key={beforeId} treePath={treePath} />
         ))}
       </Fragment>
     )
@@ -132,7 +132,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const afterElements = (
       <Fragment>
         {after.map(afterId => (
-          <ExtensionPoint id={afterId} treePath={treePath} />
+          <ExtensionPoint id={afterId} key={afterId} treePath={treePath} />
         ))}
       </Fragment>
     )

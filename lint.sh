@@ -1,2 +1,2 @@
 #!/bin/bash
-yarn --cwd react lint
+yarn --cwd react && yarn --cwd react lint
