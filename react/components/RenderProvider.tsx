@@ -19,7 +19,7 @@ import { traverseComponent } from '../utils/components'
 import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils/dom'
 import { loadLocaleData } from '../utils/locales'
 import { createLocaleCookie } from '../utils/messages'
-import { getRouteFromPath, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
+import { getRouteFromPath, goBack as pageGoBack, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
 import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
 import { TreePathContext } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
@@ -223,6 +223,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       extensions,
       fetchComponent: this.fetchComponent,
       getSettings: this.getSettings,
+      goBack: this.goBack,
       hints,
       history,
       navigate: this.navigate,
@@ -271,6 +272,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       .reduce((acc, strings) => ({...acc, ...strings}), {})
 
     return customMessages
+  }
+
+  public goBack = () => {
+    const { history } = this.props
+    return pageGoBack(history)
   }
 
   public navigate = (options: NavigateOptions) => {
