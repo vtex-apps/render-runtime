@@ -18,7 +18,7 @@ import { getClient } from '../utils/client'
 import { traverseComponent } from '../utils/components'
 import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils/dom'
 import { loadLocaleData } from '../utils/locales'
-import { createLocaleCookie, fetchMessages, fetchMessagesForApp } from '../utils/messages'
+import { createLocaleCookie } from '../utils/messages'
 import { getRouteFromPath, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
 import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
 import { TreePathContext } from '../utils/treePath'
@@ -179,7 +179,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     emitter.addListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {
-      emitter.addListener('localesUpdated', this.onLocalesUpdated)
       emitter.addListener('extensionsUpdated', this.updateRuntime)
     }
 
@@ -204,7 +203,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     emitter.removeListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {
-      emitter.removeListener('localesUpdated', this.onLocalesUpdated)
       emitter.removeListener('extensionsUpdated', this.updateRuntime)
     }
   }
@@ -459,59 +457,25 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     const { runtime } = this.props
-    const { components, culture: { locale } } = this.state
+    const { components } = this.state
     const { apps, assets } = traverseComponent(components, component)
     const unfetchedApps = apps.filter(app => !Object.keys(window.__RENDER_8_COMPONENTS__).some(c => c.startsWith(app)))
     if (unfetchedApps.length === 0) {
       return fetchAssets(runtime, assets)
     }
 
-    const messagesPromises = Promise.all(unfetchedApps.map(app => fetchMessagesForApp(this.apolloClient, app, locale)))
     const assetsPromise = fetchAssets(runtime, assets)
     assetsPromise.then(() => {
       this.sendInfoFromIframe(true)
     })
 
-    return Promise.all([messagesPromises, assetsPromise]).then(([messages]) => {
-      this.setState({
-        messages: {
-          ...this.state.messages,
-          ...Object.assign({}, ...messages),
-        },
-      })
-    })
-  }
-
-  public onLocalesUpdated = (locales: string[]) => {
-    const { runtime: { renderMajor } } = this.props
-    const { page, production, culture: { locale } } = this.state
-
-    // Current locale is one or a subset of the updated ones
-    if (locales.indexOf(locale) !== -1 || locales.indexOf(locale.split('-')[0]) !== -1) {
-      fetchMessages(this.apolloClient, page, production, locale, renderMajor, true)
-        .then(newMessages => {
-          this.setState(prevState => ({
-            ...prevState,
-            messages: { ...prevState.messages, ...newMessages },
-          }), () => {
-            this.sendInfoFromIframe(true)
-          })
-        })
-        .catch(e => {
-          console.log('Failed to fetch new locale file.')
-          console.error(e)
-        })
-    }
+    return assetsPromise
   }
 
   public onLocaleSelected = (locale: string) => {
-    const { runtime: { renderMajor } } = this.props
-    const { page, production } = this.state
-
     if (locale !== this.state.culture.locale) {
       createLocaleCookie(locale)
       Promise.all([
-        fetchMessages(this.apolloClient, page, production, locale, renderMajor),
         loadLocaleData(locale),
       ])
         .then(([newMessages]) => {
