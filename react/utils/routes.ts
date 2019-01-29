@@ -85,14 +85,13 @@ const getRoutesParam = (routeIds: string[], pages: Pages) => {
 
 export const fetchDefaultPages = ({
   apolloClient,
-  locale,
   pages,
   routeIds,
   renderMajor,
 }: FetchDefaultPages) => {
   return apolloClient.query<{defaultPages: DefaultPagesQueryResponse}>({
     query: routePreviews,
-    variables: {locale, renderMajor, routes: getRoutesParam(routeIds, pages)}
+    variables: { renderMajor, routes: getRoutesParam(routeIds, pages)}
   }).then<ParsedDefaultPagesQueryResponse>(
     ({data: {defaultPages}, errors}: DefaultPagesQueryResult) => {
       return errors ? Promise.reject(errors) : parseDefaultPagesQueryResponse(defaultPages)
