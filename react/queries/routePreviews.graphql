@@ -1,4 +1,4 @@
-query RoutePreviews($routes: [PreviewRouteInput], $locale: String, $renderMajor: Int) {
+query RoutePreviews($routes: [PreviewRouteInput], $renderMajor: Int) {
   defaultPages: routePreviews (
     routes: $routes,
     renderMajor: $renderMajor,
