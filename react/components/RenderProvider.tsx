@@ -92,6 +92,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     extensions: PropTypes.object,
     fetchComponent: PropTypes.func,
     getSettings: PropTypes.func,
+    goBack: PropTypes.func,
     hints: PropTypes.object,
     history: PropTypes.object,
     navigate: PropTypes.func,
