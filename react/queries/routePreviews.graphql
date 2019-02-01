@@ -1,13 +1,11 @@
-query RoutePreviews($routes: [PreviewRouteInput], $renderMajor: Int) {
+query RoutePreviews($routes: [PreviewRouteInput], $locale: String, $renderMajor: Int) {
   defaultPages: routePreviews (
+    locale: $locale,
     routes: $routes,
     renderMajor: $renderMajor,
   ) {
     componentsJSON
     extensionsJSON
-    messages {
-      key
-      message
-    }
+    messagesJSON
   }
 }
