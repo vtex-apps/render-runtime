@@ -5,12 +5,10 @@ query NavigationPage (
   $path: String,
   $query: String,
   $renderMajor: Int,
-  $locale: String,
 ) {
   navigationPage(
     routeId: $routeId,
     declarer: $declarer,
-    locale: $locale,
     params: $params,
     path: $path,
     query: $query,
@@ -21,7 +19,10 @@ query NavigationPage (
     cacheHintsJSON
     componentsJSON
     extensionsJSON
-    messagesJSON
+    messages {
+      key
+      message
+    }
     pagesJSON
   }
 }
