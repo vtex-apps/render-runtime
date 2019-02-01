@@ -231,7 +231,7 @@ interface RenderComponent<P={}, S={}> {
   interface PageQueryResponse {
     componentsJSON: string
     extensionsJSON: string
-    messages: [UIMesssage]
+    messages: KeyedString[]
     pagesJSON: string
     appsSettingsJSON: string
     appsEtag: string
@@ -241,7 +241,7 @@ interface RenderComponent<P={}, S={}> {
   interface DefaultPagesQueryResponse {
     componentsJSON: string
     extensionsJSON: string
-    messages: [UIMessage]
+    messages: KeyedString[]
   }
 
   interface KeyedString {
