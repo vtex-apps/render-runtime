@@ -231,7 +231,7 @@ interface RenderComponent<P={}, S={}> {
   interface PageQueryResponse {
     componentsJSON: string
     extensionsJSON: string
-    messages: KeyedString[]
+    messagesJSON: string
     pagesJSON: string
     appsSettingsJSON: string
     appsEtag: string
@@ -241,12 +241,7 @@ interface RenderComponent<P={}, S={}> {
   interface DefaultPagesQueryResponse {
     componentsJSON: string
     extensionsJSON: string
-    messages: KeyedString[]
-  }
-
-  interface KeyedString {
-    key: string
-    message: string
+    messagesJSON: string
   }
 
   interface ParsedPageQueryResponse {
@@ -299,7 +294,7 @@ interface RenderComponent<P={}, S={}> {
     preview: boolean
     production: boolean
     publicEndpoint: string
-    messages: Locale
+    messages: Record<string, string>
     components: Components
     renderMajor: number
     query?: Record<string, string>
