@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.3.1] - 2019-02-05
+
+## [8.3.0] - 2019-02-01
+
 ## [8.2.0] - 2019-01-28
 ### Removed
 - `MaybeAuth` component.
