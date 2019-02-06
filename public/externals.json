@@ -60,10 +60,6 @@
       },
       {
         "clientOnly": true,
-        "path": "https://io.vtex.com.br/rc/rc.js"
-      },
-      {
-        "clientOnly": true,
         "path": "https://unpkg.com/vtex-render-session@1.0.1/dist/index.js"
       }
     ],
@@ -124,10 +120,6 @@
       },
       {
         "path": "https://unpkg.com/vtex-tachyons@3.0.1/tachyons.min.css"
-      },
-      {
-        "clientOnly": true,
-        "path": "https://io.vtex.com.br/rc/rc.js"
       },
       {
         "clientOnly": true,
