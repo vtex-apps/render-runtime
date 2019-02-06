@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - `goBack` method to the provided context.
 
+## [8.5.0] - 2019-02-06
+
 ## [8.4.1] - 2019-02-06
 ### Removed
 - RC external script.
