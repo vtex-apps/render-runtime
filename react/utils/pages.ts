@@ -87,7 +87,7 @@ export function getRouteFromPath(path: string, pages: Pages) : Route | null {
 }
 
 export function navigate(history: History | null, pages: Pages, options: NavigateOptions) {
-  const {page, params, query, to, scrollOptions, fallbackToWindowLocation = true} = options
+  const {page, params, query, to, scrollOptions, fallbackToWindowLocation = true, replace} = options
 
   if (!page && !to) {
     console.error(`Invalid navigation options. You should use 'page' or 'to' parameters`)
@@ -105,7 +105,8 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
 
   if (history) {
     const location = createLocationDescriptor(route, {query, scrollOptions})
-    window.setTimeout(() => history.push(location), 0)
+    const method = replace ? 'replace' : 'push'
+    window.setTimeout(() => history[method](location), 0)
     return true
   }
 
@@ -187,4 +188,5 @@ export interface NavigateOptions {
   to?: string
   scrollOptions?: RenderScrollOptions
   fallbackToWindowLocation?: boolean
+  replace?: boolean
 }
