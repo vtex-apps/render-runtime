@@ -1,0 +1,28 @@
+query NavigationPage (
+  $routeId: String,
+  $declarer: String,
+  $params: String,
+  $path: String,
+  $query: String,
+  $renderMajor: Int,
+) {
+  navigationPage(
+    routeId: $routeId,
+    declarer: $declarer,
+    params: $params,
+    path: $path,
+    query: $query,
+    renderMajor: $renderMajor
+  ) {
+    appsEtag
+    appsSettingsJSON
+    cacheHintsJSON
+    componentsJSON
+    extensionsJSON
+    messages {
+      key
+      message
+    }
+    pagesJSON
+  }
+}

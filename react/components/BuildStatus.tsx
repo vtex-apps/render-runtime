@@ -6,11 +6,12 @@ import {RenderContextProps, withRuntimeContext} from './RenderContext'
 interface State {
   animateOut: boolean
   status: string | null
+  anchor: 'left' | 'right'
 }
 
 const buildStatusLoading = (
   <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-    <circle cx="50" opacity="0.4" cy="50" fill="none" stroke="#F71963" strokeWidth="14" r="40"></circle>
+    <circle cx="50" opacity="0.2" cy="50" fill="none" stroke="#F71963" strokeWidth="14" r="40"></circle>
     <circle cx="50" cy="50" fill="none" stroke="#F71963" strokeWidth="12" r="40" strokeDasharray="60 900" strokeLinecap="round" transform="rotate(96 50 50)">
       <animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50" keyTimes="0;1" dur="0.7s" begin="0s" repeatCount="indefinite"></animateTransform>
     </circle>
@@ -27,6 +28,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
     this.state = {
       animateOut: false,
       status: null,
+      anchor: 'left',
     }
   }
 
@@ -38,6 +40,16 @@ class BuildStatus extends Component<RenderContextProps, State> {
   public hideWithDelay = (delayMillis: number) => {
     this.animateOutHandle = window.setTimeout(() => this.setState({ animateOut: true }), delayMillis)
     this.hideHandle = window.setTimeout(() => this.setState({ status: null, animateOut: false }), delayMillis + 300)
+  }
+
+  private toggleAnchor = () => {
+    this.setState(state => ({
+      anchor: state.anchor === 'left' ? 'right' : 'left'
+    }))
+  }
+
+  private handleMouseOver = () => {
+    this.toggleAnchor()
   }
 
   public updateStatus = (status: string) => {
@@ -75,7 +87,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
   }
 
   public render() {
-    const {status, animateOut} = this.state
+    const {status, animateOut, anchor} = this.state
 
     if (status === null) {
       return null
@@ -94,7 +106,10 @@ class BuildStatus extends Component<RenderContextProps, State> {
     )
 
     return (
-      <div className={className} style={{ top: '12px', left: '12px', animationDuration: '0.2s'}}>
+      <div
+        className={className}
+        style={{ top: '12px', [anchor]: '12px', animationDuration: '0.2s', opacity: 0.8 }}
+        onMouseOver={this.toggleAnchor}>
         {status === 'fail'
           ? fail
           : status === 'reload'

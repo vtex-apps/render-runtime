@@ -7,11 +7,7 @@ interface State {
   error: any
 }
 
-export interface SessionProps {
-  loading?: ReactElement<any>
-}
-
-class Session extends Component<SessionProps & RenderContextProps, State> {
+class Session extends Component<RenderContextProps, State> {
   public state = {ensured: false, error: null}
 
   public componentDidMount() {
@@ -23,7 +19,7 @@ class Session extends Component<SessionProps & RenderContextProps, State> {
   }
 
   public render() {
-    const {children, loading} = this.props
+    const {children} = this.props
     const {ensured, error} = this.state
 
     if (ensured) {
@@ -43,7 +39,7 @@ class Session extends Component<SessionProps & RenderContextProps, State> {
       )
     }
 
-    return loading || <Loading />
+    return <Loading />
   }
 
   private onUpdate() {
@@ -64,4 +60,4 @@ class Session extends Component<SessionProps & RenderContextProps, State> {
   }
 }
 
-export default withRuntimeContext(Session)
+export default withRuntimeContext<{}>(Session)

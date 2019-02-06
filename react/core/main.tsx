@@ -1,8 +1,17 @@
-import { canUseDOM } from 'exenv'
+import 'apollo-cache-inmemory'
+import 'apollo-client'
+import 'apollo-link-http'
+import 'apollo-link-persisted-queries'
+import 'apollo-upload-client'
+import 'apollo-utilities'
+import 'classnames'
+import {canUseDOM} from 'exenv'
+import 'graphql'
 import createHistory from 'history/createBrowserHistory'
-import React, { ReactElement } from 'react'
-import { hydrate, render as renderDOM } from 'react-dom'
-import { Helmet } from 'react-helmet'
+import React, {ReactElement} from 'react'
+import {getDataFromTree} from 'react-apollo'
+import {hydrate, render as renderDOM} from 'react-dom'
+import {Helmet} from 'react-helmet'
 import NoSSR from 'react-no-ssr'
 import Loading from '../components/Loading'
 
@@ -11,7 +20,7 @@ import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
 import Link from '../components/Link'
-import { RenderContext, withRuntimeContext } from '../components/RenderContext'
+import { RenderContext, useRuntime, withRuntimeContext  } from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
@@ -36,12 +45,10 @@ if (window.IntlPolyfill) {
 }
 
 function renderToStringWithData(component: ReactElement<any>): Promise<ServerRendered> {
-  window.__APOLLO_SSR__ = true
   const startGetDataFromTree = window.hrtime()
-  return require('react-apollo').getDataFromTree(component).then(() => {
+  return getDataFromTree(component).then(() => {
     const endGetDataFromTree = window.hrtime(startGetDataFromTree)
 
-    window.__APOLLO_SSR__ = false
     const startRenderToString = window.hrtime()
     const markup = require('react-dom/server').renderToString(component)
     const endRenderToString = window.hrtime(startRenderToString)
@@ -75,7 +82,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   )
 
   return canUseDOM
-    ? (disableSSR || created ? renderDOM(root, elem) : hydrate(root, elem)) as Element
+    ? (disableSSR || created ? renderDOM<HTMLDivElement>(root, elem) : hydrate(root, elem)) as Element
     : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
       markups: getMarkups(name, markup),
       maxAge: cacheControl!.maxAge,
@@ -169,6 +176,7 @@ export {
   start,
   withHMR,
   withRuntimeContext,
+  useRuntime,
   withSession,
   Loading,
   buildCacheLocator

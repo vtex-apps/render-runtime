@@ -35,10 +35,24 @@ declare global {
 
   type ClientRendered = Element
 
+  interface Preview {
+    type: 'block' | 'text' | 'circle'
+    width: number
+    height: number
+  }
+
   interface Extension {
+    after?: string[]
+    around?: string[]
+    before?: string[]
+    context?: {
+      component: string
+      props?: any
+    }
     component: string
     props?: any
     shouldRender?: boolean
+    preview?: Preview
   }
 
   interface Extensions {
@@ -161,7 +175,7 @@ declare global {
     apolloClient: ApolloClient<NormalizedCacheObject>,
     locale: string,
     page: string,
-    params?: string,
+    paramsJSON?: string,
     path?: string,
     production: boolean,
     renderMajor: number,
@@ -170,13 +184,26 @@ declare global {
   interface FetchDefaultPages {
     apolloClient: ApolloClient<NormalizedCacheObject>,
     locale: string,
-    routeIds: string[]
+    pages: Pages,
+    routeIds: string[],
+    renderMajor: number,
+  }
+
+  interface FetchNavigationDataInput {
+    apolloClient: ApolloClient<NormalizedCacheObject>
+    production: boolean
+    locale: string
+    routeId: string
+    declarer?: string
+    paramsJSON?: string
+    path?: string
+    renderMajor: number
   }
 
 interface RenderComponent<P={}, S={}> {
-  new(): Component<P,S>
   getCustomMessages?: (locale: string) => any
   WrappedComponent?: RenderComponent
+  new(): Component<P,S>
 }
 
   interface ComponentsRegistry {
@@ -187,18 +214,14 @@ interface RenderComponent<P={}, S={}> {
     [appId: string]: EventEmitter
   }
 
-  interface PageQueryResult {
-    data: PageQueryResultData,
-    errors?: any,
+  interface GraphQLResult<T extends string, U> {
+    data: Record<T, U>
+    errors?: any
   }
 
   interface DefaultPagesQueryResult {
     data: DefaultPagesQueryResultData,
     errors?: any,
-  }
-
-  interface PageQueryResultData {
-    page: PageQueryResponse,
   }
 
   interface DefaultPagesQueryResultData {
@@ -208,7 +231,7 @@ interface RenderComponent<P={}, S={}> {
   interface PageQueryResponse {
     componentsJSON: string
     extensionsJSON: string
-    messagesJSON: string
+    messages: KeyedString[]
     pagesJSON: string
     appsSettingsJSON: string
     appsEtag: string
@@ -218,7 +241,12 @@ interface RenderComponent<P={}, S={}> {
   interface DefaultPagesQueryResponse {
     componentsJSON: string
     extensionsJSON: string
-    messagesJSON: string
+    messages: KeyedString[]
+  }
+
+  interface KeyedString {
+    key: string
+    message: string
   }
 
   interface ParsedPageQueryResponse {
@@ -271,7 +299,7 @@ interface RenderComponent<P={}, S={}> {
     preview: boolean
     production: boolean
     publicEndpoint: string
-    messages: Record<string, string>
+    messages: Locale
     components: Components
     renderMajor: number
     query?: Record<string, string>
@@ -299,8 +327,6 @@ interface RenderComponent<P={}, S={}> {
   }
 
   interface RuntimeExports {
-    start(): void
-    render(name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered
     ExtensionContainer: typeof ExtensionContainer
     ExtensionPoint: typeof ExtensionPoint
     Link: typeof Link
@@ -316,6 +342,9 @@ interface RenderComponent<P={}, S={}> {
     RenderContextConsumer: React.Consumer<RenderContext>
     TreePathContextConsumer: React.Consumer<TreePathProps>
     buildCacheLocator: any
+    useRuntime(): RenderContext
+    start(): void
+    render(name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered
   }
 
   interface RenderSession {
@@ -324,12 +353,11 @@ interface RenderComponent<P={}, S={}> {
   }
 
   interface Window extends Window {
-    __APOLLO_SSR__: boolean
     __ERROR__: any
-    __RENDER_7_SESSION__: RenderSession
-    __RENDER_7_RUNTIME__: RuntimeExports
-    __RENDER_7_COMPONENTS__: ComponentsRegistry
-    __RENDER_7_HOT__: HotEmitterRegistry
+    __RENDER_8_SESSION__: RenderSession
+    __RENDER_8_RUNTIME__: RuntimeExports
+    __RENDER_8_COMPONENTS__: ComponentsRegistry
+    __RENDER_8_HOT__: HotEmitterRegistry
     __RUNTIME__: RenderRuntime
     __hostname__: string
     __pathname__: string

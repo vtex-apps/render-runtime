@@ -1,8 +1,5 @@
-
 import React, {PureComponent} from 'react'
-
 import ExtensionPointComponent from '../components/ExtensionPointComponent'
-
 import { RenderContextProps } from './RenderContext'
 
 interface Props {
@@ -14,17 +11,18 @@ interface Props {
 export default class MaybeContext extends PureComponent<Props & RenderContextProps> {
   public render() {
     const {children, runtime, nestedPage, query, params} = this.props
-    const context = runtime.extensions[`${nestedPage}/__context`]
+    const {context} = runtime.extensions[nestedPage]
+    const contextComponent = context && context.component
 
-    const props = context && {
+    const props = contextComponent && {
       nextTreePath: nestedPage,
       params,
       query,
-      ...context.props,
+      ...context!.props
     }
 
-    return context
-      ? <ExtensionPointComponent component={context.component} props={props} runtime={runtime} treePath={nestedPage}>{children}</ExtensionPointComponent>
+    return contextComponent
+      ? <ExtensionPointComponent component={contextComponent} props={props} runtime={runtime} treePath={nestedPage}>{children}</ExtensionPointComponent>
       : children
   }
 }

@@ -7,13 +7,64 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [7.38.9] - 2019-01-24
-### Fixed
-- Bumping version to fix vivavinho account
+## [8.6.0] - 2019-02-06
+### Added
+- `goBack` method to the provided context.
 
-## [7.38.8] - 2019-01-21
+## [8.5.0] - 2019-02-06
+
+## [8.4.1] - 2019-02-06
+### Removed
+- RC external script.
+
+## [8.4.0] - 2019-02-06
+### Added
+- Add support to React Hooks
+- Create hook `useRuntime`.
+
+## [8.3.2] - 2019-02-06
+### Fixed
+- Props `query` and `params` not being passed to `before` and `after` blocks.
+
+## [8.3.1] - 2019-02-05
+
+## [8.3.0] - 2019-02-01
+
+## [8.2.0] - 2019-01-28
+### Removed
+- `MaybeAuth` component.
+
+## [8.1.0] - 2019-01-25
+### Added
+- Apollo Link State support.
+
+## [8.0.6] - 2019-1-22
+### Changed
+- Loading svg is loaded by Icon Pack. 
+- Change position of the building indicator when it is hovered.
+
+## [8.0.5] - 2019-1-21
+
+## [8.0.4] - 2019-01-21
 ### Fixed
 - Add the `crossOrigin` attribute **only to img tags with src from vteximg**.
+
+## [8.0.3] - 2019-1-18
+### Changed
+- Get context as extension property instead of `__context`.
+- Add wrappers when loading preview
+
+## [8.0.2] - 2019-01-18
+### Changed
+- Now, import from `render` is `vtex.render-runtime`.
+
+## [8.0.1] - 2019-1-17
+
+## [8.0.0] - 2019-1-16
+### Changed
+- Adapt to use new blocks language to build pages.
+- Remove support to legacy extensions.
+- Remove support for old pages protocol.
 
 ## [7.38.7] - 2018-12-26
 ### Fixed

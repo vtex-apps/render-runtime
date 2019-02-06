@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import ReactDOM from 'react-dom'
 
 import { getImplementation } from '../utils/assets'
 import { TreePathContext, TreePathProps, withTreePath } from '../utils/treePath'
 
-import { Loading } from '../core/main'
 import ExtensionPointComponent from './ExtensionPointComponent'
+import Loading from './Loading'
 import { RenderContext } from './RenderContext'
 
 interface Props {
@@ -81,8 +81,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const { newTreePath } = this.state
     const { children, params, query, id, treePath, ...parentProps } = this.props
     const extension = runtime.extensions && runtime.extensions[newTreePath]
-    const component = extension ? extension.component : null
-    const extensionProps = extension ? extension.props : null
+    const { component = null, after = [], around = [], before = [], props: extensionProps = null } = extension || {}
 
     this.component = component
 
@@ -95,14 +94,74 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
     let loading = null
     if (runtime.preview) {
-      loading = <Loading />
+      loading = this.withOuterExtensions(
+        after,
+        around,
+        before,
+        newTreePath,
+        props,
+        <Loading />,
+      )
     }
 
     return component
-      ? <TreePathContext.Provider value={{ treePath: newTreePath }}>
-        <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
-      </TreePathContext.Provider>
+      ? this.withOuterExtensions(
+          after,
+          around,
+          before,
+          newTreePath,
+          props,
+          (
+            <TreePathContext.Provider value={{ treePath: newTreePath }}>
+              <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
+            </TreePathContext.Provider>
+          )
+        )
       : loading
+  }
+
+  private withOuterExtensions(after: string[], around: string[], before: string[], treePath: string, props: any, element: JSX.Element) {
+    const beforeElements = (
+      <Fragment>
+        {before.map(beforeId => (
+          <ExtensionPoint
+            id={beforeId}
+            key={beforeId}
+            treePath={treePath}
+            params={props.params}
+            query={props.query}
+          />
+        ))}
+      </Fragment>
+    )
+
+    const afterElements = (
+      <Fragment>
+        {after.map(afterId => (
+          <ExtensionPoint
+            id={afterId}
+            key={afterId}
+            treePath={treePath}
+            params={props.params}
+            query={props.query}
+          />
+        ))}
+      </Fragment>
+    )
+
+    const wrapped = (
+      <Fragment>
+        {beforeElements}
+        {element}
+        {afterElements}
+      </Fragment>
+    )
+
+    return around.reduce((acc, aroundId) => (
+      <ExtensionPoint id={aroundId} treePath={treePath} {...props}>
+        {acc}
+      </ExtensionPoint>
+    ), wrapped)
   }
 
   private addDataToElementIfEditable = () => {

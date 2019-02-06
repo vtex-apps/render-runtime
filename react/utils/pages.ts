@@ -72,16 +72,8 @@ function getParams(template: string, target: string) {
 }
 
 function getPagePath(name: string, pages: Pages) {
-  const [rootName] = name.split('/')
-  const {path: rootPath, cname} = pages[rootName]
-  const {path: pagePath} = pages[name]
-
-  if (cname && isHost(cname)) {
-    const rootStart = rootPath.endsWith('/') ? rootPath.length - 1 : rootPath.length
-    return pagePath && pagePath.substr(rootStart)
-  }
-
-  return pagePath
+  const {path: pagePath, cname} = pages[name]
+  return cname && isHost(cname) ? '/' : pagePath
 }
 
 function getRouteFromPageName(id: string, pages: Pages, params: any) : Route | null {
@@ -122,6 +114,16 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
     return true
   }
 
+  return false
+}
+
+export function goBack(history: History | null) {
+  if (history) {
+    window.setTimeout(() => history.goBack(), 0)
+    return true
+  }
+
+  console.warn('Unable to go to previous page')
   return false
 }
 

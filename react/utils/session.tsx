@@ -1,8 +1,9 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { ComponentType } from 'react'
-import Session, { SessionProps } from '../components/Session'
 
-export const withSession = (options: SessionProps) => {
+import Session from '../components/Session'
+
+export const withSession = () => {
   // tslint:disable-next-line:only-arrow-functions
   return function <TOriginalProps>(Component: ComponentType<TOriginalProps>): ComponentType<TOriginalProps> {
     class WithSession extends React.Component<TOriginalProps> {
@@ -16,7 +17,7 @@ export const withSession = (options: SessionProps) => {
 
       public render() {
         return (
-          <Session {...options}>
+          <Session>
             <Component {...this.props} />
           </Session>
         )
