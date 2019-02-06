@@ -36,9 +36,6 @@
         "path": "https://unpkg.com/animate.css@3.7.0/animate.css"
       },
       {
-        "path": "https://unpkg.com/vtex-tachyons@2.10.0/tachyons.css"
-      },
-      {
         "clientOnly": true,
         "path": "https://io.vtex.com.br/rc/rc.js"
       },
@@ -81,9 +78,6 @@
       },
       {
         "path": "https://unpkg.com/animate.css@3.7.0/animate.min.css"
-      },
-      {
-        "path": "https://unpkg.com/vtex-tachyons@2.10.0/tachyons.min.css"
       },
       {
         "clientOnly": true,
