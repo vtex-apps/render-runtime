@@ -82,7 +82,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   )
 
   return canUseDOM
-    ? (disableSSR || created ? renderDOM(root, elem) : hydrate(root, elem)) as Element
+    ? (disableSSR || created ? renderDOM<HTMLDivElement>(root, elem) : hydrate(root, elem)) as Element
     : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
       markups: getMarkups(name, markup),
       maxAge: cacheControl!.maxAge,
