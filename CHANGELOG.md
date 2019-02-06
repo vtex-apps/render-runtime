@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.3.2] - 2019-02-06
+### Fixed
+- Props `query` and `params` not being passed to `before` and `after` blocks.
+
 ## [8.3.1] - 2019-02-05
 
 ## [8.3.0] - 2019-02-01
