@@ -117,6 +117,16 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
   return false
 }
 
+export function goBack(history: History | null) {
+  if (history) {
+    window.setTimeout(() => history.goBack(), 0)
+    return true
+  }
+
+  console.warn('Unable to go to previous page')
+  return false
+}
+
 export function scrollTo(options: RelativeScrollToOptions) {
   const { baseElementId = null } = options || {}
   const scrollAnchor = baseElementId && document.querySelector(`#${baseElementId}`)
