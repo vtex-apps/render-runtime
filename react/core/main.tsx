@@ -20,7 +20,7 @@ import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
 import Link from '../components/Link'
-import { RenderContext, withRuntimeContext } from '../components/RenderContext'
+import { RenderContext, useRuntime, withRuntimeContext  } from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
@@ -176,6 +176,7 @@ export {
   start,
   withHMR,
   withRuntimeContext,
+  useRuntime,
   withSession,
   Loading,
   buildCacheLocator
