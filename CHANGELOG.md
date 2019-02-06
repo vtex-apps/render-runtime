@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.4.0] - 2019-02-06
+### Added
+- Add support to React Hooks
+- Create hook `useRuntime`.
+
 ## [8.3.2] - 2019-02-06
 ### Fixed
 - Props `query` and `params` not being passed to `before` and `after` blocks.

@@ -20,7 +20,7 @@ import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
 import Link from '../components/Link'
-import { RenderContext, withRuntimeContext } from '../components/RenderContext'
+import { RenderContext, useRuntime, withRuntimeContext  } from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
@@ -82,7 +82,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   )
 
   return canUseDOM
-    ? (disableSSR || created ? renderDOM(root, elem) : hydrate(root, elem)) as Element
+    ? (disableSSR || created ? renderDOM<HTMLDivElement>(root, elem) : hydrate(root, elem)) as Element
     : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
       markups: getMarkups(name, markup),
       maxAge: cacheControl!.maxAge,
@@ -176,6 +176,7 @@ export {
   start,
   withHMR,
   withRuntimeContext,
+  useRuntime,
   withSession,
   Loading,
   buildCacheLocator

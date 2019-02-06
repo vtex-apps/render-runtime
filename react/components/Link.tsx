@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
-import React, {Component, MouseEvent} from 'react'
+import React, {Component, MouseEvent, useCallback} from 'react'
 import {NavigateOptions, pathFromPageName} from '../utils/pages'
-import {RenderContextProps, withRuntimeContext} from './RenderContext'
+import {RenderContextProps, useRuntime} from './RenderContext'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) => event.button === 0
 
@@ -16,43 +16,43 @@ interface Props extends NavigateOptions {
   onClick: (event: any) => void
 }
 
-// eslint-disable-next-line
-class Link extends Component<Props & RenderContextProps> {
-  public static defaultProps = {
-    onClick: () => { return },
-  }
+const Link: React.FunctionComponent<Props> = ({ page, onClick, params, to, scrollOptions, query, ...linkProps }) => {
+  const {pages, navigate} = useRuntime()
 
-  public static propTypes = {
-    onClick: PropTypes.func,
-    page: PropTypes.string,
-    params: PropTypes.object,
-    query: PropTypes.string,
-    to: PropTypes.string,
-  }
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>) => {
+      if (
+        isModifiedEvent(event) ||
+        !isLeftClickEvent(event) ||
+        (to && isAbsoluteUrl(to))
+      ) {
+        return
+      }
 
-  public handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    const {page, params, query, to, scrollOptions, runtime: {navigate}} = this.props
-    if (
-      isModifiedEvent(event) ||
-      !isLeftClickEvent(event) ||
-      (to && isAbsoluteUrl(to))
-    ) {
-      return
-    }
+      onClick(event)
 
-    this.props.onClick(event)
+      const options: NavigateOptions = {page, params, query, to, scrollOptions, fallbackToWindowLocation: false}
+      if (navigate(options)) {
+        event.preventDefault()
+      }
+    },
+    [page, params, query, to, scrollOptions, navigate]
+  )
 
-    const options: NavigateOptions = {page, params, query, to, scrollOptions, fallbackToWindowLocation: false}
-    if (navigate(options)) {
-      event.preventDefault()
-    }
-  }
-
-  public render() {
-    const {page, params, to, scrollOptions, query, runtime: {pages}, ...linkProps} = this.props
-    const href = to || page && pathFromPageName(page, pages, params) || '#'
-    return <a href={href} {...linkProps} onClick={this.handleClick} />
-  }
+  const href = to || page && pathFromPageName(page, pages, params) || '#'
+  return <a href={href} {...linkProps} onClick={handleClick} />
 }
 
-export default withRuntimeContext<Props>(Link)
+Link.defaultProps = {
+  onClick: () => { return },
+}
+
+Link.propTypes = {
+  onClick: PropTypes.func,
+  page: PropTypes.string,
+  params: PropTypes.object,
+  query: PropTypes.string,
+  to: PropTypes.string,
+}
+
+export default Link

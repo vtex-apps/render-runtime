@@ -201,9 +201,9 @@ declare global {
   }
 
 interface RenderComponent<P={}, S={}> {
-  new(): Component<P,S>
   getCustomMessages?: (locale: string) => any
   WrappedComponent?: RenderComponent
+  new(): Component<P,S>
 }
 
   interface ComponentsRegistry {
@@ -327,8 +327,6 @@ interface RenderComponent<P={}, S={}> {
   }
 
   interface RuntimeExports {
-    start(): void
-    render(name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered
     ExtensionContainer: typeof ExtensionContainer
     ExtensionPoint: typeof ExtensionPoint
     Link: typeof Link
@@ -344,6 +342,9 @@ interface RenderComponent<P={}, S={}> {
     RenderContextConsumer: React.Consumer<RenderContext>
     TreePathContextConsumer: React.Consumer<TreePathProps>
     buildCacheLocator: any
+    useRuntime(): RenderContext
+    start(): void
+    render(name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered
   }
 
   interface RenderSession {
