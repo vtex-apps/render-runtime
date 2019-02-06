@@ -339,10 +339,10 @@ interface RenderComponent<P={}, S={}> {
     withHMR: any
     withRuntimeContext: any
     withSession: any
-    useRuntime: any
     RenderContextConsumer: React.Consumer<RenderContext>
     TreePathContextConsumer: React.Consumer<TreePathProps>
     buildCacheLocator: any
+    useRuntime(): RenderRuntime
     start(): void
     render(name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered
   }
