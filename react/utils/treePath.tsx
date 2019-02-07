@@ -1,6 +1,5 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
-import PropTypes from 'prop-types'
-import React, {ComponentType} from 'react'
+import React, {ComponentType, useContext} from 'react'
 
 const relative = (parent: string, id: string) => id.replace(`${parent}/`, '')
 
@@ -30,6 +29,11 @@ export const getDirectChildren = (extensions: Extensions, treePath: string) => {
 }
 
 export const TreePathContext = React.createContext<TreePathProps>({treePath: ''})
+
+
+export const useTreePath = () => {
+  return useContext(TreePathContext)
+}
 
 export interface TreePathProps {
   treePath: string
