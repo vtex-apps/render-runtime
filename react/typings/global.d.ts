@@ -41,10 +41,17 @@ declare global {
     height: number
   }
 
+  interface BlockInsertion {
+    extensionPointId: string
+    blockId: string
+  }
+
   interface Extension {
     after?: string[]
     around?: string[]
     before?: string[]
+    blockId?: string
+    blocks?: BlockInsertion[]
     context?: {
       component: string
       props?: any

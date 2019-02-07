@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.6.2] - 2019-2-7
+### Changed
+- `LayoutContainer` now gets elements to be rendered from `blocks` directly.
+
 ## [8.6.1] - 2019-02-06
 ### Added
 - `replace` option to use `history`'s replace instead of `push`.
@@ -44,7 +48,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [8.0.6] - 2019-1-22
 ### Changed
-- Loading svg is loaded by Icon Pack. 
+- Loading svg is loaded by Icon Pack.
 - Change position of the building indicator when it is hovered.
 
 ## [8.0.5] - 2019-1-21

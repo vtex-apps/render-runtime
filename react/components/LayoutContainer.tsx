@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import {RenderContextProps, withRuntimeContext} from './RenderContext'
-
+import { useTreePath } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
+import { useRuntime } from './RenderContext'
 
 type Element = string | ElementArray
 interface ElementArray extends Array<Element> {}
@@ -66,16 +66,15 @@ class Container extends Component<ContainerProps> {
 }
 
 // tslint:disable-next-line
-class LayoutContainer extends Component<LayoutContainerProps & RenderContextProps> {
-  public static propTypes = {
-    aboveTheFold: PropTypes.number,
-    elements: elementPropType,
-  }
+const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = (props) => {
+  const {extensions, preview} = useRuntime()
+  const {treePath} = useTreePath()
 
-  public render() {
-    const {runtime: {preview}} = this.props
-    return <Container {...this.props} preview={preview} isRow={false} />
-  }
+  const extension = extensions[treePath]
+  const elements = extension && extension.blocks && extension.blocks.map(insertion => insertion.extensionPointId) || []
+  const containerProps = {...props, elements}
+
+  return <Container {...containerProps} preview={preview} isRow={false} />
 }
 
-export default withRuntimeContext(LayoutContainer)
+export default LayoutContainer
