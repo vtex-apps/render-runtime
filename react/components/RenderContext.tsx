@@ -17,6 +17,7 @@ export const useRuntime = () => {
 
 export const withRuntimeContext = <TOriginalProps extends {} = {}>(Component: ComponentType<TOriginalProps & RenderContextProps>): ComponentType<TOriginalProps> => {
   const ExtendedComponent = (props: TOriginalProps) => <RenderContext.Consumer>{runtime => <Component {...props} runtime={runtime} />}</RenderContext.Consumer>
+  ExtendedComponent.displayName = `ExtendedComponent(${Component.displayName || Component.name || 'Component'})`
   return hoistNonReactStatics<TOriginalProps, RenderContextProps>(ExtendedComponent, Component)
 }
 
