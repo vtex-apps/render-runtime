@@ -36,3 +36,8 @@ export function optimizeStyleForVtexImg (vtexImgHost: string, style?: any) {
     return style
   }
 }
+
+export function isStyleWritable(props: any): boolean {
+  const propertyDescriptor = Object.getOwnPropertyDescriptor(props, 'style')
+  return (propertyDescriptor && propertyDescriptor.writable) || false
+}
