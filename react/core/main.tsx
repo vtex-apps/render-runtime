@@ -23,7 +23,7 @@ import { getBaseURI } from '../utils/host'
 import { addLocaleData } from '../utils/locales'
 import { withSession } from '../utils/session'
 import { TreePathContext } from '../utils/treePath'
-import { optimizeSrcForVtexImg, optimizeStyleForVtexImg } from '../utils/vteximg'
+import { optimizeSrcForVtexImg, optimizeStyleForVtexImg, isStyleWritable } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
 
 if (window.IntlPolyfill) {
@@ -120,7 +120,7 @@ function start() {
           props.crossOrigin = props.crossOrigin || 'anonymous'
         }
       }
-      if (props && props.style) {
+      if (props && props.style && isStyleWritable(props)) {
         props.style = optimizeStyleForVtexImg(vtexImgHost, props.style)
       }
       return ReactCreateElement.apply<typeof React, any, any>(React, arguments)
