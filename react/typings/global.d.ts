@@ -146,7 +146,8 @@ declare global {
     updateExtension: (name: string, extension: Extension) => void,
     updateRuntime: (options?: PageContextOptions) => Subscription,
     workspace: RenderRuntime['workspace'],
-    route: RenderRuntime['route']
+    route: RenderRuntime['route'],
+    query: RenderRuntime['query'],
     defaultExtensions: RenderRuntime['defaultExtensions']
   }
 
