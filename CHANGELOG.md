@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.6.3] - 2019-02-13
+
+### Fixed
+- Check if `props.style` is `writable` before assigning 
+
 ## [8.6.2] - 2019-2-7
 ### Changed
 - `LayoutContainer` now gets elements to be rendered from `blocks` directly.
