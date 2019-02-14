@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.38.10] - 2019-02-13
+
+### Fixed
+- Check if `props.style` is `writable` before assigning 
+
 ## [7.38.9] - 2019-01-24
 
 ## [7.38.8] - 2019-01-21
