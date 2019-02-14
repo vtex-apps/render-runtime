@@ -21,13 +21,18 @@ const sendEvent = (id: string, event: string) => {
 
 class TrackEventsWrapper extends PureComponent<Props> {
 
+  public eventsHandler: Record<string, () => void> = {}
+
   public componentDidMount(){
     const { id, events } = this.props
     if(events && events.length && id){
       const element = ReactDOM.findDOMNode(this)
       if(element && element.addEventListener){
         forEach(
-          event => element.addEventListener(event, () => sendEvent(id, event))
+          event => {
+            this.eventsHandler[event] = () => sendEvent(id, event)
+            element.addEventListener(event, this.eventsHandler[event])
+          }
         , events)
       }
     }
@@ -39,7 +44,7 @@ class TrackEventsWrapper extends PureComponent<Props> {
       const element = ReactDOM.findDOMNode(this)
       if(element && element.addEventListener){
         forEach(
-          event => element.removeEventListener(event, () => sendEvent(id, event))
+          event => element.removeEventListener(event, this.eventsHandler[event])
         , events)
       }
     }
