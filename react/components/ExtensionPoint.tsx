@@ -8,6 +8,7 @@ import { TreePathContext, TreePathProps, withTreePath } from '../utils/treePath'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import Loading from './Loading'
 import { RenderContext } from './RenderContext'
+import TrackEventsWrapper from './TrackEventsWrapper'
 
 interface Props {
   id: string,
@@ -81,7 +82,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const { newTreePath } = this.state
     const { children, params, query, id, treePath, ...parentProps } = this.props
     const extension = runtime.extensions && runtime.extensions[newTreePath]
-    const { component = null, after = [], around = [], before = [], content = {}, props: extensionProps = null } = extension || {}
+    const { component = null, after = [], around = [], before = [], content = {}, props: extensionProps = null, track = [] } = extension || {}
 
     this.component = component
 
@@ -113,9 +114,13 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
           newTreePath,
           props,
           (
-            <TreePathContext.Provider value={{ treePath: newTreePath }}>
-              <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
-            </TreePathContext.Provider>
+            <TrackEventsWrapper
+              events={track}
+              id={id}>
+              <TreePathContext.Provider value={{ treePath: newTreePath }}>
+                <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
+              </TreePathContext.Provider>
+            </TrackEventsWrapper>
           )
         )
       : loading

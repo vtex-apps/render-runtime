@@ -57,6 +57,7 @@ declare global {
       props?: any
     }
     component: string
+    track?: string[]
     props?: any
     content?: Record<string, any>
     shouldRender?: boolean
@@ -403,5 +404,10 @@ interface RenderComponent<P={}, S={}> {
     hrtime: NodeJS.Process['hrtime']
     myvtexSSE: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
+    vtex: {
+      NavigationCapture: {
+        sendEvent: (name: string, data: any) => void
+      }
+    }
   }
 }
