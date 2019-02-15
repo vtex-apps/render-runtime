@@ -5,6 +5,7 @@ import 'apollo-link-persisted-queries'
 import 'apollo-upload-client'
 import 'apollo-utilities'
 import 'classnames'
+import * as EventEmitter from 'eventemitter3'
 import {canUseDOM} from 'exenv'
 import 'graphql'
 import createHistory from 'history/createBrowserHistory'
@@ -35,12 +36,26 @@ import { TreePathContext } from '../utils/treePath'
 import { optimizeSrcForVtexImg, optimizeStyleForVtexImg, isStyleWritable } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
 
+let emitter: EventEmitter | null = null
+
 if (window.IntlPolyfill) {
   if (!window.Intl) {
     window.Intl = window.IntlPolyfill
   } else if (!canUseDOM) {
     window.Intl.NumberFormat = window.IntlPolyfill.NumberFormat
     window.Intl.DateTimeFormat = window.IntlPolyfill.DateTimeFormat
+  }
+}
+
+const renderExtension = (extension: string, element: HTMLElement, props = {}) => {
+  if(emitter) {
+    emitter.emit('renderExtensionLoader.addOrUpdateExtension', {
+      element,
+      extension,
+      props
+    })
+  } else {
+    throw new Error(`Extension point can't be rendered before RenderProvider`)
   }
 }
 
@@ -69,6 +84,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   const cacheControl = canUseDOM ? undefined : new PageCacheControl()
   const baseURI = getBaseURI(runtime)
   registerEmitter(runtime, baseURI)
+  emitter = runtime.emitter
   addLocaleData(locale)
 
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
@@ -179,6 +195,7 @@ export {
   useRuntime,
   withSession,
   Loading,
-  buildCacheLocator
+  buildCacheLocator,
+  renderExtension
 }
 
