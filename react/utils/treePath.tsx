@@ -3,8 +3,10 @@ import React, {ComponentType, useContext} from 'react'
 
 const relative = (parent: string, id: string) => id.replace(`${parent}/`, '')
 
-const isDirectChild = (id: string, parent: string) => {
-  return id !== parent && (new RegExp(`^${parent}/[a-zA-Z0-9-]+$`)).test(id)
+export const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+
+export const isDirectChild = (id: string, parent: string) => {
+  return id !== parent && (new RegExp(`^${escapeRegex(parent)}/[a-zA-Z0-9-_]+$`)).test(id)
 }
 
 const parseId = (id: string) => {
@@ -29,7 +31,6 @@ export const getDirectChildren = (extensions: Extensions, treePath: string) => {
 }
 
 export const TreePathContext = React.createContext<TreePathProps>({treePath: ''})
-
 
 export const useTreePath = () => {
   return useContext(TreePathContext)

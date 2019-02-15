@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "types": [
+      "jest",
       "node"
     ],
     "allowJs": true,
