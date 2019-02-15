@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Escaping string that is used to make dynamic Regex in `isDirectChild`.
 
 ## [8.6.3] - 2019-02-13
 
 ### Fixed
-- Check if `props.style` is `writable` before assigning 
+- Check if `props.style` is `writable` before assigning
 
 ## [8.6.2] - 2019-2-7
 ### Changed
