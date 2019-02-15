@@ -10,7 +10,6 @@ module.exports = {
     "js",
     "json"
   ],
-  // "setupFilesAfterEnv": "<rootDir>/testUtils/setupTests.js",
   "moduleDirectories": [
     "node_modules",
     "testUtils"
