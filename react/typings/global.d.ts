@@ -66,6 +66,12 @@ declare global {
     [name: string]: Extension
   }
 
+  interface SimplifiedExtension {
+    extension: string,
+    element: HTMLElement,
+    props: any
+  }
+
   interface LogEvent {
     name: string
     data?: any
