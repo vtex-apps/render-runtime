@@ -18,16 +18,6 @@ interface State {
   extensionsToRender: PortalRenderingRequest[]
 }
 
-const addOrUpdate = (extensionsList: PortalRenderingRequest[], newExtension: PortalRenderingRequest): PortalRenderingRequest[] => {
-  const exists = R.any((el: PortalRenderingRequest) => {
-    return el.extensionName === newExtension.extensionName
-  })(extensionsList)
-  const newExtensionsList = exists ? R.map((el: PortalRenderingRequest) => {
-    return el.extensionName === newExtension.extensionName ? newExtension : el
-  }, extensionsList) : R.append(newExtension, extensionsList)
-  return newExtensionsList
-}
-
 class ExtensionManager extends Component<Props, State> {
 
   public static propTypes = {
@@ -53,7 +43,7 @@ class ExtensionManager extends Component<Props, State> {
 
   public updateExtensions = (extension: PortalRenderingRequest) => {
     this.setState({
-      extensionsToRender: addOrUpdate(this.state.extensionsToRender, extension)
+      extensionsToRender: this.addOrUpdateExtension(this.state.extensionsToRender, extension)
     })
   }
 
@@ -61,6 +51,16 @@ class ExtensionManager extends Component<Props, State> {
     return this.state.extensionsToRender.map((el) => {
       return <ExtensionPortal key={el.extensionName} extension={el}/>
     })
+  }
+
+  private addOrUpdateExtension = (extensionsList: PortalRenderingRequest[], newExtension: PortalRenderingRequest): PortalRenderingRequest[] => {
+    const exists = R.any((el: PortalRenderingRequest) => {
+      return el.extensionName === newExtension.extensionName
+    })(extensionsList)
+    const newExtensionsList = exists ? R.map((el: PortalRenderingRequest) => {
+      return el.extensionName === newExtension.extensionName ? newExtension : el
+    }, extensionsList) : R.append(newExtension, extensionsList)
+    return newExtensionsList
   }
 }
 
