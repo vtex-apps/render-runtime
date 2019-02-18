@@ -55,7 +55,7 @@ const renderExtension = (extension: string, element: HTMLElement, props = {}) =>
       props
     })
   } else {
-    throw new Error(`Extension point can't be rendered before RenderProvider`)
+    throw new Error(`ExtensionPortal can't be rendered before RenderProvider`)
   }
 }
 
