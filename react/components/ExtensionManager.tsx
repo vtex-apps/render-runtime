@@ -4,20 +4,28 @@ import React, { Component } from 'react'
 
 import ExtensionPortal from './ExtensionPortal'
 
+export interface PortalRenderingRequest {
+  extensionName: string,
+  destination: HTMLElement,
+  props: any
+}
+
 interface Props {
   runtime: RenderRuntime,
 }
 
 interface State {
-  extensions: SimplifiedExtension[]
+  extensionsToRender: PortalRenderingRequest[]
 }
 
-const addOrUpdate = (extensions: SimplifiedExtension[], extension: SimplifiedExtension): SimplifiedExtension[] => {
-  const exists = R.reduce((acc, el: SimplifiedExtension) => {
-    return acc || el.extension === extension.extension
-  }, false, extensions)
-  const newExtensions = exists ? R.map((el: SimplifiedExtension) => el.extension === extension.extension ? extension : el, extensions) : R.append(extension, extensions)
-  return newExtensions
+const addOrUpdate = (extensionsList: PortalRenderingRequest[], newExtension: PortalRenderingRequest): PortalRenderingRequest[] => {
+  const exists = R.any((el: PortalRenderingRequest) => {
+    return el.extensionName === newExtension.extensionName
+  })(extensionsList)
+  const newExtensionsList = exists ? R.map((el: PortalRenderingRequest) => {
+    return el.extensionName === newExtension.extensionName ? newExtension : el
+  }, extensionsList) : R.append(newExtension, extensionsList)
+  return newExtensionsList
 }
 
 class ExtensionManager extends Component<Props, State> {
@@ -29,7 +37,7 @@ class ExtensionManager extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      extensions: []
+      extensionsToRender: []
     }
   }
 
@@ -43,21 +51,17 @@ class ExtensionManager extends Component<Props, State> {
     emitter.removeListener('renderExtensionLoader.addOrUpdateExtension', this.updateExtensions)
   }
 
-  public updateExtensions = (extension: SimplifiedExtension) => {
-    console.log('------------ Event ------------')
-    console.log(extension)
-    console.log('-------------------------------')
+  public updateExtensions = (extension: PortalRenderingRequest) => {
     this.setState({
-      extensions: addOrUpdate(this.state.extensions, extension)
+      extensionsToRender: addOrUpdate(this.state.extensionsToRender, extension)
     })
   }
 
   public render() {
-    return this.state.extensions.map((el) => {
-      return <ExtensionPortal key={el.extension} extension={el}/>
+    return this.state.extensionsToRender.map((el) => {
+      return <ExtensionPortal key={el.extensionName} extension={el}/>
     })
   }
 }
 
 export default ExtensionManager
-

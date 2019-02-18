@@ -2,10 +2,11 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import {createPortal as reactCreatePortal} from 'react-dom'
 
+import { PortalRenderingRequest } from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 
 interface Props {
-  extension: SimplifiedExtension,
+  extension: PortalRenderingRequest,
 }
 
 class ExtensionPortal extends Component<Props> {
@@ -19,9 +20,8 @@ class ExtensionPortal extends Component<Props> {
   }
 
   public render() {
-    const { extension, element, props } = this.props.extension
-    console.log('ESTOU NO PORTAL', this.props)
-    return reactCreatePortal(<ExtensionPoint id={extension} {...props} />, element)
+    const { extensionName, destination, props } = this.props.extension
+    return reactCreatePortal(<ExtensionPoint id={extensionName} {...props} />, destination)
   }
 }
 
