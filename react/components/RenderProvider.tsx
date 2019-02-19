@@ -22,6 +22,7 @@ import { createLocaleCookie } from '../utils/messages'
 import { getRouteFromPath, goBack as pageGoBack, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
 import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
 import { TreePathContext } from '../utils/treePath'
+import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 
 import BuildStatus from './BuildStatus'
@@ -631,6 +632,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider locale={locale} messages={mergedMessages}>
               <Fragment>
+                <ExtensionManager runtime={this.props.runtime}/>
                 {!production && !isStorefrontIframe && <BuildStatus />}
                 {component}
                 {isStorefrontIframe ? <ExtensionPoint id="store/__overlay" /> : null}

@@ -5,6 +5,7 @@ import 'apollo-link-persisted-queries'
 import 'apollo-upload-client'
 import 'apollo-utilities'
 import 'classnames'
+import * as EventEmitter from 'eventemitter3'
 import {canUseDOM} from 'exenv'
 import 'graphql'
 import createHistory from 'history/createBrowserHistory'
@@ -16,6 +17,7 @@ import NoSSR from 'react-no-ssr'
 import Loading from '../components/Loading'
 
 import ExtensionContainer from '../components/ExtensionContainer'
+import { PortalRenderingRequest } from '../components/ExtensionManager'
 import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
@@ -32,8 +34,10 @@ import { getBaseURI } from '../utils/host'
 import { addLocaleData } from '../utils/locales'
 import { withSession } from '../utils/session'
 import { TreePathContext } from '../utils/treePath'
-import { optimizeSrcForVtexImg, optimizeStyleForVtexImg, isStyleWritable } from '../utils/vteximg'
+import { isStyleWritable, optimizeSrcForVtexImg, optimizeStyleForVtexImg } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
+
+let emitter: EventEmitter | null = null
 
 if (window.IntlPolyfill) {
   if (!window.Intl) {
@@ -41,6 +45,18 @@ if (window.IntlPolyfill) {
   } else if (!canUseDOM) {
     window.Intl.NumberFormat = window.IntlPolyfill.NumberFormat
     window.Intl.DateTimeFormat = window.IntlPolyfill.DateTimeFormat
+  }
+}
+
+const renderExtension = (extensionName: string, destination: HTMLElement, props = {}) => {
+  if(emitter) {
+    emitter.emit('renderExtensionLoader.addOrUpdateExtension', {
+      destination,
+      extensionName,
+      props
+    } as PortalRenderingRequest)
+  } else {
+    throw new Error(`ExtensionPortal can't be rendered before RenderProvider`)
   }
 }
 
@@ -69,6 +85,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   const cacheControl = canUseDOM ? undefined : new PageCacheControl()
   const baseURI = getBaseURI(runtime)
   registerEmitter(runtime, baseURI)
+  emitter = runtime.emitter
   addLocaleData(locale)
 
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
@@ -179,6 +196,7 @@ export {
   useRuntime,
   withSession,
   Loading,
-  buildCacheLocator
+  buildCacheLocator,
+  renderExtension
 }
 
