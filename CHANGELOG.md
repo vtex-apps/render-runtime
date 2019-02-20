@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.7.1-beta] - 2019-02-20
+
 ## [8.7.0] - 2019-02-19
 
 - Add `renderExtension` function to render runtime
