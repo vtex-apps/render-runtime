@@ -92,10 +92,18 @@ declare global {
     conditional?: boolean
   }
 
+  interface NavigationRoute {
+    path: string
+    params: Record<string, any>
+    id: string
+  }
+
   interface Route {
+    blockId: string
     canonical?: string
-    path?: string
-    params?: Record<string, string>
+    path: string
+    params: Record<string, any>
+    pageContext: PageDataContext
     id: string
   }
 
@@ -107,7 +115,7 @@ declare global {
 
   interface RenderHistoryLocation extends Location {
     state?: {
-      route: Route
+      navigationRoute: NavigationRoute
       renderRouting?: true
       scrollOptions?: RenderScrollOptions
     }
@@ -235,6 +243,16 @@ interface RenderComponent<P={}, S={}> {
     defaultPages: DefaultPagesQueryResponse,
   }
 
+  interface PageDataContext {
+    type: string
+    id: string
+  }
+
+  interface MatchingPage {
+    blockId: string
+    pageContext: PageDataContext
+  }
+
   interface PageQueryResponse {
     componentsJSON: string
     extensionsJSON: string
@@ -243,6 +261,7 @@ interface RenderComponent<P={}, S={}> {
     appsSettingsJSON: string
     appsEtag: string
     cacheHintsJSON: string
+    page: MatchingPage
   }
 
   interface DefaultPagesQueryResponse {
@@ -264,6 +283,7 @@ interface RenderComponent<P={}, S={}> {
     appsEtag: RenderRuntime['appsEtag']
     settings: RenderRuntime['settings']
     cacheHints: RenderRuntime['cacheHints']
+    matchingPage: MatchingPage
   }
 
   interface ParsedDefaultPagesQueryResponse {

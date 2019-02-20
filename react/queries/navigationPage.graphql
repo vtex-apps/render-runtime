@@ -23,6 +23,13 @@ query NavigationPage (
       key
       message
     }
+    page {
+      blockId
+      pageContext {
+        id
+        type
+      }
+    }
     pagesJSON
   }
 }
