@@ -56,7 +56,16 @@ export interface RenderProviderState {
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
-const isStorefrontIframe = canUseDOM && window.top !== window.self && window.top.__provideRuntime
+let isStorefrontIframe: (runtime: RenderContext | null, messages?: Record<string, string>, shouldUpdateRuntime?: boolean) => void | undefined
+
+try {
+  if (canUseDOM && window.top !== window.self && window.top.__provideRuntime) {
+    isStorefrontIframe = window.top.__provideRuntime
+  }
+} catch (e) {
+  console.error(e)
+}
+
 // tslint:disable-next-line:no-empty
 const noop = (() => {})
 
