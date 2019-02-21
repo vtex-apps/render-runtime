@@ -58,6 +58,7 @@ declare global {
     }
     component: string
     props?: any
+    content?: Record<string, any>
     shouldRender?: boolean
     preview?: Preview
   }
