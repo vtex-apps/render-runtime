@@ -368,8 +368,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { navigationRoute } = state
     const { id: page, params } = navigationRoute
     const transientRoute = {...route, ...navigationRoute}
+    const allowConditions = pagesState[page].hasOwnProperty('allowConditions')
+      ? pagesState[page].allowConditions
+      : true
     const shouldSkipFetchNavigationData = page.startsWith('admin') ||
-      (!pagesState[page].allowConditions && loadedPages.has(page))
+      (!allowConditions && loadedPages.has(page))
     const declarer = pagesState[page] && pagesState[page].declarer
     const query = parse(location.search.substr(1))
 
