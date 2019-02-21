@@ -11,7 +11,13 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     extensionsJSON,
     messages,
     pagesJSON,
-    page: matchingPage,
+    page: {
+      blockId,
+      pageContext: {
+        id,
+        type,
+      }
+    },
   } = page
 
   const [cacheHints, components, extensions, pages, settings] = [
@@ -27,7 +33,10 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     cacheHints,
     components,
     extensions,
-    matchingPage,
+    matchingPage: {
+      blockId,
+      pageContext: {id, type}
+    },
     messages: parseMessages(messages),
     pages,
     settings
