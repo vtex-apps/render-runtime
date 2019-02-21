@@ -346,6 +346,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return
     }
 
+    // temporary canonical fix
+    if (!state.navigationRoute) {
+      return
+    }
+
     const { navigationRoute } = state
     const { id: page, params } = navigationRoute
     const transientRoute = {...route, ...navigationRoute}
