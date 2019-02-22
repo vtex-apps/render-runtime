@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Update `pageContext` on navigation
+- Extension now has a content field that is merged with block component props.
 
 ## [8.7.1] - 2019-02-21
 
