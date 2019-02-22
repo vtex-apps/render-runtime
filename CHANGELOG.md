@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.8.1] - 2019-2-22
+### Fixed
+- Fix initial history replacement
+
 ## [8.8.0] - 2019-2-22
 ### Added
 - Update `pageContext` on navigation
