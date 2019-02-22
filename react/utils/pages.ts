@@ -20,12 +20,12 @@ function trimEndingSlash(token: string) {
   return token.replace(/\/$/, '') || '/'
 }
 
-function createLocationDescriptor (route: Route, {query, scrollOptions}: Pick<NavigateOptions, 'query' | 'scrollOptions'>): LocationDescriptorObject {
+function createLocationDescriptor (navigationRoute: NavigationRoute, {query, scrollOptions}: Pick<NavigateOptions, 'query' | 'scrollOptions'>): LocationDescriptorObject {
   return {
-    pathname: route.path!,
+    pathname: navigationRoute.path!,
     state: {
+      navigationRoute,
       renderRouting: true,
-      route,
       scrollOptions,
     },
     ...(query && {search: query}),
@@ -76,12 +76,12 @@ function getPagePath(name: string, pages: Pages) {
   return cname && isHost(cname) ? '/' : pagePath
 }
 
-function getRouteFromPageName(id: string, pages: Pages, params: any) : Route | null {
+function getRouteFromPageName(id: string, pages: Pages, params: any) : NavigationRoute | null {
   const path = pathFromPageName(id, pages, params)
   return path ? {id, path, params} : null
 }
 
-export function getRouteFromPath(path: string, pages: Pages) : Route | null {
+export function getRouteFromPath(path: string, pages: Pages) : NavigationRoute | null {
   const id = routeIdFromPath(path, pages)
   return id ? {id, path, params: getPageParams(id, path, pages)} : null
 }
@@ -94,24 +94,24 @@ export function navigate(history: History | null, pages: Pages, options: Navigat
     return false
   }
 
-  const route = page
+  const navigationRoute = page
     ? getRouteFromPageName(page, pages, params)
     : getRouteFromPath(to!, pages)
 
-  if (!route) {
+  if (!navigationRoute) {
     console.warn(`Unable to find route for ${page ? `page '${page}'`: `path '${to}'`}`)
     return false
   }
 
   if (history) {
-    const location = createLocationDescriptor(route, {query, scrollOptions})
+    const location = createLocationDescriptor(navigationRoute, {query, scrollOptions})
     const method = replace ? 'replace' : 'push'
     window.setTimeout(() => history[method](location), 0)
     return true
   }
 
   if (fallbackToWindowLocation) {
-    window.location.href = `${route.path}${query}`
+    window.location.href = `${navigationRoute.path}${query}`
     return true
   }
 

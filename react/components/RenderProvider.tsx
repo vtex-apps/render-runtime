@@ -338,7 +338,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onPageChanged = (location: RenderHistoryLocation) => {
     const { runtime: { renderMajor } } = this.props
-    const { culture: { locale }, pages: pagesState, production, device, defaultExtensions } = this.state
+    const { culture: { locale }, pages: pagesState, production, device, defaultExtensions, route } = this.state
     const { state } = location
 
     // Make sure this is our navigation
@@ -346,8 +346,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return
     }
 
-    const { route } = state
-    const { id: page, params, path } = route
+    // temporary canonical fix
+    if (!state.navigationRoute) {
+      return
+    }
+
+    const { navigationRoute } = state
+    const { id: page, params } = navigationRoute
+    const transientRoute = {...route, ...navigationRoute}
     const shouldSkipFetchNavigationData = page.startsWith('admin')
     const declarer = pagesState[page] && pagesState[page].declarer
     const query = parse(location.search.substr(1))
@@ -356,7 +362,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return this.setState({
         page,
         query,
-        route,
+        route: transientRoute,
       }, () => this.afterPageChanged(page, state.scrollOptions))
     }
 
@@ -365,7 +371,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       page,
       preview: true,
       query,
-      route,
+      route: transientRoute,
     }, () => {
       this.replaceRouteClass(page)
       this.scrollTo(state.scrollOptions)
@@ -392,18 +398,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       cacheHints,
       components,
       extensions,
+      matchingPage,
       messages,
       pages,
       settings
     }: ParsedPageQueryResponse) => {
       try {
-        if (this.props.history && this.props.history.location.state.route.id !== page) {
+        if (this.props.history && this.props.history.location.state.navigationRoute.id !== page) {
           return
         }
       } catch (e) {
         console.error('Failed to access history location state')
       }
 
+      const updatedRoute = {...transientRoute, ...matchingPage}
       this.setState({
         appsEtag,
         cacheHints,
@@ -414,7 +422,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         pages,
         preview: false,
         query,
-        route,
+        route: updatedRoute,
         settings,
       }, () => this.sendInfoFromIframe())
     })
