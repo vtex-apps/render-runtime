@@ -6,8 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [8.8.0] - 2019-2-22
 ### Added
 - Update `pageContext` on navigation
+- Extension now has a content field that is merged with block component props.
 
 ## [8.7.1] - 2019-02-21
 

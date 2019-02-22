@@ -81,13 +81,14 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const { newTreePath } = this.state
     const { children, params, query, id, treePath, ...parentProps } = this.props
     const extension = runtime.extensions && runtime.extensions[newTreePath]
-    const { component = null, after = [], around = [], before = [], props: extensionProps = null } = extension || {}
+    const { component = null, after = [], around = [], before = [], content = {}, props: extensionProps = null } = extension || {}
 
     this.component = component
 
     const props = {
       ...parentProps,
       ...extensionProps,
+      ...content,
       params,
       query,
     }
