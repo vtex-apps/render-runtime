@@ -150,7 +150,17 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const route = props.runtime.route || getRouteFromPath(path, pages)
 
     if (history) {
-      const renderLocation = { ...history.location, state: { renderRouting: true, route } }
+      const renderLocation: RenderHistoryLocation = {
+        ...history.location,
+        state: {
+          navigationRoute: {
+            id: route.id,
+            params: route.params,
+            path: route.path,
+          },
+          renderRouting: true,
+        }
+      }
       history.replace(renderLocation)
       // backwards compatibility
       window.browserHistory = global.browserHistory = history
