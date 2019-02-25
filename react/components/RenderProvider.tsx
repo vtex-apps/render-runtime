@@ -471,9 +471,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }))
 
     this.setState(({components, messages}) => ({
-      components: {...defaultComponents, ...this.state.components, ...components},
+      components: {...defaultComponents, ...components},
       defaultExtensions,
-      messages: {...defaultMessages, ...this.state.messages, ...messages}
+      messages: {...defaultMessages, ...messages}
     }))
   }
 
