@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+- React version from v16.4.2 to v16.8.3
+
 ## [7.38.11] - 2019-02-21
 
 ## [7.38.11-beta] - 2019-02-20
