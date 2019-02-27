@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.9.0] - 2019-02-27
+
+### Added
+- query to Render Runtime Context
+
 ## [8.8.1] - 2019-2-22
 ### Fixed
 - Fix initial history replacement
