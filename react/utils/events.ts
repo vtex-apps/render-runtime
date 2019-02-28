@@ -3,6 +3,12 @@ import ApolloClient from 'apollo-client'
 import * as EventEmitter from 'eventemitter3'
 import {canUseDOM} from 'exenv'
 
+import stylesInformation from '../queries/stylesInformation.graphql'
+
+const OVERRIDE_ID = 'override_link'
+const STYLE_ID = 'style_link'
+const ICONPACK_ID = 'styles_iconpack'
+
 interface IOEvent {
   key: string
   body: {
@@ -22,6 +28,18 @@ interface EmittersRegistry {
   [key: string]: EventEmitterSource
 }
 
+interface StylesInformation {
+  selectedStyle: {
+    path: string
+  }
+  listOverrides: Array<{
+    path: string
+  }>
+  selectedIconPack: {
+    svg: string
+  }
+}
+
 const CONNECTION_CLOSED = 2
 
 const emittersByWorkspace: EmittersRegistry = {}
@@ -33,7 +51,7 @@ const initSSE = (account: string, workspace: string, baseURI: string, client: Ap
 
   require('eventsource-polyfill')
   const myvtexSSE = require('myvtex-sse')
-  const path = `vtex.builder-hub:*:react2,pages0,build.status?workspace=${workspace}`
+  const path = `vtex.builder-hub:*:styles1,react2,pages0,build.status?workspace=${workspace}`
   const source: EventSource = myvtexSSE(account, workspace, path, {verbose: false, host: baseURI})
 
   const handler = ({data}: MessageEvent) => {
@@ -56,6 +74,46 @@ const initSSE = (account: string, workspace: string, baseURI: string, client: Ap
           break
       }
       return
+    }
+
+    if (key === 'styles1') {
+      client.query<StylesInformation>({ query: stylesInformation }).then((result) => {
+        try {
+          const styleTag = document.getElementById(STYLE_ID)
+          if (styleTag) {
+            styleTag.setAttribute('href', result.data.selectedStyle.path)
+          }
+        } catch (err) {
+          console.error('[styles1] There was a problem updating the style')
+        }
+        try {
+          const overridesTags = Array.from(document.getElementsByClassName(OVERRIDE_ID))
+          overridesTags.forEach(tag => {
+            if (tag.parentNode) {
+              tag.parentNode.removeChild(tag)
+            }
+          })
+          result.data.listOverrides.forEach((override, index) => {
+            const overrideTag = document.createElement('link')
+            overrideTag.setAttribute('rel', 'stylesheet')
+            overrideTag.setAttribute('type', 'text/css')
+            overrideTag.setAttribute('href', override.path)
+            overrideTag.setAttribute('id', `${OVERRIDE_ID}_${index}`)
+            overrideTag.setAttribute('class', OVERRIDE_ID)
+            document.head.appendChild(overrideTag)
+          })
+        } catch (err) {
+          console.error('[styles1] There was a problem updating overrides')
+        }
+        try {
+          const iconPackTag = document.getElementById(ICONPACK_ID)
+          if (iconPackTag) {
+            iconPackTag.innerHTML = result.data.selectedIconPack.svg
+          }
+        } catch (err) {
+          console.error('[styles1] There was a problem updating the iconpack')
+        }
+      })
     }
 
     switch (type) {
