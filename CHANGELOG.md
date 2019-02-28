@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.11.0] - 2019-02-28
+### Changed
+- Improve error page with json viewer and remove crazy red box
+
 ## [8.10.0] - 2019-02-28
 ### Added
 - Avoid feching navigation data if route declares `allowConditions: false`
