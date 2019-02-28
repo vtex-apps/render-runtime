@@ -54,6 +54,7 @@ export interface RenderProviderState {
   query: RenderRuntime['query']
   settings: RenderRuntime['settings']
   route: RenderRuntime['route']
+  loadedPages: Set<string>
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
@@ -181,6 +182,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       defaultExtensions: {},
       device: 'any',
       extensions,
+      loadedPages: new Set([page]),
       messages,
       page,
       pages,
@@ -350,7 +352,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onPageChanged = (location: RenderHistoryLocation) => {
     const { runtime: { renderMajor } } = this.props
-    const { culture: { locale }, pages: pagesState, production, device, defaultExtensions, route } = this.state
+    const { culture: { locale }, pages: pagesState, production, device, defaultExtensions, route, loadedPages } = this.state
     const { state } = location
 
     // Make sure this is our navigation
@@ -366,8 +368,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { navigationRoute } = state
     const { id: page, params } = navigationRoute
     const transientRoute = {...route, ...navigationRoute}
-    const shouldSkipFetchNavigationData = page.startsWith('admin')
-    const declarer = pagesState[page] && pagesState[page].declarer
+    const {[page]: {allowConditions, declarer}} = pagesState
+    const shouldSkipFetchNavigationData = !allowConditions && loadedPages.has(page)
     const query = parse(location.search.substr(1))
 
     if (shouldSkipFetchNavigationData) {
@@ -429,6 +431,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         cacheHints,
         components: { ...this.state.components, ...components },
         extensions: { ...this.state.extensions, ...extensions},
+        loadedPages: loadedPages.add(page),
         messages: { ...this.state.messages, ...messages },
         page,
         pages,

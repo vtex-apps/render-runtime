@@ -81,6 +81,7 @@ declare global {
   }
 
   interface Page {
+    allowConditions: boolean
     cname?: string
     path: string
     auth?: boolean
