@@ -17,6 +17,7 @@ import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { traverseComponent } from '../utils/components'
 import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils/dom'
+import { registerEmitter } from '../utils/events'
 import { loadLocaleData } from '../utils/locales'
 import { createLocaleCookie } from '../utils/messages'
 import { getRouteFromPath, goBack as pageGoBack, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
@@ -145,8 +146,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const { appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings } = props.runtime
-    const { history, baseURI, cacheControl } = props
+    const { history, baseURI, cacheControl, runtime } = props
+    const { appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings } = runtime
     const path = canUseDOM ? window.location.pathname : window.__pathname__
     const route = props.runtime.route || getRouteFromPath(path, pages)
 
@@ -172,6 +173,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const runtimeContextLink = this.createRuntimeContextLink()
     const ensureSessionLink = this.createEnsureSessionLink()
     this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, ensureSessionLink, cacheControl)
+    registerEmitter(runtime, baseURI)
 
     this.state = {
       appsEtag,
