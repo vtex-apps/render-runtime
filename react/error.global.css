@@ -21,7 +21,8 @@ body {
   height: 100%;
 }
 
-.render-container, .render-provider {
+.render-container,
+.render-provider {
   height: 100%;
 }
 
@@ -31,6 +32,23 @@ body {
 
 .img-height {
   height: 80px;
+}
+
+.error-stack {
+  margin: 20px auto;
+  max-width: 980px;
+  word-wrap: 'break-word';
+}
+
+.error-details {
+  font-family: 'courier, code';
+  max-width: 980px;
+  margin: 20px auto;
+  word-wrap: 'break-word';
+}
+
+.string-value {
+  word-wrap: 'break-all';
 }
 
 /*
