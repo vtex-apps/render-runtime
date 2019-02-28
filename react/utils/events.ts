@@ -1,3 +1,5 @@
+import { NormalizedCacheObject } from 'apollo-cache-inmemory'
+import ApolloClient from 'apollo-client'
 import * as EventEmitter from 'eventemitter3'
 import {canUseDOM} from 'exenv'
 
@@ -24,7 +26,7 @@ const CONNECTION_CLOSED = 2
 
 const emittersByWorkspace: EmittersRegistry = {}
 
-const initSSE = (account: string, workspace: string, baseURI: string) => {
+const initSSE = (account: string, workspace: string, baseURI: string, client: ApolloClient<NormalizedCacheObject>) => {
   if (Object.keys(window.__RENDER_8_HOT__).length === 0) {
     return undefined
   }
@@ -86,7 +88,7 @@ const initSSE = (account: string, workspace: string, baseURI: string) => {
   return source
 }
 
-export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
+export const registerEmitter = (runtime: RenderRuntime, baseURI: string, client: ApolloClient<NormalizedCacheObject>) => {
   if (!canUseDOM) {
     return
   }
@@ -96,14 +98,14 @@ export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
   // Share SSE connections for same account and workspace
   if (!emittersByWorkspace[`${account}/${workspace}`]) {
     emittersByWorkspace[`${account}/${workspace}`] = []
-    emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(account, workspace, baseURI)
+    emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(account, workspace, baseURI, client)
 
     if (!production) {
       document.addEventListener('visibilitychange', () => {
         const es = emittersByWorkspace[`${account}/${workspace}`].eventSource
         // Ensure SSE server connection
         if (!document.hidden && es && es.readyState === CONNECTION_CLOSED) {
-          emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(account, workspace, baseURI)
+          emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(account, workspace, baseURI, client)
         }
       })
     }

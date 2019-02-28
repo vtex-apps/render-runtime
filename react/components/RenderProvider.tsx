@@ -173,7 +173,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const runtimeContextLink = this.createRuntimeContextLink()
     const ensureSessionLink = this.createEnsureSessionLink()
     this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, ensureSessionLink, cacheControl)
-    registerEmitter(runtime, baseURI)
+    registerEmitter(runtime, baseURI, this.apolloClient)
 
     this.state = {
       appsEtag,
