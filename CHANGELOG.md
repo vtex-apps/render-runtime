@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.9.2] - 2019-02-28
+### Changed
+- Stop creating `<span>` when using react intl's `<FormattedMessage>`
+
 ## [8.9.1] - 2019-02-27
 ### Changed
 - React version from v16.8.0 to v16.8.3
