@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Removed
+- Removed default spinners when the component is loading
+
 ## [8.11.0] - 2019-02-28
 ### Changed
 - Improve error page with json viewer and remove crazy red box
