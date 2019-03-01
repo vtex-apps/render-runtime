@@ -14,16 +14,6 @@ const LOADING_TRESHOLD_MS = 1000
 const LOADING_UNMOUNT_TRESHOLD_MS = 1000
 let visible = false
 
-const defaultLoading = (
-  <div className="flex justify-center w-100 pa4">
-    <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink">
-      <use xlinkHref="#sti-loading" />
-    </svg>
-  </div>
-)
-
 class Loading extends PureComponent<RenderContextProps, State> {
   public state: State = {
     visible,
@@ -61,7 +51,7 @@ class Loading extends PureComponent<RenderContextProps, State> {
           const loadingType = value.treePath && extensions[t] && extensions[t].preview && extensions[t].preview!.type
           const loadingComponent = loadingType
             ? loadingType === 'text' ? List : Instagram
-            : defaultLoading
+            : null
 
           return (
             <div style={isVisible ? undefined : style}>
