@@ -673,6 +673,11 @@ isarray@0.0.1:
   resolved "https://registry.yarnpkg.com/isarray/-/isarray-0.0.1.tgz#8a18acfca9a8f4177e09abfc6038939b05d1eedf"
   integrity sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8=
 
+isbot@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/isbot/-/isbot-2.2.1.tgz#6c187c52122e5a2cd4d023b0215ffe6ade31c1b7"
+  integrity sha512-z0idtpC0uKKKTBhd1g73GREBWhCQdnJq8U5o+8XhgPvuPiRb/vkpNreLvtoneaZX9FNxDFOU0ohEj9hTWm/tPw==
+
 isomorphic-fetch@^2.1.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/isomorphic-fetch/-/isomorphic-fetch-2.2.1.tgz#611ae1acf14f5e81f729507472819fe9733558a9"
