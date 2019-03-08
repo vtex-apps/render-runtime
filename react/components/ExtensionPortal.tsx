@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { Component, ReactPortal } from 'react'
 import { createPortal } from 'react-dom'
 
 import { PortalRenderingRequest } from './ExtensionManager'
@@ -21,7 +21,7 @@ class ExtensionPortal extends Component<Props> {
 
   public render() {
     const { extensionName, destination, props } = this.props.extension
-    return createPortal(<ExtensionPoint id={extensionName} {...props} />, destination)
+    return createPortal(<ExtensionPoint id={extensionName} {...props} />, destination) as ReactPortal
   }
 }
 

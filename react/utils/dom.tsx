@@ -1,6 +1,6 @@
 import { canUseDOM } from 'exenv'
-import React, { Fragment, ReactElement } from 'react'
-import {createPortal as reactCreatePortal} from 'react-dom'
+import React, { Fragment, ReactElement, ReactPortal } from 'react'
+import { createPortal as reactCreatePortal } from 'react-dom'
 
 const portalPattern = /START_SERVER_PORTAL_([^!]+)!((\n|.)+)END_SERVER_PORTAL_\1!/g
 
@@ -41,7 +41,7 @@ export const createPortal = (children: ReactElement<any>, name: string, hydrate:
     return null
   }
 
-  return reactCreatePortal(children, container)
+  return reactCreatePortal(children, container) as ReactPortal
 }
 
 export const getMarkups = (pageName: string, pageMarkup: string): NamedMarkup[] => {
