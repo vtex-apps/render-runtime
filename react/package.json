@@ -22,6 +22,7 @@
     "graphql": "^0.13.2",
     "history": "^4.7.2",
     "hoist-non-react-statics": "^2.5.0",
+    "isbot": "^2.2.1",
     "js-base64": "^2.4.9",
     "myvtex-sse": "^1.2.0",
     "prop-types": "^15.6.0",
