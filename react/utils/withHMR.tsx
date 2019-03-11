@@ -1,12 +1,37 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import PropTypes from 'prop-types'
 import React, {Component, ComponentType} from 'react'
+import { path } from 'ramda'
 
 import {withEmitter} from '../components/RenderContext'
 import {withTreePath} from './treePath'
 
 const isComponentType = (Arg: any): Arg is ComponentType => {
-  return typeof Arg === 'function' || (Arg && Arg.prototype && Arg.prototype.render)
+  const isFunction = typeof Arg === 'function' 
+
+  /** If Arg is a function, assumes an UpperCamelCase naming convention
+   * for components, and lowerCamelCase for functions.
+   * (See https://reactjs.org/docs/jsx-in-depth.html#user-defined-components-must-be-capitalized)
+   * If the function name is unable to be determined, defaults
+   * to true (i.e. assumes the function is probably a component)
+   * 
+   * This is needed so that functions exported on IO (e.g. HOC) don't
+   * get treated as components, so they can be callable.
+   * */
+  if (isFunction) {
+    const name = path(['prototype', 'constructor', 'name'], Arg)
+    if (!name) return true
+
+    const firstChar = name.charAt(0)
+
+    if (!firstChar || firstChar === '') return true
+
+    const isFirstCharUpperCase = firstChar.toUpperCase() === firstChar
+
+    return isFirstCharUpperCase
+  }
+
+  return !!(Arg && Arg.prototype && Arg.prototype.render)
 }
 
 export default (module: Module, InitialImplementer: any) => {
