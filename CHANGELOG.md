@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Fixed bug where functions would be wrapped around components on HMR, thus losing the ability to be called.
+
 ## [8.11.2] - 2019-03-01
 
 ## [8.11.1] - 2019-03-01
