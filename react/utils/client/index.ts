@@ -101,6 +101,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(window.__STATE__) : cache,
       link,
+      resolvers: {},
       ssrMode: !canUseDOM,
     })
   }
