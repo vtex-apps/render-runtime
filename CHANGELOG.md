@@ -12,9 +12,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update Apollo Client and React Apollo.
 
 ## [8.11.3] - 2019-03-12
-
 ### Fixed
 - Fixed bug where functions would be wrapped around components on HMR, thus losing the ability to be called.
+
+## [8.11.3-beta] - 2019-03-12
 
 ## [8.11.2] - 2019-03-01
 
