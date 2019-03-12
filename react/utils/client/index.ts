@@ -14,8 +14,6 @@ import {omitTypenameLink} from './links/omitVariableTypenameLink'
 import {persistedQueryVersionLink} from './links/persistedQueryVersionLink'
 import {createUriSwitchLink} from './links/uriSwitchLink'
 import {versionSplitterLink} from './links/versionSplitterLink'
-import { createStateLink } from './links/stateLink'
-import { getGlobalLinkState } from '../linkState'
 
 interface ApolloClientsRegistry {
   [key: string]: ApolloClient<NormalizedCacheObject>
@@ -87,17 +85,12 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
     const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
 
     const cacheLink = cacheControl ? [cachingLink(cacheControl)] : []
-
-    const {initialState = {}, resolvers = {}} = getGlobalLinkState()
-
-    const stateLink = createStateLink(initialState, resolvers, cache)
-
+    
     const link = ApolloLink.from([
       omitTypenameLink,
       versionSplitterLink,
       runtimeContextLink,
       ensureSessionLink,
-      stateLink,
       persistedQueryLink,
       persistedQueryVersionLink,
       uriSwitchLink,
@@ -108,6 +101,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
       cache: canUseDOM ? cache.restore(window.__STATE__) : cache,
       link,
+      resolvers: {},
       ssrMode: !canUseDOM,
     })
   }
