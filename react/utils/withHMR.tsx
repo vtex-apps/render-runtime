@@ -19,7 +19,7 @@ const isComponentType = (Arg: any): Arg is ComponentType => {
    * get treated as components, so they can be callable.
    * */
   if (isFunction) {
-    const name = path(['prototype', 'constructor', 'name'], Arg)
+    const name: string | undefined = path(['prototype', 'constructor', 'name'], Arg)
     if (!name) return true
 
     const firstChar = name.charAt(0)
