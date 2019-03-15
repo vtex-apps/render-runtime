@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.13.0] - 2019-03-15
+
 ## [8.12.0] - 2019-03-13
 ### Changed
 - Update Apollo Client and React Apollo.
