@@ -7,7 +7,6 @@ import { getImplementation } from '../utils/assets'
 import { TreePathContext, TreePathProps, withTreePath } from '../utils/treePath'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
-import Loading from './Loading'
 import { RenderContext } from './RenderContext'
 import TrackEventsWrapper from './TrackEventsWrapper'
 
@@ -87,6 +86,34 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     )
   }
 
+  private renderPreview = (runtime: RenderContext) => {
+    const { newTreePath } = this.state
+    const extension = runtime.extensions && runtime.extensions[newTreePath]
+    const { props = {} } = extension || {}
+
+    const { elements = null } = props
+
+    const previews = elements && elements.map((element:string, i:number) => {
+      const elementTreePath = `${runtime.page}/${element}`
+      const currentExtension = runtime.extensions[elementTreePath]
+
+      if (currentExtension) {
+        return (
+          <TreePathContext.Provider value={{ treePath: elementTreePath }} key={i}>
+            <ExtensionPointComponent
+              component={currentExtension.component}
+              props={currentExtension.props}
+              runtime={runtime}
+              treePath={elementTreePath} />
+          </TreePathContext.Provider>
+        )
+      }
+      return null
+    })
+
+    return previews
+  }
+
   private getExtensionPointComponent = (runtime: RenderContext) => {
     const { newTreePath } = this.state
     const {
@@ -128,43 +155,31 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       { params, query },
     ])
 
-    let loading = null
-    if (runtime.preview) {
-      loading = this.withOuterExtensions(
-        after,
-        around,
-        before,
-        newTreePath,
-        props,
-        <Loading />
-      )
-    }
-
     const isCompositionChildren = extension && extension.composition === 'children'
 
     const componentChildren = (isCompositionChildren && extension.blocks) ?
       this.getChildExtensions(runtime, newTreePath) : children
 
-    return component
-      ? this.withOuterExtensions(
-          after,
-          around,
-          before,
-          newTreePath,
-          props,
-          (
-            <TrackEventsWrapper
-              events={track}
-              id={id}>
-              <TreePathContext.Provider value={{ treePath: newTreePath }}>
-                <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>
-                  {componentChildren}
-                </ExtensionPointComponent>
-              </TreePathContext.Provider>
-            </TrackEventsWrapper>
-          )
-        )
-      : loading
+    return this.withOuterExtensions(
+      after,
+      around,
+      before,
+      newTreePath,
+      props,
+      (
+        <TrackEventsWrapper
+          events={track}
+          id={id}>
+          <TreePathContext.Provider value={{ treePath: newTreePath }}>
+            {component ? (
+              <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>
+                {componentChildren}
+              </ExtensionPointComponent>
+            ) : this.renderPreview(runtime)}
+          </TreePathContext.Provider>
+        </TrackEventsWrapper>
+      )
+    )
   }
 
   private getChildExtensions(runtime: RenderContext, treePath: string) {
