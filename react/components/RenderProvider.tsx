@@ -538,7 +538,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             },
           }), () => {
             this.sendInfoFromIframe(true)
-            // this.apolloClient.clearStore()
             this.onPageChanged(this.props.history!.location)
           })
         })
