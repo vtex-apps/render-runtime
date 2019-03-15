@@ -18,14 +18,18 @@ import { getClient } from '../utils/client'
 import { traverseComponent } from '../utils/components'
 import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils/dom'
 import { loadLocaleData } from '../utils/locales'
-import { createLocaleCookie } from '../utils/messages'
-import { getRouteFromPath, goBack as pageGoBack, navigate as pageNavigate, NavigateOptions, scrollTo as pageScrollTo } from '../utils/pages'
+import {
+  getRouteFromPath,
+  goBack as pageGoBack,
+  navigate as pageNavigate,
+  NavigateOptions,
+  scrollTo as pageScrollTo,
+} from '../utils/pages'
 import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
 import { TreePathContext } from '../utils/treePath'
+import BuildStatus from './BuildStatus'
 import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
-
-import BuildStatus from './BuildStatus'
 import { RenderContext } from './RenderContext'
 import RenderPage from './RenderPage'
 
@@ -116,8 +120,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     preview: PropTypes.bool,
     production: PropTypes.bool,
     publicEndpoint: PropTypes.string,
-    route: PropTypes.object,
     query: PropTypes.object,
+    route: PropTypes.object,
     setDevice: PropTypes.func,
     updateComponentAssets: PropTypes.func,
     updateExtension: PropTypes.func,
@@ -260,8 +264,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       preview,
       production,
       publicEndpoint,
-      route,
       query,
+      route,
       setDevice: this.handleSetDevice,
       updateComponentAssets: this.updateComponentAssets,
       updateExtension: this.updateExtension,
@@ -514,20 +518,27 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onLocaleSelected = (locale: string) => {
     if (locale !== this.state.culture.locale) {
-      createLocaleCookie(locale)
+      const sessionData = {
+        public: {
+          cultureInfo: {
+              value: locale
+          }
+        }
+      }
       Promise.all([
+        this.patchSession(sessionData),
         loadLocaleData(locale),
       ])
-        .then(([newMessages]) => {
+        .then(() => {
           this.setState(prevState => ({
             ...prevState,
             culture: {
               ...this.state.culture,
               locale,
             },
-            messages: { ...prevState.messages, ...newMessages },
           }), () => {
             this.sendInfoFromIframe(true)
+            this.onPageChanged(this.props.history!.location)
           })
         })
         .then(() => window.postMessage({ key: 'cookie.locale', body: { locale } }, '*'))
