@@ -527,10 +527,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }
       Promise.all([
         this.patchSession(sessionData),
-        loadLocaleData(locale),
       ])
         .then(() => window.location.reload())
-        .then(() => window.postMessage({ key: 'cookie.locale', body: { locale } }, '*'))
         .catch(e => {
           console.log('Failed to fetch new locale file.')
           console.error(e)
