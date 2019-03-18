@@ -1,5 +1,13 @@
+import { NormalizedCacheObject } from 'apollo-cache-inmemory'
+import ApolloClient from 'apollo-client'
 import * as EventEmitter from 'eventemitter3'
 import {canUseDOM} from 'exenv'
+
+import stylesInformation from '../queries/stylesInformation.graphql'
+
+const OVERRIDE_ID = 'override_link'
+const STYLE_ID = 'style_link'
+const ICONPACK_ID = 'styles_iconpack'
 
 interface IOEvent {
   key: string
@@ -20,18 +28,30 @@ interface EmittersRegistry {
   [key: string]: EventEmitterSource
 }
 
+interface StylesInformation {
+  selectedStyle: {
+    path: string
+  }
+  listOverrides: Array<{
+    path: string
+  }>
+  selectedIconPack: {
+    svg: string
+  }
+}
+
 const CONNECTION_CLOSED = 2
 
 const emittersByWorkspace: EmittersRegistry = {}
 
-const initSSE = (account: string, workspace: string, baseURI: string) => {
+const initSSE = (account: string, workspace: string, baseURI: string, client: ApolloClient<NormalizedCacheObject>) => {
   if (Object.keys(window.__RENDER_8_HOT__).length === 0) {
     return undefined
   }
 
   require('eventsource-polyfill')
   const myvtexSSE = require('myvtex-sse')
-  const path = `vtex.builder-hub:*:react2,pages0,build.status?workspace=${workspace}`
+  const path = `vtex.builder-hub:*:styles1,react2,pages0,build.status?workspace=${workspace}`
   const source: EventSource = myvtexSSE(account, workspace, path, {verbose: false, host: baseURI})
 
   const handler = ({data}: MessageEvent) => {
@@ -54,6 +74,46 @@ const initSSE = (account: string, workspace: string, baseURI: string) => {
           break
       }
       return
+    }
+
+    if (key === 'styles1') {
+      client.query<StylesInformation>({ query: stylesInformation }).then((result) => {
+        try {
+          const styleTag = document.getElementById(STYLE_ID)
+          if (styleTag) {
+            styleTag.setAttribute('href', result.data.selectedStyle.path)
+          }
+        } catch (err) {
+          console.error('[styles1] There was a problem updating the style')
+        }
+        try {
+          const overridesTags = Array.from(document.getElementsByClassName(OVERRIDE_ID))
+          overridesTags.forEach(tag => {
+            if (tag.parentNode) {
+              tag.parentNode.removeChild(tag)
+            }
+          })
+          result.data.listOverrides.forEach((override, index) => {
+            const overrideTag = document.createElement('link')
+            overrideTag.setAttribute('rel', 'stylesheet')
+            overrideTag.setAttribute('type', 'text/css')
+            overrideTag.setAttribute('href', override.path)
+            overrideTag.setAttribute('id', `${OVERRIDE_ID}_${index}`)
+            overrideTag.setAttribute('class', OVERRIDE_ID)
+            document.head.appendChild(overrideTag)
+          })
+        } catch (err) {
+          console.error('[styles1] There was a problem updating overrides')
+        }
+        try {
+          const iconPackTag = document.getElementById(ICONPACK_ID)
+          if (iconPackTag) {
+            iconPackTag.innerHTML = result.data.selectedIconPack.svg
+          }
+        } catch (err) {
+          console.error('[styles1] There was a problem updating the iconpack')
+        }
+      })
     }
 
     switch (type) {
@@ -86,7 +146,7 @@ const initSSE = (account: string, workspace: string, baseURI: string) => {
   return source
 }
 
-export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
+export const registerEmitter = (runtime: RenderRuntime, baseURI: string, client: ApolloClient<NormalizedCacheObject>) => {
   if (!canUseDOM) {
     return
   }
@@ -96,14 +156,14 @@ export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
   // Share SSE connections for same account and workspace
   if (!emittersByWorkspace[`${account}/${workspace}`]) {
     emittersByWorkspace[`${account}/${workspace}`] = []
-    emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(account, workspace, baseURI)
+    emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(account, workspace, baseURI, client)
 
     if (!production) {
       document.addEventListener('visibilitychange', () => {
         const es = emittersByWorkspace[`${account}/${workspace}`].eventSource
         // Ensure SSE server connection
         if (!document.hidden && es && es.readyState === CONNECTION_CLOSED) {
-          emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(account, workspace, baseURI)
+          emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(account, workspace, baseURI, client)
         }
       })
     }

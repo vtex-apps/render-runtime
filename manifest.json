@@ -9,7 +9,8 @@
     "react": "3.x"
   },
   "dependencies": {
-    "vtex.pages-graphql": "2.x"
+    "vtex.pages-graphql": "2.x",
+    "vtex.styles-graphql": "1.x"
   },
   "mustUpdateAt": "2018-09-05",
   "categories": [],

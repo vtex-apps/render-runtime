@@ -1,0 +1,11 @@
+query stylesInformation {
+  selectedStyle {
+    path
+  }
+  listOverrides {
+    path
+  }
+  selectedIconPack {
+    svg
+  }
+}

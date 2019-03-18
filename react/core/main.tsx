@@ -29,7 +29,6 @@ import PageCacheControl from '../utils/cacheControl'
 import { getState } from '../utils/client'
 import { buildCacheLocator } from '../utils/client'
 import { ensureContainer, getContainer, getMarkups } from '../utils/dom'
-import { registerEmitter } from '../utils/events'
 import { getBaseURI } from '../utils/host'
 import { addLocaleData } from '../utils/locales'
 import { withSession } from '../utils/session'
@@ -84,7 +83,6 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
 
   const cacheControl = canUseDOM ? undefined : new PageCacheControl()
   const baseURI = getBaseURI(runtime)
-  registerEmitter(runtime, baseURI)
   emitter = runtime.emitter
   addLocaleData(locale)
 
