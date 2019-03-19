@@ -28,7 +28,7 @@
     "query-string": "^6.4.2",
     "ramda": "^0.26.1",
     "react-apollo": "^2.5.2",
-    "react-content-loader": "^3.4.2",
+    "react-content-loader": "^4.0.1",
     "react-helmet": "^5.2.0",
     "react-json-view": "^1.19.1",
     "react-no-ssr": "^1.1.0",
