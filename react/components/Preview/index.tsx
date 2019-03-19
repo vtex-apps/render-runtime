@@ -20,7 +20,7 @@ export default class Preview extends React.PureComponent<
   Props,
   State
 > {
-  private container: RefObject<HTMLDivElement>;
+  private container: RefObject<HTMLDivElement>
 
   constructor(props: Props) {
     super(props)
@@ -57,6 +57,9 @@ export default class Preview extends React.PureComponent<
   )
 
   componentDidMount() { // tslint:disable-line member-access member-ordering
+    /** Fixes a bug on react-content-loader related to limiting
+     * the width of the component
+     */
     const containerElement = this.container.current
     if (!containerElement) {
       return
