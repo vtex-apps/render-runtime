@@ -29,12 +29,12 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   }
 
   public static childContextTypes = {
-    treePath: PropTypes.string
+    treePath: PropTypes.string,
   }
 
   public static getDerivedStateFromProps(props: ExtendedProps) {
     return {
-      newTreePath: ExtensionPoint.mountTreePath(props.id, props.treePath)
+      newTreePath: ExtensionPoint.mountTreePath(props.id, props.treePath),
     }
   }
 
@@ -48,7 +48,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     super(props)
 
     this.state = {
-      newTreePath: ExtensionPoint.mountTreePath(props.id, props.treePath)
+      newTreePath: ExtensionPoint.mountTreePath(props.id, props.treePath),
     }
   }
 
