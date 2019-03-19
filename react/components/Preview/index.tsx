@@ -38,6 +38,7 @@ export default class Preview extends React.PureComponent<
 
     switch (type) {
       case 'box':
+      /** TODO: deprecate block in favor of box */
       case 'block':
         return <Box width={width} height={height} />
       case 'text': 
