@@ -78,7 +78,8 @@ export default class Preview extends React.PureComponent<
     const width = initialWidth ? Math.min(maxWidth, initialWidth) : maxWidth
 
     return (
-      /** TODO: remove this div in favor of the Container component
+      /** TODO: remove this div in favor of the Container component,
+       * currently on store-components
        * @author: lbebber
        */
       <div
