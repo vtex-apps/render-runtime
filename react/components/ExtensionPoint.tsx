@@ -76,32 +76,36 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     )
   }
 
-  private renderPreview = (runtime: RenderContext) => {
+  /** This function is used for rendering the previews of child elements
+   * of the component, while the component is not loaded
+   */
+  private renderChildElements = (runtime: RenderContext) => {
     const { newTreePath } = this.state
     const extension = runtime.extensions && runtime.extensions[newTreePath]
     const { props = {} } = extension || {}
 
-    const { elements } = props
+    const elementIds: string[]  = props.elements
 
-    const previews = elements && elements.map((element:string, i:number) => {
-      const elementTreePath = `${runtime.page}/${element}`
-      const currentExtension = runtime.extensions[elementTreePath]
+    const elements = elementIds &&
+      elementIds.map((elementId:string, i:number) => {
+        const elementTreePath = `${runtime.page}/${elementId}`
+        const currentExtension = runtime.extensions[elementTreePath]
 
-      if (currentExtension) {
-        return (
-          <TreePathContext.Provider value={{ treePath: elementTreePath }} key={i}>
-            <ExtensionPointComponent
-              component={currentExtension.component}
-              props={currentExtension.props}
-              runtime={runtime}
-              treePath={elementTreePath} />
-          </TreePathContext.Provider>
-        )
-      }
-      return null
-    })
+        if (currentExtension) {
+          return (
+            <TreePathContext.Provider value={{ treePath: elementTreePath }} key={i}>
+              <ExtensionPointComponent
+                component={currentExtension.component}
+                props={currentExtension.props}
+                runtime={runtime}
+                treePath={elementTreePath} />
+            </TreePathContext.Provider>
+          )
+        }
+        return null
+      })
 
-    return previews
+    return elements
   }
 
   private getExtensionPointComponent = (runtime: RenderContext) => {
@@ -136,7 +140,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
               treePath={newTreePath}>
               {children}
             </ExtensionPointComponent>
-          ) : this.renderPreview(runtime)}
+          ) : this.renderChildElements(runtime)}
         </TreePathContext.Provider>
       )
     )
