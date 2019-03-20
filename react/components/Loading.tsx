@@ -10,7 +10,7 @@ interface Props {
 }
 
 class Loading extends Component<RenderContextProps & Props> {
-  public render() { // tslint:disable-line member-ordering
+  public render() {
     const { runtime: { extensions } } = this.props
 
     return (
