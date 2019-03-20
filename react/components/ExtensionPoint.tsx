@@ -102,13 +102,13 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
         before,
         newTreePath,
         props,
-        <Loading />,
+        <Loading />
       )
     }
 
     const isDynamicLayout = extension && extension.layoutMode === 'dynamic'
 
-    const componentChildren = (extension.blocks && isDynamicLayout) ?
+    const componentChildren = (isDynamicLayout && extension.blocks) ?
       extension.blocks.map((block, i) =>
         <ExtensionPoint
           key={i}
