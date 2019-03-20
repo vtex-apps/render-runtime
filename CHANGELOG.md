@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.13.2] - 2019-03-20
+
 ### Changed
 
 - Change ErrorPage component to use CSS Modules
