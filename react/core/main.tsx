@@ -176,11 +176,12 @@ function start() {
         }
         // Follow Google's security recommendations concerning target blank
         // https://developers.google.com/web/tools/lighthouse/audits/noopener
+        const rel = props.rel ? props.rel.split(' ') : []
         if (
           props.target === '_blank' &&
-          !(props.rel === 'noopener' || props.rel === 'noreferrer')
+          !(rel.indexOf('noopener') !== -1 || rel.indexOf('noreferrer') !== -1)
         ) {
-          props.rel = 'noopener'
+          props.rel = rel.concat('noopener').join(' ')
         }
       }
 
