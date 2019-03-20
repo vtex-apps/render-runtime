@@ -61,10 +61,6 @@
       {
         "clientOnly": true,
         "path": "npm:vtex-render-session@1.0.1/dist/index.js"
-      },
-      {
-        "clientOnly": true,
-        "path": "https://io.vtex.com.br/rc/rc.js"
       }
     ],
     "prod": [
@@ -128,10 +124,6 @@
       {
         "clientOnly": true,
         "path": "npm:vtex-render-session@1.0.1/dist/index.min.js"
-      },
-      {
-        "clientOnly": true,
-        "path": "https://io.vtex.com.br/rc/rc.js"
       }
     ]
   },

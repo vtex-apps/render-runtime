@@ -404,10 +404,5 @@ interface RenderComponent<P={}, S={}> {
     hrtime: NodeJS.Process['hrtime']
     myvtexSSE: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
-    vtex: {
-      NavigationCapture: {
-        sendEvent: (name: string, data: any) => void
-      }
-    }
   }
 }

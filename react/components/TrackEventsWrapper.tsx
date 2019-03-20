@@ -8,15 +8,12 @@ interface Props {
 }
 
 const sendEvent = (id: string, event: string) => {
-  window.vtex.NavigationCapture.sendEvent(
-    'pageComponentInteraction',
-    {
-      pageComponentInteraction : {
-        componentId: id,
-        interactionType: event,
-      }
+  window.postMessage({
+    pageComponentInteraction : {
+      block: id,
+      interactionType: event,
     }
-  )
+  }, '*')
 }
 
 class TrackEventsWrapper extends PureComponent<Props> {
