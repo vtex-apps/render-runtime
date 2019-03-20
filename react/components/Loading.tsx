@@ -17,8 +17,8 @@ class Loading extends Component<RenderContextProps & Props> {
       <TreePathContext.Consumer>
         {(value: TreePathProps) => {
           const t = value.treePath
-
-          const preview = (t && extensions[t] && extensions[t].preview) || this.props.preview
+          const extension = t && extensions[t]
+          const preview = (extension && extension.preview) || this.props.preview
 
           return preview && <Preview {...preview} />
         }}
