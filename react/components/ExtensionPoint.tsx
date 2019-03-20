@@ -106,7 +106,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       )
     }
 
-    const isDynamicLayout = extension && extension.layoutMode === LayoutMode.dynamic
+    const isDynamicLayout = extension && extension.layoutMode === 'dynamic'
 
     const componentChildren = (extension.blocks && isDynamicLayout) ?
       extension.blocks.map((block, i) =>
