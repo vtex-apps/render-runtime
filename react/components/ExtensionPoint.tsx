@@ -84,7 +84,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const extension = runtime.extensions && runtime.extensions[newTreePath]
     const { props = {} } = extension || {}
 
-    const elementIds: string[]  = props.elements
+    const elementIds: string[] = props.elements
 
     const elements = elementIds &&
       elementIds.map((elementId:string, i:number) => {
