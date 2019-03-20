@@ -1,0 +1,27 @@
+
+.imgHeight {
+  height: 80px;
+}
+
+.errorStack {
+  margin: 20px auto;
+  max-width: 980px;
+  word-wrap: 'break-word';
+}
+
+.errorDetails {
+  font-family: 'courier, code';
+  max-width: 980px;
+  margin: 20px auto;
+  word-wrap: 'break-word';
+}
+
+.stringValue {
+  word-wrap: 'break-all';
+}
+
+@media only screen and (min-width: 40em) {
+  .imgHeight {
+    height: 225px;
+  }
+}

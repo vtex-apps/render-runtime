@@ -18,4 +18,9 @@ declare module '*.png' {
   export = url
 }
 
+declare module '*.css' {
+  const content: any;
+  export default content;
+}
+
 declare var vtex: any

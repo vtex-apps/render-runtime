@@ -3,7 +3,7 @@ import ReactJson from 'react-json-view'
 
 import ErrorImg from './images/error-img.png'
 
-import './error.global.css'
+import style from './error.css'
 
 const toSplunkLink = (rid: string) =>
   `https://splunk7.vtex.com/en-US/app/vtex_colossus/search?q=search%20index%3Dcolossus%20sender%3Dvtex.render-server%40*%20body.requestId%3D${rid}&display.page.search.mode=verbose&dispatch.sample_ratio=1&earliest=-5m%40m&latest=now`
@@ -47,7 +47,7 @@ export default class ErrorPage extends Component {
           </div>
         </div>
         <div>
-          <img src={ErrorImg} onClick={this.handleImageClick} className="img-height pb6 pb0-ns"></img>
+          <img src={ErrorImg} onClick={this.handleImageClick} className={`${style.imgHeight} pb6 pb0-ns`}></img>
         </div>
       </div>
     )
@@ -56,12 +56,12 @@ export default class ErrorPage extends Component {
   private renderErrorDetails = (error: any) => {
     return (
       <div>
-        <div className="error-stack bg-danger--faded pa7 mt4 br3 t-body lh-copy">
-        {error.stack.split('\n').map((item: string, key: number) => {
-          return <Fragment key={key}>{item}<br/></Fragment>
-        })}
+        <div className={`${style.errorStack} bg-danger--faded pa7 mt4 br3 t-body lh-copy`}>
+          {error.stack.split('\n').map((item: string, key: number) => {
+            return <Fragment key={key}>{item}<br/></Fragment>
+          })}
         </div>
-        <div className="error-details bg-warning--faded pa7 mt4 br3 lh-copy">
+        <div className={`${style.errorDetails} bg-warning--faded pa7 mt4 br3 lh-copy`}>
           <ReactJson src={error.details} />
         </div>
       </div>
