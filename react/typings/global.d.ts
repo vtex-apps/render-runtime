@@ -41,6 +41,11 @@ declare global {
     height: number
   }
 
+  enum LayoutMode {
+    static = 'static',
+    dynamic = 'dynamic',
+  }
+
   interface BlockInsertion {
     extensionPointId: string
     blockId: string
@@ -62,6 +67,7 @@ declare global {
     content?: Record<string, any>
     shouldRender?: boolean
     preview?: Preview
+    layoutMode: LayoutMode
   }
 
   interface Extensions {
