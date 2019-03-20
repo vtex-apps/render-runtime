@@ -97,7 +97,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const elementIds: string[] = props.elements
 
     const elements = elementIds &&
-      elementIds.map((elementId:string, i:number) => {
+      elementIds.map((elementId:string, i) => {
         const elementTreePath = `${runtime.page}/${elementId}`
         const currentExtension = runtime.extensions[elementTreePath]
 
