@@ -12,6 +12,7 @@ const sendEvent = (id: string, event: string) => {
     pageComponentInteraction : {
       blockId: id,
       interactionType: event,
+      namespace: 'renderRuntime',
     }
   }, '*')
 }
