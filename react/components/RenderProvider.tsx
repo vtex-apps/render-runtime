@@ -17,7 +17,6 @@ import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { traverseComponent } from '../utils/components'
 import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils/dom'
-import { loadLocaleData } from '../utils/locales'
 import {
   getRouteFromPath,
   goBack as pageGoBack,
@@ -147,6 +146,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private sessionPromise: Promise<void>
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
+  private lastNavigatedRouteId: string
 
   constructor(props: Props) {
     super(props)
@@ -172,6 +172,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       window.browserHistory = global.browserHistory = history
     }
 
+    this.lastNavigatedRouteId = route.id
     // todo: reload window if client-side created a segment different from server-side
     this.sessionPromise = canUseDOM ? window.__RENDER_8_SESSION__.sessionPromise : Promise.resolve()
     const runtimeContextLink = this.createRuntimeContextLink()
@@ -356,7 +357,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onPageChanged = (location: RenderHistoryLocation) => {
     const { runtime: { renderMajor } } = this.props
-    const { culture: { locale }, pages: pagesState, production, device, defaultExtensions, route, loadedPages } = this.state
+    const { culture: { locale }, pages: pagesState, production, defaultExtensions, route, loadedPages } = this.state
     const { state } = location
 
     // Make sure this is our navigation
@@ -375,6 +376,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {[page]: {allowConditions, declarer}} = pagesState
     const shouldSkipFetchNavigationData = !allowConditions && loadedPages.has(page)
     const query = parse(location.search.substr(1))
+    this.lastNavigatedRouteId = page
 
     if (shouldSkipFetchNavigationData) {
       return this.setState({
@@ -421,12 +423,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       settings
     }: ParsedPageQueryResponse) => {
-      try {
-        if (this.props.history && this.props.history.location.state.navigationRoute.id !== page) {
-          return
-        }
-      } catch (e) {
-        console.error('Failed to access history location state')
+      if (routeId !== this.lastNavigatedRouteId) {
+        return
       }
 
       const updatedRoute = {...transientRoute, ...matchingPage}
