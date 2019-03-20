@@ -10,7 +10,7 @@ interface Props {
 const sendEvent = (id: string, event: string) => {
   window.postMessage({
     pageComponentInteraction : {
-      block: id,
+      blockId: id,
       interactionType: event,
     }
   }, '*')
