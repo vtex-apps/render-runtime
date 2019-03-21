@@ -20,6 +20,7 @@ import ExtensionContainer from '../components/ExtensionContainer'
 import { PortalRenderingRequest } from '../components/ExtensionManager'
 import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
+import { useChildBlock, ChildBlock } from '../components/ChildBlock'
 import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
 import Link from '../components/Link'
 import { RenderContext, useRuntime, withRuntimeContext  } from '../components/RenderContext'
@@ -193,6 +194,8 @@ export {
   start,
   withHMR,
   withRuntimeContext,
+  ChildBlock,
+  useChildBlock,
   useRuntime,
   withSession,
   Loading,
