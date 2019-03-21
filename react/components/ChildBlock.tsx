@@ -10,7 +10,8 @@ export function useChildBlock({ id }: ChildBlock) : Block | null {
   const block = runtime.extensions && runtime.extensions[childPath]
 
   // We are explicitly not exposing the private API here
-  return block ? { exists: true } : null
+  /** Placeholder for possible block data in the future  */
+  return block ? {} : null
 }
 
 export function ChildBlock({ id, children }: ChildBlockProps) {
@@ -23,8 +24,9 @@ interface ChildBlock {
   id: string
 }
 
+/** Placeholder for possible block data in the future */
+/* tslint:disable-next-line no-empty-interface */
 interface Block {
-  exists: boolean
 }
 
 interface ChildBlockProps extends ChildBlock {
