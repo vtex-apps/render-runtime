@@ -102,9 +102,20 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
         before,
         newTreePath,
         props,
-        <Loading />,
+        <Loading />
       )
     }
+
+    const isDynamicLayout = extension && extension.unstable__layoutMode === 'dynamic'
+
+    const componentChildren = (isDynamicLayout && extension.blocks) ?
+      extension.blocks.map((block, i) =>
+        <ExtensionPoint
+          key={i}
+          id={block.extensionPointId}
+          treePath={newTreePath}
+        />
+      ) : children
 
     return component
       ? this.withOuterExtensions(
@@ -118,7 +129,9 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
               events={track}
               id={id}>
               <TreePathContext.Provider value={{ treePath: newTreePath }}>
-                <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>{children}</ExtensionPointComponent>
+                <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>
+                  {componentChildren}
+                </ExtensionPointComponent>
               </TreePathContext.Provider>
             </TrackEventsWrapper>
           )

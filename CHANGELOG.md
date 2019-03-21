@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.15.0] - 2019-03-21
+### Added
+- Added support for `unstable__layoutMode`.
+
 ## [8.14.0] - 2019-03-21
 ### Added
 - `TrackEventsWrapper` to add event listener based in track field of interface
