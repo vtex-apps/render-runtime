@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.14.0] - 2019-03-21
+### Added
+- `TrackEventsWrapper` to add event listener based in track field of interface
+
 ## [8.13.2] - 2019-03-20
 
 ### Changed

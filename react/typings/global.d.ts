@@ -57,6 +57,7 @@ declare global {
       props?: any
     }
     component: string
+    track?: string[]
     props?: any
     content?: Record<string, any>
     shouldRender?: boolean
