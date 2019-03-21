@@ -16,11 +16,11 @@ import {Helmet} from 'react-helmet'
 import NoSSR from 'react-no-ssr'
 import Loading from '../components/Loading'
 
+import { ChildBlock, useChildBlock } from '../components/ChildBlock'
 import ExtensionContainer from '../components/ExtensionContainer'
 import { PortalRenderingRequest } from '../components/ExtensionManager'
 import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
-import { useChildBlock, ChildBlock } from '../components/ChildBlock'
 import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
 import Link from '../components/Link'
 import { RenderContext, useRuntime, withRuntimeContext  } from '../components/RenderContext'
@@ -194,8 +194,8 @@ export {
   start,
   withHMR,
   withRuntimeContext,
-  ChildBlock,
-  useChildBlock,
+  ChildBlock as Unstable__ChildBlock,
+  useChildBlock as unstable__useChildBlock,
   useRuntime,
   withSession,
   Loading,

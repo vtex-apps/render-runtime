@@ -1,6 +1,6 @@
 import React from 'react'
-import { useRuntime } from './RenderContext'
 import { useTreePath } from '../utils/treePath'
+import { useRuntime } from './RenderContext'
 
 export function useChildBlock({ id }: ChildBlock) : Block | null {
   const runtime = useRuntime()
