@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Add `useChildBlock` and `ChildBlock`. This feature makes it possible to check the existence of a child block. It is useful for developing a component, such as Header, which will create a compat mode that will check for the existence of the new block if it's not present will render the legacy block.
+
 ## [8.15.0] - 2019-03-21
 ### Added
 - Added support for `unstable__layoutMode`.
