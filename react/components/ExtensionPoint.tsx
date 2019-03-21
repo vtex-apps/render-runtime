@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { mergeDeepRight, reduce } from 'ramda'
 import React, { Component, Fragment } from 'react'
 import ReactDOM from 'react-dom'
 
@@ -82,17 +83,16 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const { newTreePath } = this.state
     const { children, params, query, id, treePath, ...parentProps } = this.props
     const extension = runtime.extensions && runtime.extensions[newTreePath]
-    const { component = null, after = [], around = [], before = [], content = {}, props: extensionProps = null, track = [] } = extension || {}
+    const { component = null, after = [], around = [], before = [], content = {}, props: extensionProps = {}, track = [] } = extension || {}
 
     this.component = component
 
-    const props = {
-      ...parentProps,
-      ...extensionProps,
-      ...content,
-      params,
-      query,
-    }
+    const props = reduce(mergeDeepRight, {}, [
+      parentProps,
+      extensionProps,
+      content,
+      { params, query },
+    ])
 
     let loading = null
     if (runtime.preview) {
