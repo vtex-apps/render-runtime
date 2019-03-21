@@ -67,7 +67,7 @@ declare global {
     content?: Record<string, any>
     shouldRender?: boolean
     preview?: Preview
-    layoutMode?: LayoutMode
+    unstable__layoutMode?: LayoutMode
   }
 
   interface Extensions {
