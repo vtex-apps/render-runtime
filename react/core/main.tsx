@@ -195,7 +195,7 @@ export {
   withHMR,
   withRuntimeContext,
   ChildBlock as Unstable__ChildBlock,
-  useChildBlock as unstable__useChildBlock,
+  useChildBlock as useChildBlock__unstable,
   useRuntime,
   withSession,
   Loading,
