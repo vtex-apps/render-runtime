@@ -222,7 +222,8 @@ declare global {
     declarer?: string
     paramsJSON?: string
     path?: string
-    renderMajor: number
+    renderMajor: number,
+    query: string
   }
 
 interface RenderComponent<P={}, S={}> {

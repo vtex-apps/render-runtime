@@ -68,7 +68,8 @@ export const fetchNavigationPage = ({
   declarer,
   production,
   paramsJSON,
-  renderMajor
+  renderMajor,
+  query
 }: FetchNavigationDataInput) => apolloClient.query<{navigationPage: PageQueryResponse}>({
   fetchPolicy: production ? 'cache-first' : 'network-only',
   query: navigationPageQuery,
@@ -76,8 +77,9 @@ export const fetchNavigationPage = ({
     declarer,
     params: paramsJSON,
     production,
+    query,
     renderMajor,
-    routeId,
+    routeId
   }
 }).then<ParsedPageQueryResponse>(({data: {navigationPage: pageData}, errors}: GraphQLResult<'navigationPage', PageQueryResponse>) =>
       errors ? Promise.reject(errors) : parsePageQueryResponse(pageData))

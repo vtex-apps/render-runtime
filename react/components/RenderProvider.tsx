@@ -374,7 +374,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const transientRoute = {...route, ...navigationRoute}
     const {[page]: {allowConditions, declarer}} = pagesState
     const shouldSkipFetchNavigationData = !allowConditions && loadedPages.has(page)
-    const query = parse(location.search.substr(1))
+    const query = parse(window.location.search.substr(1))
+
+    if(this.state.query && 'disableUserLand' in this.state.query && this.state.query.disableUserLand !== 'false'){
+      query['disableUserLand'] = this.state.query.disableUserLand
+      const queryString = Object.keys(query).map(key => `${key}${query[key]? '=' + query[key]: ''}`).join('&')
+      window.browserHistory.replace(`?${queryString}`)
+    }
 
     if (shouldSkipFetchNavigationData) {
       return this.setState({
@@ -409,8 +415,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       locale,
       paramsJSON,
       production,
+      query: JSON.stringify(query),
       renderMajor,
-      routeId,
+      routeId
     }).then(({
       appsEtag,
       cacheHints,
@@ -550,6 +557,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       paramsJSON,
       path: pathname,
       production,
+      query: '',
       renderMajor,
       routeId: page,
       ...options,
