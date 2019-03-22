@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.16.0] - 2019-03-22
+
+### Added
+
+- Add experimental features `useChildBlock__unstable` and `Unstable__ChildBlock`. It allows checking whether a child block was included or not.
+
 ## [8.15.0] - 2019-03-21
 ### Added
 - Added support for `unstable__layoutMode`.

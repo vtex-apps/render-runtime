@@ -16,6 +16,7 @@ import {Helmet} from 'react-helmet'
 import NoSSR from 'react-no-ssr'
 import Loading from '../components/Loading'
 
+import { ChildBlock, useChildBlock } from '../components/ChildBlock'
 import ExtensionContainer from '../components/ExtensionContainer'
 import { PortalRenderingRequest } from '../components/ExtensionManager'
 import ExtensionPoint from '../components/ExtensionPoint'
@@ -193,6 +194,8 @@ export {
   start,
   withHMR,
   withRuntimeContext,
+  ChildBlock as Unstable__ChildBlock,
+  useChildBlock as useChildBlock__unstable,
   useRuntime,
   withSession,
   Loading,
