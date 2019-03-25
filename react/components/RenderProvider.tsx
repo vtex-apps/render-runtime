@@ -376,10 +376,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const shouldSkipFetchNavigationData = !allowConditions && loadedPages.has(page)
     const query = parse(window.location.search.substr(1))
 
+    // Store and pass disableUserLand logic to navigation
     if(this.state.query && 'disableUserLand' in this.state.query && this.state.query.disableUserLand !== 'false'){
       query['disableUserLand'] = this.state.query.disableUserLand
-      const queryString = Object.keys(query).map(key => `${key}${query[key]? '=' + query[key]: ''}`).join('&')
-      window.browserHistory.replace(`?${queryString}`)
+      const queryString = '?' + Object.keys(query).map(key => `${key}${query[key]? '=' + query[key]: ''}`).join('&')
+      if(this.props.history){
+        const historyCache = JSON.stringify(this.props.history)
+        window.browserHistory.replace(queryString)
+        this.props.history.location = {...JSON.parse(historyCache).location, search:queryString}
+      }
     }
 
     if (shouldSkipFetchNavigationData) {
