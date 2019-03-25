@@ -6,7 +6,7 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { parse } from 'qs'
+import { parse, stringify } from 'qs'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -379,7 +379,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // Store and pass disableUserLand logic to navigation
     if(this.state.query && 'disableUserLand' in this.state.query && this.state.query.disableUserLand !== 'false'){
       query['disableUserLand'] = this.state.query.disableUserLand
-      const queryString = '?' + Object.keys(query).map(key => `${key}${query[key]? '=' + query[key]: ''}`).join('&')
+      const queryString = stringify(query, {addQueryPrefix: true})
       if(this.props.history){
         const historyCache = JSON.stringify(this.props.history)
         window.browserHistory.replace(queryString)
