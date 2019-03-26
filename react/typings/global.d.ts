@@ -41,9 +41,9 @@ declare global {
     height: number
   }
 
-  enum LayoutMode {
-    static = 'static',
-    dynamic = 'dynamic',
+  enum Composition {
+    blocks = 'blocks',
+    children = 'children',
   }
 
   interface BlockInsertion {
@@ -57,6 +57,7 @@ declare global {
     before?: string[]
     blockId?: string
     blocks?: BlockInsertion[]
+    children?: BlockInsertion[]
     context?: {
       component: string
       props?: any
@@ -67,7 +68,7 @@ declare global {
     content?: Record<string, any>
     shouldRender?: boolean
     preview?: Preview
-    unstable__layoutMode?: LayoutMode
+    composition?: Composition
   }
 
   interface Extensions {
