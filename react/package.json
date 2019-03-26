@@ -26,6 +26,7 @@
     "myvtex-sse": "^1.2.0",
     "prop-types": "^15.6.0",
     "qs": "^6.5.1",
+    "query-string": "^6.4.0",
     "ramda": "^0.26.1",
     "react-apollo": "^2.5.2",
     "react-content-loader": "^3.4.2",

@@ -16,12 +16,18 @@ import { fetchAssets, getImplementation, preloadAssets } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { traverseComponent } from '../utils/components'
-import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils/dom'
+import {
+  RENDER_CONTAINER_CLASS,
+  ROUTE_CLASS_PREFIX,
+  routeClass,
+} from '../utils/dom'
 import {
   getRouteFromPath,
   goBack as pageGoBack,
+  mapToQueryString,
   navigate as pageNavigate,
   NavigateOptions,
+  queryStringToMap,
   scrollTo as pageScrollTo,
 } from '../utils/pages'
 import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
@@ -61,7 +67,11 @@ export interface RenderProviderState {
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
-let isStorefrontIframe: (runtime: RenderContext | null, messages?: Record<string, string>, shouldUpdateRuntime?: boolean) => void | undefined
+let isStorefrontIframe: (
+  runtime: RenderContext | null,
+  messages?: Record<string, string>,
+  shouldUpdateRuntime?: boolean
+) => void | undefined
 
 try {
   if (canUseDOM && window.top !== window.self && window.top.__provideRuntime) {
@@ -72,27 +82,37 @@ try {
 }
 
 // tslint:disable-next-line:no-empty
-const noop = (() => {})
+const noop = () => {}
 
-const unionKeys = (record1: any, record2: any) => [...new Set([...Object.keys(record1), ...Object.keys(record2)])]
+const unionKeys = (record1: any, record2: any) => [
+  ...new Set([...Object.keys(record1), ...Object.keys(record2)]),
+]
 
 const isChildOrSelf = (child: string, parent: string) =>
-  child === parent || (child.startsWith(`${parent}/`) && !child.startsWith(`${parent}/$`))
+  child === parent ||
+  (child.startsWith(`${parent}/`) && !child.startsWith(`${parent}/$`))
 
-const replaceExtensionsWithDefault = (extensions: Extensions, page: string, defaultExtensions: Extensions) =>
-  unionKeys(extensions, defaultExtensions)
-  .reduce((acc, key) => {
-    const maybeExtension = isChildOrSelf(key, page)
-      ? defaultExtensions[key] || {
-        ...extensions[key],
-        component: null,
+const replaceExtensionsWithDefault = (
+  extensions: Extensions,
+  page: string,
+  defaultExtensions: Extensions
+) => {
+  return unionKeys(extensions, defaultExtensions).reduce(
+    (acc, key) => {
+      const maybeExtension = isChildOrSelf(key, page)
+        ? defaultExtensions[key] || {
+            ...extensions[key],
+            component: null,
+          }
+        : extensions[key]
+      if (maybeExtension) {
+        acc[key] = maybeExtension
       }
-      : extensions[key]
-    if (maybeExtension) {
-      acc[key] = maybeExtension
-    }
-    return acc
-  }, {} as Extensions)
+      return acc
+    },
+    {} as Extensions
+  )
+}
 
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
@@ -122,6 +142,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     query: PropTypes.object,
     route: PropTypes.object,
     setDevice: PropTypes.func,
+    setQuery: PropTypes.func,
     updateComponentAssets: PropTypes.func,
     updateExtension: PropTypes.func,
     updateRuntime: PropTypes.func,
@@ -138,7 +159,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public sendInfoFromIframe = debounce((shouldUpdateRuntime?: boolean) => {
     if (isStorefrontIframe) {
       const { messages } = this.state
-      window.top.__provideRuntime(this.getChildContext(), messages, shouldUpdateRuntime)
+      window.top.__provideRuntime(
+        this.getChildContext(),
+        messages,
+        shouldUpdateRuntime
+      )
     }
   }, SEND_INFO_DEBOUNCE_MS)
 
@@ -150,7 +175,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   constructor(props: Props) {
     super(props)
-    const { appsEtag, cacheHints, culture, messages, components, extensions, pages, page, query, production, settings } = props.runtime
+    const {
+      appsEtag,
+      cacheHints,
+      culture,
+      messages,
+      components,
+      extensions,
+      pages,
+      page,
+      query,
+      production,
+      settings,
+    } = props.runtime
     const { history, baseURI, cacheControl } = props
     const path = canUseDOM ? window.location.pathname : window.__pathname__
     const route = props.runtime.route || getRouteFromPath(path, pages)
@@ -165,7 +202,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             path: route.path,
           },
           renderRouting: true,
-        }
+        },
       }
       history.replace(renderLocation)
       // backwards compatibility
@@ -174,10 +211,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     this.lastNavigatedRouteId = route.id
     // todo: reload window if client-side created a segment different from server-side
-    this.sessionPromise = canUseDOM ? window.__RENDER_8_SESSION__.sessionPromise : Promise.resolve()
+    this.sessionPromise = canUseDOM
+      ? window.__RENDER_8_SESSION__.sessionPromise
+      : Promise.resolve()
     const runtimeContextLink = this.createRuntimeContextLink()
     const ensureSessionLink = this.createEnsureSessionLink()
-    this.apolloClient = getClient(props.runtime, baseURI, runtimeContextLink, ensureSessionLink, cacheControl)
+    this.apolloClient = getClient(
+      props.runtime,
+      baseURI,
+      runtimeContextLink,
+      ensureSessionLink,
+      cacheControl
+    )
 
     this.state = {
       appsEtag,
@@ -218,7 +263,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // If RenderProvider is being re-rendered, the global runtime might have changed
     // so we must update all extensions.
     if (this.rendered) {
-      const { runtime: { extensions } } = nextProps
+      const {
+        runtime: { extensions },
+      } = nextProps
       this.setState({ extensions })
     }
   }
@@ -238,8 +285,26 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public getChildContext() {
     const { history, runtime } = this.props
-    const { components, extensions, page, pages, preview, culture, device, route, query, defaultExtensions } = this.state
-    const { account, emitter, hints, production, publicEndpoint, workspace } = runtime
+    const {
+      components,
+      extensions,
+      page,
+      pages,
+      preview,
+      culture,
+      device,
+      route,
+      query,
+      defaultExtensions,
+    } = this.state
+    const {
+      account,
+      emitter,
+      hints,
+      production,
+      publicEndpoint,
+      workspace,
+    } = runtime
 
     return {
       account,
@@ -268,6 +333,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query,
       route,
       setDevice: this.handleSetDevice,
+      setQuery: this.setQuery,
       updateComponentAssets: this.updateComponentAssets,
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
@@ -285,7 +351,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public patchSession = (data?: any) => {
-    return this.sessionPromise.then(() => canUseDOM ? window.__RENDER_8_SESSION__.patchSession(data) : undefined)
+    return this.sessionPromise.then(() =>
+      canUseDOM ? window.__RENDER_8_SESSION__.patchSession(data) : undefined
+    )
   }
 
   public getCustomMessages = (locale: string) => {
@@ -294,12 +362,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const customMessages = componentsArray
       .map(getImplementation)
-      .filter(component => component && (component.getCustomMessages || component.WrappedComponent))
+      .filter(
+        component =>
+          component &&
+          (component.getCustomMessages || component.WrappedComponent)
+      )
       .map(component => {
-        const getCustomMessages = component.getCustomMessages || (component.WrappedComponent && component.WrappedComponent.getCustomMessages) || noop
+        const getCustomMessages =
+          component.getCustomMessages ||
+          (component.WrappedComponent &&
+            component.WrappedComponent.getCustomMessages) ||
+          noop
         return getCustomMessages(locale)
       })
-      .reduce((acc, strings) => ({...acc, ...strings}), {})
+      .reduce((acc, strings) => ({ ...acc, ...strings }), {})
 
     return customMessages
   }
@@ -307,6 +383,32 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public goBack = () => {
     const { history } = this.props
     return pageGoBack(history)
+  }
+
+  public setQuery = (
+    query: Record<string, any> = {},
+    merge: boolean = true
+  ): boolean => {
+    const { history } = this.props
+    const {
+      pages,
+      page,
+      route: { params },
+    } = this.state
+    if (!history) {
+      return false
+    }
+    const {
+      location: { search },
+    } = history
+    const current = queryStringToMap(search)
+    const nextQuery = mapToQueryString({ ...current, ...query })
+    return pageNavigate(history, pages, {
+      query: nextQuery,
+      page,
+      params,
+      fetchPage: false,
+    })
   }
 
   public navigate = (options: NavigateOptions) => {
@@ -318,18 +420,17 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public replaceRouteClass = (route: string) => {
     try {
       const containers = document.getElementsByClassName(RENDER_CONTAINER_CLASS)
-      const currentRouteClass = containers[0].className.split(' ').find(c => c.startsWith(ROUTE_CLASS_PREFIX))
+      const currentRouteClass = containers[0].className
+        .split(' ')
+        .find(c => c.startsWith(ROUTE_CLASS_PREFIX))
       const newRouteClass = routeClass(route)
 
-      Array.prototype.forEach.call(
-        containers,
-        (e: Element) => {
-          if (currentRouteClass) {
-            e.classList.remove(currentRouteClass)
-          }
-          e.classList.add(newRouteClass)
+      Array.prototype.forEach.call(containers, (e: Element) => {
+        if (currentRouteClass) {
+          e.classList.remove(currentRouteClass)
         }
-      )
+        e.classList.add(newRouteClass)
+      })
     } catch (e) {
       console.error('Failed to set route class', routeClass(route))
     }
@@ -343,21 +444,32 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
       const options = scrollOptions || { top: 0, left: 0 }
       window.setTimeout(() => pageScrollTo(options), 0)
-    }
-    catch (e) {
+    } catch (e) {
       console.warn('Failed to scroll after page navigation.')
     }
   }
 
-  public afterPageChanged = (route: string, scrollOptions?: RenderScrollOptions) => {
+  public afterPageChanged = (
+    route: string,
+    scrollOptions?: RenderScrollOptions
+  ) => {
     this.replaceRouteClass(route)
     this.scrollTo(scrollOptions)
     this.sendInfoFromIframe()
   }
 
   public onPageChanged = (location: RenderHistoryLocation) => {
-    const { runtime: { renderMajor } } = this.props
-    const { culture: { locale }, pages: pagesState, production, defaultExtensions, route, loadedPages } = this.state
+    const {
+      runtime: { renderMajor },
+    } = this.props
+    const {
+      culture: { locale },
+      pages: pagesState,
+      production,
+      defaultExtensions,
+      route,
+      loadedPages,
+    } = this.state
     const { state } = location
 
     // Make sure this is our navigation
@@ -370,32 +482,45 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return
     }
 
-    const { navigationRoute } = state
+    const { navigationRoute, fetchPage } = state
     const { id: page, params } = navigationRoute
-    const transientRoute = {...route, ...navigationRoute}
-    const {[page]: {allowConditions, declarer}} = pagesState
-    const shouldSkipFetchNavigationData = !allowConditions && loadedPages.has(page)
+    const transientRoute = { ...route, ...navigationRoute }
+    const {
+      [page]: { allowConditions, declarer },
+    } = pagesState
+    const shouldSkipFetchNavigationData =
+      (!allowConditions && loadedPages.has(page)) || !fetchPage
     const query = parse(location.search.substr(1))
     this.lastNavigatedRouteId = page
 
-    if (shouldSkipFetchNavigationData) {
-      return this.setState({
-        page,
-        query,
-        route: transientRoute,
-      }, () => this.afterPageChanged(page, state.scrollOptions))
+    if (true || shouldSkipFetchNavigationData) {
+      return this.setState(
+        {
+          page,
+          query,
+          route: transientRoute,
+        },
+        () => this.afterPageChanged(page, state.scrollOptions)
+      )
     }
 
-    this.setState({
-      extensions: replaceExtensionsWithDefault(this.state.extensions, page, defaultExtensions),
-      page,
-      preview: true,
-      query,
-      route: transientRoute,
-    }, () => {
-      this.replaceRouteClass(page)
-      this.scrollTo(state.scrollOptions)
-    })
+    this.setState(
+      {
+        extensions: replaceExtensionsWithDefault(
+          this.state.extensions,
+          page,
+          defaultExtensions
+        ),
+        page,
+        preview: true,
+        query,
+        route: transientRoute,
+      },
+      () => {
+        this.replaceRouteClass(page)
+        this.scrollTo(state.scrollOptions)
+      }
+    )
 
     const paramsJSON = JSON.stringify(params)
     const apolloClient = this.apolloClient
@@ -413,36 +538,41 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       production,
       renderMajor,
       routeId,
-    }).then(({
-      appsEtag,
-      cacheHints,
-      components,
-      extensions,
-      matchingPage,
-      messages,
-      pages,
-      settings
-    }: ParsedPageQueryResponse) => {
-      if (routeId !== this.lastNavigatedRouteId) {
-        return
-      }
-
-      const updatedRoute = {...transientRoute, ...matchingPage}
-      this.setState({
+    }).then(
+      ({
         appsEtag,
         cacheHints,
-        components: { ...this.state.components, ...components },
-        extensions: { ...this.state.extensions, ...extensions},
-        loadedPages: loadedPages.add(page),
-        messages: { ...this.state.messages, ...messages },
-        page,
+        components,
+        extensions,
+        matchingPage,
+        messages,
         pages,
-        preview: false,
-        query,
-        route: updatedRoute,
         settings,
-      }, () => this.sendInfoFromIframe())
-    })
+      }: ParsedPageQueryResponse) => {
+        if (routeId !== this.lastNavigatedRouteId) {
+          return
+        }
+
+        const updatedRoute = { ...transientRoute, ...matchingPage }
+        this.setState(
+          {
+            appsEtag,
+            cacheHints,
+            components: { ...this.state.components, ...components },
+            extensions: { ...this.state.extensions, ...extensions },
+            loadedPages: loadedPages.add(page),
+            messages: { ...this.state.messages, ...messages },
+            page,
+            pages,
+            preview: false,
+            query,
+            route: updatedRoute,
+            settings,
+          },
+          () => this.sendInfoFromIframe()
+        )
+      }
+    )
   }
 
   public prefetchPage = (pageName: string) => {
@@ -457,8 +587,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public prefetchDefaultPages = async (routeIds: string[]) => {
-    const { runtime, runtime: {renderMajor}} = this.props
-    const { culture: { locale }, pages } = this.state
+    const {
+      runtime,
+      runtime: { renderMajor },
+    } = this.props
+    const {
+      culture: { locale },
+      pages,
+    } = this.state
 
     const {
       components: defaultComponents,
@@ -472,15 +608,21 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       routeIds,
     })
 
-    await Promise.all(Object.keys(defaultComponents).map((component: string) => {
-      const { assets } = traverseComponent(defaultComponents, component)
-      return preloadAssets(runtime, assets)
-    }))
+    await Promise.all(
+      Object.keys(defaultComponents).map((component: string) => {
+        const { assets } = traverseComponent(defaultComponents, component)
+        return preloadAssets(runtime, assets)
+      })
+    )
 
-    this.setState(({components, messages}) => ({
-      components: {...defaultComponents, ...this.state.components, ...components},
+    this.setState(({ components, messages }) => ({
+      components: {
+        ...defaultComponents,
+        ...this.state.components,
+        ...components,
+      },
       defaultExtensions,
-      messages: {...defaultMessages, ...this.state.messages, ...messages}
+      messages: { ...defaultMessages, ...this.state.messages, ...messages },
     }))
   }
 
@@ -489,7 +631,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       components: {
         ...this.state.components,
         ...availableComponents,
-      }
+      },
     })
   }
 
@@ -501,7 +643,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { runtime } = this.props
     const { components } = this.state
     const { apps, assets } = traverseComponent(components, component)
-    const unfetchedApps = apps.filter(app => !Object.keys(window.__RENDER_8_COMPONENTS__).some(c => c.startsWith(app)))
+    const unfetchedApps = apps.filter(
+      app =>
+        !Object.keys(window.__RENDER_8_COMPONENTS__).some(c =>
+          c.startsWith(app)
+        )
+    )
     if (unfetchedApps.length === 0) {
       return fetchAssets(runtime, assets)
     }
@@ -519,13 +666,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       const sessionData = {
         public: {
           cultureInfo: {
-              value: locale
-          }
-        }
+            value: locale,
+          },
+        },
       }
-      Promise.all([
-        this.patchSession(sessionData),
-      ])
+      Promise.all([this.patchSession(sessionData)])
         .then(() => window.location.reload())
         .catch(e => {
           console.log('Failed to fetch new locale file.')
@@ -535,11 +680,21 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public updateRuntime = (options?: PageContextOptions) => {
-    const { runtime: { renderMajor } } = this.props
-    const { page, pages: pagesState, production, culture: { locale }, route } = this.state
+    const {
+      runtime: { renderMajor },
+    } = this.props
+    const {
+      page,
+      pages: pagesState,
+      production,
+      culture: { locale },
+      route,
+    } = this.state
     const declarer = pagesState[page] && pagesState[page].declarer
     const { pathname } = window.location
-    const paramsJSON = JSON.stringify(pagesState[page] && pagesState[page].params || {})
+    const paramsJSON = JSON.stringify(
+      (pagesState[page] && pagesState[page].params) || {}
+    )
 
     return fetchNavigationPage({
       apolloClient: this.apolloClient,
@@ -551,53 +706,67 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       renderMajor,
       routeId: page,
       ...options,
-    }).then(({
-      appsEtag,
-      cacheHints,
-      components,
-      extensions,
-      messages,
-      pages,
-      settings
-    }: ParsedPageQueryResponse) => {
-      this.setState({
+    }).then(
+      ({
         appsEtag,
         cacheHints,
         components,
         extensions,
         messages,
-        page,
         pages,
-        route,
         settings,
-      })
-    })
+      }: ParsedPageQueryResponse) => {
+        this.setState({
+          appsEtag,
+          cacheHints,
+          components,
+          extensions,
+          messages,
+          page,
+          pages,
+          route,
+          settings,
+        })
+      }
+    )
   }
 
   public createEnsureSessionLink() {
-    return new ApolloLink((operation: Operation, forward?: NextLink) =>
-      new Observable(observer => {
-        let handle: Subscription | undefined
-        this.sessionPromise.then(() => {
-          handle = forward && forward(operation).subscribe({
-            complete: observer.complete.bind(observer),
-            error: observer.error.bind(observer),
-            next: observer.next.bind(observer),
-          })
-        }).catch(observer.error.bind(observer))
+    return new ApolloLink(
+      (operation: Operation, forward?: NextLink) =>
+        new Observable(observer => {
+          let handle: Subscription | undefined
+          this.sessionPromise
+            .then(() => {
+              handle =
+                forward &&
+                forward(operation).subscribe({
+                  complete: observer.complete.bind(observer),
+                  error: observer.error.bind(observer),
+                  next: observer.next.bind(observer),
+                })
+            })
+            .catch(observer.error.bind(observer))
 
-        return () => {
-          if (handle) {
-            handle.unsubscribe()
+          return () => {
+            if (handle) {
+              handle.unsubscribe()
+            }
           }
-        }
-      })
+        })
     )
   }
 
   public createRuntimeContextLink() {
     return new ApolloLink((operation: Operation, forward?: NextLink) => {
-      const { appsEtag, cacheHints, components, extensions, messages, pages } = this.state
+      const {
+        appsEtag,
+        cacheHints,
+        components,
+        extensions,
+        messages,
+        pages,
+      } = this.state
       operation.setContext((currentContext: Record<string, any>) => {
         return {
           ...currentContext,
@@ -618,16 +787,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public updateExtension = (name: string, extension: Extension) => {
     const { extensions } = this.state
 
-    this.setState({
-      extensions: {
-        ...extensions,
-        [name]: extension,
+    this.setState(
+      {
+        extensions: {
+          ...extensions,
+          [name]: extension,
+        },
       },
-    }, () => {
-      if (name !== 'store/__overlay') {
-        this.sendInfoFromIframe()
+      () => {
+        if (name !== 'store/__overlay') {
+          this.sendInfoFromIframe()
+        }
       }
-    })
+    )
   }
 
   public handleSetDevice = (device: ConfigurationDevice) => {
@@ -636,21 +808,28 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public render() {
     const { children } = this.props
-    const { culture: { locale }, messages, pages, page, query, production } = this.state
+    const {
+      culture: { locale },
+      messages,
+      pages,
+      page,
+      query,
+      production,
+    } = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
       ...messages,
       ...customMessages,
     }
 
-    const component = children
-      ? React.cloneElement(children as ReactElement<any>, { query })
-      : (
-        <div className="render-provider">
-          <Helmet title={pages[page] && pages[page].title} />
-          <RenderPage page={page} query={query} />
-        </div>
-      )
+    const component = children ? (
+      React.cloneElement(children as ReactElement<any>, { query })
+    ) : (
+      <div className="render-provider">
+        <Helmet title={pages[page] && pages[page].title} />
+        <RenderPage page={page} query={query} />
+      </div>
+    )
 
     const context = this.getChildContext()
 
@@ -658,12 +837,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       <RenderContext.Provider value={context}>
         <TreePathContext.Provider value={{ treePath: '' }}>
           <ApolloProvider client={this.apolloClient}>
-            <IntlProvider locale={locale} messages={mergedMessages} textComponent={Fragment}>
+            <IntlProvider
+              locale={locale}
+              messages={mergedMessages}
+              textComponent={Fragment}
+            >
               <Fragment>
-                <ExtensionManager runtime={this.props.runtime}/>
+                <ExtensionManager runtime={this.props.runtime} />
                 {!production && !isStorefrontIframe && <BuildStatus />}
                 {component}
-                {isStorefrontIframe ? <ExtensionPoint id="store/__overlay" /> : null}
+                {isStorefrontIframe ? (
+                  <ExtensionPoint id="store/__overlay" />
+                ) : null}
               </Fragment>
             </IntlProvider>
           </ApolloProvider>
