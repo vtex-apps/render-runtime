@@ -127,6 +127,7 @@ declare global {
       navigationRoute: NavigationRoute
       renderRouting?: true
       scrollOptions?: RenderScrollOptions
+      fetchPage?: true
     }
   }
 
