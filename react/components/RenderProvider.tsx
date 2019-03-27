@@ -440,7 +440,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         page,
         pages,
         preview: false,
-        query,
         route: updatedRoute,
         settings,
       }, () => this.sendInfoFromIframe())
