@@ -21,12 +21,13 @@ import {
   ROUTE_CLASS_PREFIX,
   routeClass,
 } from '../utils/dom'
-import { loadLocaleData } from '../utils/locales'
 import {
   getRouteFromPath,
   goBack as pageGoBack,
+  mapToQueryString,
   navigate as pageNavigate,
   NavigateOptions,
+  queryStringToMap,
   scrollTo as pageScrollTo,
 } from '../utils/pages'
 import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
@@ -140,6 +141,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     query: PropTypes.object,
     route: PropTypes.object,
     setDevice: PropTypes.func,
+    setQuery: PropTypes.func,
     updateComponentAssets: PropTypes.func,
     updateExtension: PropTypes.func,
     updateRuntime: PropTypes.func,
@@ -168,6 +170,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private sessionPromise: Promise<void>
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
+  private lastNavigatedRouteId: string
 
   constructor(props: Props) {
     super(props)
@@ -205,6 +208,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       window.browserHistory = global.browserHistory = history
     }
 
+    this.lastNavigatedRouteId = route.id
     // todo: reload window if client-side created a segment different from server-side
     this.sessionPromise = canUseDOM
       ? window.__RENDER_8_SESSION__.sessionPromise
@@ -328,6 +332,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query,
       route,
       setDevice: this.handleSetDevice,
+      setQuery: this.setQuery,
       updateComponentAssets: this.updateComponentAssets,
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
@@ -377,6 +382,32 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public goBack = () => {
     const { history } = this.props
     return pageGoBack(history)
+  }
+
+  public setQuery = (
+    query: Record<string, any> = {},
+    merge: boolean = true
+  ): boolean => {
+    const { history } = this.props
+    const {
+      pages,
+      page,
+      route: { params },
+    } = this.state
+    if (!history) {
+      return false
+    }
+    const {
+      location: { search },
+    } = history
+    const current = queryStringToMap(search)
+    const nextQuery = mapToQueryString({ ...current, ...query })
+    return pageNavigate(history, pages, {
+      query: nextQuery,
+      page,
+      params,
+      fetchPage: false,
+    })
   }
 
   public navigate = (options: NavigateOptions) => {
@@ -434,7 +465,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture: { locale },
       pages: pagesState,
       production,
-      device,
       defaultExtensions,
       route,
       loadedPages,
@@ -451,15 +481,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       return
     }
 
-    const { navigationRoute } = state
+    const { navigationRoute, fetchPage } = state
     const { id: page, params } = navigationRoute
     const transientRoute = { ...route, ...navigationRoute }
     const {
       [page]: { allowConditions, declarer },
     } = pagesState
     const shouldSkipFetchNavigationData =
-      !allowConditions && loadedPages.has(page)
+      (!allowConditions && loadedPages.has(page)) || !fetchPage
     const query = parse(location.search.substr(1))
+    this.lastNavigatedRouteId = page
 
     if (shouldSkipFetchNavigationData) {
       return this.setState(
@@ -517,15 +548,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         pages,
         settings,
       }: ParsedPageQueryResponse) => {
-        try {
-          if (
-            this.props.history &&
-            this.props.history.location.state.navigationRoute.id !== page
-          ) {
-            return
-          }
-        } catch (e) {
-          console.error('Failed to access history location state')
+        if (routeId !== this.lastNavigatedRouteId) {
+          return
         }
 
         const updatedRoute = { ...transientRoute, ...matchingPage }
