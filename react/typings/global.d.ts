@@ -57,7 +57,6 @@ declare global {
     before?: string[]
     blockId?: string
     blocks?: BlockInsertion[]
-    children?: BlockInsertion[]
     context?: {
       component: string
       props?: any
