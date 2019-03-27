@@ -108,8 +108,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
     const isCompositionChildren = extension && extension.composition === 'children'
 
-    const componentChildren = (isCompositionChildren && extension.children) ?
-      extension.children.map((child, i) =>
+    const componentChildren = (isCompositionChildren && extension.blocks) ?
+      extension.blocks.map((child, i) =>
         <ExtensionPoint
           key={i}
           id={child.extensionPointId}
