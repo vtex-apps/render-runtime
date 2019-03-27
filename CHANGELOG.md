@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.16.2] - 2019-03-27
+
+- Add support to disable user blocks QueryString `disableUserLand`
 ## [8.16.1] - 2019-03-25
 
 ### Fixed

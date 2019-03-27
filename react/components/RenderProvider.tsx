@@ -6,7 +6,7 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { parse } from 'qs'
+import { parse, stringify } from 'qs'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -374,7 +374,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const transientRoute = {...route, ...navigationRoute}
     const {[page]: {allowConditions, declarer}} = pagesState
     const shouldSkipFetchNavigationData = !allowConditions && loadedPages.has(page)
-    const query = parse(location.search.substr(1))
+    const query = parse(window.location.search.substr(1))
+
+    // Store and pass disableUserLand logic to navigation
+    if(this.state.query && 'disableUserLand' in this.state.query && this.state.query.disableUserLand !== 'false'){
+      query['disableUserLand'] = this.state.query.disableUserLand
+      const queryString = stringify(query, {addQueryPrefix: true})
+      if(this.props.history){
+        const historyCache = JSON.stringify(this.props.history)
+        window.browserHistory.replace(queryString)
+        this.props.history.location = {...JSON.parse(historyCache).location, search:queryString}
+      }
+    }
 
     if (shouldSkipFetchNavigationData) {
       return this.setState({
@@ -409,8 +420,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       locale,
       paramsJSON,
       production,
+      query: JSON.stringify(query),
       renderMajor,
-      routeId,
+      routeId
     }).then(({
       appsEtag,
       cacheHints,
@@ -550,6 +562,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       paramsJSON,
       path: pathname,
       production,
+      query: '',
       renderMajor,
       routeId: page,
       ...options,
