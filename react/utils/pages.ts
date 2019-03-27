@@ -28,6 +28,7 @@ function createLocationDescriptor(
   {
     query,
     scrollOptions,
+    fetchPage,
   }: Pick<NavigateOptions, 'query' | 'scrollOptions' | 'fetchPage'>
 ): LocationDescriptorObject {
   return {
