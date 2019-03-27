@@ -401,12 +401,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       location: { search },
     } = history
     const current = queryStringToMap(search)
-    const nextQuery = mapToQueryString({ ...current, ...query })
+    const nextQuery = mapToQueryString(merge ? { ...current, ...query } : query)
     return pageNavigate(history, pages, {
-      query: nextQuery,
+      fetchPage: false,
       page,
       params,
-      fetchPage: false,
+      query: nextQuery,
     })
   }
 
