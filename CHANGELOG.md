@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.16.3] - 2019-03-27
+
 ### Changed
 - Changed from `unstable__layoutMode` to `composition`.
 
