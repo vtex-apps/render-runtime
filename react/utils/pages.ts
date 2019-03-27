@@ -1,5 +1,6 @@
 import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
+import queryString from 'query-string'
 import * as RouteParser from 'route-parser'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
@@ -24,11 +25,16 @@ function trimEndingSlash(token: string) {
 
 function createLocationDescriptor(
   navigationRoute: NavigationRoute,
-  { query, scrollOptions }: Pick<NavigateOptions, 'query' | 'scrollOptions'>
+  {
+    query,
+    scrollOptions,
+    fetchPage,
+  }: Pick<NavigateOptions, 'query' | 'scrollOptions' | 'fetchPage'>
 ): LocationDescriptorObject {
   return {
     pathname: navigationRoute.path!,
     state: {
+      fetchPage,
       navigationRoute,
       renderRouting: true,
       scrollOptions,
@@ -62,6 +68,17 @@ export function pathFromPageName(page: string, pages: Pages, params: any) {
 
   const properTemplate = adjustTemplate(template)
   return new RouteParser(properTemplate).reverse(params) || null
+}
+
+export function queryStringToMap(query: string) {
+  if (!query) {
+    return {}
+  }
+  return queryString.parse(query)
+}
+
+export function mapToQueryString(query: Record<string, any> = {}): string {
+  return queryString.stringify(query)
 }
 
 export function getPageParams(name: string, path: string, pages: Pages) {
@@ -114,6 +131,7 @@ export function navigate(
     scrollOptions,
     fallbackToWindowLocation = true,
     replace,
+    fetchPage = true,
   } = options
 
   if (!page && !to) {
@@ -136,6 +154,7 @@ export function navigate(
 
   if (history) {
     const location = createLocationDescriptor(navigationRoute, {
+      fetchPage,
       query,
       scrollOptions,
     })
@@ -223,4 +242,5 @@ export interface NavigateOptions {
   scrollOptions?: RenderScrollOptions
   fallbackToWindowLocation?: boolean
   replace?: boolean
+  fetchPage: boolean
 }
