@@ -485,7 +485,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { id: page, params } = navigationRoute
     const transientRoute = {...route, ...navigationRoute}
     const {[page]: {allowConditions, declarer}} = pagesState
-    const shouldSkipFetchNavigationData = !allowConditions && loadedPages.has(page)
+    const shouldSkipFetchNavigationData = (!allowConditions && loadedPages.has(page)) || !fetchPage
     const query = parse(window.location.search.substr(1))
 
     // Store and pass disableUserLand logic to navigation
