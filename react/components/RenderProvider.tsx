@@ -489,7 +489,7 @@ this.lastNavigatedRouteId = route.id
       [page]: { allowConditions, declarer },
     } = pagesState
     const shouldSkipFetchNavigationData =
-      (!allowConditions && loadedPages.has(page)) || fetchPage
+      (!allowConditions && loadedPages.has(page)) || !fetchPage
     const query = queryStringToMap(location.search) as RenderRuntime['query'] 
 
     // Store and pass disableUserLand logic to navigation
