@@ -118,8 +118,9 @@ const mergePersistingQueries = (currentQuery: string, query: string) => {
   const KEYS = ['disableUserLand']
   const current = queryStringToMap(currentQuery)
   const next = queryStringToMap(query)
+  const has = (value?: string) => !!value || value === null
   const persisting = KEYS.reduce((cur, key) => {
-    if (current[key] && current[key] !== 'false'){
+    if (has(current[key]) && current[key] !== 'false'){
       cur[key] = current[key]
     }
     return cur
