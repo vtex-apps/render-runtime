@@ -66,7 +66,7 @@ export function pathFromPageName(page: string, pages: Pages, params: any) {
   return new RouteParser(properTemplate).reverse(params) || null
 }
 
-export function queryStringToMap(query: string) {
+export function queryStringToMap(query: string): Record<string, any> {
   if (!query) {
     return {}
   }
@@ -114,6 +114,19 @@ export function getRouteFromPath(
   return id ? { id, path, params: getPageParams(id, path, pages) } : null
 }
 
+const mergePersistingQueries = (currentQuery: string, query: string) => {
+  const KEYS = ['disableUserLand']
+  const current = queryStringToMap(currentQuery)
+  const next = queryStringToMap(query)
+  const persisting = KEYS.reduce((cur, key) => {
+    if (current[key] && current[key] !== 'false'){
+      cur[key] = current[key]
+    }
+    return cur
+  } , {} as Record<string, any>)
+  return mapToQueryString({...persisting, ...next})
+}
+
 export function navigate(
   history: History | null,
   pages: Pages,
@@ -149,9 +162,10 @@ export function navigate(
   }
 
   if (history) {
+    const nextQuery = mergePersistingQueries(history.location.search, query)
     const location = createLocationDescriptor(navigationRoute, {
       fetchPage,
-      query,
+      query: nextQuery,
       scrollOptions,
     })
     const method = replace ? 'replace' : 'push'

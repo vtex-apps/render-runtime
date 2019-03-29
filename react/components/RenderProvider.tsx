@@ -492,24 +492,6 @@ this.lastNavigatedRouteId = route.id
       (!allowConditions && loadedPages.has(page)) || !fetchPage
     const query = queryStringToMap(location.search) as RenderRuntime['query'] 
 
-    // Store and pass disableUserLand logic to navigation
-    if (
-      this.state.query &&
-      'disableUserLand' in this.state.query &&
-      this.state.query.disableUserLand !== 'false'
-    ) {
-      const { disableUserLand } = this.state.query
-      const queryString = mapToQueryString({ ...query, disableUserLand})
-      if (this.props.history) {
-        const historyCache = JSON.stringify(this.props.history)
-        window.browserHistory.replace(queryString)
-        this.props.history.location = {
-          ...JSON.parse(historyCache).location,
-          search: queryString,
-        }
-      }
-    }
-
     if (shouldSkipFetchNavigationData) {
       return this.setState(
         {
