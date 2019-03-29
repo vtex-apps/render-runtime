@@ -238,5 +238,5 @@ export interface NavigateOptions {
   scrollOptions?: RenderScrollOptions
   fallbackToWindowLocation?: boolean
   replace?: boolean
-  fetchPage: boolean
+  fetchPage?: boolean
 }

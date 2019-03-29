@@ -6,7 +6,7 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { parse, stringify } from 'qs'
+import { parse, stringify } from 'query-string'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -404,10 +404,10 @@ this.lastNavigatedRouteId = route.id
     const current = queryStringToMap(search)
     const nextQuery = mapToQueryString({ ...current, ...query })
     return pageNavigate(history, pages, {
-      query: nextQuery,
+      fetchPage: false,
       page,
       params,
-      fetchPage: false,
+      query: nextQuery,
     })
   }
 
@@ -489,8 +489,8 @@ this.lastNavigatedRouteId = route.id
       [page]: { allowConditions, declarer },
     } = pagesState
     const shouldSkipFetchNavigationData =
-      !allowConditions && loadedPages.has(page)
-    const query = parse(window.location.search.substr(1))
+      (!allowConditions && loadedPages.has(page)) || fetchPage
+    const query = parse(location.search) as RenderRuntime['query'] 
 
     // Store and pass disableUserLand logic to navigation
     if (
@@ -498,8 +498,8 @@ this.lastNavigatedRouteId = route.id
       'disableUserLand' in this.state.query &&
       this.state.query.disableUserLand !== 'false'
     ) {
-      query['disableUserLand'] = this.state.query.disableUserLand
-      const queryString = stringify(query, { addQueryPrefix: true })
+      const { disableUserLand } = this.state.query
+      const queryString = stringify({ ...query, disableUserLand})
       if (this.props.history) {
         const historyCache = JSON.stringify(this.props.history)
         window.browserHistory.replace(queryString)
@@ -567,11 +567,6 @@ this.lastNavigatedRouteId = route.id
         pages,
         settings,
       }: ParsedPageQueryResponse) => {
-
-        if (routeId !== this.lastNavigatedRouteId) {
-          return
-        }
-
         const updatedRoute = { ...transientRoute, ...matchingPage }
         this.setState(
           {
