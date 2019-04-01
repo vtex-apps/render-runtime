@@ -194,6 +194,9 @@ export {
   start,
   withHMR,
   withRuntimeContext,
+  ChildBlock,
+  useChildBlock,
+  // These unstable apis should be deprecated shortly
   ChildBlock as Unstable__ChildBlock,
   useChildBlock as useChildBlock__unstable,
   useRuntime,
