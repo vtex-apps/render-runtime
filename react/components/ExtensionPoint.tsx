@@ -116,13 +116,15 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
         const childExtension = runtime.extensions && runtime.extensions[childTreePath]
         const childProps = childExtension ? childExtension.props : {}
 
-        /* This ChildExtensionPoint thing is done so the user can read the
-         * props that were passed through blocks.json to its children
-         * in a native react-ish way
-         * (i.e. `React.Children.map(children, child => child.props)`).
-         * The problem was if the user passed a prop that conflicted with
-         * ExtensionPoint props (most notabily, `id`), so just destructuring
-         * the `childProps` over ExtensionPoint would override those props
+        /* This ChildExtensionPoint thing is done so the user can read
+         * the props that were passed through the blocks.json file to
+         * its children in a standard, React-ish way; that is:
+         * `React.Children.map(children, child => child.props)`
+         * 
+         * The problem was, if the user passed a prop that conflicted with
+         * ExtensionPoint props (most notabily, `id`), just destructuring
+         * the `childProps` over ExtensionPoint would override the 
+         * ExtensionPoint props, which would break the rendering.
          * (or vice versa, which would cause wrong values being read by
          * the user component). 
         */
