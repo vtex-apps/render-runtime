@@ -127,10 +127,10 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
          * the user component). 
         */
         const ChildExtensionPoint = () => (
-        <ExtensionPoint
-          id={child.extensionPointId}
-          treePath={newTreePath}
-        />
+          <ExtensionPoint
+            id={child.extensionPointId}
+            treePath={newTreePath}
+          />
         )
         return (
           <ChildExtensionPoint
