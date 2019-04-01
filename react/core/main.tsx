@@ -181,6 +181,10 @@ const TreePathContextConsumer = TreePathContext.Consumer
 
 export {
   ExtensionContainer,
+  /** Block is the preferred nomenclature now, ExtensionPoint is kept for
+   * backwards compatibility
+   */
+  ExtensionPoint as Block,
   ExtensionPoint,
   LayoutContainer,
   LegacyExtensionContainer,
