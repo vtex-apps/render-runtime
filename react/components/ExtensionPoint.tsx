@@ -12,9 +12,10 @@ import { RenderContext } from './RenderContext'
 import TrackEventsWrapper from './TrackEventsWrapper'
 
 interface Props {
-  id: string,
-  params?: any,
-  query?: any,
+  id: string
+  params?: any
+  query?: any
+  treePath?: string
 }
 
 type ExtendedProps = Props & TreePathProps
@@ -26,9 +27,10 @@ interface State {
 class ExtensionPoint extends Component<ExtendedProps, State> {
   public static propTypes = {
     children: PropTypes.node,
+    id: PropTypes.string,
     params: PropTypes.object,
     query: PropTypes.object,
-    treePath: PropTypes.string.isRequired,
+    treePath: PropTypes.string,
   }
 
   public static childContextTypes = {
