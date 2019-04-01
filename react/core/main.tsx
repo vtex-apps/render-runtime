@@ -200,7 +200,7 @@ export {
   withRuntimeContext,
   ChildBlock,
   useChildBlock,
-  // These unstable apis should be deprecated shortly
+  // These unstable APIs should be deprecated shortly
   ChildBlock as Unstable__ChildBlock,
   useChildBlock as useChildBlock__unstable,
   useRuntime,
