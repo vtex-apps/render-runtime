@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Export ChildBlock and useChildBlock APIs, without unstable flag.
-- ChildBlock now returns the props of the block, inserted via the blocks.json file.
-- Send props inserted via the blocks.json file to the props each child when the block has composition: children.
+- ChildBlock now returns the props of the block, inserted via the `blocks.json` file.
+- Send props inserted via the `blocks.json` file to the `props` object of each child (when `composition` is set to `children`).
 - Export Block component, which is an alias of the ExtensionPoint component, and is now the preferred nomenclature.
 
 ### Deprecated
