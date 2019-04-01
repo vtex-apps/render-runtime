@@ -209,7 +209,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       window.browserHistory = global.browserHistory = history
     }
 
-this.lastNavigatedRouteId = route.id
+    this.lastNavigatedRouteId = route.id
     // todo: reload window if client-side created a segment different from server-side
     this.sessionPromise = canUseDOM
       ? window.__RENDER_8_SESSION__.sessionPromise
@@ -387,7 +387,7 @@ this.lastNavigatedRouteId = route.id
 
   public setQuery = (
     query: Record<string, any> = {},
-    merge: boolean = true
+    { merge = true, replace = false }: SetQueryOptions = {}
   ): boolean => {
     const { history } = this.props
     const {
@@ -402,12 +402,13 @@ this.lastNavigatedRouteId = route.id
       location: { search },
     } = history
     const current = queryStringToMap(search)
-    const nextQuery = mapToQueryString({ ...current, ...query })
+    const nextQuery = mapToQueryString(merge ? { ...current, ...query } : query)
     return pageNavigate(history, pages, {
       fetchPage: false,
       page,
       params,
       query: nextQuery,
+      replace,
     })
   }
 
@@ -490,7 +491,7 @@ this.lastNavigatedRouteId = route.id
     } = pagesState
     const shouldSkipFetchNavigationData =
       (!allowConditions && loadedPages.has(page)) || !fetchPage
-    const query = queryStringToMap(location.search) as RenderRuntime['query'] 
+    const query = queryStringToMap(location.search) as RenderRuntime['query']
 
     if (shouldSkipFetchNavigationData) {
       return this.setState(
