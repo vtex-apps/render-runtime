@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Export ChildBlock and useChildBlock APIs, without unstable flag.
+- ChildBlock now returns the props of the block, inserted via the blocks.json file.
+- Send props inserted via the blocks.json file to the props each child when the block has composition: children.
+- Export Block component, which is an alias of the ExtensionPoint component, and is now the preferred nomenclature.
+
+### Deprecated
+- Unstable__ChildBlock and useChildBlock__unstable.
+- ExtensionPoint component--prefer using the Block component, which has exactly the same API and functionality.
 
 ## [8.17.4] - 2019-04-05
 ### Changed
