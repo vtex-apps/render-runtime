@@ -107,6 +107,11 @@ declare global {
     id: string
   }
 
+  interface SetQueryOptions {
+    merge?: boolean
+    replace?: boolean
+  }
+
   interface Route {
     blockId: string
     canonical?: string

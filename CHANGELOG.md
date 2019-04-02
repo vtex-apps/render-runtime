@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.17.1] - 2019-04-02
+### Added
+- Support for `replace` option in setQuery for using that method in navigation.
+
 ## [8.17.0] - 2019-03-29
 ### Added
 - Add setQuery method for changing query string without remounting.
