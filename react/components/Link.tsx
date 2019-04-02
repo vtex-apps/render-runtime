@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types'
-import React, {Component, MouseEvent} from 'react'
-import {NavigateOptions, pathFromPageName} from '../utils/pages'
-import {RenderContextProps, withRuntimeContext} from './RenderContext'
+import React, { Component, MouseEvent } from 'react'
+import { NavigateOptions, pathFromPageName } from '../utils/pages'
+import { RenderContextProps, withRuntimeContext } from './RenderContext'
 
-const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) => event.button === 0
+const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) =>
+  event.button === 0
 
 const isModifiedEvent = (event: MouseEvent<HTMLAnchorElement>) =>
   !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey)
@@ -19,7 +20,9 @@ interface Props extends NavigateOptions {
 // eslint-disable-next-line
 class Link extends Component<Props & RenderContextProps> {
   public static defaultProps = {
-    onClick: () => { return },
+    onClick: () => {
+      return
+    },
   }
 
   public static propTypes = {
@@ -31,7 +34,14 @@ class Link extends Component<Props & RenderContextProps> {
   }
 
   public handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    const {page, params, query, to, scrollOptions, runtime: {navigate}} = this.props
+    const {
+      page,
+      params,
+      query,
+      to,
+      scrollOptions,
+      runtime: { navigate },
+    } = this.props
     if (
       isModifiedEvent(event) ||
       !isLeftClickEvent(event) ||
@@ -42,16 +52,44 @@ class Link extends Component<Props & RenderContextProps> {
 
     this.props.onClick(event)
 
-    const options: NavigateOptions = {page, params, query, to, scrollOptions, fallbackToWindowLocation: false}
+    const options: NavigateOptions = {
+      fallbackToWindowLocation: false,
+      page,
+      params,
+      query,
+      scrollOptions,
+      to,
+    }
     if (navigate(options)) {
       event.preventDefault()
     }
   }
 
+  public getHref = ({to, page, pages, params, query}: any) => {
+    if (to) {
+      return to
+    }
+    if (page) {
+      const path = pathFromPageName(page, pages, params) 
+      const qs = query ? `?${query}` : ''
+      if (path) {
+        return path + qs
+      }
+    }
+    return '#'
+  }
+
   public render() {
-    const {page, params, to, scrollOptions, query, runtime: {pages}, ...linkProps} = this.props
-    const href = to || page && pathFromPageName(page, pages, params) || '#'
-    return <a href={href} {...linkProps} onClick={this.handleClick} />
+    const {
+      page,
+      params,
+      to,
+      scrollOptions,
+      query,
+      runtime: { pages },
+      ...linkProps
+    } = this.props
+    return <a href={this.getHref({ to, page, pages, params, query })} {...linkProps} onClick={this.handleClick} />
   }
 }
 
