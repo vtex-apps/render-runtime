@@ -60,12 +60,15 @@ const Link: React.FunctionComponent<Props> = ({
       return to
     }
     if (page) {
-      return `${pathFromPageName(page, pages, params)}${
-        query ? `?${query}` : ''
-      }`
+      const path = pathFromPageName(page, pages, params) 
+      const qs = query ? `?${query}` : ''
+      if (path) {
+        return path + qs
+      }
     }
     return '#'
   }
+
   return <a href={getHref()} {...linkProps} onClick={handleClick} />
 }
 
