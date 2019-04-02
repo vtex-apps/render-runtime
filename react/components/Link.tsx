@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types'
-import React, {Component, MouseEvent, useCallback} from 'react'
-import {NavigateOptions, pathFromPageName} from '../utils/pages'
-import {RenderContextProps, useRuntime} from './RenderContext'
+import React, { Component, MouseEvent, useCallback } from 'react'
+import { NavigateOptions, pathFromPageName } from '../utils/pages'
+import { RenderContextProps, useRuntime } from './RenderContext'
 
-const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) => event.button === 0
+const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) =>
+  event.button === 0
 
 const isModifiedEvent = (event: MouseEvent<HTMLAnchorElement>) =>
   !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey)
@@ -16,8 +17,16 @@ interface Props extends NavigateOptions {
   onClick: (event: any) => void
 }
 
-const Link: React.FunctionComponent<Props> = ({ page, onClick, params, to, scrollOptions, query, ...linkProps }) => {
-  const {pages, navigate} = useRuntime()
+const Link: React.FunctionComponent<Props> = ({
+  page,
+  onClick,
+  params,
+  to,
+  scrollOptions,
+  query,
+  ...linkProps
+}) => {
+  const { pages, navigate } = useRuntime()
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLAnchorElement>) => {
@@ -31,7 +40,14 @@ const Link: React.FunctionComponent<Props> = ({ page, onClick, params, to, scrol
 
       onClick(event)
 
-      const options: NavigateOptions = {page, params, query, to, scrollOptions, fallbackToWindowLocation: false}
+      const options: NavigateOptions = {
+        page,
+        params,
+        query,
+        to,
+        scrollOptions,
+        fallbackToWindowLocation: false,
+      }
       if (navigate(options)) {
         event.preventDefault()
       }
@@ -39,12 +55,14 @@ const Link: React.FunctionComponent<Props> = ({ page, onClick, params, to, scrol
     [page, params, query, to, scrollOptions, navigate]
   )
 
-  const href = to || page && pathFromPageName(page, pages, params) || '#'
+  const href = to || (page && pathFromPageName(page, pages, params)) || '#'
   return <a href={href} {...linkProps} onClick={handleClick} />
 }
 
 Link.defaultProps = {
-  onClick: () => { return },
+  onClick: () => {
+    return
+  },
 }
 
 Link.propTypes = {
