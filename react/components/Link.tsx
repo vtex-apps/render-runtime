@@ -66,7 +66,6 @@ const Link: React.FunctionComponent<Props> = ({
     }
     return '#'
   }
-
   return <a href={getHref()} {...linkProps} onClick={handleClick} />
 }
 
