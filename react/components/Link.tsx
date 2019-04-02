@@ -41,12 +41,12 @@ const Link: React.FunctionComponent<Props> = ({
       onClick(event)
 
       const options: NavigateOptions = {
+        fallbackToWindowLocation: false,
         page,
         params,
         query,
-        to,
         scrollOptions,
-        fallbackToWindowLocation: false,
+        to,
       }
       if (navigate(options)) {
         event.preventDefault()
@@ -55,8 +55,19 @@ const Link: React.FunctionComponent<Props> = ({
     [page, params, query, to, scrollOptions, navigate]
   )
 
-  const href = to || (page && pathFromPageName(page, pages, params)) || '#'
-  return <a href={href} {...linkProps} onClick={handleClick} />
+  const getHref = () => {
+    if (to) {
+      return to
+    }
+    if (page) {
+      return `${pathFromPageName(page, pages, params)}${
+        query ? `?${query}` : ''
+      }`
+    }
+    return '#'
+  }
+
+  return <a href={getHref()} {...linkProps} onClick={handleClick} />
 }
 
 Link.defaultProps = {
