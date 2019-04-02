@@ -115,7 +115,7 @@ export function getRouteFromPath(
 }
 
 const mergePersistingQueries = (currentQuery: string, query: string) => {
-  const KEYS = ['disableUserLand']
+  const KEYS = ['__disableUserLand']
   const current = queryStringToMap(currentQuery)
   const next = queryStringToMap(query)
   const has = (value?: string) => !!value || value === null
