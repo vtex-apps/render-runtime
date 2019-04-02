@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.17.2] - 2019-04-02
+### Changed
+- Make the query string part of the `href` in Render's Link component.
+
 ## [8.17.1] - 2019-04-02
 ### Added
 - Support for `replace` option in setQuery for using that method in navigation.
