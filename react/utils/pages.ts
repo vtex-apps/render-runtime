@@ -245,6 +245,15 @@ function routeIdFromPath(path: string, routes: Pages) {
   return id
 }
 
+export function warnUserLand(){
+  const runtime = window.__RUNTIME__
+  const shouldWarnUserLand = !runtime.production && runtime.query
+            && runtime.query.__disableUserLand !== null && runtime.query.__disableUserLand !== 'false'
+  if(shouldWarnUserLand){
+    console.warn('You may not view blocks edited through admin when __disableUserLand is enabled')
+  }
+}
+
 export interface NavigateOptions {
   page?: string
   params?: any
