@@ -154,7 +154,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       : loading
   }
 
-  private getChildExtensions = (runtime: RenderContext, treePath: string) => {
+  private getChildExtensions(runtime: RenderContext, treePath: string) {
     const extension = runtime.extensions && runtime.extensions[treePath]
 
     if (!extension || !extension.blocks) {
