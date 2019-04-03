@@ -80,3 +80,10 @@ import { Link } from 'render-runtime'
 	</Link>
 ```
 _Extracted from [vtex.search-result](https://github.com/vtex-apps/search-result/blob/master/react/components/SelectionListOrderBy.js)_
+
+### Other methods
+
+#### goBack
+...
+#### setQuery
+...
