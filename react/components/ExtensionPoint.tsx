@@ -130,7 +130,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const isCompositionChildren = extension && extension.composition === 'children'
 
     const componentChildren = (isCompositionChildren && extension.blocks) ?
-      this.getChildExtensions(runtime, treePath) : children
+      this.getChildExtensions(runtime, newTreePath) : children
 
     return component
       ? this.withOuterExtensions(
