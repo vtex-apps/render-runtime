@@ -16,6 +16,7 @@ interface Props {
   params?: any
   query?: any
   treePath?: string
+  blockProps?: object
 }
 
 type ExtendedProps = Props & TreePathProps
@@ -83,15 +84,33 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
   private getExtensionPointComponent = (runtime: RenderContext) => {
     const { newTreePath } = this.state
-    const { children, params, query, id, treePath, ...parentProps } = this.props
+    const {
+      children,
+      params,
+      query,
+      id,
+      treePath,
+      blockProps = {},
+      ...parentProps
+    } = this.props
+
     const extension = runtime.extensions && runtime.extensions[newTreePath]
-    const { component = null, after = [], around = [], before = [], content = {}, props: extensionProps = {}, track = [] } = extension || {}
+    const {
+      component = null,
+      after = [],
+      around = [],
+      before = [],
+      content = {},
+      props: extensionProps = {},
+      track = []
+    } = extension || {}
 
     this.component = component
 
     const props = reduce(mergeDeepRight, {}, [
       parentProps,
       extensionProps,
+      blockProps,
       content,
       { params, query },
     ])
@@ -111,37 +130,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const isCompositionChildren = extension && extension.composition === 'children'
 
     const componentChildren = (isCompositionChildren && extension.blocks) ?
-      extension.blocks.map((child, i) => {
-        const childTreePath = ExtensionPoint.mountTreePath(child.extensionPointId, newTreePath)
-        const childExtension = runtime.extensions && runtime.extensions[childTreePath]
-        const childProps = childExtension ? childExtension.props : {}
-
-        /* This ChildExtensionPoint thing is done so the user can read
-         * the props that were passed through the blocks.json file to
-         * its children in a standard, React-ish way; that is:
-         * `React.Children.map(children, child => child.props)`
-         * 
-         * The problem was, if the user passed a prop that conflicted with
-         * ExtensionPoint props (most notabily, `id`), just destructuring
-         * the `childProps` over ExtensionPoint would override the 
-         * ExtensionPoint props, which would break the rendering.
-         * (or vice versa, which would cause wrong values being read by
-         * the user component). 
-        */
-        const ChildExtensionPoint = () => (
-          <ExtensionPoint
-            id={child.extensionPointId}
-            treePath={newTreePath}
-          />
-        )
-        return (
-          <ChildExtensionPoint
-            key={i}
-            {...childProps}
-          />
-        )
-
-      }) : children
+      this.getChildExtensions(runtime, treePath) : children
 
     return component
       ? this.withOuterExtensions(
@@ -163,6 +152,47 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
           )
         )
       : loading
+  }
+
+  private getChildExtensions = (runtime: RenderContext, treePath: string) => {
+    const extension = runtime.extensions && runtime.extensions[treePath]
+
+    if (!extension || !extension.blocks) {
+      return
+    }
+
+    return extension.blocks.map((child, i) => {
+      const childTreePath = ExtensionPoint.mountTreePath(child.extensionPointId, treePath)
+      const childExtension = runtime.extensions && runtime.extensions[childTreePath]
+      const childProps = childExtension ? childExtension.props : {}
+
+      /* This ChildExtensionPoint thing is done so the user can read
+        * the props that were passed through the blocks.json file to
+        * its children in a standard, React-ish way; that is:
+        * `React.Children.map(children, child => child.props)`
+        * 
+        * The problem was, if the user passed a prop that conflicted with
+        * ExtensionPoint props (most notabily, `id`), just destructuring
+        * the `childProps` over ExtensionPoint would override the 
+        * ExtensionPoint props, which would break the rendering.
+        * (or vice versa, which would cause wrong values being read by
+        * the user component). 
+      */
+      const ChildExtensionPoint = (blockProps: object) => (
+        <ExtensionPoint
+          id={child.extensionPointId}
+          treePath={treePath}
+          blockProps={blockProps}
+        />
+      )
+      return (
+        <ChildExtensionPoint
+          key={i}
+          {...childProps}
+        />
+      )
+
+    })
   }
 
   private withOuterExtensions(after: string[], around: string[], before: string[], treePath: string, props: any, element: JSX.Element) {
