@@ -166,7 +166,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       const childExtension = runtime.extensions && runtime.extensions[childTreePath]
       const childProps = childExtension ? childExtension.props : {}
 
-      /* This ChildExtensionPoint thing is done so the user can read
+      /* This ExtensionPointWrapper thing is done so the user can read
         * the props that were passed through the blocks.json file to
         * its children in a standard, React-ish way; that is:
         * `React.Children.map(children, child => child.props)`
@@ -178,20 +178,20 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
         * (or vice versa, which would cause wrong values being read by
         * the user component). 
       */
-      const ChildExtensionPoint = (blockProps: object) => (
+      const ExtensionPointWrapper = (blockProps: object) => (
         <ExtensionPoint
           id={child.extensionPointId}
           treePath={treePath}
           blockProps={blockProps}
         />
       )
+
       return (
-        <ChildExtensionPoint
+        <ExtensionPointWrapper
           key={i}
           {...childProps}
         />
       )
-
     })
   }
 
