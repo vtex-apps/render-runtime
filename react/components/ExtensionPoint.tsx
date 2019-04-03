@@ -113,16 +113,15 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     this.component = component
 
     const props = reduce(mergeDeepRight, {}, [
-      /** Extra props passed to the ExtensionPoint component,
+      /** Extra props passed to the ExtensionPoint component
        * e.g. <ExtensionPoint foo="bar" />
        */
       parentProps,
-      /** Props that are read from runtime.extensions, that come from
-       * the blocks files
+      /** Props that are read from runtime.extensions, that come from the blocks files
        */
       extensionProps,
-      /** Props from the blockProps prop, sent this way to 
-       * prevent overriding the native ExtensionPoint props
+      /** Props from the blockProps prop, used when the user wants to prevent overriding
+       * the native ExtensionPoint props (such as `id`)
        */
       blockProps,
       content,
