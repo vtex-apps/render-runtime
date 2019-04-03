@@ -27,11 +27,16 @@ interface State {
 
 class ExtensionPoint extends Component<ExtendedProps, State> {
   public static propTypes = {
+    blockProps: PropTypes.object,
     children: PropTypes.node,
     id: PropTypes.string,
     params: PropTypes.object,
     query: PropTypes.object,
     treePath: PropTypes.string,
+  }
+
+  public static defaultProps = {
+    blockProps: {},
   }
 
   public static childContextTypes = {
@@ -90,7 +95,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       query,
       id,
       treePath,
-      blockProps = {},
+      blockProps,
       ...parentProps
     } = this.props
 
