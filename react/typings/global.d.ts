@@ -1,6 +1,6 @@
 import {ApolloClient, Subscription} from 'apollo-client'
 import {NormalizedCacheObject} from "apollo-cache-inmemory"
-import * as EventEmitter from 'eventemitter3'
+import {EventEmitter} from 'eventemitter3'
 import {ReactElement, Component} from "react"
 import ExtensionContainer from "../ExtensionContainer"
 import ExtensionPoint from "../ExtensionPoint"

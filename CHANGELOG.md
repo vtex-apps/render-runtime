@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.17.3] - 2019-04-04
+
 ## [8.17.2] - 2019-04-02
 ### Changed
 - Make the query string part of the `href` in Render's Link component.
