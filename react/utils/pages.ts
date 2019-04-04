@@ -3,6 +3,7 @@ import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
 import * as RouteParser from 'route-parser'
 
+const DISABLE_USER_LAND_KEY = '__disableUserLand'
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
 function getScore(path: string) {
@@ -115,7 +116,7 @@ export function getRouteFromPath(
 }
 
 const mergePersistingQueries = (currentQuery: string, query: string) => {
-  const KEYS = ['__disableUserLand']
+  const KEYS = [DISABLE_USER_LAND_KEY]
   const current = queryStringToMap(currentQuery)
   const next = queryStringToMap(query)
   const has = (value?: string) => !!value || value === null
@@ -248,7 +249,7 @@ function routeIdFromPath(path: string, routes: Pages) {
 export function warnUserLand(){
   const runtime = window.__RUNTIME__
   const shouldWarnUserLand = !runtime.production && runtime.query
-            && runtime.query.__disableUserLand !== null && runtime.query.__disableUserLand !== 'false'
+            && runtime.query[DISABLE_USER_LAND_KEY] !== null && runtime.query[DISABLE_USER_LAND_KEY] !== 'false'
   if(shouldWarnUserLand){
     console.warn('You may not view blocks edited through admin when __disableUserLand is enabled')
   }
