@@ -4,20 +4,29 @@ This app handles runtime execution of React apps in the VTEX IO Platform.
 
 ## Table of Contents
 
-- [Components](#components)
+- [Exported Components](#exported-components)
+	- [Link](#link-1)
+	- [NoSSR](#nossr)
 - [Navigation](#navigation)
   - [navigate](#navigate)
     - [Navigate options](#navigate-options)
     - [Example](#example)
   - [Link](#link)
+  - [Other methods](#other-methods)
+     - [goBack](#goback)
+     - [setQuery](#setQuery)
+## Exported Components 
 
-## Components 
+### [Link](#link-1)
+### NoSSR
+Thiswrapper component remove its children from the subject of the Server Side Rendering(SSR). It may be useful for Components that use DOM related data _(e.g: document)_. We use [`react-no-ssr`](https://github.com/kadirahq/react-no-ssr) under the hood.
 
-- Link
-- NoSSR
-- ExtensionPoint
-- ExtensionContainer
-
+```javascript
+<NoSSR>
+	<DomRelatedComponent .../>
+	{...}
+</NoSSR>
+```
 
 ## Navigation
 The Render framework provides a built-in navigation solution that provides great experience and modularity for our sites. Building a store, alongside `blocks.json` and ` interfaces.json`, you can provide a `routes.json` file that describes **routes** that a user is able to access. A route look like this:
@@ -96,11 +105,29 @@ import { Link } from 'render-runtime'
 	  {option.label}
 	</Link>
 ```
-_Extracted from [vtex.search-result](https://github.com/vtex-apps/search-result/blob/master/react/components/SelectionListOrderBy.js)_
+_Extracted from [vtex.search-result](https://github.com/vtex-apps/search-result/blob/c02540b274c0169fac20d0382bde83d128e84752/react/components/SelectionListOrderBy.js)_
 
 ### Other methods
 
 #### goBack
+This method has no parameters and can be called to go to the last navigated page.
+```javascript
+const { goBack } = useRuntime()
 ...
+goBack()
+```
 #### setQuery
-...
+This auxiliary method changes the current page's query string without fetching navigation data to `pages-graphql`. It operates in the same way that React's  `setState`does, merging the passed queries to the current ones. You can also specify to replace all of the queries.
+```javascript
+setQuery(query, options)
+```
+##### Parameters
+| Name      | Type          | Default  | Description | 
+| :------------- |:-------------| :-----|:-----|
+| query     | `object`  | -- | Object describing the query E.g: `{ order: 'price' }`
+| options     | `object`  | -- | Configuration. _Described below_
+##### Options
+| Name      | Type          | Default  | Description | 
+| :------------- |:-------------| :-----|:-----|
+| merge     | `boolean`  | `true` | Specify if the passed queries will be merged into the current ones.
+| replace  | `boolean`  | `false` | If `true`, it will use _history_'s replace method instead of push.
