@@ -19,7 +19,7 @@ This app handles runtime execution of React apps in the VTEX IO Platform.
 
 ### [Link](#link-1)
 ### NoSSR
-Thiswrapper component remove its children from the subject of the Server Side Rendering(SSR). It may be useful for Components that use DOM related data _(e.g: document)_. We use [`react-no-ssr`](https://github.com/kadirahq/react-no-ssr) under the hood.
+This wrapper component removes its children from the subject of the Server Side Rendering(SSR). It may be useful for Components that use DOM related data _(e.g: document)_. We use [`react-no-ssr`](https://github.com/kadirahq/react-no-ssr) under the hood.
 
 ```javascript
 <NoSSR>
@@ -29,7 +29,7 @@ Thiswrapper component remove its children from the subject of the Server Side Re
 ```
 
 ## Navigation
-The Render framework provides a built-in navigation solution that provides great experience and modularity for our sites. Building a store, alongside `blocks.json` and ` interfaces.json`, you can provide a `routes.json` file that describes **routes** that a user is able to access. A route look like this:
+The Render framework provides a built-in navigation solution that provides great experience and modularity for our sites. Building a store, alongside `blocks.json` and ` interfaces.json`, you can provide a `routes.json` file that describes **routes** that a user is able to access. A route looks like this:
 ```
 "store.product": {
 	"path": "/:slug/p"
@@ -37,9 +37,9 @@ The Render framework provides a built-in navigation solution that provides great
 ```
 _Extracted from [vtex-store](https://github.com/vtex-apps/store/blob/master/store/routes.json)_
 
-In this example, `store.product` represents an **block** that render a specific template, and `/:slug/p` represents the URL path that match with that product block and render its template.
+In this example, `store.product` represents a **block** that renders a specific template, and `/:slug/p` represents the URL path that match with that product block. 
 
-**We provide two solutions for navigation inside our Render apps:** the `navigate` method exported from `render-runtime`, and the `Link` component. One can also only change query params using the `setQuery` method.
+**We provide two solutions for navigation inside our Render apps:** the `navigate` method exported from `render-runtime`, and the `Link` component. You can also only set query parameters using the `setQuery` method.
 
 ### `navigate`
 This method is the most powerful solution for navigation and can be used inside a React Component's lifecycle. It may be injected with the HOC `withRuntimeContext` or, preferably, with the `useRuntime` hook.
@@ -54,17 +54,17 @@ const MyOtherComponent = ({ navigate }) => {
 export withRuntimeContext(MyOtherComponent)
 ```
 
-One can pass a handful of configuration props to navigate: 
+You can pass a handful of configuration props to navigate: 
 
 #### Navigate options
 
 | Name      | Type          | Default  | Description | 
 | :------------- |:-------------| :-----|:-----|
-| fallbackToWindowLocation     | `boolean`   | `false`  |If `true`, will set the href of `window.location` with the future path
-| fetchPage     | `boolean`   | `true`  | If false, will not fetch navigation assets in `pages-graphql`
-| page     | `string`  | --  | Name of the page that the component will redirect to. Maps to a `blocks.json` block. Example: `'store.product'`
+| fallbackToWindowLocation     | `boolean`   | `false`  |If `true`, sets the href of `window.location` with the future path
+| fetchPage     | `boolean`   | `true`  | If `false`, won't fetch navigation assets in `pages-graphql`
+| page     | `string`  | --  | Name of the page that will be redirected to. Maps to a `blocks.json` block. Example: `'store.product'`
 | to     | `string`    |  --  | Alternatively to `page`, you can pass the URL directly instead of the page name (Useful for the `search-result`). Example: `/:slug/p`
-| params | `object`      |   `{}`  | Map of _param_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}`
+| params | `object`      |   `{}`  | Map of _parameters_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}`
 | query | `string`  | `''`   | String representation of the query params that will be appended to the path. Example: `skuId=231`.
 | scrollOptions | `RenderScrollOptions` | -- | After the navigation, if the page should be scrolled to a specific position, or should stay still (use `false`)
 #### Example
@@ -78,13 +78,13 @@ navigate({
 ```
 
 ### Link
-Link is a custom React component that renderes a `a` HTML element that, when clicked, will navigate the user to the provided route. It has a similar API with the `navigate` method.
+Link is a custom React component that renders an `a` HTML element that, when clicked, navigates the user to the provided route. It has a similar API with the `navigate` method.
 
 #### Props
 
 | Name      | Type          | Default  | Description | 
 | :------------- |:-------------| :-----|:-----|
-| page     | `string`  | --  | Name of the page that the component will redirect to. Maps to a `blocks.json` block. Example: `'store.product'`
+| page     | `string`  | --  | Name of the page that will be redirect to. Maps to a `blocks.json` block. Example: `'store.product'`
 | to     | `string`    |  --  | Alternatively to `page`, you can pass the URL directly instead of the page name (Useful for the `search-result`). Example: `/:slug/p`
 | params | `object`      |   `{}`  | Map of _param_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}`
 | query | `string`  | `''`   | String representation of the query params that will be appended to the path. Example: `skuId=231`.
@@ -110,7 +110,7 @@ _Extracted from [vtex.search-result](https://github.com/vtex-apps/search-result/
 ### Other methods
 
 #### goBack
-This method has no parameters and can be called to go to the last navigated page.
+This method has no parameters and can be called to return the user to the last navigated page.
 ```javascript
 const { goBack } = useRuntime()
 ...
@@ -129,5 +129,5 @@ setQuery(query, options)
 ##### Options
 | Name      | Type          | Default  | Description | 
 | :------------- |:-------------| :-----|:-----|
-| merge     | `boolean`  | `true` | Specify if the passed queries will be merged into the current ones.
-| replace  | `boolean`  | `false` | If `true`, it will use _history_'s replace method instead of push.
+| merge     | `boolean`  | `true` | Set if the passed queries will be merged into the current ones.
+| replace  | `boolean`  | `false` | If `true`, it uses _history_'s replace method instead of push.
