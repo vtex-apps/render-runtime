@@ -11,13 +11,15 @@ This app handles runtime execution of React apps in the VTEX IO Platform.
   - [navigate](#navigate)
     - [Navigate options](#navigate-options)
     - [Example](#example)
-  - [Link](#link)
+  - [Link](#link-1)
   - [Other methods](#other-methods)
      - [goBack](#goback)
      - [setQuery](#setQuery)
 ## Exported Components 
 
-### [Link](#link-1)
+### Link
+Navigation related component that, when clicked, redirects to another route. Details [here](#link-1).
+
 ### NoSSR
 This wrapper component removes its children from the subject of the Server Side Rendering(SSR). It may be useful for Components that use DOM related data _(e.g: document)_. We use [`react-no-ssr`](https://github.com/kadirahq/react-no-ssr) under the hood.
 
