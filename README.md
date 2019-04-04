@@ -25,8 +25,7 @@ This wrapper component removes its children from the subject of the Server Side 
 
 ```javascript
 <NoSSR>
-	<DomRelatedComponent .../>
-	{...}
+  <DomRelatedComponent/> 
 </NoSSR>
 ```
 
@@ -49,10 +48,14 @@ This method is the most powerful solution for navigation and can be used inside 
 import { useRuntime, withRuntimeContext } from 'vtex.render-runtime'
 ...
 const MyComponent = () => {
-	const { navigate }  = useRuntime()
+  const { navigate }  = useRuntime()
+}
+
 // OR
+
 const MyOtherComponent = ({ navigate }) => {
-...
+}
+
 export withRuntimeContext(MyOtherComponent)
 ```
 
@@ -74,7 +77,7 @@ You can pass a handful of configuration props to navigate:
 navigate({
   page: 'store.search',
   params: { department: 'accessories' },
-  query: { 'order=OrderByPrice' },
+  query: 'order=OrderByPrice', 
   scrollOptions: { baseElementId: 'search-result-anchor', top: -HEADER_SCROLL_OFFSET },
 })
 ```
@@ -97,15 +100,14 @@ Other props you pass will be forwarded to the `a` component and can be used for 
 #### Use Example
 ```javascript
 import { Link } from 'render-runtime'
-	{...}
-	<Link
-	  page={linkProps.page}
-	  query={linkProps.queryString}
-	  params={linkProps.params}
-	  className="c-on-base f5 ml-auto db no-underline pv4 ph5 hover-bg-muted-4"
-	>
-	  {option.label}
-	</Link>
+  <Link
+    page={linkprops.page}
+    query={linkprops.querystring}
+    params={linkprops.params}
+    classname="c-on-base f5 ml-auto db no-underline pv4 ph5 hover-bg-muted-4"
+  >
+   {option.label}
+  </Link>
 ```
 _Extracted from [vtex.search-result](https://github.com/vtex-apps/search-result/blob/c02540b274c0169fac20d0382bde83d128e84752/react/components/SelectionListOrderBy.js)_
 
