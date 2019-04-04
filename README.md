@@ -2,8 +2,25 @@
 
 This app handles runtime execution of React apps in the VTEX IO Platform.
 
+## Table of Contents
+
+- [Components](#components)
+- [Navigation](#navigation)
+  - [navigate](#navigate)
+    - [Navigate options](#navigate-options)
+    - [Example](#example)
+  - [Link](#link)
+
+## Components 
+
+- Link
+- NoSSR
+- ExtensionPoint
+- ExtensionContainer
+
+
 ## Navigation
-The Render framework provides a built-in navigation solution that provides great experience and  modularity for our sites. Building a store, alongside `blocks.json` and ` interfaces.json`, you can provide a `routes.json` file that describes **routes** that a user will be able to access. A route look like this:
+The Render framework provides a built-in navigation solution that provides great experience and modularity for our sites. Building a store, alongside `blocks.json` and ` interfaces.json`, you can provide a `routes.json` file that describes **routes** that a user is able to access. A route look like this:
 ```
 "store.product": {
 	"path": "/:slug/p"
@@ -11,14 +28,14 @@ The Render framework provides a built-in navigation solution that provides great
 ```
 _Extracted from [vtex-store](https://github.com/vtex-apps/store/blob/master/store/routes.json)_
 
-In this example, `store.product` represents an **block** that will render a specific template, and `/:slug/p` represents the URL path that will match with that product block and render its template.
+In this example, `store.product` represents an **block** that render a specific template, and `/:slug/p` represents the URL path that match with that product block and render its template.
 
 **We provide two solutions for navigation inside our Render apps:** the `navigate` method exported from `render-runtime`, and the `Link` component. One can also only change query params using the `setQuery` method.
 
-### navigate
+### `navigate`
 This method is the most powerful solution for navigation and can be used inside a React Component's lifecycle. It may be injected with the HOC `withRuntimeContext` or, preferably, with the `useRuntime` hook.
 ```javascript
-import { useRuntime, withRuntimeContext } from 'render-runtime'
+import { useRuntime, withRuntimeContext } from 'vtex.render-runtime'
 ...
 const MyComponent = () => {
 	const { navigate }  = useRuntime()
@@ -30,7 +47,7 @@ export withRuntimeContext(MyOtherComponent)
 
 One can pass a handful of configuration props to navigate: 
 
-#### Props (NavigateOptions)
+#### Navigate options
 
 | Name      | Type          | Default  | Description | 
 | :------------- |:-------------| :-----|:-----|
@@ -41,7 +58,7 @@ One can pass a handful of configuration props to navigate:
 | params | `object`      |   `{}`  | Map of _param_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}`
 | query | `string`  | `''`   | String representation of the query params that will be appended to the path. Example: `skuId=231`.
 | scrollOptions | `RenderScrollOptions` | -- | After the navigation, if the page should be scrolled to a specific position, or should stay still (use `false`)
-#### Use Example
+#### Example
 ```javascript
 navigate({
   page: 'store.search',
