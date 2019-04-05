@@ -21,10 +21,10 @@ This app handles runtime execution of React apps in the VTEX IO Platform.
 Navigation related component that, when clicked, redirects to another route. Details [here](#link-1).
 
 ### NoSSR
-This wrapper component removes its children from the subject of the Server Side Rendering(SSR). It may be useful for Components that use DOM related data _(e.g: document)_. We use [`react-no-ssr`](https://github.com/kadirahq/react-no-ssr) under the hood.
+This wrapper component removes its children from the subject of the Server Side Rendering(SSR). It may be useful for Components that use DOM related data _(e.g: document)_. We use [`react-no-ssr`](https://github.com/kadirahq/react-no-ssr) under the hood. You can provide an optional prop _noSSR_ with a component to render instead when in SSR mode.
 
 ```javascript
-<NoSSR>
+<NoSSR onSSR={<div>Loading...</div>}>
   <DomRelatedComponent/> 
 </NoSSR>
 ```
