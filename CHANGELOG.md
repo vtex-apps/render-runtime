@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.17.4] - 2019-04-05
+### Changed
+- Update vtex-tachyons to 3.1.0
+
 ## [8.17.3] - 2019-04-04
 
 ## [8.17.2] - 2019-04-02
