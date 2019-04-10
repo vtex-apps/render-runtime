@@ -20,8 +20,11 @@ export function useChildBlock(childBlock: ChildBlock) : Block | null {
   const block = runtime.extensions && runtime.extensions[childPath]
 
   // We are explicitly not exposing the private API here
-  /** Placeholder for possible block data in the future  */
-  return block ? {} : null
+  return block
+    ? {
+      props: block.props,
+    }
+    : null
 }
 
 export function ChildBlock({ id, children }: ChildBlockProps) {
