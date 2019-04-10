@@ -33,6 +33,7 @@ import { ensureContainer, getContainer, getMarkups } from '../utils/dom'
 import { registerEmitter } from '../utils/events'
 import { getBaseURI } from '../utils/host'
 import { addLocaleData } from '../utils/locales'
+import { warnUserLand } from '../utils/pages'
 import { withSession } from '../utils/session'
 import { TreePathContext } from '../utils/treePath'
 import { isStyleWritable, optimizeSrcForVtexImg, optimizeStyleForVtexImg } from '../utils/vteximg'
@@ -167,6 +168,7 @@ function start() {
         }))
     } else {
       console.log('Welcome to Render! Want to look under the hood? https://careers.vtex.com')
+      warnUserLand()
     }
   } catch (error) {
     console.error('Unexpected error rendering:', error)
