@@ -387,7 +387,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public setQuery = (
     query: Record<string, any> = {},
-    { merge = true, replace = false }: SetQueryOptions = {}
+    { merge = true, replace = false, scrollOptions = false}: SetQueryOptions = {}
   ): boolean => {
     const { history } = this.props
     const {
@@ -409,6 +409,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       params,
       query: nextQuery,
       replace,
+      scrollOptions,
     })
   }
 
@@ -475,11 +476,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     // Make sure this is our navigation
     if (!state || !state.renderRouting) {
-      return
-    }
-
-    // temporary canonical fix
-    if (!state.navigationRoute) {
       return
     }
 
