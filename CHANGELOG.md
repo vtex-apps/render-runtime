@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.18.1] - 2019-04-11
+### Changed
+- Allow hash on direct children regexp
+
 ## [8.18.0] - 2019-04-10
 ### Added
 - Export ChildBlock and useChildBlock APIs, without unstable flag.
