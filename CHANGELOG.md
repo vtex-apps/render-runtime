@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Support for `scrollOptions` on `setQuery`.
+
+### Changed
 - Removing `navigationRoute` check for the back button functionality.
 
 ## [8.18.1] - 2019-04-11
