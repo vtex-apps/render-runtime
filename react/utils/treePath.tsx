@@ -6,7 +6,7 @@ const relative = (parent: string, id: string) => id.replace(`${parent}/`, '')
 export const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 
 export const isDirectChild = (id: string, parent: string) => {
-  return id !== parent && (new RegExp(`^${escapeRegex(parent)}/[a-zA-Z0-9-_]+$`)).test(id)
+  return id !== parent && (new RegExp(`^${escapeRegex(parent)}/[a-zA-Z0-9-_#]+$`)).test(id)
 }
 
 const parseId = (id: string) => {
