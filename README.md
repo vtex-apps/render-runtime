@@ -135,3 +135,4 @@ setQuery(query, options)
 | :------------- |:-------------| :-----|:-----|
 | merge     | `boolean`  | `true` | Set if the passed queries will be merged into the current ones.
 | replace  | `boolean`  | `false` | If `true`, it uses _history_'s replace method instead of push.
+| scrollOptions  | `RenderScrollOptions`  | `false` | After the navigation, if the page should be scrolled to a specific position, or should stay still (use `false`) 

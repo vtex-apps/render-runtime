@@ -110,6 +110,7 @@ declare global {
   interface SetQueryOptions {
     merge?: boolean
     replace?: boolean
+    scrollOptions?: RenderScrollOptions 
   }
 
   interface Route {
