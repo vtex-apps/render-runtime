@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.18.3] - 2019-04-18
+### Changed
+- Updated React packages to version 16.8.6
+
 ## [8.18.2] - 2019-04-12
 ### Added
 - Support for `scrollOptions` on `setQuery`.
