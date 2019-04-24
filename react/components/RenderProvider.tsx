@@ -140,6 +140,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     production: PropTypes.bool,
     publicEndpoint: PropTypes.string,
     query: PropTypes.object,
+    renderMajor: PropTypes.number,
     route: PropTypes.object,
     setDevice: PropTypes.func,
     setQuery: PropTypes.func,
@@ -303,6 +304,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       hints,
       production,
       publicEndpoint,
+      renderMajor,
       workspace,
     } = runtime
 
@@ -331,6 +333,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       production,
       publicEndpoint,
       query,
+      renderMajor,
       route,
       setDevice: this.handleSetDevice,
       setQuery: this.setQuery,
