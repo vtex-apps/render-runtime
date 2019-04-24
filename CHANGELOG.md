@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-- Export raw contexts for use within hooks.
+- Export RenderContext and TreePathContext, intended for usage with React Hooks.
 
 ## [8.18.4] - 2019-04-24
 
