@@ -34,7 +34,7 @@ import { registerEmitter } from '../utils/events'
 import { getBaseURI } from '../utils/host'
 import { addLocaleData } from '../utils/locales'
 import { withSession } from '../utils/session'
-import { TreePathContext } from '../utils/treePath'
+import { TreePathContext, useTreePath } from '../utils/treePath'
 import { isStyleWritable, optimizeSrcForVtexImg, optimizeStyleForVtexImg } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
 
@@ -191,10 +191,9 @@ export {
   Helmet,
   Link,
   NoSSR,
-  RenderContext,
   RenderContextConsumer,
-  TreePathContext,
   TreePathContextConsumer,
+  useTreePath,
   canUseDOM,
   render,
   start,
