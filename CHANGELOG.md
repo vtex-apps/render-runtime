@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.19.0] - 2019-04-24
+### Added
+- Export useTreePath hook.
+
 ## [8.18.4] - 2019-04-24
 
 ## [8.18.3] - 2019-04-18
