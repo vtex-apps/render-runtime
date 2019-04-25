@@ -1,8 +1,6 @@
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import { Base64 } from 'js-base64'
 
-import { OperationContext } from './uriSwitchLink'
-
 const MAX_QUERYSTRING_SIZE = 4096
 
 export const toBase64Link = new ApolloLink((operation: Operation, forward?: NextLink) => {
@@ -14,13 +12,10 @@ export const toBase64Link = new ApolloLink((operation: Operation, forward?: Next
       variables: Base64.encode(JSON.stringify(variables))
     }
     if (JSON.stringify(operation.extensions).length > MAX_QUERYSTRING_SIZE) {
-      operation.setContext((oldContext: OperationContext) => {
-        const { fetchOptions = {}} = oldContext
-        return {
-          ...oldContext,
-          fetchOptions: {...fetchOptions, method: 'POST'},
-        }
-      })
+      const {runtime: {production}} = operation.getContext()
+      if (!production) {
+        throw new Error('Max querystring size exceeded. Make sure you are not exceeding the graphql query limit')
+      }
     }
   }
   return forward ? forward(operation) : null
