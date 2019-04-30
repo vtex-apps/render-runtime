@@ -152,16 +152,21 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     runtime: PropTypes.object,
   }
 
-  public sendInfoFromIframe = debounce((shouldUpdateRuntime?: boolean) => {
-    if (isStorefrontIframe) {
-      const { messages } = this.state
-      window.top.__provideRuntime(
-        this.getChildContext(),
-        messages,
-        shouldUpdateRuntime
-      )
-    }
-  }, SEND_INFO_DEBOUNCE_MS)
+  public sendInfoFromIframe = debounce(
+    (shouldUpdateRuntime: boolean = false) => {
+      if (isStorefrontIframe) {
+        const { messages } = this.state
+
+        window.top.__provideRuntime(
+          this.getChildContext(),
+          messages,
+          shouldUpdateRuntime,
+          this.updateMessages,
+        )
+      }
+    },
+    SEND_INFO_DEBOUNCE_MS,
+  )
 
   private rendered!: boolean
   private sessionPromise: Promise<void>
@@ -848,6 +853,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           </ApolloProvider>
         </TreePathContext.Provider>
       </RenderContext.Provider>
+    )
+  }
+
+  private updateMessages = (newMessages: RenderProviderState['messages']) => {
+    this.setState(
+      prevState => ({
+        ...prevState,
+        messages: { ...prevState.messages, ...newMessages },
+      }),
+      () => {
+        this.sendInfoFromIframe()
+      },
     )
   }
 }

@@ -423,7 +423,12 @@ interface RenderComponent<P={}, S={}> {
     __REQUEST_ID__: string
     __APP_ID__: string
     __hasPortals__: boolean
-    __provideRuntime: (runtime: RenderContext | null, messages?: Record<string, string>, shouldUpdateRuntime?: boolean) => void
+    __provideRuntime: (
+      runtime: RenderContext | null,
+      messages: Record<string, string>,
+      shouldUpdateRuntime: boolean,
+      setMessages: (messages: RenderRuntime['messages']) => void,
+    ) => void
     browserHistory: History
     ReactIntlLocaleData: any
     IntlPolyfill: any
