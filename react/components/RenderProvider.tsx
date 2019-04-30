@@ -6,7 +6,6 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { parse, stringify } from 'query-string'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -21,7 +20,6 @@ import {
   ROUTE_CLASS_PREFIX,
   routeClass,
 } from '../utils/dom'
-import { loadLocaleData } from '../utils/locales'
 import {
   getRouteFromPath,
   goBack as pageGoBack,
