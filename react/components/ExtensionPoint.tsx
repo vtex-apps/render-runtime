@@ -7,6 +7,7 @@ import { getImplementation } from '../utils/assets'
 import { TreePathContext, TreePathProps, withTreePath } from '../utils/treePath'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
+import { HostAppProvider } from './HostApp'
 import Loading from './Loading'
 import { RenderContext } from './RenderContext'
 import TrackEventsWrapper from './TrackEventsWrapper'
@@ -145,18 +146,20 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       props,
       <TrackEventsWrapper events={track} id={id}>
         <TreePathContext.Provider value={{ treePath: newTreePath }}>
-          {component ? (
-            <ExtensionPointComponent
-              component={component}
-              props={props}
-              runtime={runtime}
-              treePath={newTreePath}
-            >
-              {componentChildren}
-            </ExtensionPointComponent>
-          ) : (
-            <Loading />
-          )}
+          <HostAppProvider>
+            {component ? (
+              <ExtensionPointComponent
+                component={component}
+                props={props}
+                runtime={runtime}
+                treePath={newTreePath}
+              >
+                {componentChildren}
+              </ExtensionPointComponent>
+            ) : (
+              <Loading />
+            )}
+          </HostAppProvider>
         </TreePathContext.Provider>
       </TrackEventsWrapper>
     )
