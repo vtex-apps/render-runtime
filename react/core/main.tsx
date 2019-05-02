@@ -45,8 +45,9 @@ import {
   optimizeSrcForVtexImg,
   optimizeStyleForVtexImg,
 } from '../utils/vteximg'
+import useCssHandles from '../utils/useCssHandles'
 import withHMR from '../utils/withHMR'
-import { generateExtensions } from '../utils/blocks';
+import { generateExtensions } from '../utils/blocks'
 
 let emitter: EventEmitter | null = null
 
@@ -272,6 +273,7 @@ export {
   useChildBlock as useChildBlock__unstable,
   useRuntime,
   useTreePath,
+  useCssHandles,
   withSession,
   Loading,
   buildCacheLocator,
