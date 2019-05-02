@@ -1,44 +1,21 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import PropTypes from 'prop-types'
-import React, {Component, ComponentType} from 'react'
-import { path } from 'ramda'
+import React, { Component, ComponentType } from 'react'
 
-import {withEmitter} from '../components/RenderContext'
-import {withTreePath} from './treePath'
-
-const isComponentType = (Arg: any): Arg is ComponentType => {
-  const isFunction = typeof Arg === 'function' 
-
-  /** If Arg is a function, assumes an UpperCamelCase naming convention
-   * for components, and lowerCamelCase for functions.
-   * (See https://reactjs.org/docs/jsx-in-depth.html#user-defined-components-must-be-capitalized)
-   * If the function name is unable to be determined, defaults
-   * to true (i.e. assumes the function is probably a component)
-   * 
-   * This is needed so that functions exported on IO (e.g. HOC) don't
-   * get treated as components, so they can be callable.
-   * */
-  if (isFunction) {
-    const name: string | undefined = path(['prototype', 'constructor', 'name'], Arg)
-    if (!name) return true
-
-    const firstChar = name.charAt(0)
-
-    if (!firstChar || firstChar === '') return true
-
-    const isFirstCharUpperCase = firstChar.toUpperCase() === firstChar
-
-    return isFirstCharUpperCase
-  }
-
-  return !!(Arg && Arg.prototype && Arg.prototype.render)
-}
+import { withEmitter } from '../components/RenderContext'
+import { isComponentType } from './registerComponent'
+import { withTreePath } from './treePath'
 
 export default (module: Module, InitialImplementer: any) => {
   if (!isComponentType(InitialImplementer) || !module.hot) {
     return InitialImplementer
   }
 
+  /**
+   * We should move this registering code to registerComponent.tsx. We currently
+   * can not do this since old apps are still using this function to register
+   * thenselves with the old withHMR function
+   */
   const instances: HMRComponent[] = []
   const registerInstance = (instance: HMRComponent) => {
     instances.push(instance)
