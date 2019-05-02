@@ -45,6 +45,7 @@ import {
   optimizeSrcForVtexImg,
   optimizeStyleForVtexImg,
 } from '../utils/vteximg'
+import useCssHandles from '../utils/useCssHandles'
 import withHMR from '../utils/withHMR'
 import { generateExtensions } from '../utils/blocks'
 
@@ -275,6 +276,7 @@ export {
   useChildBlock,
   useRuntime,
   useTreePath,
+  useCssHandles,
   withSession,
   Loading,
   buildCacheLocator,

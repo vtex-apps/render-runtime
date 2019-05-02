@@ -2,6 +2,7 @@ import { mergeDeepRight, reduce } from 'ramda'
 import React, { FC, Fragment } from 'react'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
+import { HostAppProvider } from './HostApp'
 import Loading from './Loading'
 import { useRuntime } from './RenderContext'
 import { useTreePath } from '../utils/treePath'
@@ -177,7 +178,11 @@ const ExtensionPoint: FC<Props> = props => {
     </ExtensionPointComponent>
   )
 
-  return extensionPointComponent
+  return (
+    <HostAppProvider>
+      {extensionPointComponent}
+    </HostAppProvider>
+  )
 }
 
 ExtensionPoint.defaultProps = {
