@@ -33,6 +33,7 @@ import { ensureContainer, getContainer, getMarkups } from '../utils/dom'
 import { registerEmitter } from '../utils/events'
 import { getBaseURI } from '../utils/host'
 import { addLocaleData } from '../utils/locales'
+import registerComponent from '../utils/registerComponent'
 import { withSession } from '../utils/session'
 import { TreePathContext, useTreePath } from '../utils/treePath'
 import { isStyleWritable, optimizeSrcForVtexImg, optimizeStyleForVtexImg } from '../utils/vteximg'
@@ -197,6 +198,7 @@ export {
   render,
   start,
   withHMR,
+  registerComponent,
   withRuntimeContext,
   ChildBlock,
   useChildBlock,
