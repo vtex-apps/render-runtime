@@ -11,10 +11,12 @@ interface Props {
 export default class MaybeContext extends PureComponent<Props & RenderContextProps> {
   public render() {
     const {children, runtime, nestedPage, query, params} = this.props
-    const {context} = runtime.extensions[nestedPage]
+    const {context, props: pageProps} = runtime.extensions[nestedPage]
     const contextComponent = context && context.component
+    const pageContextProps = pageProps && pageProps.context
 
     const props = contextComponent && {
+      ...pageContextProps,
       nextTreePath: nestedPage,
       params,
       query,
