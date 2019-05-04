@@ -359,6 +359,7 @@ interface RenderComponent<P={}, S={}> {
     cacheHints: CacheHintsMap
     segmentToken: string
     defaultExtensions: Extensions
+    rootPath?: string
   }
 
   interface CacheHints {

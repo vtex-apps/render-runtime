@@ -7,13 +7,13 @@ const isRenderServedPage = () => {
 }
 
 export const getBaseURI = (runtime: RenderRuntime) => {
-  const {account, workspace, publicEndpoint} = runtime
+  const {account, workspace, publicEndpoint, rootPath = ''} = runtime
   if (!canUseDOM) {
     return `${workspace}--${account}.${publicEndpoint}`
   } else {
     const {location: {hostname}} = window
     return hostname.endsWith(`.${publicEndpoint}`) || isRenderServedPage()
-      ? hostname
+      ? hostname + rootPath
       : `${hostname}/api/io`
   }
 }
