@@ -1,19 +1,21 @@
-import React, { RefObject } from 'react'
-import ContentLoader from 'react-content-loader'
+import React, { ReactElement, RefObject } from 'react'
+import ContentLoader, { IContentLoaderProps } from 'react-content-loader'
 
 import Box from './Box'
 import Circle from './Circle'
 import Grid from './Grid'
 import Text from './Text'
 
-export interface Props {
-  type: string
-  width: number
-  height: number
+interface Props {
+  extension: Extension
 }
-
 interface State {
   containerWidth?: number | null
+}
+
+interface PreviewGraphic {
+  preserveAspectRatio: string
+  svg: ReactElement<any> | null
 }
 
 export default class Preview extends React.PureComponent<
@@ -31,31 +33,39 @@ export default class Preview extends React.PureComponent<
     }
   }
 
-  private renderPreviewGraphic = ({ width, height, type }: { width: number, height: number, type: string }): React.ReactNode => {
+  private getPreviewGraphic = (width: number, height: number, type: string): PreviewGraphic | null => {
     if (!type || type === 'none') {
-      return
+      return null
     }
 
     switch (type) {
       case 'box':
       /** TODO: deprecate block in favor of box */
       case 'block':
-        return <Box width={width} height={height} />
+        return {
+          preserveAspectRatio: 'none',
+          svg: <Box width={width} height={height} />,
+        }
       case 'text': 
-        return <Text width={width} height={height} />
+        return {
+          preserveAspectRatio: 'none',
+          svg: <Text width={width} height={height} />,
+        }
       /** TODO: add support for Grid preview */
       case 'grid': 
-        return <Grid width={width} height={height} />
+        return {
+          preserveAspectRatio: 'none',
+          svg: <Grid width={width} height={height} />,
+        }
       case 'circle':
-        return <Circle width={width} height={height} />
+        return {
+          preserveAspectRatio: 'xMidYMid meet',
+          svg: <Circle width={width} height={height} />,
+        }
       default:
-        return
+        return null
     }
   }
-
-  private getPreserveAspectRatio = () => (
-    this.props.type === 'circle' ? 'xMidYMid meet' : 'none'
-  )
 
   componentDidMount() { // tslint:disable-line member-access member-ordering
     /** Fixes a bug on react-content-loader related to limiting
@@ -71,12 +81,74 @@ export default class Preview extends React.PureComponent<
     })
   }
 
+  private getDimension = (dimension: PreviewDimension) => {
+    if (typeof dimension === 'number') {
+      return dimension
+    }
+
+    if (!dimension) {
+      return null
+    }
+
+    const { extension } = this.props
+
+    // TODO: support mobile
+    const dimensionObject = dimension.desktop
+    if (!dimensionObject) {
+      return null
+    }
+
+    const { defaultValue } = dimensionObject
+
+    const valueFromProp = dimensionObject.fromProp && extension.props[dimensionObject.fromProp]
+
+    if (typeof valueFromProp === 'number') {
+      return valueFromProp
+    }
+
+    return defaultValue
+  }
+
+  private getDimensions = () => {
+    const { extension } = this.props
+
+    if (!extension.preview) {
+      return { width: null, height: null }
+    }
+
+    const { width, height } = extension.preview
+
+    return {
+      height: this.getDimension(height),
+      width: this.getDimension(width),
+    }
+  }
+
   render() { // tslint:disable-line member-access member-ordering
-    const { width: initialWidth, height, type } = this.props
+    const { extension } = this.props
+
+    if (!extension.preview) {
+      return null
+    }
+
+    const {
+      type,
+      fullWidth,
+    } = extension.preview
+
+    const {
+      width: initialWidth,
+      height: initialHeight,
+    } = this.getDimensions()
+
     const { containerWidth } = this.state
 
     const maxWidth = containerWidth || (window && window.innerWidth) || initialWidth || 0
-    const width = initialWidth ? Math.min(maxWidth, initialWidth) : maxWidth
+
+    const width = typeof initialWidth === 'number' ? Math.min(maxWidth, initialWidth) : maxWidth
+    const height = initialHeight || 0
+
+    const previewGraphic = this.getPreviewGraphic(width, height, type)
 
     return (
       /** TODO: remove this div in favor of the Container component,
@@ -85,22 +157,27 @@ export default class Preview extends React.PureComponent<
        */
       <div
         ref={this.container}
-        className="ph3 ph5-m ph8-l ph9-xl mw9 center">
-        <ContentLoader
-          width={width}
-          height={height}
-          /** TODO: get these colors from the store theme */
-          primaryColor="#fafafa"
-          secondaryColor="#f3f3f3"
-          preserveAspectRatio={this.getPreserveAspectRatio()}
-          style={{
-            height,
-            maxWidth: width,
-            width: '100%'
-          }}
-        >
-          {this.renderPreviewGraphic({ width, height, type })}
-        </ContentLoader>
+        className={fullWidth ? '' : 'ph3 ph5-m ph8-l ph9-xl mw9 center'}>
+        {previewGraphic ? (
+          <ContentLoader
+            width={width}
+            height={height}
+
+            /** TODO: get these colors from the store theme */
+            primaryColor="#fafafa"
+            secondaryColor="#f3f3f3"
+            preserveAspectRatio={previewGraphic.preserveAspectRatio as IContentLoaderProps['preserveAspectRatio']}
+            style={{
+              height,
+              maxWidth: width,
+              width: '100%'
+            }}
+          >
+            {previewGraphic.svg}
+          </ContentLoader>
+        ) : (
+          <div style={{ height, width }}/>
+        )}
       </div>
     )
   }
