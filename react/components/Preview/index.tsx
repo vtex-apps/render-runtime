@@ -145,8 +145,9 @@ export default class Preview extends React.PureComponent<
 
     const maxWidth = containerWidth || (window && window.innerWidth) || initialWidth || 0
 
-    const width = typeof initialWidth === 'number' ? Math.min(maxWidth, initialWidth) : maxWidth
-    const height = initialHeight || 0
+    const padding = 5
+    const width = (typeof initialWidth === 'number' ? Math.min(maxWidth, initialWidth) : maxWidth) - padding * 2
+    const height = initialHeight ? initialHeight - padding * 2 : 0
 
     const previewGraphic = this.getPreviewGraphic(width, height, type)
 
@@ -157,7 +158,8 @@ export default class Preview extends React.PureComponent<
        */
       <div
         ref={this.container}
-        className={fullWidth ? '' : 'ph3 ph5-m ph2-xl mw9 center'}>
+        className={fullWidth ? '' : 'mw9 center'}
+        style={{ padding }}>
         {previewGraphic ? (
           <ContentLoader
             width={width}
