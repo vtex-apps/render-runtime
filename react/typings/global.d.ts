@@ -36,9 +36,20 @@ declare global {
   type ClientRendered = Element
 
   interface Preview {
-    type: 'block' | 'text' | 'circle'
-    width: number
-    height: number
+    type: string
+    width: PreviewDimension
+    height: PreviewDimension
+    fullWidth?: boolean
+  }
+
+  interface PreviewDimension {
+    desktop: PreviewDimensionValue
+    mobile: PreviewDimensionValue
+  }
+
+  interface PreviewDimensionValue {
+    fromProp?: string
+    defaultValue?: number
   }
 
   enum Composition {
