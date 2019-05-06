@@ -7,6 +7,7 @@ import { getImplementation } from '../utils/assets'
 import { TreePathContext, TreePathProps, withTreePath } from '../utils/treePath'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
+import Loading from './Loading'
 import { RenderContext } from './RenderContext'
 import TrackEventsWrapper from './TrackEventsWrapper'
 
@@ -86,38 +87,6 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     )
   }
 
-  /** This function is used for rendering the previews of child elements
-   * of the component, while the component is not loaded
-   */
-  private renderChildElements = (runtime: RenderContext) => {
-    const { newTreePath } = this.state
-    const extension = runtime.extensions && runtime.extensions[newTreePath]
-    const { props = {} } = extension || {}
-
-    const elementIds: string[] = props.elements
-
-    const elements = elementIds &&
-      elementIds.map((elementId:string, i) => {
-        const elementTreePath = `${runtime.page}/${elementId}`
-        const currentExtension = runtime.extensions[elementTreePath]
-
-        if (currentExtension) {
-          return (
-            <TreePathContext.Provider value={{ treePath: elementTreePath }} key={i}>
-              <ExtensionPointComponent
-                component={currentExtension.component}
-                props={currentExtension.props}
-                runtime={runtime}
-                treePath={elementTreePath} />
-            </TreePathContext.Provider>
-          )
-        }
-        return null
-      })
-
-    return elements
-  }
-
   private getExtensionPointComponent = (runtime: RenderContext) => {
     const { newTreePath } = this.state
     const {
@@ -179,7 +148,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
               <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>
                 {componentChildren}
               </ExtensionPointComponent>
-            ) : this.renderChildElements(runtime)}
+            ) : <Loading />}
           </TreePathContext.Provider>
         </TrackEventsWrapper>
       )
