@@ -157,7 +157,7 @@ export default class Preview extends React.PureComponent<
        */
       <div
         ref={this.container}
-        className={fullWidth ? '' : 'ph3 ph5-m ph8-l ph9-xl mw9 center'}>
+        className={fullWidth ? '' : 'ph3 ph5-m ph2-xl mw9 center'}>
         {previewGraphic ? (
           <ContentLoader
             width={width}
