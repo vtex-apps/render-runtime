@@ -140,6 +140,7 @@ export function navigate(
     to,
     scrollOptions,
     fallbackToWindowLocation = true,
+    rootPath,
     replace,
     fetchPage = true,
   } = options
@@ -160,6 +161,10 @@ export function navigate(
       `Unable to find route for ${page ? `page '${page}'` : `path '${to}'`}`
     )
     return false
+  }
+
+  if (rootPath && !navigationRoute.path.startsWith('http')) {
+    navigationRoute.path = rootPath + navigationRoute.path
   }
 
   if (history) {
@@ -254,4 +259,5 @@ export interface NavigateOptions {
   fallbackToWindowLocation?: boolean
   replace?: boolean
   fetchPage?: boolean
+  rootPath?: string
 }

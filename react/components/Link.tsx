@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
-import React, { Component, MouseEvent, useCallback } from 'react'
+import React, { MouseEvent, useCallback } from 'react'
 import { NavigateOptions, pathFromPageName } from '../utils/pages'
-import { RenderContextProps, useRuntime } from './RenderContext'
+import { useRuntime } from './RenderContext'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) =>
   event.button === 0
@@ -26,7 +26,7 @@ const Link: React.FunctionComponent<Props> = ({
   query,
   ...linkProps
 }) => {
-  const { pages, navigate } = useRuntime()
+  const { pages, navigate, rootPath = '' } = useRuntime()
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLAnchorElement>) => {
@@ -45,6 +45,7 @@ const Link: React.FunctionComponent<Props> = ({
         page,
         params,
         query,
+        rootPath,
         scrollOptions,
         to,
       }
@@ -57,13 +58,16 @@ const Link: React.FunctionComponent<Props> = ({
 
   const getHref = () => {
     if (to) {
+      if (rootPath && !to.startsWith('http') && !to.startsWith(rootPath)) {
+        return rootPath + to
+      }
       return to
     }
     if (page) {
-      const path = pathFromPageName(page, pages, params) 
+      const path = pathFromPageName(page, pages, params)
       const qs = query ? `?${query}` : ''
       if (path) {
-        return path + qs
+        return rootPath + path + qs
       }
     }
     return '#'
