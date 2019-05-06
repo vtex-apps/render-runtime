@@ -1,30 +1,25 @@
-import React, { Component, CSSProperties } from 'react'
+import React from 'react'
 
-import { TreePathContext, TreePathProps } from '../utils/treePath'
+import { useExtension } from '../utils/extension'
 
-import Preview, {Props as PreviewProps} from './Preview'
-import { RenderContextProps, withRuntimeContext } from './RenderContext'
+import Preview from './Preview'
 
-interface Props {
-  preview?: PreviewProps
-}
+const Loading = () => {
+  const extension = useExtension()
 
-class Loading extends Component<RenderContextProps & Props> {
-  public render() {
-    const { runtime: { extensions } } = this.props
-
-    return (
-      <TreePathContext.Consumer>
-        {(value: TreePathProps) => {
-          const t = value.treePath
-          const extension = t && extensions[t]
-          const preview = (extension && extension.preview) || this.props.preview
-
-          return preview && <Preview {...preview} />
-        }}
-      </TreePathContext.Consumer>
-    )
+  if (!extension) {
+    return null
   }
+
+  const { preview } = extension
+
+  if (!preview) {
+    return null
+  }
+
+  return (
+    <Preview extension={extension} />
+  )
 }
 
-export default withRuntimeContext<Props>(Loading)
+export default Loading
