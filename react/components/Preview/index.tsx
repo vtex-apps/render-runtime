@@ -165,7 +165,7 @@ export default class Preview extends React.PureComponent<
 
             /** TODO: get these colors from the store theme */
             primaryColor="#fafafa"
-            secondaryColor="#f3f3f3"
+            secondaryColor="#efefef"
             preserveAspectRatio={previewGraphic.preserveAspectRatio as IContentLoaderProps['preserveAspectRatio']}
             style={{
               height,
