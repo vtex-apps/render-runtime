@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.24.0] - 2019-05-07
+
 ### Added
 - Added support for `rootPath` property in runtime, which causes links and navigation to be scoped by a prefix (e.g. when serving your store from a specific path in a domain). See https://github.com/vtex/render-root-path-example
 
