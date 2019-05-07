@@ -58,6 +58,7 @@ const Link: React.FunctionComponent<Props> = ({
 
   const getHref = () => {
     if (to) {
+      // Prefix any non-absolute paths (e.g. http:// or https://) with runtime.rootPath
       if (rootPath && !to.startsWith('http') && !to.startsWith(rootPath)) {
         return rootPath + to
       }

@@ -163,6 +163,7 @@ export function navigate(
     return false
   }
 
+  // Prefix any non-absolute paths (e.g. http:// or https://) with runtime.rootPath
   if (rootPath && !navigationRoute.path.startsWith('http')) {
     navigationRoute.path = rootPath + navigationRoute.path
   }
