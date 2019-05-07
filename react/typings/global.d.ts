@@ -110,7 +110,7 @@ declare global {
   interface SetQueryOptions {
     merge?: boolean
     replace?: boolean
-    scrollOptions?: RenderScrollOptions 
+    scrollOptions?: RenderScrollOptions
   }
 
   interface Route {
@@ -193,7 +193,8 @@ declare global {
     workspace: RenderRuntime['workspace'],
     route: RenderRuntime['route'],
     query: RenderRuntime['query'],
-    defaultExtensions: RenderRuntime['defaultExtensions']
+    defaultExtensions: RenderRuntime['defaultExtensions'],
+    rootPath?: string
   }
 
   interface PageContextOptions {
@@ -359,6 +360,7 @@ interface RenderComponent<P={}, S={}> {
     cacheHints: CacheHintsMap
     segmentToken: string
     defaultExtensions: Extensions
+    rootPath?: string
   }
 
   interface CacheHints {
