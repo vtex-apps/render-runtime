@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.23.0] - 2019-05-07
+
 ## [8.22.0] - 2019-05-03
 ### Added
 - Template blocks can now configure their context providers.
