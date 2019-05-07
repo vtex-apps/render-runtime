@@ -7,6 +7,7 @@ interface Props {
 }
 
 const Text = ({width, height}: Props) => {
+  // TODO: make the line height configurable
   const lineHeight = 16
   const lineSize = lineHeight * 1.5
   const lines = Math.round(height / lineSize)

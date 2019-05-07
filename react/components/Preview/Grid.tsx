@@ -7,6 +7,7 @@ interface Props {
 }
 
 const Grid = ({width, height}: Props) => {
+  // TODO: make these values configurable
   const itemWidth = 250
   const itemHeight = 400
   const minSpacingX = 10
