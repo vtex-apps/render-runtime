@@ -1,4 +1,5 @@
 import React from 'react'
+import ContentLoader from './ContentLoader'
 
 interface Props {
   width: number
@@ -14,7 +15,7 @@ const Text = ({width, height}: Props) => {
   const horizontalMargin = 16
 
   return (
-    <React.Fragment>
+    <ContentLoader width={width} height={height}>
       {Array.from({ length: lines }).map((_, i) => {
         const isLast = i === lines - 1
         const widthMultiplier = isLast ? 0.7 : 1
@@ -32,7 +33,7 @@ const Text = ({width, height}: Props) => {
           />
         )
       })}
-    </React.Fragment>
+    </ContentLoader>
   )
 }
 

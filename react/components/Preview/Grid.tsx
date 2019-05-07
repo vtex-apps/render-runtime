@@ -1,4 +1,5 @@
 import React from 'react'
+import ContentLoader from './ContentLoader'
 
 interface Props {
   width: number
@@ -17,7 +18,7 @@ const Grid = ({width, height}: Props) => {
   const spacingY = (height - (itemsNumY * itemHeight)) / (itemsNumY > 1 ? itemsNumY - 1 : 2)
 
   return (
-    <React.Fragment>
+    <ContentLoader width={width} height={height}>
       {Array.from({ length: itemsNumX }).map((_, x) =>
         Array.from({ length: itemsNumY }).map((__, y) => (
           <rect
@@ -31,7 +32,7 @@ const Grid = ({width, height}: Props) => {
           />
         ))
       )}
-    </React.Fragment>
+    </ContentLoader>
   )
 }
 

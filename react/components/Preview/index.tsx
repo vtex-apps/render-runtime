@@ -1,9 +1,9 @@
 import React, { ReactElement, RefObject } from 'react'
-import ContentLoader, { IContentLoaderProps } from 'react-content-loader'
 
 import Box from './Box'
 import Circle from './Circle'
 import Grid from './Grid'
+import Spinner from './Spinner'
 import Text from './Text'
 
 interface Props {
@@ -11,11 +11,6 @@ interface Props {
 }
 interface State {
   containerWidth?: number | null
-}
-
-interface PreviewGraphic {
-  preserveAspectRatio: string
-  svg: ReactElement<any> | null
 }
 
 export default class Preview extends React.PureComponent<
@@ -33,7 +28,7 @@ export default class Preview extends React.PureComponent<
     }
   }
 
-  private getPreviewGraphic = (width: number, height: number, type: string): PreviewGraphic | null => {
+  private renderPreviewGraphic = (width: number, height: number, type: string): ReactElement<any> | null => {
     if (!type || type === 'none') {
       return null
     }
@@ -42,26 +37,18 @@ export default class Preview extends React.PureComponent<
       case 'box':
       /** TODO: deprecate block in favor of box */
       case 'block':
-        return {
-          preserveAspectRatio: 'none',
-          svg: <Box width={width} height={height} />,
-        }
+        return <Box width={width} height={height} />
       case 'text': 
-        return {
-          preserveAspectRatio: 'none',
-          svg: <Text width={width} height={height} />,
-        }
+        return <Text width={width} height={height} />
       /** TODO: add support for Grid preview */
       case 'grid': 
-        return {
-          preserveAspectRatio: 'none',
-          svg: <Grid width={width} height={height} />,
-        }
+        return <Grid width={width} height={height} />
       case 'circle':
-        return {
-          preserveAspectRatio: 'xMidYMid meet',
-          svg: <Circle width={width} height={height} />,
-        }
+        return <Circle width={width} height={height} />
+      case 'spinner':
+        return <Spinner width={width} height={height} />
+      case 'transparent':
+        return <div style={{ width, height }} />
       default:
         return null
     }
@@ -149,8 +136,6 @@ export default class Preview extends React.PureComponent<
     const width = (typeof initialWidth === 'number' ? Math.min(maxWidth, initialWidth) : maxWidth) - padding * 2
     const height = initialHeight ? initialHeight - padding * 2 : 0
 
-    const previewGraphic = this.getPreviewGraphic(width, height, type)
-
     return (
       /** TODO: remove this div in favor of the Container component,
        * currently on store-components
@@ -160,26 +145,7 @@ export default class Preview extends React.PureComponent<
         ref={this.container}
         className={fullWidth ? '' : 'mw9 center'}
         style={{ padding }}>
-        {previewGraphic ? (
-          <ContentLoader
-            width={width}
-            height={height}
-
-            /** TODO: get these colors from the store theme */
-            primaryColor="#fafafa"
-            secondaryColor="#efefef"
-            preserveAspectRatio={previewGraphic.preserveAspectRatio as IContentLoaderProps['preserveAspectRatio']}
-            style={{
-              height,
-              maxWidth: width,
-              width: '100%'
-            }}
-          >
-            {previewGraphic.svg}
-          </ContentLoader>
-        ) : (
-          <div style={{ height, width }}/>
-        )}
+        {this.renderPreviewGraphic(width, height, type)}
       </div>
     )
   }

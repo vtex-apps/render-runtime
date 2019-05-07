@@ -1,4 +1,5 @@
 import React from 'react'
+import ContentLoader from './ContentLoader'
 
 interface Props {
   width: number
@@ -6,14 +7,16 @@ interface Props {
 }
 
 const Box = ({width, height}: Props) => (
-  <rect
-    x="0"
-    y="0"
-    rx="5"
-    ry="5"
-    width={width}
-    height={height}
-  />
+  <ContentLoader width={width} height={height}>
+    <rect
+      x="0"
+      y="0"
+      rx="5"
+      ry="5"
+      width={width}
+      height={height}
+    />
+  </ContentLoader>
 )
 
 export default Box

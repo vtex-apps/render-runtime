@@ -1,4 +1,5 @@
 import React from 'react'
+import ContentLoader from './ContentLoader'
 
 interface Props {
   width: number
@@ -6,14 +7,16 @@ interface Props {
 }
 
 const Circle = ({width, height}: Props) => (
-  <rect
-    x="0"
-    y="0"
-    rx={width}
-    ry={height}
-    width={width}
-    height={height}
-  />
+  <ContentLoader width={width} height={height} preserveAspectRatio="xMidYMid meet">
+    <rect
+      x="0"
+      y="0"
+      rx={width}
+      ry={height}
+      width={width}
+      height={height}
+    />
+  </ContentLoader>
 )
 
 export default Circle
