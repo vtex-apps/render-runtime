@@ -132,7 +132,7 @@ export default class Preview extends React.PureComponent<
 
     const maxWidth = containerWidth || (window && window.innerWidth) || initialWidth || 0
 
-    const padding = 5
+    const padding = 20
     const width = (typeof initialWidth === 'number' ? Math.min(maxWidth, initialWidth) : maxWidth) - padding * 2
     const height = initialHeight ? initialHeight - padding * 2 : 0
 
