@@ -85,34 +85,6 @@ try {
 // tslint:disable-next-line:no-empty
 const noop = () => {}
 
-const unionKeys = (record1: any, record2: any) => [
-  ...new Set([...Object.keys(record1), ...Object.keys(record2)]),
-]
-
-const isChildOrSelf = (child: string, parent: string) =>
-  child === parent ||
-  (child.startsWith(`${parent}/`) && !child.startsWith(`${parent}/$`))
-
-const replaceExtensionsWithDefault = (
-  extensions: Extensions,
-  page: string,
-  defaultExtensions: Extensions
-) =>
-  unionKeys(extensions, defaultExtensions).reduce(
-    (acc, key) => {
-      const maybeExtension = isChildOrSelf(key, page)
-        ? defaultExtensions[key] || {
-            ...extensions[key],
-            component: null,
-          }
-        : extensions[key]
-      if (maybeExtension) {
-        acc[key] = maybeExtension
-      }
-      return acc
-    },
-    {} as Extensions
-  )
 
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
@@ -474,7 +446,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture: { locale },
       pages: pagesState,
       production,
-      defaultExtensions,
       route,
       loadedPages,
     } = this.state
@@ -508,11 +479,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     this.setState(
       {
-        extensions: replaceExtensionsWithDefault(
-          this.state.extensions,
-          page,
-          defaultExtensions
-        ),
         page,
         preview: true,
         query,
