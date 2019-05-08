@@ -68,7 +68,7 @@ function getValidTemplate(page: string, pages: Pages) {
 
 export function pathFromPageName(page: string, pages: Pages, params: any) {
   const validTemplate = getValidTemplate(page, pages)
-  if(!validTemplate) return null;
+  if (!validTemplate) return null
   return new RouteParser(validTemplate).reverse(params) || null
 }
 
@@ -108,7 +108,7 @@ function getValidParams(id: string, pages: Pages, path: string, params: any) {
   const validParams = getParams(template, path) as Record<string, any>
   const invalidParams = difference(keys(params), keys(validParams))
 
-  if(!isEmpty(invalidParams)){
+  if (!isEmpty(invalidParams)) {
     console.warn(`The following params are invalid:\n${invalidParams.join('\n')}\n`)
   }
   return validParams
@@ -121,7 +121,7 @@ function getRouteFromPageName(
 ): NavigationRoute | null {
   const path = pathFromPageName(id, pages, params) || ''
   const validParams = getValidParams(id, pages, path, params)
-  return path ? { id, path, params: validParams} : null
+  return path ? { id, path, params: validParams } : null
 }
 
 export function getRouteFromPath(
