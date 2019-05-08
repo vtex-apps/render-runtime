@@ -193,7 +193,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { history, baseURI, cacheControl } = props
     const path = canUseDOM ? window.location.pathname : window.__pathname__
     const route = props.runtime.route || getRouteFromPath(path, pages)
-
+    
     if (history) {
       const renderLocation: RenderHistoryLocation = {
         ...history.location,

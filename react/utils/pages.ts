@@ -49,6 +49,23 @@ function adjustPath(path: string) {
   return trimEndingSlash(pathname)
 }
 
+function getValidTemplate(page: string, pages: Pages) {
+  const pageDescriptor = pages[page]
+
+  if (!pageDescriptor) {
+    console.error(`Page ${page} was not found`)
+    return null
+  }
+
+  const { path: template } = pageDescriptor
+  if (!template) {
+    console.error(`Page ${page} has no path`)
+    return null
+  }
+
+  return adjustTemplate(template)
+}
+
 export function pathFromPageName(page: string, pages: Pages, params: any) {
   const pageDescriptor = pages[page]
   if (!pageDescriptor) {
@@ -102,7 +119,9 @@ function getRouteFromPageName(
   pages: Pages,
   params: any
 ): NavigationRoute | null {
-  const path = pathFromPageName(id, pages, params)
+  const path = pathFromPageName(id, pages, params) || ''
+  const validParams = new RouteParser(getValidTemplate(id, pages) || '').match(path)
+  console.log(validParams === params)
   return path ? { id, path, params } : null
 }
 
