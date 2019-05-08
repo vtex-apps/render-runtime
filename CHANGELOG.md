@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.25.0] - 2019-05-08
+### Added
+- Added preview support for top-level blocks.
+
 ## [8.24.0] - 2019-05-07
 
 ### Added

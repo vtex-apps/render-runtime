@@ -1,6 +1,4 @@
-import PropTypes from 'prop-types'
 import React, {Component} from 'react'
-import Loading from './Loading'
 import {RenderContextProps, withRuntimeContext} from './RenderContext'
 
 interface State {
