@@ -154,7 +154,7 @@ function getRouteFromPageName(
 }
 
 export function getRouteFromPath(
-  path: string, 
+  path: string,
   pages: Pages
 ): NavigationRoute | null {
   const id = routeIdFromPath(path, pages)
