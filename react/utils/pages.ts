@@ -67,20 +67,10 @@ function getValidTemplate(page: string, pages: Pages) {
 }
 
 export function pathFromPageName(page: string, pages: Pages, params: any) {
-  const pageDescriptor = pages[page]
-  if (!pageDescriptor) {
-    console.error(`Page ${page} was not found`)
-    return null
-  }
 
-  const { path: template } = pageDescriptor
-  if (!template) {
-    console.error(`Page ${page} has no path`)
-    return null
-  }
-
-  const properTemplate = adjustTemplate(template)
-  return new RouteParser(properTemplate).reverse(params) || null
+  const validTemplate = getValidTemplate(page, pages)
+  if(!validTemplate) return null;
+  return new RouteParser(validTemplate).reverse(params) || null
 }
 
 export function queryStringToMap(query: string): Record<string, any> {
@@ -121,12 +111,15 @@ function getRouteFromPageName(
 ): NavigationRoute | null {
   const path = pathFromPageName(id, pages, params) || ''
   const validParams = new RouteParser(getValidTemplate(id, pages) || '').match(path)
-  console.log(validParams === params)
+  if(JSON.stringify(params) !== JSON.stringify(validParams) ){
+    console.warn('invalid params')
+  }
+  params = validParams
   return path ? { id, path, params } : null
 }
 
 export function getRouteFromPath(
-  path: string,
+  path: string, 
   pages: Pages
 ): NavigationRoute | null {
   const id = routeIdFromPath(path, pages)
