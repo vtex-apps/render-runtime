@@ -1,22 +1,8 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Revert some changes
 import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
 import * as RouteParser from 'route-parser'
-<<<<<<< HEAD
-=======
-import { canUseDOM } from "exenv";
-import { History, LocationDescriptorObject } from "history";
-import queryString from "query-string";
-import * as RouteParser from "route-parser";
-import { keys, difference, isEmpty } from "ramda";
->>>>>>> Improve params display of warning and refactor getValidParams method
-=======
 import { keys, difference, isEmpty } from 'ramda'
->>>>>>> Revert some changes
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
@@ -133,24 +119,9 @@ function getRouteFromPageName(
   pages: Pages,
   params: any
 ): NavigationRoute | null {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  const path = pathFromPageName(id, pages, params) || ''
-  const template = getValidTemplate(id, pages) || ''
-  const validParams = getParams(template, path)
-
-  params = validParams
-  return path ? { id, path, params} : null
-=======
-  const path = pathFromPageName(id, pages, params) || "";
-  const validParams = getValidParams(id, pages, path, params);
-  return path ? { id, path, params: validParams } : null;
->>>>>>> Improve params display of warning and refactor getValidParams method
-=======
   const path = pathFromPageName(id, pages, params) || ''
   const validParams = getValidParams(id, pages, path, params)
   return path ? { id, path, params: validParams} : null
->>>>>>> Revert some changes
 }
 
 export function getRouteFromPath(
