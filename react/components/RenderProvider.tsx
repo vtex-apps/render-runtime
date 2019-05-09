@@ -6,7 +6,6 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { parse, stringify } from 'query-string'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -21,7 +20,6 @@ import {
   ROUTE_CLASS_PREFIX,
   routeClass,
 } from '../utils/dom'
-import { loadLocaleData } from '../utils/locales'
 import {
   getRouteFromPath,
   goBack as pageGoBack,
@@ -68,15 +66,11 @@ export interface RenderProviderState {
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
-let isStorefrontIframe: (
-  runtime: RenderContext | null,
-  messages?: Record<string, string>,
-  shouldUpdateRuntime?: boolean
-) => void | undefined
+let isStorefrontIframe: boolean
 
 try {
   if (canUseDOM && window.top !== window.self && window.top.__provideRuntime) {
-    isStorefrontIframe = window.top.__provideRuntime
+    isStorefrontIframe = !!window.top.__provideRuntime
   }
 } catch (e) {
   console.error(e)
@@ -158,16 +152,21 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     runtime: PropTypes.object,
   }
 
-  public sendInfoFromIframe = debounce((shouldUpdateRuntime?: boolean) => {
-    if (isStorefrontIframe) {
-      const { messages } = this.state
-      window.top.__provideRuntime(
-        this.getChildContext(),
-        messages,
-        shouldUpdateRuntime
-      )
-    }
-  }, SEND_INFO_DEBOUNCE_MS)
+  public sendInfoFromIframe = debounce(
+    (shouldUpdateRuntime: boolean = false) => {
+      if (isStorefrontIframe) {
+        const { messages } = this.state
+
+        window.top.__provideRuntime(
+          this.getChildContext(),
+          messages,
+          shouldUpdateRuntime,
+          this.updateMessages,
+        )
+      }
+    },
+    SEND_INFO_DEBOUNCE_MS,
+  )
 
   private rendered!: boolean
   private sessionPromise: Promise<void>
@@ -854,6 +853,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           </ApolloProvider>
         </TreePathContext.Provider>
       </RenderContext.Provider>
+    )
+  }
+
+  private updateMessages = (newMessages: RenderProviderState['messages']) => {
+    this.setState(
+      prevState => ({
+        ...prevState,
+        messages: { ...prevState.messages, ...newMessages },
+      }),
+      () => {
+        this.sendInfoFromIframe()
+      },
     )
   }
 }
