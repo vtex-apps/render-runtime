@@ -109,7 +109,7 @@ function getValidParams(id: string, pages: Pages, path: string, params: any) {
   const invalidParams = difference(keys(params), keys(validParams))
 
   if (!isEmpty(invalidParams)) {
-    console.warn(`The following params are invalid:\n${invalidParams.join('\n')}`)
+    console.warn(`The following params are invalid: ${invalidParams.join(', ')}`)
   }
   return validParams
 }
