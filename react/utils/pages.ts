@@ -2,7 +2,7 @@ import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
 import * as RouteParser from 'route-parser'
-import { keys, difference, isEmpty } from 'ramda'
+import { difference, is, isEmpty, keys } from 'ramda'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
@@ -26,7 +26,11 @@ function trimEndingSlash(token: string) {
 
 function createLocationDescriptor(
   navigationRoute: NavigationRoute,
-  { query, scrollOptions, fetchPage }: Pick<NavigateOptions, 'query' | 'scrollOptions' | 'fetchPage'>
+  {
+    query,
+    scrollOptions,
+    fetchPage,
+  }: Pick<NavigateOptions, 'query' | 'scrollOptions' | 'fetchPage'>
 ): LocationDescriptorObject {
   return {
     pathname: navigationRoute.path!,
@@ -68,7 +72,9 @@ function getValidTemplate(page: string, pages: Pages) {
 
 export function pathFromPageName(page: string, pages: Pages, params: any) {
   const validTemplate = getValidTemplate(page, pages)
-  if (!validTemplate) return null
+  if (!validTemplate) {
+    return null
+  }
   return new RouteParser(validTemplate).reverse(params) || null
 }
 
@@ -79,7 +85,7 @@ export function queryStringToMap(query: string): Record<string, any> {
   return queryString.parse(query)
 }
 
- export function mapToQueryString(query: Record<string, any> = {}): string {
+export function mapToQueryString(query: Record<string, any> = {}): string {
   return queryString.stringify(query)
 }
 
@@ -103,15 +109,16 @@ function getPagePath(name: string, pages: Pages) {
   return cname && isHost(cname) ? '/' : pagePath
 }
 
-function getValidParams(id: string, pages: Pages, path: string, params: any) {
+function checkValidParams(id: string, pages: Pages, path: string, params: any) {
   const template = getValidTemplate(id, pages) || ''
   const validParams = getParams(template, path) as Record<string, any>
   const invalidParams = difference(keys(params), keys(validParams))
 
   if (!isEmpty(invalidParams)) {
-    console.warn(`The following params are invalid: ${invalidParams.join(', ')}`)
+    console.warn(
+      `The following params are invalid: ${invalidParams.join(', ')}`
+    )
   }
-  return validParams
 }
 
 function getRouteFromPageName(
@@ -120,8 +127,8 @@ function getRouteFromPageName(
   params: any
 ): NavigationRoute | null {
   const path = pathFromPageName(id, pages, params) || ''
-  const validParams = getValidParams(id, pages, path, params)
-  return path ? { id, path, params: validParams } : null
+  checkValidParams(id, pages, path, params)
+  return path ? { id, path, params } : null
 }
 
 export function getRouteFromPath(
@@ -137,13 +144,16 @@ const mergePersistingQueries = (currentQuery: string, query: string) => {
   const current = queryStringToMap(currentQuery)
   const next = queryStringToMap(query)
   const has = (value?: string) => !!value || value === null
-  const persisting = KEYS.reduce((cur, key) => {
-    if (has(current[key]) && current[key] !== 'false'){
-      cur[key] = current[key]
-    }
-    return cur
-  } , {} as Record<string, any>)
-  return mapToQueryString({...persisting, ...next})
+  const persisting = KEYS.reduce(
+    (cur, key) => {
+      if (has(current[key]) && current[key] !== 'false') {
+        cur[key] = current[key]
+      }
+      return cur
+    },
+    {} as Record<string, any>
+  )
+  return mapToQueryString({ ...persisting, ...next })
 }
 
 export function navigate(
@@ -154,8 +164,8 @@ export function navigate(
   const {
     page,
     params,
-    query,
-    to,
+    query: inputQuery,
+    to: inputTo = '',
     scrollOptions,
     fallbackToWindowLocation = true,
     rootPath,
@@ -163,12 +173,21 @@ export function navigate(
     fetchPage = true,
   } = options
 
-  if (!page && !to) {
+  if (!page && !inputTo) {
     console.error(
       `Invalid navigation options. You should use 'page' or 'to' parameters`
     )
     return false
   }
+
+  if (inputTo && inputQuery) {
+    console.warn(
+      `You shouldn't pass 'query' in a separate prop when using 'to'`
+    )
+  }
+
+  const [to, extractedQuery] = (is(String, inputTo) ? inputTo : '').split('?')
+  const query = inputQuery || extractedQuery
 
   const navigationRoute = page
     ? getRouteFromPageName(page, pages, params)
@@ -176,7 +195,9 @@ export function navigate(
 
   if (!navigationRoute) {
     console.warn(
-      `Unable to find route for ${page ? `page '${page}'` : `path '${to}'`}`
+      `Unable to find route for ${
+        page ? `page '${page}' and the passed parameters` : `path '${to}'`
+      }`
     )
     return false
   }

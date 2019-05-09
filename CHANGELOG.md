@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.27.0] - 2019-05-09
+### Fixed
+- Extracted query params from `to` path, for the query object. 
+
 ## [8.26.0] - 2019-05-09
 
 ## [8.25.1] - 2019-05-09
