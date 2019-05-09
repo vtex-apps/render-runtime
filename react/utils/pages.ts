@@ -2,6 +2,7 @@ import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
 import * as RouteParser from 'route-parser'
+import { keys, difference, isEmpty } from 'ramda'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
@@ -49,8 +50,9 @@ function adjustPath(path: string) {
   return trimEndingSlash(pathname)
 }
 
-export function pathFromPageName(page: string, pages: Pages, params: any) {
+function getValidTemplate(page: string, pages: Pages) {
   const pageDescriptor = pages[page]
+
   if (!pageDescriptor) {
     console.error(`Page ${page} was not found`)
     return null
@@ -61,9 +63,13 @@ export function pathFromPageName(page: string, pages: Pages, params: any) {
     console.error(`Page ${page} has no path`)
     return null
   }
+  return adjustTemplate(template)
+}
 
-  const properTemplate = adjustTemplate(template)
-  return new RouteParser(properTemplate).reverse(params) || null
+export function pathFromPageName(page: string, pages: Pages, params: any) {
+  const validTemplate = getValidTemplate(page, pages)
+  if (!validTemplate) return null
+  return new RouteParser(validTemplate).reverse(params) || null
 }
 
 export function queryStringToMap(query: string): Record<string, any> {
@@ -97,13 +103,25 @@ function getPagePath(name: string, pages: Pages) {
   return cname && isHost(cname) ? '/' : pagePath
 }
 
+function getValidParams(id: string, pages: Pages, path: string, params: any) {
+  const template = getValidTemplate(id, pages) || ''
+  const validParams = getParams(template, path) as Record<string, any>
+  const invalidParams = difference(keys(params), keys(validParams))
+
+  if (!isEmpty(invalidParams)) {
+    console.warn(`The following params are invalid: ${invalidParams.join(', ')}`)
+  }
+  return validParams
+}
+
 function getRouteFromPageName(
   id: string,
   pages: Pages,
   params: any
 ): NavigationRoute | null {
-  const path = pathFromPageName(id, pages, params)
-  return path ? { id, path, params } : null
+  const path = pathFromPageName(id, pages, params) || ''
+  const validParams = getValidParams(id, pages, path, params)
+  return path ? { id, path, params: validParams } : null
 }
 
 export function getRouteFromPath(
