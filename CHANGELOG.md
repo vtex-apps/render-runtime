@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Fixed
-- Checks for invalid params in route and throws a warning.
+- Extracted query params from `to` path, for the query object. 
 
 ## [8.26.0] - 2019-05-09
 
