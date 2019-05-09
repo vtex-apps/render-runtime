@@ -68,7 +68,7 @@ You can pass a handful of configuration props to navigate:
 | fallbackToWindowLocation     | `boolean`   | `false`  |If `true`, sets the href of `window.location` with the future path
 | fetchPage     | `boolean`   | `true`  | If `false`, won't fetch navigation assets in `pages-graphql`
 | page     | `string`  | --  | Name of the page that will be redirected to. Maps to a `blocks.json` block. Example: `'store.product'`
-| to     | `string`    |  --  | Alternatively to `page`, you can pass the URL directly instead of the page name (Useful for the `search-result`). Example: `/:slug/p`
+| to     | `string`    |  --  | Alternatively to `page`, you can pass the whole URL directly instead of the page name (Useful for the `search-result`). Example: `/shirt/p?skuId=1`
 | params | `object`      |   `{}`  | Map of _parameters_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}`
 | query | `string`  | `''`   | String representation of the query params that will be appended to the path. Example: `skuId=231`.
 | scrollOptions | `RenderScrollOptions` | -- | After the navigation, if the page should be scrolled to a specific position, or should stay still (use `false`)
@@ -90,7 +90,7 @@ Link is a custom React component that renders an `a` HTML element that, when cli
 | Name      | Type          | Default  | Description | 
 | :------------- |:-------------| :-----|:-----|
 | page     | `string`  | --  | Name of the page that will be redirect to. Maps to a `blocks.json` block. Example: `'store.product'`
-| to     | `string`    |  --  | Alternatively to `page`, you can pass the URL directly instead of the page name (Useful for the `search-result`). Example: `/:slug/p`
+| to     | `string`    |  --  | Alternatively to `page`, you can pass the whole URL directly instead of the page name (Useful for the `search-result`). Example: `/shirt/p?skuId=1`
 | params | `object`      |   `{}`  | Map of _param_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}`
 | query | `string`  | `''`   | String representation of the query params that will be appended to the path. Example: `skuId=231`.
 | onClick | `function` | -- | Callback that will be fired when the user click on the Component. Example: `() => alert('Salut')`
