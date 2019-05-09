@@ -154,8 +154,8 @@ export function navigate(
   const {
     page,
     params,
-    query,
-    to,
+    query: inputQuery,
+    to: inputTo = '',
     scrollOptions,
     fallbackToWindowLocation = true,
     rootPath,
@@ -163,11 +163,18 @@ export function navigate(
     fetchPage = true,
   } = options
 
-  if (!page && !to) {
+  if (!page && !inputTo) {
     console.error(
       `Invalid navigation options. You should use 'page' or 'to' parameters`
     )
     return false
+  }
+  
+  const [to, extractedQuery] = inputTo.split('?')
+  const query = inputQuery || extractedQuery
+
+  if (inputTo && inputQuery) {
+    console.warn(`You shouldn't pass 'query' in a separate prop when using 'to'`)
   }
 
   const navigationRoute = page
@@ -176,7 +183,7 @@ export function navigate(
 
   if (!navigationRoute) {
     console.warn(
-      `Unable to find route for ${page ? `page '${page}'` : `path '${to}'`}`
+      `Unable to find route for ${page ? `page '${page}' and the passed parameters` : `path '${to}'`}`
     )
     return false
   }
