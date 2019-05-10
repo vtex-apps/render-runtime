@@ -1,6 +1,7 @@
 import { path } from 'ramda'
 import { ComponentType } from 'react'
 
+import { scopeMessages } from '../components/ScopeMessagesHandler'
 import maybeWrapWithHMR from './withHMR'
 
 export const isComponentType = (Arg: any): Arg is ComponentType => {
@@ -42,7 +43,10 @@ const idToAppAtMajor = (appId: string) => {
 }
 
 export default (module: Module, InitialImplementer: any, app: string, name: string) => {
-  const wrappedComponent = maybeWrapWithHMR(module, InitialImplementer)
+  const Implementer = isComponentType(InitialImplementer)
+    ? scopeMessages(app, InitialImplementer)
+    : InitialImplementer
+  const wrappedComponent = maybeWrapWithHMR(module, Implementer)
   window.__RENDER_8_COMPONENTS__[`${app}/${name}`] = wrappedComponent
   window.__RENDER_8_COMPONENTS__[`${idToAppAtMajor(app)}/${name}`] = wrappedComponent
   return wrappedComponent
