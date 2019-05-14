@@ -159,6 +159,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         this.getChildContext(),
         this.state.messages,
         (params && params.shouldUpdateRuntime) || false,
+        // Deprecated
         this.updateMessages
       )
     },
@@ -873,6 +874,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     )
   }
 
+  // Deprecated
   private updateMessages = (newMessages: RenderProviderState['messages']) => {
     this.setState(
       prevState => ({
