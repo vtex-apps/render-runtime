@@ -106,6 +106,7 @@ const replaceExtensionsWithDefault = (
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
+    addMessages: PropTypes.func,
     components: PropTypes.object,
     culture: PropTypes.object,
     defaultExtensions: PropTypes.object,
@@ -118,6 +119,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     goBack: PropTypes.func,
     hints: PropTypes.object,
     history: PropTypes.object,
+    messages: PropTypes.object,
     navigate: PropTypes.func,
     onPageChanged: PropTypes.func,
     page: PropTypes.string,
@@ -148,17 +150,17 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public sendInfoFromIframe = debounce(
-    (shouldUpdateRuntime: boolean = false) => {
-      if (isStorefrontIframe) {
-        const { messages } = this.state
-
-        window.top.__provideRuntime(
-          this.getChildContext(),
-          messages,
-          shouldUpdateRuntime,
-          this.updateMessages
-        )
+    (params?: { shouldUpdateRuntime?: boolean }) => {
+      if (!isStorefrontIframe) {
+        return undefined
       }
+
+      return window.top.__provideRuntime(
+        this.getChildContext(),
+        this.state.messages,
+        (params && params.shouldUpdateRuntime) || false,
+        this.updateMessages
+      )
     },
     SEND_INFO_DEBOUNCE_MS
   )
@@ -286,6 +288,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {
       components,
       extensions,
+      messages,
       page,
       pages,
       preview,
@@ -308,6 +311,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     return {
       account,
+      addMessages: this.addMessages,
       components,
       culture,
       defaultExtensions,
@@ -320,6 +324,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       goBack: this.goBack,
       hints,
       history,
+      messages,
       navigate: this.navigate,
       onPageChanged: this.onPageChanged,
       page,
@@ -654,7 +659,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const assetsPromise = fetchAssets(runtime, assets)
     assetsPromise.then(() => {
-      this.sendInfoFromIframe(true)
+      this.sendInfoFromIframe({ shouldUpdateRuntime: true })
     })
 
     return assetsPromise
@@ -802,6 +807,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public handleSetDevice = (device: ConfigurationDevice) => {
     this.setState({ device })
+  }
+
+  public addMessages = (newMessages: RenderRuntime['messages']) => {
+    const newStateMessages = { ...this.state.messages, ...newMessages }
+
+    this.setState(
+      {
+        messages: newStateMessages,
+      },
+      () => {
+        this.sendInfoFromIframe()
+      }
+    )
   }
 
   public render() {

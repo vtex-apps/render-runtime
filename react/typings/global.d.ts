@@ -180,6 +180,7 @@ declare global {
 
   interface RenderContext {
     account: RenderRuntime['account']
+    addMessages: (newMessages: RenderContext['messages']) => void
     components: RenderRuntime['components']
     culture: RenderRuntime['culture']
     device: ConfigurationDevice
@@ -190,6 +191,7 @@ declare global {
     getSettings: (app: string) => any
     hints: RenderHints
     history: History | null
+    messages: RenderRuntime['messages']
     navigate: (options: NavigateOptions) => boolean
     onPageChanged: (location: RenderHistoryLocation) => void
     page: RenderRuntime['page']
