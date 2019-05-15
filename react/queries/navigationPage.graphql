@@ -25,6 +25,7 @@ query NavigationPage (
     }
     page {
       blockId
+      canonicalPath
       pageContext {
         id
         type

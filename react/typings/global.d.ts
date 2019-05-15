@@ -128,7 +128,7 @@ declare global {
 
   interface Route {
     blockId: string
-    canonical?: string
+    canonicalPath?: string
     path: string
     params: Record<string, any>
     pageContext: PageDataContext
@@ -282,6 +282,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface MatchingPage {
     blockId: string
+    canonicalPath?: string
     pageContext: PageDataContext
   }
 

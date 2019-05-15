@@ -13,6 +13,7 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     pagesJSON,
     page: {
       blockId,
+      canonicalPath,
       pageContext: {
         id,
         type,
@@ -35,6 +36,7 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     extensions,
     matchingPage: {
       blockId,
+      canonicalPath,
       pageContext: {id, type}
     },
     messages: parseMessages(messages),

@@ -21,7 +21,6 @@ import {
   routeClass,
 } from '../utils/dom'
 import {
-  getRouteFromPath,
   goBack as pageGoBack,
   mapToQueryString,
   navigate as pageNavigate,
@@ -187,11 +186,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       page,
       query,
       production,
+      route,
       settings,
     } = props.runtime
     const { history, baseURI, cacheControl } = props
-    const path = canUseDOM ? window.location.pathname : window.__pathname__
-    const route = props.runtime.route || getRouteFromPath(path, pages)
 
     if (history) {
       const renderLocation: RenderHistoryLocation = {
