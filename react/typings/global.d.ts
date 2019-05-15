@@ -110,6 +110,7 @@ declare global {
     name?: string
     title?: string
     conditional?: boolean
+    map?: string[]
   }
 
   interface NavigationRoute {

@@ -1,8 +1,8 @@
 import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
+import { difference, is, isEmpty, keys, startsWith } from 'ramda'
 import * as RouteParser from 'route-parser'
-import { difference, is, isEmpty, keys } from 'ramda'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
@@ -89,13 +89,12 @@ export function mapToQueryString(query: Record<string, any> = {}): string {
   return queryString.stringify(query)
 }
 
-export function getPageParams(name: string, path: string, pages: Pages) {
-  const pagePath = getPagePath(name, pages)
+export function getPageParams(path: string, routePath: string) {
   const pagePathWithRest =
-    pagePath && /\*\w+$/.test(pagePath)
-      ? pagePath
-      : pagePath.replace(/\/?$/, '*_rest')
-  return (pagePath && getParams(pagePathWithRest, path)) || EMPTY_OBJECT
+    routePath && /\*\w+$/.test(routePath)
+      ? routePath
+      : routePath.replace(/\/?$/, '*_rest')
+  return (routePath && getParams(pagePathWithRest, path)) || EMPTY_OBJECT
 }
 
 function getParams(template: string, target: string) {
@@ -133,10 +132,20 @@ function getRouteFromPageName(
 
 export function getRouteFromPath(
   path: string,
-  pages: Pages
+  pages: Pages,
+  query?: string
 ): NavigationRoute | null {
-  const id = routeIdFromPath(path, pages)
-  return id ? { id, path, params: getPageParams(id, path, pages) } : null
+  const queryMap = query ?  queryStringToMap(query) : {}
+  const routeMatch = routeIdFromPathAndQuery(path, queryMap, pages)
+  if (!routeMatch) {
+    return null
+  }
+
+  return {
+    id: routeMatch.id,
+    params: getPageParams(path, routeMatch.path),
+    path,
+  }
 }
 
 const mergePersistingQueries = (currentQuery: string, query: string) => {
@@ -191,7 +200,7 @@ export function navigate(
 
   const navigationRoute = page
     ? getRouteFromPageName(page, pages, params)
-    : getRouteFromPath(to!, pages)
+    : getRouteFromPath(to!, pages, query)
 
   if (!navigationRoute) {
     console.warn(
@@ -263,7 +272,43 @@ function polyfillScrollTo(options: ScrollToOptions) {
   }
 }
 
-function routeIdFromPath(path: string, routes: Pages) {
+function routeMatchForMappedURL(mappedSegments: string[], routes: Pages) {
+  let id: string | undefined
+  let score: number
+  let highScore: number = Number.NEGATIVE_INFINITY
+
+  // tslint:disable-next-line:forin
+  for (const name in routes) {
+    const {map = [], path: routePath} = routes[name]
+    if (!routePath || map.length === 0 || !startsWith(map, mappedSegments)) {
+      continue
+    }
+
+    score = map.length
+    if (highScore > score) {
+      continue
+    }
+
+    highScore = score
+    id = name
+  }
+
+  if (!id) {
+    return null
+  }
+
+  const {path} = routes[id]
+  const pathSegments = path.split('/')
+  const slicedPathSegments = pathSegments.slice(0, highScore + 1)
+  const newPath = slicedPathSegments.join('/')
+
+  return {
+    id,
+    path: newPath
+  }
+}
+
+function routeMatchFromPath(path: string, routes: Pages) {
   let id: string | undefined
   let score: number
   let highScore: number = Number.NEGATIVE_INFINITY
@@ -271,23 +316,47 @@ function routeIdFromPath(path: string, routes: Pages) {
   // tslint:disable-next-line:forin
   for (const name in routes) {
     const pagePath = getPagePath(name, routes)
-    if (pagePath) {
-      const matches = !!getParams(pagePath, path)
-      if (!matches) {
-        continue
-      }
-
-      score = getScore(pagePath)
-      if (highScore > score) {
-        continue
-      }
-
-      highScore = score
-      id = name
+    if (!pagePath) {
+      continue
     }
+
+    const matches = !!getParams(pagePath, path)
+    if (!matches) {
+      continue
+    }
+
+    score = getScore(pagePath)
+    if (highScore > score) {
+      continue
+    }
+
+    highScore = score
+    id = name
   }
 
-  return id
+  if (!id) {
+    return null
+  }
+
+  return {
+    id,
+    path: getPagePath(id, routes)
+  }
+}
+
+function routeIdFromPathAndQuery(path: string, query: Record<string, string>, routes: Pages) {
+  const mappedSegments = query.map ? query.map.split(',') : []
+  let routeMatch: {id: string, path: string} | null = null
+
+  if (mappedSegments.length > 0) {
+    routeMatch = routeMatchForMappedURL(mappedSegments, routes)
+  }
+
+  if (!routeMatch) {
+    routeMatch = routeMatchFromPath(path, routes)
+  }
+
+  return routeMatch
 }
 
 export interface NavigateOptions {
