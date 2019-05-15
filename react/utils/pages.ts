@@ -62,12 +62,13 @@ function getValidTemplate(page: string, pages: Pages) {
     return null
   }
 
-  const { path: template } = pageDescriptor
+  const { path: template, canonical } = pageDescriptor
   if (!template) {
     console.error(`Page ${page} has no path`)
     return null
   }
-  return adjustTemplate(template)
+
+  return adjustTemplate(canonical || template)
 }
 
 export function pathFromPageName(page: string, pages: Pages, params: any) {
@@ -130,6 +131,17 @@ function getRouteFromPageName(
   return path ? { id, path, params } : null
 }
 
+function getCanonicalPath (canonicalPathTemplate: string, params: Record<string, string>): string | false {
+  const properPathTemplate = adjustTemplate(canonicalPathTemplate)
+  const canonicalPath = new RouteParser(properPathTemplate).reverse(params)
+  if (canonicalPath) {
+    return canonicalPath
+  }
+
+  console.warn(`Canonical path template '${canonicalPathTemplate}' could not be created with params: ${params}`)
+  return false
+}
+
 export function getRouteFromPath(
   path: string,
   pages: Pages,
@@ -141,10 +153,15 @@ export function getRouteFromPath(
     return null
   }
 
+  const params = getPageParams(path, routeMatch.path)
+  const navigationPath = routeMatch.canonical
+    ? getCanonicalPath(routeMatch.canonical, params) || path
+    : path
+
   return {
     id: routeMatch.id,
-    params: getPageParams(path, routeMatch.path),
-    path,
+    params,
+    path: navigationPath,
   }
 }
 
@@ -272,7 +289,7 @@ function polyfillScrollTo(options: ScrollToOptions) {
   }
 }
 
-function routeMatchForMappedURL(mappedSegments: string[], routes: Pages) {
+function routeMatchForMappedURL(mappedSegments: string[], routes: Pages): RouteMatch | null {
   let id: string | undefined
   let score: number
   let highScore: number = Number.NEGATIVE_INFINITY
@@ -308,7 +325,7 @@ function routeMatchForMappedURL(mappedSegments: string[], routes: Pages) {
   }
 }
 
-function routeMatchFromPath(path: string, routes: Pages) {
+function routeMatchFromPath(path: string, routes: Pages): RouteMatch | null {
   let id: string | undefined
   let score: number
   let highScore: number = Number.NEGATIVE_INFINITY
@@ -339,6 +356,7 @@ function routeMatchFromPath(path: string, routes: Pages) {
   }
 
   return {
+    canonical: routes[id].canonical,
     id,
     path: getPagePath(id, routes)
   }
@@ -346,7 +364,7 @@ function routeMatchFromPath(path: string, routes: Pages) {
 
 function routeIdFromPathAndQuery(path: string, query: Record<string, string>, routes: Pages) {
   const mappedSegments = query.map ? query.map.split(',') : []
-  let routeMatch: {id: string, path: string} | null = null
+  let routeMatch: RouteMatch | null = null
 
   if (mappedSegments.length > 0) {
     routeMatch = routeMatchForMappedURL(mappedSegments, routes)
@@ -357,6 +375,12 @@ function routeIdFromPathAndQuery(path: string, query: Record<string, string>, ro
   }
 
   return routeMatch
+}
+
+interface RouteMatch {
+  canonical?: string
+  id: string
+  path: string
 }
 
 export interface NavigateOptions {
