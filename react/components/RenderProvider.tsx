@@ -190,10 +190,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       settings,
     } = props.runtime
     const { history, baseURI, cacheControl } = props
+    const ignoreCanonicalReplacement = query && query.map || !route.canonicalPath
 
     if (history) {
       const renderLocation: RenderHistoryLocation = {
         ...history.location,
+        pathname: ignoreCanonicalReplacement
+          ? history.location.pathname
+          : route.canonicalPath!,
         state: {
           navigationRoute: {
             id: route.id,
