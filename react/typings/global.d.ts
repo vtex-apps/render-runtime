@@ -100,6 +100,7 @@ declare global {
 
   interface Page {
     allowConditions: boolean
+    canonical?: string
     cname?: string
     path: string
     auth?: boolean
@@ -110,6 +111,7 @@ declare global {
     name?: string
     title?: string
     conditional?: boolean
+    map?: string[]
   }
 
   interface NavigationRoute {
@@ -126,7 +128,7 @@ declare global {
 
   interface Route {
     blockId: string
-    canonical?: string
+    canonicalPath?: string
     path: string
     params: Record<string, any>
     pageContext: PageDataContext
@@ -280,6 +282,7 @@ interface RenderComponent<P={}, S={}> {
 
   interface MatchingPage {
     blockId: string
+    canonicalPath?: string
     pageContext: PageDataContext
   }
 
