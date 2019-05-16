@@ -6,14 +6,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Use `?map` to do route matching.
+- Add first class support to canonical routes.
 
 ## [8.28.0] - 2019-05-10
 ### Added
-- Scope messages. 
+- Scope messages.
 
 ## [8.27.0] - 2019-05-09
 ### Fixed
-- Extracted query params from `to` path, for the query object. 
+- Extracted query params from `to` path, for the query object.
 
 ## [8.26.0] - 2019-05-09
 
