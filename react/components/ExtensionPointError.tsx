@@ -5,6 +5,7 @@ interface Props {
   treePath: string
   error?: Error
   errorInfo?: ErrorInfo | null
+  operationIds: string[]
 }
 
 interface State {
@@ -30,8 +31,9 @@ class ExtensionPointError extends PureComponent<Props, State> {
   }
 
   public render() {
-    const { treePath, error, errorInfo } = this.props
+    const { treePath, error, errorInfo, operationIds } = this.props
     const { errorDetails } = this.state
+
     const componentStack = errorInfo && errorInfo.componentStack
 
     return (
@@ -49,13 +51,13 @@ class ExtensionPointError extends PureComponent<Props, State> {
         {errorDetails && error && (
           <>
             <ul className="f6 list pl0">
-              {window && window.graphQLErrors && window.graphQLErrors[0] ? window.graphQLErrors[0].map(
-                (graphQLError) => (
-                  <li key={graphQLError.operationId}>
-                    <span>Operation ID:</span> <span className="i">{graphQLError.operationId}</span>
+              {operationIds.map(
+                (operationId) => (
+                  <li key={operationId}>
+                    <span>Operation ID:</span> <span className="i">{operationId}</span>
                   </li>
                 )
-              ) : null}
+              )}
             </ul>
           <pre>
             <code className="f6">{error.stack}</code>

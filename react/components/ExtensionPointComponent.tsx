@@ -4,6 +4,7 @@ import { chain, pluck } from 'ramda'
 import React, { ErrorInfo, PureComponent } from 'react'
 
 import { getImplementation } from '../utils/assets'
+import graphQLErrorsStore from '../utils/graphQLErrorsStore'
 
 import ExtensionPointError from './ExtensionPointError'
 import Loading from './Loading'
@@ -18,6 +19,7 @@ interface Props {
 interface State {
   error?: Error | null
   errorInfo?: ErrorInfo | null
+  operationIds: string[]
   lastUpdate?: number
 }
 
@@ -42,7 +44,9 @@ class ExtensionPointComponent extends PureComponent<
   public constructor(props: Props & RenderContextProps) {
     super(props)
 
-    this.state = {}
+    this.state = {
+      operationIds: [],
+    }
     this.mountedError = false
   }
 
@@ -93,6 +97,7 @@ class ExtensionPointComponent extends PureComponent<
     this.setState({
       error: null,
       errorInfo: null,
+      operationIds: []
     })
   }
 
@@ -107,13 +112,16 @@ class ExtensionPointComponent extends PureComponent<
     const { children, __errorInstance, __clearError, ...componentProps } = props
 
     console.error('Failed to render extension point', path, component)
+
+    const operationIds = graphQLErrorsStore.getOperationIds()
+
     // Only log 10 percent of the errors so we dont exceed our quota
     if (production && Math.random() < 0.1) {
       Sentry.configureScope(scope => {
         scope.setExtra('runtime', runtime)
         scope.setExtra('treePath', path)
         scope.setExtra('props', componentProps)
-        scope.setExtra('operationIds', chain(pluck('operationId'), window.graphQLErrors))
+        scope.setExtra('operationIds', operationIds)
 
         scope.setTag('account', account)
         scope.setTag('workspace', workspace)
@@ -127,6 +135,7 @@ class ExtensionPointComponent extends PureComponent<
     this.setState({
       error,
       errorInfo,
+      operationIds,
     })
   }
 
@@ -139,7 +148,7 @@ class ExtensionPointComponent extends PureComponent<
     this.fetchAndRerender()
     if (this.state.error) {
       if (this.mountedError) {
-        this.clearError()
+        // this.clearError()
       } else {
         this.mountedError = true
       }
@@ -158,7 +167,7 @@ class ExtensionPointComponent extends PureComponent<
       treePath,
       runtime: { production, pages, page },
     } = this.props
-    const { error, errorInfo } = this.state
+    const { error, errorInfo, operationIds } = this.state
     const Component = component && getImplementation(component)
 
     // A children of this extension point throwed an uncaught error
@@ -172,6 +181,7 @@ class ExtensionPointComponent extends PureComponent<
         <ExtensionPointError
           error={error}
           errorInfo={errorInfo}
+          operationIds={operationIds}
           treePath={treePath}
         />
       )
