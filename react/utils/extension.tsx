@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react'
+import { ReactElement } from 'react'
 
 import { useRuntime } from '../components/RenderContext'
 import { useTreePath } from './treePath'

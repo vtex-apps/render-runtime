@@ -4,7 +4,7 @@ import React, {ErrorInfo, PureComponent} from 'react'
 interface Props {
   treePath: string
   error?: Error
-  errorInfo?: ErrorInfo
+  errorInfo?: ErrorInfo | null
 }
 
 interface State {
@@ -18,7 +18,7 @@ class ExtensionPointError extends PureComponent<Props, State> {
     treePath: PropTypes.string,
   }
 
-  constructor(props: any) {
+  public constructor(props: any) {
     super(props)
     this.state = {}
   }
@@ -38,10 +38,10 @@ class ExtensionPointError extends PureComponent<Props, State> {
       <div className="bg-washed-red pa6 f5 serious-black br3 pre">
         <span>Error rendering extension point <strong>{treePath}</strong></span>
         <button type="button" className="red ph0 ma0 mh3 bg-transparent bn pointer link" onClick={this.handleToggleErrorDetails}>({errorDetails ? 'hide' : 'show'} details)</button>
-        {errorDetails && (
+        {errorDetails && error && (
           <pre>
             <code className="f6">
-              {error!.stack}
+              {error.stack}
             </code>
           </pre>
         )}

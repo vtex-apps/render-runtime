@@ -5,6 +5,7 @@ import ExtensionPoint from './ExtensionPoint'
 import { useRuntime } from './RenderContext'
 
 type Element = string | ElementArray
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ElementArray extends Array<Element> {}
 
 interface LayoutContainerProps {

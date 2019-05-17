@@ -1,3 +1,4 @@
+/* global module */
 import * as runtimeGlobals from './core/main'
 
 window.__RENDER_8_RUNTIME__ = {...runtimeGlobals}
@@ -26,6 +27,7 @@ start()
 
 if (module.hot) {
   module.hot.accept('./core/main', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const hotGlobals = require('./core/main')
     window.__RENDER_8_RUNTIME__.ExtensionContainer = hotGlobals.ExtensionContainer
     window.__RENDER_8_RUNTIME__.ExtensionPoint = hotGlobals.ExtensionPoint
@@ -38,7 +40,7 @@ if (module.hot) {
 } else {
   const CLOSED = 2
   let eventSource: any
-  function initSSE () {
+  const initSSE = () => {
     const hasNoSSE = !eventSource || eventSource.readyState === CLOSED
     if (!document.hidden && hasNoSSE) {
       eventSource = window.myvtexSSE(global.__RUNTIME__.account, global.__RUNTIME__.workspace, 'vtex.builder-hub:*:build.status', {verbose: true}, (event: any) => {

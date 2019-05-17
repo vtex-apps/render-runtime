@@ -62,6 +62,8 @@ const queryFromNodeCreator = (query: DocumentNode) => (node: Node) => visit(pars
         variableDefinitions: Object.values(node.usedVariables),
       }
     }
+
+    return null
   },
 }) as DocumentNode
 
@@ -110,7 +112,7 @@ const mergeRecursively = (accumulator: any, value: any) => {
 }
 
 const createOperationForQuery = (operation: Operation) => (query: DocumentNode) => {
-  const graphQLRequest = {...operation, query} as GraphQLRequest
+  const graphQLRequest: GraphQLRequest = {...operation, query}
   const op = validateOperation(transformOperation(graphQLRequest))
   return createOperation(operation.getContext(), op)
 }

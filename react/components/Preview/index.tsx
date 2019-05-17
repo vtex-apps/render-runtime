@@ -19,7 +19,7 @@ export default class Preview extends React.PureComponent<
 > {
   private container: RefObject<HTMLDivElement>
 
-  constructor(props: Props) {
+  public constructor(props: Props) {
     super(props)
 
     this.container = React.createRef()
@@ -36,6 +36,7 @@ export default class Preview extends React.PureComponent<
     switch (type) {
       case 'box':
       /** TODO: deprecate block in favor of box */
+      // eslint-disable-next-line no-fallthrough
       case 'block':
         return <Box width={width} height={height} />
       case 'text': 
@@ -54,7 +55,7 @@ export default class Preview extends React.PureComponent<
     }
   }
 
-  componentDidMount() { // tslint:disable-line member-access member-ordering
+  public componentDidMount() {
     /** Fixes a bug on react-content-loader related to limiting
      * the width of the component
      */
@@ -111,7 +112,7 @@ export default class Preview extends React.PureComponent<
     }
   }
 
-  render() { // tslint:disable-line member-access member-ordering
+  public render() {
     const { extension } = this.props
 
     if (!extension.preview) {

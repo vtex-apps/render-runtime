@@ -2,7 +2,7 @@ import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
 import { difference, is, isEmpty, keys, startsWith } from 'ramda'
-import * as RouteParser from 'route-parser'
+import RouteParser from 'route-parser'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
@@ -10,7 +10,6 @@ function getScore(path: string) {
   const catchAll = (path.match(/\*/g) || []).length
   const catchOne = (path.match(/:/g) || []).length
   const fixed = (path.match(/\/[\w_-]+/g) || []).length
-  // tslint:disable-next-line:no-bitwise
   return ~((catchAll << 12) + (catchOne << 6) + ((1 << 6) - fixed - 1))
 }
 
@@ -33,7 +32,7 @@ function createLocationDescriptor(
   }: Pick<NavigateOptions, 'query' | 'scrollOptions' | 'fetchPage'>
 ): LocationDescriptorObject {
   return {
-    pathname: navigationRoute.path!,
+    pathname: navigationRoute.path,
     state: {
       fetchPage,
       navigationRoute,
@@ -170,14 +169,14 @@ const mergePersistingQueries = (currentQuery: string, query: string) => {
   const current = queryStringToMap(currentQuery)
   const next = queryStringToMap(query)
   const has = (value?: string) => !!value || value === null
-  const persisting = KEYS.reduce(
+  const persisting = KEYS.reduce<Record<string, any>>(
     (cur, key) => {
       if (has(current[key]) && current[key] !== 'false') {
         cur[key] = current[key]
       }
       return cur
     },
-    {} as Record<string, any>
+    {}
   )
   return mapToQueryString({ ...persisting, ...next })
 }
@@ -217,7 +216,7 @@ export function navigate(
 
   const navigationRoute = page
     ? getRouteFromPageName(page, pages, params)
-    : getRouteFromPath(to!, pages, query)
+    : getRouteFromPath(to, pages, query)
 
   if (!navigationRoute) {
     console.warn(

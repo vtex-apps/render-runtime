@@ -19,7 +19,7 @@ const getAbsoluteURL = (account: string, url: string, production: boolean) => {
 }
 
 class ServerSideAssetLoadingError extends Error {
-  constructor() {
+  public constructor() {
     super('Loading assets on server side rendering is not supported')
   }
 }
@@ -90,7 +90,10 @@ function preloadScript(href: string) {
 function getExistingScriptSrcs() {
   const paths: string[] = []
   for (let i = 0; i < document.scripts.length; i++) {
-    paths.push(document.scripts.item(i)!.src)
+    const script = document.scripts.item(i)
+    if (script !== null) {
+      paths.push(script.src)
+    }
   }
   return paths
 }
@@ -98,9 +101,12 @@ function getExistingScriptSrcs() {
 function getExistingStyleHrefs() {
   const hrefs: string[] = []
   for (let i = 0; i < document.styleSheets.length; i++) {
-    const href = document.styleSheets.item(i)!.href
-    if (href) {
-      hrefs.push(href)
+    const stylesheet = document.styleSheets.item(i)
+    if (stylesheet !== null) {
+      const href = stylesheet.href
+      if (href) {
+        hrefs.push(href)
+      }
     }
   }
   return hrefs

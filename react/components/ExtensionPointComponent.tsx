@@ -36,11 +36,10 @@ class ExtensionPointComponent extends PureComponent<
     treePath: PropTypes.string,
   }
 
-  // tslint:disable-next-line:variable-name
   private _isMounted!: boolean
   private mountedError!: boolean
 
-  constructor(props: Props & RenderContextProps) {
+  public constructor(props: Props & RenderContextProps) {
     super(props)
 
     this.state = {}
@@ -54,11 +53,14 @@ class ExtensionPointComponent extends PureComponent<
 
     this.setState({ error: null, errorInfo: null, lastUpdate: Date.now() })
     const { component: mounted, treePath } = this.props
+
     console.log(
       `[render] Component updated. treePath=${treePath} ${
         mounted !== component ? `mounted=${mounted} ` : ''
       }updated=${component}`
     )
+
+    return true
   }
 
   public fetchAndRerender = () => {
@@ -166,7 +168,7 @@ class ExtensionPointComponent extends PureComponent<
       const errorInstance = (
         <ExtensionPointError
           error={error}
-          errorInfo={errorInfo!}
+          errorInfo={errorInfo}
           treePath={treePath}
         />
       )

@@ -12,15 +12,20 @@ export default class MaybeContext extends PureComponent<Props & RenderContextPro
   public render() {
     const {children, runtime, nestedPage, query, params} = this.props
     const {context, props: pageProps} = runtime.extensions[nestedPage]
-    const contextComponent = context && context.component
     const pageContextProps = pageProps && pageProps.context
 
-    const props = contextComponent && {
-      ...pageContextProps,
-      nextTreePath: nestedPage,
-      params,
-      query,
-      ...context!.props
+    let contextComponent
+    let props
+
+    if (context) {
+      contextComponent  = context.component
+      props = {
+        ...pageContextProps,
+        nextTreePath: nestedPage,
+        params,
+        query,
+        ...context.props
+      }
     }
 
     return contextComponent

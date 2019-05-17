@@ -56,7 +56,7 @@ const renderExtension = (extensionName: string, destination: HTMLElement, props 
       destination,
       extensionName,
       props
-    } as PortalRenderingRequest)
+    })
   } else {
     throw new Error(`ExtensionPortal can't be rendered before RenderProvider`)
   }
@@ -92,7 +92,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
 
   const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
   const created = !element && ensureContainer(page)
-  const elem = element || getContainer(name)
+  const elem = element || getContainer()
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
     <RenderProvider history={history} cacheControl={cacheControl} baseURI={baseURI} root={name} runtime={runtime}>
@@ -104,6 +104,7 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
     ? (disableSSR || created ? renderDOM<HTMLDivElement>(root, elem) : hydrate(root, elem)) as Element
     : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
       markups: getMarkups(name, markup),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       maxAge: cacheControl!.maxAge,
       page,
       renderTimeMetric
@@ -149,7 +150,7 @@ function start() {
       if (props && props.style && isStyleWritable(props)) {
         props.style = optimizeStyleForVtexImg(vtexImgHost, props.style)
       }
-      return ReactCreateElement.apply<typeof React, any, any>(React, arguments)
+      return ReactCreateElement.apply(React, arguments)
     }
 
     const maybeRenderPromise = render(rootName, runtime)
@@ -157,9 +158,9 @@ function start() {
       // Expose render promise to global context.
       window.rendered = (maybeRenderPromise as Promise<NamedServerRendered>)
         .then(({ markups, maxAge, page, renderTimeMetric }) => ({
-          extensions: markups.reduce(
+          extensions: markups.reduce<RenderedSuccess['extensions']>(
             (acc, { name, markup }) => (acc[name] = markup, acc),
-            {} as RenderedSuccess['extensions'],
+            {},
           ),
           head: Helmet.rewind(),
           maxAge,

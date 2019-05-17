@@ -2,7 +2,7 @@ const SECURE_PROTOCOL = 'https://'
 const PROTOCOL_RELATIVE_PREFIX = '//'
 const ARQUIVOS_RELATIVE_PREFIX = '/arquivos'
 const ASSETS_RELATIVE_PREFIX = '/assets'
-const FILE_MANAGER_PATH_REGEX = /url\(\"?(.*\/)assets\/vtex\.file-manager-graphql/
+const FILE_MANAGER_PATH_REGEX = /url\("?(.*\/)assets\/vtex\.file-manager-graphql/
 
 export function optimizeSrcForVtexImg (vtexImgHost: string, src?: any) {
   try {

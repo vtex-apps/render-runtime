@@ -30,6 +30,7 @@ const buildCacheId = (
 const dataIdFromObject = (value: any) => {
   const {cacheId, __typename} = value || {} as any
   if (value && __typename && cacheId) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [vendor, app, major, minor, patch, ...type] = __typename.split('_')
     return buildCacheId(vendor, app, major, type, cacheId)
   }
@@ -37,7 +38,7 @@ const dataIdFromObject = (value: any) => {
 }
 
 export const buildCacheLocator = (app: string, type: string, cacheId: string) => {
-  const [vendor, appAndMajor, x] = app.replace(/-/g, '').split('.')
+  const [vendor, appAndMajor] = app.replace(/-/g, '').split('.')
   const [appName, major] = appAndMajor && appAndMajor.split('@')
   return buildCacheId(vendor, appName, major, type, cacheId)
 }

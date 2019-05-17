@@ -36,7 +36,7 @@ export default class ErrorPage extends Component {
           <div className="f2 c-on-base">Something went wrong</div>
           <div className="f5 pt5 c-on-base lh-copy">
             <div>There was a technical problem loading this page.</div>
-            <div> Try refreshing the page or come back in 5 minutes.</div>
+            <div>Try refreshing the page or come back in 5 minutes.</div>
           </div>
           <div className="f6 pt5 c-muted-2" style={{fontFamily: 'courier, code'}}>
             <div>ID: {window.__REQUEST_ID__}</div>
@@ -47,7 +47,8 @@ export default class ErrorPage extends Component {
           </div>
         </div>
         <div>
-          <img src={ErrorImg} onClick={this.handleImageClick} className={`${style.imgHeight} pb6 pb0-ns`}></img>
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+          <img src={ErrorImg} onKeyDown={e => e.key === 'Enter' && this.handleImageClick()} onClick={this.handleImageClick} className={`${style.imgHeight} pb6 pb0-ns`} alt=""></img>
         </div>
       </div>
     )

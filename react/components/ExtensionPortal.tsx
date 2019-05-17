@@ -15,7 +15,7 @@ class ExtensionPortal extends Component<Props> {
     extension: PropTypes.object,
   }
 
-  constructor(props: Props) {
+  public constructor(props: Props) {
     super(props)
   }
 

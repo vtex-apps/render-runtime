@@ -1,4 +1,4 @@
-import React, {Component, ReactElement} from 'react'
+import React, {Component} from 'react'
 import Loading from './Loading'
 import {RenderContextProps, withRuntimeContext} from './RenderContext'
 

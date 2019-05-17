@@ -24,6 +24,7 @@ class TrackEventsWrapper extends PureComponent<Props> {
   public componentDidMount(){
     const { id, events } = this.props
     if(events && events.length && id){
+      // eslint-disable-next-line react/no-find-dom-node
       const element = ReactDOM.findDOMNode(this)
       if(element && element.addEventListener){
         forEach(
@@ -39,6 +40,7 @@ class TrackEventsWrapper extends PureComponent<Props> {
   public componentWillUnmount(){
     const { id, events } = this.props
     if(events && events.length && id){
+      // eslint-disable-next-line react/no-find-dom-node
       const element = ReactDOM.findDOMNode(this)
       if(element && element.addEventListener){
         forEach(

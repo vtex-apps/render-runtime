@@ -5,7 +5,7 @@ const STATIC_PAGE_MAX_AGE_S = 7 * 24 * 60 * 60
 const parseCacheControl = (cacheControl: string) => {
   const cacheDirectives = cacheControl.split(',').map(d => d.trim())
   const maxAgeDirective = cacheDirectives.find(d => d.startsWith('max-age'))
-  const [, maxAgeStr] = maxAgeDirective ? maxAgeDirective.split('=') : [, null]
+  const maxAgeStr = maxAgeDirective ? maxAgeDirective.split('=')[1] : null
   const maxAge = maxAgeStr ? parseInt(maxAgeStr, 10) : 0
 
   return {
@@ -32,7 +32,7 @@ const getMaxAge = (response: Response) => {
 export default class PageCacheControl {
   private maxAges: number[] = []
 
-  get maxAge(): number {
+  public get maxAge(): number {
     return this.maxAges.length > 0
       ? Math.min(...this.maxAges)
       : STATIC_PAGE_MAX_AGE_S

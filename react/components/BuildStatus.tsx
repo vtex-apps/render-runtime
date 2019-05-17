@@ -20,7 +20,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
   private animateOutHandle!: number
   private hideHandle!: number
 
-  constructor(props: RenderContextProps) {
+  public constructor(props: RenderContextProps) {
     super(props)
 
     this.state = {
@@ -40,14 +40,10 @@ class BuildStatus extends Component<RenderContextProps, State> {
     this.hideHandle = window.setTimeout(() => this.setState({ status: null, animateOut: false }), delayMillis + 300)
   }
 
-  private toggleAnchor = () => {
+  private handleMouseOver = () => {
     this.setState(state => ({
       anchor: state.anchor === 'left' ? 'right' : 'left'
     }))
-  }
-
-  private handleMouseOver = () => {
-    this.toggleAnchor()
   }
 
   public updateStatus = (status: string) => {
@@ -104,10 +100,13 @@ class BuildStatus extends Component<RenderContextProps, State> {
     )
 
     return (
+      // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
       <div
+        aria-hidden
         className={className}
         style={{ top: '12px', [anchor]: '12px', animationDuration: '0.2s', opacity: 0.8 }}
-        onMouseOver={this.toggleAnchor}>
+        onMouseOver={this.handleMouseOver}
+      >
         {status === 'fail'
           ? fail
           : status === 'reload'

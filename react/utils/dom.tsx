@@ -68,7 +68,7 @@ export const getMarkups = (pageName: string, pageMarkup: string): NamedMarkup[] 
 }
 
 
-export const getContainer = (name: string) => {
+export const getContainer = () => {
   return canUseDOM ? document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0] : null
 }
 

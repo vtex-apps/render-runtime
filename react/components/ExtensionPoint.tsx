@@ -55,7 +55,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
   private component?: string | null
 
-  constructor(props: ExtendedProps) {
+  public constructor(props: ExtendedProps) {
     super(props)
 
     this.state = {
@@ -248,6 +248,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       return
     }
 
+    // eslint-disable-next-line react/no-find-dom-node
     const element = ReactDOM.findDOMNode(this) as Element
 
     if (element && element.setAttribute) {
@@ -256,6 +257,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   }
 
   private removeDataFromElement = () => {
+    // eslint-disable-next-line react/no-find-dom-node
     const element = ReactDOM.findDOMNode(this) as Element
 
     if (element && element.removeAttribute) {

@@ -388,9 +388,9 @@ interface RenderComponent<P={}, S={}> {
   }
 
   interface RuntimeExports {
-    ExtensionContainer: typeof ExtensionContainer
-    ExtensionPoint: typeof ExtensionPoint
-    Link: typeof Link
+    ExtensionContainer: ExtensionContainer
+    ExtensionPoint: ExtensionPoint
+    Link: Link
     NoSSR: any
     LayoutContainer: any
     LegacyExtensionContainer: any

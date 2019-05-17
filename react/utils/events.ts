@@ -30,6 +30,7 @@ const initSSE = (account: string, workspace: string, baseURI: string) => {
   }
 
   require('eventsource-polyfill')
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const myvtexSSE = require('myvtex-sse')
   const path = `vtex.builder-hub:*:react2,pages0,build.status?workspace=${workspace}`
   const source: EventSource = myvtexSSE(account, workspace, path, {verbose: false, host: baseURI})

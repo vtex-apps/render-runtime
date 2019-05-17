@@ -3,14 +3,20 @@ import React, {ComponentType, useContext} from 'react'
 
 const relative = (parent: string, id: string) => id.replace(`${parent}/`, '')
 
-export const escapeRegex = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+export const escapeRegex = (s: string) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
 
 export const isDirectChild = (id: string, parent: string) => {
   return id !== parent && (new RegExp(`^${escapeRegex(parent)}/[a-zA-Z0-9-_#]+$`)).test(id)
 }
 
 const parseId = (id: string) => {
-  const [, text, numericText] = /^(.*?)(\d+)?$/.exec(id)!
+  const matches = /^(.*?)(\d+)?$/.exec(id)
+
+  if (matches === null) {
+    return []
+  }
+
+  const [, text, numericText] = matches
   const numbericValue = numericText ? parseInt(numericText, 10) : 0
   return [text, numbericValue]
 }
