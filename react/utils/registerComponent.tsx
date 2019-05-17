@@ -17,7 +17,10 @@ export const isComponentType = (Arg: any): Arg is ComponentType => {
    * get treated as components, so they can be callable.
    */
   if (isFunction) {
-    const name: string | undefined = path(['prototype', 'constructor', 'name'], Arg)
+    const name: string | undefined = path(
+      ['prototype', 'constructor', 'name'],
+      Arg
+    )
     if (!name) {
       return true
     }
@@ -42,12 +45,19 @@ const idToAppAtMajor = (appId: string) => {
   return `${name}@${major}.x`
 }
 
-export default (module: Module, InitialImplementer: any, app: string, name: string) => {
+export default (
+  module: Module,
+  InitialImplementer: any,
+  app: string,
+  name: string
+) => {
   const Implementer = isComponentType(InitialImplementer)
     ? scopeMessages(app, InitialImplementer)
     : InitialImplementer
   const wrappedComponent = maybeWrapWithHMR(module, Implementer)
   window.__RENDER_8_COMPONENTS__[`${app}/${name}`] = wrappedComponent
-  window.__RENDER_8_COMPONENTS__[`${idToAppAtMajor(app)}/${name}`] = wrappedComponent
+  window.__RENDER_8_COMPONENTS__[
+    `${idToAppAtMajor(app)}/${name}`
+  ] = wrappedComponent
   return wrappedComponent
 }

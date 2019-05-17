@@ -1,4 +1,4 @@
-import {canUseDOM} from 'exenv'
+import { canUseDOM } from 'exenv'
 
 const isRenderServedPage = () => {
   const generatorMetaTag = document.querySelector(`meta[name='generator']`)
@@ -7,11 +7,13 @@ const isRenderServedPage = () => {
 }
 
 export const getBaseURI = (runtime: RenderRuntime) => {
-  const {account, workspace, publicEndpoint, rootPath = ''} = runtime
+  const { account, workspace, publicEndpoint, rootPath = '' } = runtime
   if (!canUseDOM) {
     return `${workspace}--${account}.${publicEndpoint}`
   } else {
-    const {location: {hostname}} = window
+    const {
+      location: { hostname },
+    } = window
     return hostname.endsWith(`.${publicEndpoint}`) || isRenderServedPage()
       ? hostname + rootPath
       : `${hostname}/api/io`

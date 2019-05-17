@@ -23,7 +23,6 @@ interface State {
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
 
-
 class ExtensionPointComponent extends PureComponent<
   Props & RenderContextProps,
   State
@@ -72,7 +71,7 @@ class ExtensionPointComponent extends PureComponent<
 
     // Let's fetch the assets and re-render.
     if (component && !Component) {
-      if (!(component in componentPromiseMap)){
+      if (!(component in componentPromiseMap)) {
         componentPromiseMap[component] = fetchComponent(component)
       } else if (componentPromiseResolvedMap[component]) {
         throw new Error(`Unable to fetch component ${component}`)
@@ -100,11 +99,11 @@ class ExtensionPointComponent extends PureComponent<
     const {
       component,
       props,
-      runtime: {production, account, workspace},
+      runtime: { production, account, workspace },
       runtime,
       treePath: path,
     } = this.props
-    const {children, __errorInstance, __clearError, ...componentProps} = props
+    const { children, __errorInstance, __clearError, ...componentProps } = props
 
     console.error('Failed to render extension point', path, component)
     // Only log 10 percent of the errors so we dont exceed our quota

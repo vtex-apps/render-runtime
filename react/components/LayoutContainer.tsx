@@ -20,7 +20,8 @@ interface ContainerProps {
   preview?: boolean
 }
 
-const elementPropType = PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired
+const elementPropType = PropTypes.oneOfType([PropTypes.string, PropTypes.array])
+  .isRequired
 
 class Container extends Component<ContainerProps> {
   public static propTypes = {
@@ -33,7 +34,9 @@ class Container extends Component<ContainerProps> {
   public render() {
     const { isRow, elements, children, ...props } = this.props
 
-    const className = `flex flex-grow-1 w-100 ${isRow ? 'flex-row' : 'flex-column'}`
+    const className = `flex flex-grow-1 w-100 ${
+      isRow ? 'flex-row' : 'flex-column'
+    }`
     if (typeof elements === 'string') {
       if (elements === '__children__') {
         return children
@@ -50,30 +53,39 @@ class Container extends Component<ContainerProps> {
       elementsToRender = this.props.aboveTheFold
     }
 
-    const returnValue: JSX.Element[] = elements.slice(0, elementsToRender).map((element: Element) => {
-      return (
-        <Container key={element.toString()} elements={element} isRow={!isRow} {...props}>
-          {children}
-        </Container>
-      )
-    })
+    const returnValue: JSX.Element[] = elements
+      .slice(0, elementsToRender)
+      .map((element: Element) => {
+        return (
+          <Container
+            key={element.toString()}
+            elements={element}
+            isRow={!isRow}
+            {...props}
+          >
+            {children}
+          </Container>
+        )
+      })
 
-    return (
-      <div className={className}>
-        {returnValue}
-      </div>
-    )
+    return <div className={className}>{returnValue}</div>
   }
 }
 
 // tslint:disable-next-line
-const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = (props) => {
-  const {extensions, preview} = useRuntime()
-  const {treePath} = useTreePath()
+const LayoutContainer: React.FunctionComponent<
+  LayoutContainerProps
+> = props => {
+  const { extensions, preview } = useRuntime()
+  const { treePath } = useTreePath()
 
   const extension = extensions[treePath]
-  const elements = extension && extension.blocks && extension.blocks.map(insertion => insertion.extensionPointId) || []
-  const containerProps = {...props, elements}
+  const elements =
+    (extension &&
+      extension.blocks &&
+      extension.blocks.map(insertion => insertion.extensionPointId)) ||
+    []
+  const containerProps = { ...props, elements }
 
   return <Container {...containerProps} preview={preview} isRow={false} />
 }

@@ -4,7 +4,7 @@ import MaybeContext from './MaybeContext'
 import { RenderContext } from './RenderContext'
 
 interface Props {
-  page: string,
+  page: string
   query?: Record<string, string>
 }
 
@@ -12,12 +12,18 @@ export default class RenderPage extends PureComponent<Props> {
   public render() {
     return (
       <RenderContext.Consumer>
-      {
-        runtime => {
-          const {route: {params}} = runtime
-          const {page, query} = this.props
+        {runtime => {
+          const {
+            route: { params },
+          } = runtime
+          const { page, query } = this.props
           return (
-            <MaybeContext nestedPage={page} query={query} params={params} runtime={runtime}>
+            <MaybeContext
+              nestedPage={page}
+              query={query}
+              params={params}
+              runtime={runtime}
+            >
               <ExtensionPoint
                 id={page}
                 query={query}
@@ -26,8 +32,7 @@ export default class RenderPage extends PureComponent<Props> {
               />
             </MaybeContext>
           )
-        }
-      }
+        }}
       </RenderContext.Consumer>
     )
   }

@@ -17,9 +17,7 @@ const Loading = () => {
     return null
   }
 
-  return (
-    <Preview extension={extension} />
-  )
+  return <Preview extension={extension} />
 }
 
 export default Loading

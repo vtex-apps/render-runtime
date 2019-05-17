@@ -1,19 +1,23 @@
-import {HeuristicFragmentMatcher, InMemoryCache, NormalizedCacheObject} from 'apollo-cache-inmemory'
-import {ApolloClient} from 'apollo-client'
-import {ApolloLink} from 'apollo-link'
-import {createHttpLink} from 'apollo-link-http'
-import {createPersistedQueryLink} from 'apollo-link-persisted-queries'
-import {createUploadLink} from 'apollo-upload-client'
-import {canUseDOM} from 'exenv'
+import {
+  HeuristicFragmentMatcher,
+  InMemoryCache,
+  NormalizedCacheObject,
+} from 'apollo-cache-inmemory'
+import { ApolloClient } from 'apollo-client'
+import { ApolloLink } from 'apollo-link'
+import { createHttpLink } from 'apollo-link-http'
+import { createPersistedQueryLink } from 'apollo-link-persisted-queries'
+import { createUploadLink } from 'apollo-upload-client'
+import { canUseDOM } from 'exenv'
 import PageCacheControl from '../cacheControl'
-import {generateHash} from './generateHash'
-import {toBase64Link} from './links/base64Link'
-import {cachingLink} from './links/cachingLink'
-import {createIOFetchLink} from './links/ioFetchLink'
-import {omitTypenameLink} from './links/omitVariableTypenameLink'
-import {persistedQueryVersionLink} from './links/persistedQueryVersionLink'
-import {createUriSwitchLink} from './links/uriSwitchLink'
-import {versionSplitterLink} from './links/versionSplitterLink'
+import { generateHash } from './generateHash'
+import { toBase64Link } from './links/base64Link'
+import { cachingLink } from './links/cachingLink'
+import { createIOFetchLink } from './links/ioFetchLink'
+import { omitTypenameLink } from './links/omitVariableTypenameLink'
+import { persistedQueryVersionLink } from './links/persistedQueryVersionLink'
+import { createUriSwitchLink } from './links/uriSwitchLink'
+import { versionSplitterLink } from './links/versionSplitterLink'
 
 interface ApolloClientsRegistry {
   [key: string]: ApolloClient<NormalizedCacheObject>
@@ -28,7 +32,7 @@ const buildCacheId = (
 ) => `${vendor}.${app}@${major}.x:${type}:${cacheId}`
 
 const dataIdFromObject = (value: any) => {
-  const {cacheId, __typename} = value || {} as any
+  const { cacheId, __typename } = value || ({} as any)
   if (value && __typename && cacheId) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [vendor, app, major, minor, patch, ...type] = __typename.split('_')
@@ -37,7 +41,11 @@ const dataIdFromObject = (value: any) => {
   return null
 }
 
-export const buildCacheLocator = (app: string, type: string, cacheId: string) => {
+export const buildCacheLocator = (
+  app: string,
+  type: string,
+  cacheId: string
+) => {
   const [vendor, appAndMajor] = app.replace(/-/g, '').split('.')
   const [appName, major] = appAndMajor && appAndMajor.split('@')
   return buildCacheId(vendor, appName, major, type, cacheId)
@@ -46,21 +54,25 @@ export const buildCacheLocator = (app: string, type: string, cacheId: string) =>
 const clientsByWorkspace: ApolloClientsRegistry = {}
 
 export const getState = (runtime: RenderRuntime) => {
-  const {account, workspace} = runtime
+  const { account, workspace } = runtime
   const apolloClient = clientsByWorkspace[`${account}/${workspace}`]
-  return apolloClient
-    ? apolloClient.cache.extract()
-    : {}
+  return apolloClient ? apolloClient.cache.extract() : {}
 }
 
-export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContextLink: ApolloLink, ensureSessionLink: ApolloLink, cacheControl?: PageCacheControl) => {
-  const {account, workspace} = runtime
+export const getClient = (
+  runtime: RenderRuntime,
+  baseURI: string,
+  runtimeContextLink: ApolloLink,
+  ensureSessionLink: ApolloLink,
+  cacheControl?: PageCacheControl
+) => {
+  const { account, workspace } = runtime
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
     const cache = new InMemoryCache({
       addTypename: true,
       dataIdFromObject,
-      fragmentMatcher: new HeuristicFragmentMatcher()
+      fragmentMatcher: new HeuristicFragmentMatcher(),
     })
 
     const httpLink = ApolloLink.from([
@@ -68,7 +80,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       createHttpLink({
         credentials: 'include',
         useGETForQueries: false,
-      })
+      }),
     ])
 
     const uploadLink = createUploadLink({
@@ -86,7 +98,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
     const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
 
     const cacheLink = cacheControl ? [cachingLink(cacheControl)] : []
-    
+
     const link = ApolloLink.from([
       omitTypenameLink,
       versionSplitterLink,
@@ -96,7 +108,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       persistedQueryVersionLink,
       uriSwitchLink,
       ...cacheLink,
-      fetcherLink
+      fetcherLink,
     ])
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({

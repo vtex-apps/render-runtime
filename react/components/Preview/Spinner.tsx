@@ -5,11 +5,16 @@ interface Props {
   height: number
 }
 
-const Spinner = ({width, height}: Props) => (
+const Spinner = ({ width, height }: Props) => (
   <div className="flex items-center justify-center" style={{ width, height }}>
-    <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink">
+    <svg
+      width="26px"
+      height="26px"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlnsXlink="http://www.w3.org/1999/xlink"
+    >
       <use xlinkHref="#sti-loading" />
     </svg>
   </div>

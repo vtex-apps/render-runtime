@@ -136,42 +136,67 @@ function isStyle(path: string) {
   return getExtension(path) === '.css'
 }
 
-export function shouldAddScriptToPage(path: string, scripts: string[] = getExistingScriptSrcs()) {
+export function shouldAddScriptToPage(
+  path: string,
+  scripts: string[] = getExistingScriptSrcs()
+) {
   return isScript(path) && !assetOnList(path, scripts)
 }
 
-function shouldAddStyleToPage(path: string, styles: string[] = getExistingStyleHrefs()) {
+function shouldAddStyleToPage(
+  path: string,
+  styles: string[] = getExistingStyleHrefs()
+) {
   return isStyle(path) && !assetOnList(path, styles)
 }
 
-export function getImplementation<P={}, S={}>(component: string) {
+export function getImplementation<P = {}, S = {}>(component: string) {
   return window.__RENDER_8_COMPONENTS__[component] as RenderComponent<P, S>
 }
 
-export function getExtensionImplementation<P={}, S={}>(extensions: Extensions, name: string) {
+export function getExtensionImplementation<P = {}, S = {}>(
+  extensions: Extensions,
+  name: string
+) {
   const extension = extensions[name]
-  return extension && extension.component ? getImplementation<P, S>(extension.component) : null
+  return extension && extension.component
+    ? getImplementation<P, S>(extension.component)
+    : null
 }
 
 export function fetchAssets(runtime: RenderRuntime, assets: string[]) {
   const { account, production } = runtime
-  const absoluteAssets = assets.map(url => getAbsoluteURL(account, url, production))
+  const absoluteAssets = assets.map(url =>
+    getAbsoluteURL(account, url, production)
+  )
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
-  const scripts = absoluteAssets.filter((a) => shouldAddScriptToPage(a, existingScripts))
-  const styles = absoluteAssets.filter((a) => shouldAddStyleToPage(a, existingStyles))
+  const scripts = absoluteAssets.filter(a =>
+    shouldAddScriptToPage(a, existingScripts)
+  )
+  const styles = absoluteAssets.filter(a =>
+    shouldAddStyleToPage(a, existingStyles)
+  )
   styles.forEach(addStyleToPage)
-  return Promise.all(scripts.map(addScriptToPage)).then(() => { return })
+  return Promise.all(scripts.map(addScriptToPage)).then(() => {
+    return
+  })
 }
 
 export function preloadAssets(runtime: RenderRuntime, assets: string[]) {
   const { account, production } = runtime
-  const absoluteAssets = assets.map(url => getAbsoluteURL(account, url, production))
+  const absoluteAssets = assets.map(url =>
+    getAbsoluteURL(account, url, production)
+  )
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
   const existingPreloads = getExistingPreloadLinks()
-  const scripts = absoluteAssets.filter((a) => shouldAddScriptToPage(a, [...existingScripts, ...existingPreloads]))
-  const styles = absoluteAssets.filter((a) => shouldAddStyleToPage(a, [...existingStyles, ...existingPreloads]))
+  const scripts = absoluteAssets.filter(a =>
+    shouldAddScriptToPage(a, [...existingScripts, ...existingPreloads])
+  )
+  const styles = absoluteAssets.filter(a =>
+    shouldAddStyleToPage(a, [...existingStyles, ...existingPreloads])
+  )
   scripts.forEach(preloadScript)
   styles.forEach(preloadStyle)
 }

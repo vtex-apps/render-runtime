@@ -19,7 +19,7 @@ interface ExtensionContext {
 }
 
 interface Props {
-  children({ extension } : ExtensionContext): ReactElement<any> | null
+  children({ extension }: ExtensionContext): ReactElement<any> | null
 }
 
 const ExtensionConsumer = ({ children }: Props) => {

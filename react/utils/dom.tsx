@@ -13,7 +13,8 @@ export const RENDER_CONTAINER_CLASS = 'render-container'
 
 export const ROUTE_CLASS_PREFIX = 'render-route-'
 
-export const routeClass = (name: string) => `${ROUTE_CLASS_PREFIX}${hyphenate(name)}`
+export const routeClass = (name: string) =>
+  `${ROUTE_CLASS_PREFIX}${hyphenate(name)}`
 
 const renderContainer = (name: string, markup: string) =>
   `<div class="${RENDER_CONTAINER_CLASS} ${routeClass(name)}">${markup}</div>`
@@ -21,13 +22,21 @@ const renderContainer = (name: string, markup: string) =>
 const portalWrapper = (name: string, markup: string) =>
   `<span id="${portalWrapperId(name)}">${markup}</span>`
 
-export const createPortal = (children: ReactElement<any>, name: string, hydrate: boolean) => {
+export const createPortal = (
+  children: ReactElement<any>,
+  name: string,
+  hydrate: boolean
+) => {
   window.__hasPortals__ = true
 
   if (!hydrate) {
-    return canUseDOM
-      ? null
-      : <Fragment>{`START_SERVER_PORTAL_${name}!`}{children}{`END_SERVER_PORTAL_${name}!`}</Fragment>
+    return canUseDOM ? null : (
+      <Fragment>
+        {`START_SERVER_PORTAL_${name}!`}
+        {children}
+        {`END_SERVER_PORTAL_${name}!`}
+      </Fragment>
+    )
   }
 
   const ssrPortalContainer = document.getElementById(portalWrapperId(name))
@@ -44,7 +53,10 @@ export const createPortal = (children: ReactElement<any>, name: string, hydrate:
   return reactCreatePortal(children, container) as ReactPortal
 }
 
-export const getMarkups = (pageName: string, pageMarkup: string): NamedMarkup[] => {
+export const getMarkups = (
+  pageName: string,
+  pageMarkup: string
+): NamedMarkup[] => {
   const markups: NamedMarkup[] = []
 
   let matches = window.__hasPortals__ && portalPattern.exec(pageMarkup)
@@ -54,7 +66,7 @@ export const getMarkups = (pageName: string, pageMarkup: string): NamedMarkup[] 
     strippedMarkup = strippedMarkup.replace(matched, '')
     markups.push({
       markup: renderContainer(name, portalWrapper(name, markup)),
-      name
+      name,
     })
     matches = portalPattern.exec(pageMarkup)
   }
@@ -67,9 +79,10 @@ export const getMarkups = (pageName: string, pageMarkup: string): NamedMarkup[] 
   return markups
 }
 
-
 export const getContainer = () => {
-  return canUseDOM ? document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0] : null
+  return canUseDOM
+    ? document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0]
+    : null
 }
 
 export const ensureContainer = (name: string) => {
@@ -77,7 +90,9 @@ export const ensureContainer = (name: string) => {
     return false
   }
 
-  const existingContainer = document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0]
+  const existingContainer = document.getElementsByClassName(
+    RENDER_CONTAINER_CLASS
+  )[0]
   if (existingContainer) {
     return false
   }

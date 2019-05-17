@@ -13,7 +13,9 @@ export default class ErrorPage extends Component {
   private splunk = 0
 
   public componentDidMount() {
-    window.setTimeout(()=>{this.setState({enabled: true})} , 5000)
+    window.setTimeout(() => {
+      this.setState({ enabled: true })
+    }, 5000)
   }
 
   public render() {
@@ -38,17 +40,39 @@ export default class ErrorPage extends Component {
             <div>There was a technical problem loading this page.</div>
             <div>Try refreshing the page or come back in 5 minutes.</div>
           </div>
-          <div className="f6 pt5 c-muted-2" style={{fontFamily: 'courier, code'}}>
+          <div
+            className="f6 pt5 c-muted-2"
+            style={{ fontFamily: 'courier, code' }}
+          >
             <div>ID: {window.__REQUEST_ID__}</div>
             <div className="f6 c-muted-2 lh-copy fw7">{date.toUTCString()}</div>
           </div>
           <div className="pt7">
-            <button className={'bw1 ba fw5 ttu br2 fw4 v-mid relative pv4 ph6 f5 ' + (this.state.enabled ? 'bg-action-primary b--action-primary c-on-action-primary hover-bg-action-primary hover-b--action-primary hover-c-on-action-primary pointer' : 'bg-disabled b--disabled c-on-disabled')} disabled={!this.state.enabled} onClick={ ()=>{window.location.reload()}}>Refresh</button>
+            <button
+              className={
+                'bw1 ba fw5 ttu br2 fw4 v-mid relative pv4 ph6 f5 ' +
+                (this.state.enabled
+                  ? 'bg-action-primary b--action-primary c-on-action-primary hover-bg-action-primary hover-b--action-primary hover-c-on-action-primary pointer'
+                  : 'bg-disabled b--disabled c-on-disabled')
+              }
+              disabled={!this.state.enabled}
+              onClick={() => {
+                window.location.reload()
+              }}
+            >
+              Refresh
+            </button>
           </div>
         </div>
         <div>
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-          <img src={ErrorImg} onKeyDown={e => e.key === 'Enter' && this.handleImageClick()} onClick={this.handleImageClick} className={`${style.imgHeight} pb6 pb0-ns`} alt=""></img>
+          <img
+            src={ErrorImg}
+            onKeyDown={e => e.key === 'Enter' && this.handleImageClick()}
+            onClick={this.handleImageClick}
+            className={`${style.imgHeight} pb6 pb0-ns`}
+            alt=""
+          />
         </div>
       </div>
     )
@@ -57,12 +81,25 @@ export default class ErrorPage extends Component {
   private renderErrorDetails = (error: any) => {
     return (
       <div>
-        <div className={`${style.errorStack} bg-danger--faded pa7 mt4 br3 t-body lh-copy`}>
+        <div
+          className={`${
+            style.errorStack
+          } bg-danger--faded pa7 mt4 br3 t-body lh-copy`}
+        >
           {error.stack.split('\n').map((item: string, key: number) => {
-            return <Fragment key={key}>{item}<br/></Fragment>
+            return (
+              <Fragment key={key}>
+                {item}
+                <br />
+              </Fragment>
+            )
           })}
         </div>
-        <div className={`${style.errorDetails} bg-warning--faded pa7 mt4 br3 lh-copy`}>
+        <div
+          className={`${
+            style.errorDetails
+          } bg-warning--faded pa7 mt4 br3 lh-copy`}
+        >
           <ReactJson src={error.details} />
         </div>
       </div>

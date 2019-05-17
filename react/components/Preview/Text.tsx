@@ -6,7 +6,7 @@ interface Props {
   height: number
 }
 
-const Text = ({width, height}: Props) => {
+const Text = ({ width, height }: Props) => {
   // TODO: make the line height configurable
   const lineHeight = 16
   const lineSize = lineHeight * 1.5
@@ -20,8 +20,7 @@ const Text = ({width, height}: Props) => {
       {Array.from({ length: lines }).map((_, i) => {
         const isLast = i === lines - 1
         const widthMultiplier = isLast ? 0.7 : 1
-        const lineWidth =
-          width * widthMultiplier - horizontalMargin * 2
+        const lineWidth = width * widthMultiplier - horizontalMargin * 2
         return (
           <rect
             key={i}

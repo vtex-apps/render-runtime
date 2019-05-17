@@ -13,10 +13,7 @@ interface State {
   containerWidth?: number | null
 }
 
-export default class Preview extends React.PureComponent<
-  Props,
-  State
-> {
+export default class Preview extends React.PureComponent<Props, State> {
   private container: RefObject<HTMLDivElement>
 
   public constructor(props: Props) {
@@ -28,7 +25,11 @@ export default class Preview extends React.PureComponent<
     }
   }
 
-  private renderPreviewGraphic = (width: number, height: number, type: string): ReactElement<any> | null => {
+  private renderPreviewGraphic = (
+    width: number,
+    height: number,
+    type: string
+  ): ReactElement<any> | null => {
     if (!type || type === 'none') {
       return null
     }
@@ -39,10 +40,10 @@ export default class Preview extends React.PureComponent<
       // eslint-disable-next-line no-fallthrough
       case 'block':
         return <Box width={width} height={height} />
-      case 'text': 
+      case 'text':
         return <Text width={width} height={height} />
       /** TODO: add support for Grid preview */
-      case 'grid': 
+      case 'grid':
         return <Grid width={width} height={height} />
       case 'circle':
         return <Circle width={width} height={height} />
@@ -88,7 +89,8 @@ export default class Preview extends React.PureComponent<
 
     const { defaultValue } = dimensionObject
 
-    const valueFromProp = dimensionObject.fromProp && extension.props[dimensionObject.fromProp]
+    const valueFromProp =
+      dimensionObject.fromProp && extension.props[dimensionObject.fromProp]
 
     if (typeof valueFromProp === 'number') {
       return valueFromProp
@@ -119,22 +121,21 @@ export default class Preview extends React.PureComponent<
       return null
     }
 
-    const {
-      type,
-      fullWidth,
-    } = extension.preview
+    const { type, fullWidth } = extension.preview
 
-    const {
-      width: initialWidth,
-      height: initialHeight,
-    } = this.getDimensions()
+    const { width: initialWidth, height: initialHeight } = this.getDimensions()
 
     const { containerWidth } = this.state
 
-    const maxWidth = containerWidth || (window && window.innerWidth) || initialWidth || 0
+    const maxWidth =
+      containerWidth || (window && window.innerWidth) || initialWidth || 0
 
     const padding = 20
-    const width = (typeof initialWidth === 'number' ? Math.min(maxWidth, initialWidth) : maxWidth) - padding * 2
+    const width =
+      (typeof initialWidth === 'number'
+        ? Math.min(maxWidth, initialWidth)
+        : maxWidth) -
+      padding * 2
     const height = initialHeight ? initialHeight - padding * 2 : 0
 
     return (
@@ -145,10 +146,10 @@ export default class Preview extends React.PureComponent<
       <div
         ref={this.container}
         className={fullWidth ? '' : 'mw9 center'}
-        style={{ padding }}>
+        style={{ padding }}
+      >
         {this.renderPreviewGraphic(width, height, type)}
       </div>
     )
   }
 }
-

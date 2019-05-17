@@ -21,7 +21,7 @@ const getMaxAge = (response: Response) => {
     return DEFAULT_MAX_AGE_S
   }
 
-  const {noCache, noStore, maxAge} = parseCacheControl(cacheControlHeader)
+  const { noCache, noStore, maxAge } = parseCacheControl(cacheControlHeader)
   if (noCache || noStore) {
     return MINIMUM_MAX_AGE_S
   }
@@ -38,7 +38,7 @@ export default class PageCacheControl {
       : STATIC_PAGE_MAX_AGE_S
   }
 
-  public evaluate (innerResponse: Response) {
+  public evaluate(innerResponse: Response) {
     const responseMaxAge = getMaxAge(innerResponse)
     this.maxAges.push(responseMaxAge)
   }

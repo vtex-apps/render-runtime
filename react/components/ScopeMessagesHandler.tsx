@@ -14,19 +14,16 @@ const removeScopeForApp = (appNameAtMajor: string) => (key: string) => {
 }
 
 export const scopeMessages = (app: string, Component: any) => {
-  const ScopeMessagesComponent = ({children, intl, ...props}: any) => {
+  const ScopeMessagesComponent = ({ children, intl, ...props }: any) => {
     const { messages } = intl
     const [appName, version] = app.split('@')
     const [major] = version.split('.')
     const appNameAtMajor = `${appName}@${major}.x`
     const removeScope = removeScopeForApp(appNameAtMajor)
-    forEachObjIndexed(
-      (value, key, obj) => {
-        const renamedKey = removeScope(key as string)
-        obj[renamedKey] = value
-      },
-      messages
-    )
+    forEachObjIndexed((value, key, obj) => {
+      const renamedKey = removeScope(key as string)
+      obj[renamedKey] = value
+    }, messages)
     return (
       <IntlProvider messages={messages}>
         <Component {...props}>{children}</Component>

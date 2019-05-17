@@ -2,9 +2,11 @@ import React from 'react'
 import { useTreePath } from '../utils/treePath'
 import { useRuntime } from './RenderContext'
 
-export function useChildBlock(childBlock: ChildBlock) : Block | null {
+export function useChildBlock(childBlock: ChildBlock): Block | null {
   if (typeof childBlock === 'string') {
-    throw new Error(`You are passing a string as a parameter to useChildBlock ("${childBlock}"). You should pass an object like {id: "${childBlock}"}.`)
+    throw new Error(
+      `You are passing a string as a parameter to useChildBlock ("${childBlock}"). You should pass an object like {id: "${childBlock}"}.`
+    )
   }
 
   const { id } = childBlock
@@ -22,8 +24,8 @@ export function useChildBlock(childBlock: ChildBlock) : Block | null {
   // We are explicitly not exposing the private API here
   return block
     ? {
-      props: block.props,
-    }
+        props: block.props,
+      }
     : null
 }
 
@@ -39,8 +41,7 @@ interface ChildBlock {
 
 /** Placeholder for possible block data in the future */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface Block {
-}
+interface Block {}
 
 interface ChildBlockProps extends ChildBlock {
   children(block: Block | null): React.ReactNode

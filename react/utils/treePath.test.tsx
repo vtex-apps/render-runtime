@@ -1,11 +1,28 @@
 import { escapeRegex, isDirectChild } from './treePath'
 
 describe('#escapeRegex', () => {
-  const specialRegexCharacters = ['[', ']','\\', '^', '$', '.', '|', '?', '*', '+', '(', ')']
+  const specialRegexCharacters = [
+    '[',
+    ']',
+    '\\',
+    '^',
+    '$',
+    '.',
+    '|',
+    '?',
+    '*',
+    '+',
+    '(',
+    ')',
+  ]
 
-  it(`should prefix regex special characters: [ '${specialRegexCharacters.join(`', '`)}' ] with \\`, () => {
-    specialRegexCharacters.forEach((specialRegexCharacter) => {
-      expect(escapeRegex(specialRegexCharacter)).toEqual(`\\${specialRegexCharacter}`)
+  it(`should prefix regex special characters: [ '${specialRegexCharacters.join(
+    `', '`
+  )}' ] with \\`, () => {
+    specialRegexCharacters.forEach(specialRegexCharacter => {
+      expect(escapeRegex(specialRegexCharacter)).toEqual(
+        `\\${specialRegexCharacter}`
+      )
     })
   })
 
@@ -24,7 +41,9 @@ describe('#isDirectChild', () => {
   })
 
   it('should allow regex special characters on names', () => {
-    expect(isDirectChild('store/home/$before_0/shelf_0', 'store/home/$before_0')).toBe(true)
+    expect(
+      isDirectChild('store/home/$before_0/shelf_0', 'store/home/$before_0')
+    ).toBe(true)
   })
 
   it('should return false for 2 levels nesting', () => {

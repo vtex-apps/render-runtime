@@ -91,21 +91,18 @@ const replaceExtensionsWithDefault = (
   page: string,
   defaultExtensions: Extensions
 ) =>
-  unionKeys(extensions, defaultExtensions).reduce<Extensions>(
-    (acc, key) => {
-      const maybeExtension = isChildOrSelf(key, page)
-        ? defaultExtensions[key] || {
-            ...extensions[key],
-            component: null,
-          }
-        : extensions[key]
-      if (maybeExtension) {
-        acc[key] = maybeExtension
-      }
-      return acc
-    },
-    {}
-  )
+  unionKeys(extensions, defaultExtensions).reduce<Extensions>((acc, key) => {
+    const maybeExtension = isChildOrSelf(key, page)
+      ? defaultExtensions[key] || {
+          ...extensions[key],
+          component: null,
+        }
+      : extensions[key]
+    if (maybeExtension) {
+      acc[key] = maybeExtension
+    }
+    return acc
+  }, {})
 
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
@@ -160,11 +157,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           this.getChildContext(),
           messages,
           shouldUpdateRuntime,
-          this.updateMessages,
+          this.updateMessages
         )
       }
     },
-    SEND_INFO_DEBOUNCE_MS,
+    SEND_INFO_DEBOUNCE_MS
   )
 
   private rendered!: boolean
@@ -194,9 +191,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     if (history) {
       const renderLocation: RenderHistoryLocation = {
         ...history.location,
-        pathname: ignoreCanonicalReplacement || !route.canonicalPath
-          ? history.location.pathname
-          : route.canonicalPath,
+        pathname:
+          ignoreCanonicalReplacement || !route.canonicalPath
+            ? history.location.pathname
+            : route.canonicalPath,
         state: {
           navigationRoute: {
             id: route.id,
@@ -392,7 +390,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public setQuery = (
     query: Record<string, any> = {},
-    { merge = true, replace = false, scrollOptions = false}: SetQueryOptions = {}
+    {
+      merge = true,
+      replace = false,
+      scrollOptions = false,
+    }: SetQueryOptions = {}
   ): boolean => {
     const { history } = this.props
     const {
@@ -864,7 +866,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }),
       () => {
         this.sendInfoFromIframe()
-      },
+      }
     )
   }
 }

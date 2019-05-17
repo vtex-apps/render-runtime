@@ -1,5 +1,5 @@
-import React, {Component} from 'react'
-import {RenderContextProps, withRuntimeContext} from './RenderContext'
+import React, { Component } from 'react'
+import { RenderContextProps, withRuntimeContext } from './RenderContext'
 
 interface State {
   animateOut: boolean
@@ -8,10 +8,42 @@ interface State {
 }
 
 const buildStatusLoading = (
-  <svg width="26px" height="26px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-    <circle cx="50" opacity="0.2" cy="50" fill="none" stroke="#F71963" strokeWidth="14" r="40"></circle>
-    <circle cx="50" cy="50" fill="none" stroke="#F71963" strokeWidth="12" r="40" strokeDasharray="60 900" strokeLinecap="round" transform="rotate(96 50 50)">
-      <animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50" keyTimes="0;1" dur="0.7s" begin="0s" repeatCount="indefinite"></animateTransform>
+  <svg
+    width="26px"
+    height="26px"
+    viewBox="0 0 100 100"
+    preserveAspectRatio="xMidYMid"
+  >
+    <circle
+      cx="50"
+      opacity="0.2"
+      cy="50"
+      fill="none"
+      stroke="#F71963"
+      strokeWidth="14"
+      r="40"
+    />
+    <circle
+      cx="50"
+      cy="50"
+      fill="none"
+      stroke="#F71963"
+      strokeWidth="12"
+      r="40"
+      strokeDasharray="60 900"
+      strokeLinecap="round"
+      transform="rotate(96 50 50)"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        calcMode="linear"
+        values="0 50 50;360 50 50"
+        keyTimes="0;1"
+        dur="0.7s"
+        begin="0s"
+        repeatCount="indefinite"
+      />
     </circle>
   </svg>
 )
@@ -36,13 +68,19 @@ class BuildStatus extends Component<RenderContextProps, State> {
   }
 
   public hideWithDelay = (delayMillis: number) => {
-    this.animateOutHandle = window.setTimeout(() => this.setState({ animateOut: true }), delayMillis)
-    this.hideHandle = window.setTimeout(() => this.setState({ status: null, animateOut: false }), delayMillis + 300)
+    this.animateOutHandle = window.setTimeout(
+      () => this.setState({ animateOut: true }),
+      delayMillis
+    )
+    this.hideHandle = window.setTimeout(
+      () => this.setState({ status: null, animateOut: false }),
+      delayMillis + 300
+    )
   }
 
   private handleMouseOver = () => {
     this.setState(state => ({
-      anchor: state.anchor === 'left' ? 'right' : 'left'
+      anchor: state.anchor === 'left' ? 'right' : 'left',
     }))
   }
 
@@ -52,7 +90,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
       return
     }
 
-    this.setState({status, animateOut: false})
+    this.setState({ status, animateOut: false })
     this.clearTimeouts()
 
     if (status === 'success' || status === 'hmr:success') {
@@ -62,12 +100,12 @@ class BuildStatus extends Component<RenderContextProps, State> {
   }
 
   public subscribeToStatus = () => {
-    const {emitter} = this.props.runtime
+    const { emitter } = this.props.runtime
     emitter.addListener('build.status', this.updateStatus)
   }
 
   public unsubscribeToStatus = () => {
-    const {emitter} = this.props.runtime
+    const { emitter } = this.props.runtime
     emitter.removeListener('build.status', this.updateStatus)
   }
 
@@ -81,7 +119,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
   }
 
   public render() {
-    const {status, animateOut, anchor} = this.state
+    const { status, animateOut, anchor } = this.state
 
     if (status === null) {
       return null
@@ -92,26 +130,31 @@ class BuildStatus extends Component<RenderContextProps, State> {
     }`
 
     const fail = (
-      <p className="ma2">Oops! Build failed. Check your terminal for more information</p>
+      <p className="ma2">
+        Oops! Build failed. Check your terminal for more information
+      </p>
     )
 
-    const reload = (
-      <p className="ma2">Performing full reload</p>
-    )
+    const reload = <p className="ma2">Performing full reload</p>
 
     return (
       // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
       <div
         aria-hidden
         className={className}
-        style={{ top: '12px', [anchor]: '12px', animationDuration: '0.2s', opacity: 0.8 }}
+        style={{
+          top: '12px',
+          [anchor]: '12px',
+          animationDuration: '0.2s',
+          opacity: 0.8,
+        }}
         onMouseOver={this.handleMouseOver}
       >
         {status === 'fail'
           ? fail
           : status === 'reload'
-            ? reload
-            : buildStatusLoading}
+          ? reload
+          : buildStatusLoading}
       </div>
     )
   }

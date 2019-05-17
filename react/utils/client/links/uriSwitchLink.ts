@@ -1,26 +1,34 @@
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import { canUseDOM } from 'exenv'
-import { ASTNode, DirectiveNode, OperationDefinitionNode, StringValueNode, visit } from 'graphql'
+import {
+  ASTNode,
+  DirectiveNode,
+  OperationDefinitionNode,
+  StringValueNode,
+  visit,
+} from 'graphql'
 
 import { generateHash } from '../generateHash'
 
 interface Assets {
-  operationType: string,
+  operationType: string
   queryScope?: string
 }
 
 const assetsFromQuery = (query: ASTNode) => {
-  const assets: Assets = {operationType: 'mutation'}
+  const assets: Assets = { operationType: 'mutation' }
   visit(query, {
-    Directive (node: DirectiveNode) {
+    Directive(node: DirectiveNode) {
       if (node.name.value === 'context') {
-        const scopeArg = node.arguments && node.arguments.find((argNode) => argNode.name.value === 'scope')
+        const scopeArg =
+          node.arguments &&
+          node.arguments.find(argNode => argNode.name.value === 'scope')
         if (scopeArg) {
           assets.queryScope = (scopeArg.value as StringValueNode).value
         }
       }
     },
-    OperationDefinition (node: OperationDefinitionNode) {
+    OperationDefinition(node: OperationDefinitionNode) {
       assets.operationType = node.operation
     },
   })
@@ -28,23 +36,24 @@ const assetsFromQuery = (query: ASTNode) => {
 }
 
 interface OperationContext {
-  fetchOptions: any,
-  runtime: RenderRuntime,
+  fetchOptions: any
+  runtime: RenderRuntime
 }
 
-const equals = (a: string, b: string) => a && b && a.toLowerCase() === b.toLowerCase()
+const equals = (a: string, b: string) =>
+  a && b && a.toLowerCase() === b.toLowerCase()
 
 const extractHints = (query: ASTNode, meta: CacheHints) => {
-  const {operationType, queryScope} = assetsFromQuery(query)
+  const { operationType, queryScope } = assetsFromQuery(query)
 
   let hints
   if (equals(operationType, 'query')) {
-    hints = meta ? meta : {scope: queryScope}
+    hints = meta ? meta : { scope: queryScope }
   } else {
-    hints = {...meta, scope: 'private'}
+    hints = { ...meta, scope: 'private' }
   }
 
-  const {maxAge = 'long', scope = 'public', version = 1} = hints
+  const { maxAge = 'long', scope = 'public', version = 1 } = hints
   return {
     maxAge: maxAge.toLowerCase(),
     operationType,
@@ -56,15 +65,24 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
 export const createUriSwitchLink = (baseURI: string, workspace: string) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     operation.setContext((oldContext: OperationContext) => {
-      const { fetchOptions = {}, runtime: {appsEtag, cacheHints} } = oldContext
+      const {
+        fetchOptions = {},
+        runtime: { appsEtag, cacheHints },
+      } = oldContext
       const oldMethod = fetchOptions.method || 'POST'
       const hash = generateHash(operation.query)
       const protocol = canUseDOM ? 'https:' : 'http:'
-      const {maxAge, scope, version, operationType} = extractHints(operation.query, cacheHints[hash])
-      const method = (equals(scope, 'private') && equals(operationType, 'query')) ? 'POST' : oldMethod
+      const { maxAge, scope, version, operationType } = extractHints(
+        operation.query,
+        cacheHints[hash]
+      )
+      const method =
+        equals(scope, 'private') && equals(operationType, 'query')
+          ? 'POST'
+          : oldMethod
       return {
         ...oldContext,
-        fetchOptions: {...fetchOptions, method},
+        fetchOptions: { ...fetchOptions, method },
         uri: `${protocol}//${baseURI}/_v/${scope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
       }
     })

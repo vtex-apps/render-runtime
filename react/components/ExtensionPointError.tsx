@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React, {ErrorInfo, PureComponent} from 'react'
+import React, { ErrorInfo, PureComponent } from 'react'
 
 interface Props {
   treePath: string
@@ -30,26 +30,30 @@ class ExtensionPointError extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {treePath, error, errorInfo} = this.props
-    const {errorDetails} = this.state
+    const { treePath, error, errorInfo } = this.props
+    const { errorDetails } = this.state
     const componentStack = errorInfo && errorInfo.componentStack
 
     return (
       <div className="bg-washed-red pa6 f5 serious-black br3 pre">
-        <span>Error rendering extension point <strong>{treePath}</strong></span>
-        <button type="button" className="red ph0 ma0 mh3 bg-transparent bn pointer link" onClick={this.handleToggleErrorDetails}>({errorDetails ? 'hide' : 'show'} details)</button>
+        <span>
+          Error rendering extension point <strong>{treePath}</strong>
+        </span>
+        <button
+          type="button"
+          className="red ph0 ma0 mh3 bg-transparent bn pointer link"
+          onClick={this.handleToggleErrorDetails}
+        >
+          ({errorDetails ? 'hide' : 'show'} details)
+        </button>
         {errorDetails && error && (
           <pre>
-            <code className="f6">
-              {error.stack}
-            </code>
+            <code className="f6">{error.stack}</code>
           </pre>
         )}
         {errorDetails && componentStack && (
           <pre>
-            <code className="f6">
-              {componentStack}
-            </code>
+            <code className="f6">{componentStack}</code>
           </pre>
         )}
       </div>

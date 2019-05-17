@@ -1,3 +1,3 @@
-import {LayoutContainer} from 'vtex.render-runtime'
+import { LayoutContainer } from 'vtex.render-runtime'
 
 export default LayoutContainer

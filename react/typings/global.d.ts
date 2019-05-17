@@ -1,19 +1,19 @@
-import {ApolloClient, Subscription} from 'apollo-client'
-import {NormalizedCacheObject} from "apollo-cache-inmemory"
-import {EventEmitter} from 'eventemitter3'
-import {ReactElement, Component} from "react"
-import ExtensionContainer from "../ExtensionContainer"
-import ExtensionPoint from "../ExtensionPoint"
-import Link from "../components/Link"
-import {History, Location} from "history"
-import {HelmetData} from "react-helmet"
-import {TreePathProps} from "../utils/treePath"
+import { ApolloClient, Subscription } from 'apollo-client'
+import { NormalizedCacheObject } from 'apollo-cache-inmemory'
+import { EventEmitter } from 'eventemitter3'
+import { ReactElement, Component } from 'react'
+import ExtensionContainer from '../ExtensionContainer'
+import ExtensionPoint from '../ExtensionPoint'
+import Link from '../components/Link'
+import { History, Location } from 'history'
+import { HelmetData } from 'react-helmet'
+import { TreePathProps } from '../utils/treePath'
 import { LayoutContainer } from '../core/main'
 
 declare global {
   interface RenderMetric {
-    getDataFromTree: [number, number],
-    renderToString: [number, number],
+    getDataFromTree: [number, number]
+    renderToString: [number, number]
   }
 
   interface ServerRendered {
@@ -155,8 +155,8 @@ declare global {
   }
 
   interface RenderedSuccess {
-    state: any,
-    head: HelmetData,
+    state: any
+    head: HelmetData
     maxAge: number
     extensions: {
       [id: string]: string
@@ -179,34 +179,34 @@ declare global {
   }
 
   interface RenderContext {
-    account: RenderRuntime['account'],
-    components: RenderRuntime['components'],
-    culture: RenderRuntime['culture'],
-    device: ConfigurationDevice,
-    emitter: RenderRuntime['emitter'],
-    ensureSession: () => Promise<void>,
-    extensions: RenderRuntime['extensions'],
-    fetchComponent: (component: string) => Promise<void>,
-    getSettings: (app: string) => any,
-    hints: RenderHints,
-    history: History | null,
-    navigate: (options: NavigateOptions) => boolean,
-    onPageChanged: (location: RenderHistoryLocation) => void,
-    page: RenderRuntime['page'],
-    pages: RenderRuntime['pages'],
-    patchSession: (data?: any) => Promise<void>,
-    prefetchPage: (name: string) => void,
-    preview: RenderRuntime['preview'],
-    production: RenderRuntime['production'],
-    publicEndpoint: RenderRuntime['publicEndpoint'],
-    setDevice: (device: ConfigurationDevice) => void,
-    updateComponentAssets: (availableComponents: Components) => void,
-    updateExtension: (name: string, extension: Extension) => void,
-    updateRuntime: (options?: PageContextOptions) => Subscription,
-    workspace: RenderRuntime['workspace'],
-    route: RenderRuntime['route'],
-    query: RenderRuntime['query'],
-    defaultExtensions: RenderRuntime['defaultExtensions'],
+    account: RenderRuntime['account']
+    components: RenderRuntime['components']
+    culture: RenderRuntime['culture']
+    device: ConfigurationDevice
+    emitter: RenderRuntime['emitter']
+    ensureSession: () => Promise<void>
+    extensions: RenderRuntime['extensions']
+    fetchComponent: (component: string) => Promise<void>
+    getSettings: (app: string) => any
+    hints: RenderHints
+    history: History | null
+    navigate: (options: NavigateOptions) => boolean
+    onPageChanged: (location: RenderHistoryLocation) => void
+    page: RenderRuntime['page']
+    pages: RenderRuntime['pages']
+    patchSession: (data?: any) => Promise<void>
+    prefetchPage: (name: string) => void
+    preview: RenderRuntime['preview']
+    production: RenderRuntime['production']
+    publicEndpoint: RenderRuntime['publicEndpoint']
+    setDevice: (device: ConfigurationDevice) => void
+    updateComponentAssets: (availableComponents: Components) => void
+    updateExtension: (name: string, extension: Extension) => void
+    updateRuntime: (options?: PageContextOptions) => Subscription
+    workspace: RenderRuntime['workspace']
+    route: RenderRuntime['route']
+    query: RenderRuntime['query']
+    defaultExtensions: RenderRuntime['defaultExtensions']
     rootPath?: string
   }
 
@@ -218,21 +218,21 @@ declare global {
   }
 
   interface FetchRoutesInput extends PageContextOptions {
-    apolloClient: ApolloClient<NormalizedCacheObject>,
-    locale: string,
-    page: string,
-    paramsJSON?: string,
-    path?: string,
-    production: boolean,
-    renderMajor: number,
+    apolloClient: ApolloClient<NormalizedCacheObject>
+    locale: string
+    page: string
+    paramsJSON?: string
+    path?: string
+    production: boolean
+    renderMajor: number
   }
 
   interface FetchDefaultPages {
-    apolloClient: ApolloClient<NormalizedCacheObject>,
-    locale: string,
-    pages: Pages,
-    routeIds: string[],
-    renderMajor: number,
+    apolloClient: ApolloClient<NormalizedCacheObject>
+    locale: string
+    pages: Pages
+    routeIds: string[]
+    renderMajor: number
   }
 
   interface FetchNavigationDataInput {
@@ -243,15 +243,15 @@ declare global {
     declarer?: string
     paramsJSON?: string
     path?: string
-    renderMajor: number,
+    renderMajor: number
     query: string
   }
 
-interface RenderComponent<P={}, S={}> {
-  getCustomMessages?: (locale: string) => any
-  WrappedComponent?: RenderComponent
-  new(): Component<P,S>
-}
+  interface RenderComponent<P = {}, S = {}> {
+    getCustomMessages?: (locale: string) => any
+    WrappedComponent?: RenderComponent
+    new (): Component<P, S>
+  }
 
   interface ComponentsRegistry {
     [component: string]: RenderComponent<any, any>
@@ -267,12 +267,12 @@ interface RenderComponent<P={}, S={}> {
   }
 
   interface DefaultPagesQueryResult {
-    data: DefaultPagesQueryResultData,
-    errors?: any,
+    data: DefaultPagesQueryResultData
+    errors?: any
   }
 
   interface DefaultPagesQueryResultData {
-    defaultPages: DefaultPagesQueryResponse,
+    defaultPages: DefaultPagesQueryResponse
   }
 
   interface PageDataContext {
@@ -369,7 +369,7 @@ interface RenderComponent<P={}, S={}> {
       config?: any
     }
     settings: {
-      [app: string]: any;
+      [app: string]: any
     }
     cacheHints: CacheHintsMap
     segmentToken: string
@@ -405,7 +405,11 @@ interface RenderComponent<P={}, S={}> {
     buildCacheLocator: any
     useRuntime(): RenderContext
     start(): void
-    render(name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered
+    render(
+      name: string,
+      runtime: RenderRuntime,
+      element?: HTMLElement
+    ): Rendered
   }
 
   interface RenderSession {
@@ -430,7 +434,7 @@ interface RenderComponent<P={}, S={}> {
       runtime: RenderContext | null,
       messages: Record<string, string>,
       shouldUpdateRuntime: boolean,
-      setMessages: (messages: RenderRuntime['messages']) => void,
+      setMessages: (messages: RenderRuntime['messages']) => void
     ) => void
     browserHistory: History
     ReactIntlLocaleData: any

@@ -107,7 +107,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       before = [],
       content = {},
       props: extensionProps = {},
-      track = []
+      track = [],
     } = extension || {}
 
     this.component = component
@@ -128,10 +128,13 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       { params, query },
     ])
 
-    const isCompositionChildren = extension && extension.composition === 'children'
+    const isCompositionChildren =
+      extension && extension.composition === 'children'
 
-    const componentChildren = (isCompositionChildren && extension.blocks) ?
-      this.getChildExtensions(runtime, newTreePath) : children
+    const componentChildren =
+      isCompositionChildren && extension.blocks
+        ? this.getChildExtensions(runtime, newTreePath)
+        : children
 
     return this.withOuterExtensions(
       after,
@@ -139,19 +142,22 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       before,
       newTreePath,
       props,
-      (
-        <TrackEventsWrapper
-          events={track}
-          id={id}>
-          <TreePathContext.Provider value={{ treePath: newTreePath }}>
-            {component ? (
-              <ExtensionPointComponent component={component} props={props} runtime={runtime} treePath={newTreePath}>
-                {componentChildren}
-              </ExtensionPointComponent>
-            ) : <Loading />}
-          </TreePathContext.Provider>
-        </TrackEventsWrapper>
-      )
+      <TrackEventsWrapper events={track} id={id}>
+        <TreePathContext.Provider value={{ treePath: newTreePath }}>
+          {component ? (
+            <ExtensionPointComponent
+              component={component}
+              props={props}
+              runtime={runtime}
+              treePath={newTreePath}
+            >
+              {componentChildren}
+            </ExtensionPointComponent>
+          ) : (
+            <Loading />
+          )}
+        </TreePathContext.Provider>
+      </TrackEventsWrapper>
     )
   }
 
@@ -163,22 +169,26 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     }
 
     return extension.blocks.map((child, i) => {
-      const childTreePath = ExtensionPoint.mountTreePath(child.extensionPointId, treePath)
-      const childExtension = runtime.extensions && runtime.extensions[childTreePath]
+      const childTreePath = ExtensionPoint.mountTreePath(
+        child.extensionPointId,
+        treePath
+      )
+      const childExtension =
+        runtime.extensions && runtime.extensions[childTreePath]
       const childProps = childExtension ? childExtension.props : {}
 
       /* This ExtensionPointWrapper thing is done so the user can read
-        * the props that were passed through the blocks.json file to
-        * its children in a standard, React-ish way; that is:
-        * `React.Children.map(children, child => child.props)`
-        * 
-        * The problem was, if the user passed a prop that conflicted with
-        * ExtensionPoint props (most notabily, `id`), just destructuring
-        * the `childProps` over ExtensionPoint would override the 
-        * ExtensionPoint props, which would break the rendering.
-        * (or vice versa, which would cause wrong values being read by
-        * the user component). 
-      */
+       * the props that were passed through the blocks.json file to
+       * its children in a standard, React-ish way; that is:
+       * `React.Children.map(children, child => child.props)`
+       *
+       * The problem was, if the user passed a prop that conflicted with
+       * ExtensionPoint props (most notabily, `id`), just destructuring
+       * the `childProps` over ExtensionPoint would override the
+       * ExtensionPoint props, which would break the rendering.
+       * (or vice versa, which would cause wrong values being read by
+       * the user component).
+       */
       const ExtensionPointWrapper = (blockProps: object) => (
         <ExtensionPoint
           id={child.extensionPointId}
@@ -187,16 +197,18 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
         />
       )
 
-      return (
-        <ExtensionPointWrapper
-          key={i}
-          {...childProps}
-        />
-      )
+      return <ExtensionPointWrapper key={i} {...childProps} />
     })
   }
 
-  private withOuterExtensions(after: string[], around: string[], before: string[], treePath: string, props: any, element: JSX.Element) {
+  private withOuterExtensions(
+    after: string[],
+    around: string[],
+    before: string[],
+    treePath: string,
+    props: any,
+    element: JSX.Element
+  ) {
     const beforeElements = (
       <Fragment>
         {before.map(beforeId => (
@@ -233,16 +245,22 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       </Fragment>
     )
 
-    return around.reduce((acc, aroundId) => (
-      <ExtensionPoint id={aroundId} treePath={treePath} {...props}>
-        {acc}
-      </ExtensionPoint>
-    ), wrapped)
+    return around.reduce(
+      (acc, aroundId) => (
+        <ExtensionPoint id={aroundId} treePath={treePath} {...props}>
+          {acc}
+        </ExtensionPoint>
+      ),
+      wrapped
+    )
   }
 
   private addDataToElementIfEditable = () => {
     const ComponentImpl = this.component && getImplementation(this.component)
-    const isEditable = ComponentImpl && (ComponentImpl.hasOwnProperty('schema') || ComponentImpl.hasOwnProperty('getSchema'))
+    const isEditable =
+      ComponentImpl &&
+      (ComponentImpl.hasOwnProperty('schema') ||
+        ComponentImpl.hasOwnProperty('getSchema'))
 
     if (!isEditable) {
       return

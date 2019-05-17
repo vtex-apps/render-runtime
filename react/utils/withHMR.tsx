@@ -28,14 +28,18 @@ export default (module: Module, InitialImplementer: any) => {
     }
   }
 
-  class HMRComponent extends Component<any, {lastUpdate?: number}> {
+  class HMRComponent extends Component<any, { lastUpdate?: number }> {
     public static propTypes = {
       __clearError: PropTypes.func,
       __errorInstance: PropTypes.node,
     }
 
     public static get displayName(): string {
-      return HMRComponent.Implementer.displayName || HMRComponent.Implementer.name || 'Component'
+      return (
+        HMRComponent.Implementer.displayName ||
+        HMRComponent.Implementer.name ||
+        'Component'
+      )
     }
 
     public static hotReload = (NewImplementer: ComponentType) => {
@@ -47,16 +51,20 @@ export default (module: Module, InitialImplementer: any) => {
     private static Implementer = InitialImplementer as ComponentType
 
     public updateComponent = () => {
-      const {__emitter, treePath, __clearError, __errorInstance} = this.props
+      const { __emitter, treePath, __clearError, __errorInstance } = this.props
       __emitter.emit('build.status', 'hmr:success')
 
       if (__clearError && __errorInstance) {
         __clearError()
       } else {
-        this.setState({lastUpdate: Date.now()})
+        this.setState({ lastUpdate: Date.now() })
       }
 
-      console.log(`[render] Component updated. treePath=${treePath} updated=${HMRComponent.displayName}`)
+      console.log(
+        `[render] Component updated. treePath=${treePath} updated=${
+          HMRComponent.displayName
+        }`
+      )
     }
 
     public componentDidMount() {
@@ -68,10 +76,15 @@ export default (module: Module, InitialImplementer: any) => {
     }
 
     public render() {
-      const {__emitter, __clearError, __errorInstance, ...props} = this.props
-      return this.props.__errorInstance || <HMRComponent.Implementer {...props} />
+      const { __emitter, __clearError, __errorInstance, ...props } = this.props
+      return (
+        this.props.__errorInstance || <HMRComponent.Implementer {...props} />
+      )
     }
   }
 
-  return hoistNonReactStatics(withEmitter(withTreePath(HMRComponent)), InitialImplementer)
+  return hoistNonReactStatics(
+    withEmitter(withTreePath(HMRComponent)),
+    InitialImplementer
+  )
 }
