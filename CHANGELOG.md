@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.29.1] - 2019-05-17
+
 ## [8.29.0] - 2019-05-16
 ### Added
 - Use `?map` to do route matching.
