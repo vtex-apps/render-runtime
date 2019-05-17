@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/browser'
 import PropTypes from 'prop-types'
-import { chain, pluck } from 'ramda'
+import { forEachObjIndexed, pickBy } from 'ramda'
 import React, { ErrorInfo, PureComponent } from 'react'
 
 import { getImplementation } from '../utils/assets'
@@ -97,7 +97,7 @@ class ExtensionPointComponent extends PureComponent<
     this.setState({
       error: null,
       errorInfo: null,
-      operationIds: []
+      operationIds: [],
     })
   }
 
@@ -112,13 +112,20 @@ class ExtensionPointComponent extends PureComponent<
     const { children, __errorInstance, __clearError, ...componentProps } = props
 
     console.error('Failed to render extension point', path, component)
-
     const operationIds = graphQLErrorsStore.getOperationIds()
-
     // Only log 10 percent of the errors so we dont exceed our quota
     if (production && Math.random() < 0.1) {
       Sentry.configureScope(scope => {
-        scope.setExtra('runtime', runtime)
+        const blacklistedRuntimeKeys = ['cacheHints', 'components', 'culture', 'emitter', 'history', 'messages']
+
+        const filteredRuntime = pickBy((val, key) => {
+          return typeof val !== 'function' && !blacklistedRuntimeKeys.includes(key)
+        }, runtime)
+
+        forEachObjIndexed((value, key) => {
+          scope.setExtra(`runtime.${key}`, value)
+        }, filteredRuntime)
+
         scope.setExtra('treePath', path)
         scope.setExtra('props', componentProps)
         scope.setExtra('operationIds', operationIds)
@@ -148,7 +155,7 @@ class ExtensionPointComponent extends PureComponent<
     this.fetchAndRerender()
     if (this.state.error) {
       if (this.mountedError) {
-        // this.clearError()
+        this.clearError()
       } else {
         this.mountedError = true
       }
