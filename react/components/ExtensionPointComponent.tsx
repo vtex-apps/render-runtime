@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/browser'
 import PropTypes from 'prop-types'
+import { chain, pluck } from 'ramda'
 import React, { ErrorInfo, PureComponent } from 'react'
 
 import { getImplementation } from '../utils/assets'
@@ -112,10 +113,13 @@ class ExtensionPointComponent extends PureComponent<
         scope.setExtra('runtime', runtime)
         scope.setExtra('treePath', path)
         scope.setExtra('props', componentProps)
+        scope.setExtra('operationIds', chain(pluck('operationId'), window.graphQLErrors))
 
         scope.setTag('account', account)
         scope.setTag('workspace', workspace)
         scope.setTag('component', component || '')
+        scope.setTag('domain', runtime.route.domain)
+        scope.setTag('page', runtime.page)
       })
       Sentry.captureException(error)
     }

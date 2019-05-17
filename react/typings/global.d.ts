@@ -127,6 +127,7 @@ declare global {
   }
 
   interface Route {
+    domain: string
     blockId: string
     canonicalPath?: string
     id: string

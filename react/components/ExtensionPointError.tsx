@@ -47,9 +47,20 @@ class ExtensionPointError extends PureComponent<Props, State> {
           ({errorDetails ? 'hide' : 'show'} details)
         </button>
         {errorDetails && error && (
+          <>
+            <ul className="f6 list pl0">
+              {window && window.graphQLErrors && window.graphQLErrors[0] ? window.graphQLErrors[0].map(
+                (graphQLError) => (
+                  <li key={graphQLError.operationId}>
+                    <span>Operation ID:</span> <span className="i">{graphQLError.operationId}</span>
+                  </li>
+                )
+              ) : null}
+            </ul>
           <pre>
             <code className="f6">{error.stack}</code>
           </pre>
+          </>
         )}
         {errorDetails && componentStack && (
           <pre>

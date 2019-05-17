@@ -5,6 +5,7 @@ import {
 } from 'apollo-cache-inmemory'
 import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
+import { onError } from 'apollo-link-error'
 import { createHttpLink } from 'apollo-link-http'
 import { createPersistedQueryLink } from 'apollo-link-persisted-queries'
 import { createUploadLink } from 'apollo-upload-client'
@@ -59,6 +60,10 @@ export const getState = (runtime: RenderRuntime) => {
   return apolloClient ? apolloClient.cache.extract() : {}
 }
 
+if (canUseDOM) {
+  window.graphQLErrors = []
+}
+
 export const getClient = (
   runtime: RenderRuntime,
   baseURI: string,
@@ -99,7 +104,20 @@ export const getClient = (
 
     const cacheLink = cacheControl ? [cachingLink(cacheControl)] : []
 
+    const errorLink = onError(({ graphQLErrors }) => {
+      const ignoredErrorTypes = ['UserInputError', 'AuthenticationError', 'ForbiddenError']
+      if (graphQLErrors) {
+        const relevantGraphQLErrors = graphQLErrors.filter(({extensions}) => {
+          return extensions && !ignoredErrorTypes.includes(extensions.exception.name)
+        })
+        if (relevantGraphQLErrors.length > 0) {
+          window.graphQLErrors = [relevantGraphQLErrors, ...window.graphQLErrors]
+        }
+      }
+    })
+
     const link = ApolloLink.from([
+      errorLink,
       omitTypenameLink,
       versionSplitterLink,
       runtimeContextLink,
