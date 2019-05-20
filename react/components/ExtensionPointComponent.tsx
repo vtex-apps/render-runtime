@@ -115,7 +115,7 @@ class ExtensionPointComponent extends PureComponent<
     const operationIds = graphQLErrorsStore.getOperationIds()
     // Only log 10 percent of the errors so we dont exceed our quota
     if (production && Math.random() < 0.1) {
-      Sentry.configureScope(scope => {
+      Sentry.withScope(scope => {
         const blacklistedRuntimeKeys = ['cacheHints', 'components', 'culture', 'emitter', 'history', 'messages']
 
         const filteredRuntime = pickBy((val, key) => {
@@ -135,8 +135,8 @@ class ExtensionPointComponent extends PureComponent<
         scope.setTag('component', component || '')
         scope.setTag('domain', runtime.route.domain)
         scope.setTag('page', runtime.page)
+        Sentry.captureException(error)
       })
-      Sentry.captureException(error)
     }
 
     this.setState({
