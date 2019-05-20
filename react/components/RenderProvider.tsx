@@ -691,9 +691,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = this.state
     const declarer = pagesState[page] && pagesState[page].declarer
     const { pathname } = window.location
-    const paramsJSON = JSON.stringify(
-      (pagesState[page] && pagesState[page].params) || {}
-    )
+    const paramsJSON = JSON.stringify(route.params || {})
 
     return fetchNavigationPage({
       apolloClient: this.apolloClient,
