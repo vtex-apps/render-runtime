@@ -456,4 +456,11 @@ declare global {
     myvtexSSE: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
   }
+
+  namespace NodeJS {
+    interface Global extends Window {}
+  }
+  interface NodeModule {
+    hot: any
+  }
 }
