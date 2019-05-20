@@ -72,7 +72,6 @@ class Container extends Component<ContainerProps> {
   }
 }
 
-// tslint:disable-next-line
 const LayoutContainer: React.FunctionComponent<
   LayoutContainerProps
 > = props => {

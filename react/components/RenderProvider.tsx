@@ -75,7 +75,6 @@ try {
   console.error(e)
 }
 
-// tslint:disable-next-line:no-empty
 const noop = () => {}
 
 const unionKeys = (record1: any, record2: any) => [
