@@ -59,9 +59,9 @@ class ExtensionPointError extends PureComponent<Props, State> {
                 )
               )}
             </ul>
-          <pre>
-            <code className="f6">{error.stack}</code>
-          </pre>
+            <pre>
+              <code className="f6">{error.stack}</code>
+            </pre>
           </>
         )}
         {errorDetails && componentStack && (
