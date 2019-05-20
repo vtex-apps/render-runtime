@@ -684,7 +684,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public updateRuntime = (options?: PageContextOptions) => {
+  public updateRuntime = async (options?: PageContextOptions) => {
     const {
       runtime: { renderMajor },
     } = this.props
@@ -699,7 +699,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { pathname } = window.location
     const paramsJSON = JSON.stringify(route.params || {})
 
-    return fetchNavigationPage({
+    const {
+      appsEtag,
+      cacheHints,
+      components,
+      extensions,
+      messages,
+      pages,
+      settings,
+    } = await fetchNavigationPage({
       apolloClient: this.apolloClient,
       declarer,
       locale,
@@ -710,17 +718,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       renderMajor,
       routeId: page,
       ...options,
-    }).then(
-      ({
-        appsEtag,
-        cacheHints,
-        components,
-        extensions,
-        messages,
-        pages,
-        settings,
-      }: ParsedPageQueryResponse) => {
-        this.setState({
+    })
+
+    return new Promise<void>(resolve => {
+      this.setState(
+        {
           appsEtag,
           cacheHints,
           components,
@@ -730,9 +732,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           pages,
           route,
           settings,
-        })
-      }
-    )
+        },
+        async () => {
+          await this.sendInfoFromIframe()
+
+          resolve()
+        }
+      )
+    })
   }
 
   public createEnsureSessionLink() {
@@ -788,22 +795,26 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     })
   }
 
-  public updateExtension = (name: string, extension: Extension) => {
+  public updateExtension = async (name: string, extension: Extension) => {
     const { extensions } = this.state
 
-    this.setState(
-      {
-        extensions: {
-          ...extensions,
-          [name]: extension,
+    return new Promise<void>(resolve => {
+      this.setState(
+        {
+          extensions: {
+            ...extensions,
+            [name]: extension,
+          },
         },
-      },
-      () => {
-        if (name !== 'store/__overlay') {
-          this.sendInfoFromIframe()
+        async () => {
+          if (name !== 'store/__overlay') {
+            await this.sendInfoFromIframe()
+          }
+
+          resolve()
         }
-      }
-    )
+      )
+    })
   }
 
   public handleSetDevice = (device: ConfigurationDevice) => {
