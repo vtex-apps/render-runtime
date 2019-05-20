@@ -1,5 +1,5 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
-import React, {ComponentType, useContext} from 'react'
+import React, { ComponentType, useContext } from 'react'
 
 export interface RenderContextProps {
   runtime: RenderContext
@@ -15,22 +15,44 @@ export const useRuntime = () => {
   return useContext(RenderContext)
 }
 
-export const withRuntimeContext = <TOriginalProps extends {} = {}>(Component: ComponentType<TOriginalProps & RenderContextProps>): ComponentType<TOriginalProps> => {
-  const ExtendedComponent = (props: TOriginalProps) => <RenderContext.Consumer>{runtime => <Component {...props} runtime={runtime} />}</RenderContext.Consumer>
-  ExtendedComponent.displayName = `ExtendedComponent(${Component.displayName || Component.name || 'Component'})`
-  return hoistNonReactStatics<TOriginalProps, RenderContextProps>(ExtendedComponent, Component)
+export const withRuntimeContext = <TOriginalProps extends {} = {}>(
+  Component: ComponentType<TOriginalProps & RenderContextProps>
+): ComponentType<TOriginalProps> => {
+  const ExtendedComponent = (props: TOriginalProps) => (
+    <RenderContext.Consumer>
+      {runtime => <Component {...props} runtime={runtime} />}
+    </RenderContext.Consumer>
+  )
+  ExtendedComponent.displayName = `ExtendedComponent(${Component.displayName ||
+    Component.name ||
+    'Component'})`
+  return hoistNonReactStatics<TOriginalProps, RenderContextProps>(
+    ExtendedComponent,
+    Component
+  )
 }
 
-export const withEmitter = <TOriginalProps extends {} = {}>(Component: ComponentType<TOriginalProps & EmitterProps>): ComponentType<TOriginalProps> => {
+export const withEmitter = <TOriginalProps extends {} = {}>(
+  Component: ComponentType<TOriginalProps & EmitterProps>
+): ComponentType<TOriginalProps> => {
   class WithEmitter extends React.Component<TOriginalProps> {
     public static get displayName(): string {
-      return `WithEmitter(${Component.displayName || Component.name || 'Component'})`
+      return `WithEmitter(${Component.displayName ||
+        Component.name ||
+        'Component'})`
     }
 
     public render() {
-      return <RenderContext.Consumer>{runtime => <Component {...this.props} __emitter={runtime.emitter} />}</RenderContext.Consumer>
+      return (
+        <RenderContext.Consumer>
+          {runtime => <Component {...this.props} __emitter={runtime.emitter} />}
+        </RenderContext.Consumer>
+      )
     }
   }
 
-  return hoistNonReactStatics<TOriginalProps, EmitterProps>(WithEmitter, Component)
+  return hoistNonReactStatics<TOriginalProps, EmitterProps>(
+    WithEmitter,
+    Component
+  )
 }

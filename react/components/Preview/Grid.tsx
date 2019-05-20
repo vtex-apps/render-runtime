@@ -6,7 +6,7 @@ interface Props {
   height: number
 }
 
-const Grid = ({width, height}: Props) => {
+const Grid = ({ width, height }: Props) => {
   // TODO: make these values configurable
   const itemWidth = 250
   const itemHeight = 400
@@ -15,8 +15,10 @@ const Grid = ({width, height}: Props) => {
   const itemsNumX = Math.floor(width / (itemWidth + minSpacingX))
   const itemsNumY = Math.floor(height / (itemHeight + minSpacingY))
   // distributes the remaining available space between each item of the grid
-  const spacingX = (width - (itemsNumX * itemWidth)) / (itemsNumX > 1 ? itemsNumX - 1 : 2) 
-  const spacingY = (height - (itemsNumY * itemHeight)) / (itemsNumY > 1 ? itemsNumY - 1 : 2)
+  const spacingX =
+    (width - itemsNumX * itemWidth) / (itemsNumX > 1 ? itemsNumX - 1 : 2)
+  const spacingY =
+    (height - itemsNumY * itemHeight) / (itemsNumY > 1 ? itemsNumY - 1 : 2)
 
   return (
     <ContentLoader width={width} height={height}>

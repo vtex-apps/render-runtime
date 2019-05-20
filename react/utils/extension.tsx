@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react'
+import { ReactElement } from 'react'
 
 import { useRuntime } from '../components/RenderContext'
 import { useTreePath } from './treePath'
@@ -19,7 +19,7 @@ interface ExtensionContext {
 }
 
 interface Props {
-  children({ extension } : ExtensionContext): ReactElement<any> | null
+  children({ extension }: ExtensionContext): ReactElement<any> | null
 }
 
 const ExtensionConsumer = ({ children }: Props) => {

@@ -2,7 +2,7 @@ import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
 import { difference, is, isEmpty, keys, startsWith } from 'ramda'
-import * as RouteParser from 'route-parser'
+import RouteParser from 'route-parser'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
@@ -10,7 +10,6 @@ function getScore(path: string) {
   const catchAll = (path.match(/\*/g) || []).length
   const catchOne = (path.match(/:/g) || []).length
   const fixed = (path.match(/\/[\w_-]+/g) || []).length
-  // tslint:disable-next-line:no-bitwise
   return ~((catchAll << 12) + (catchOne << 6) + ((1 << 6) - fixed - 1))
 }
 
@@ -33,7 +32,7 @@ function createLocationDescriptor(
   }: Pick<NavigateOptions, 'query' | 'scrollOptions' | 'fetchPage'>
 ): LocationDescriptorObject {
   return {
-    pathname: navigationRoute.path!,
+    pathname: navigationRoute.path,
     state: {
       fetchPage,
       navigationRoute,
@@ -131,14 +130,19 @@ function getRouteFromPageName(
   return path ? { id, path, params } : null
 }
 
-function getCanonicalPath (canonicalPathTemplate: string, params: Record<string, string>): string | false {
+function getCanonicalPath(
+  canonicalPathTemplate: string,
+  params: Record<string, string>
+): string | false {
   const properPathTemplate = adjustTemplate(canonicalPathTemplate)
   const canonicalPath = new RouteParser(properPathTemplate).reverse(params)
   if (canonicalPath) {
     return canonicalPath
   }
 
-  console.warn(`Canonical path template '${canonicalPathTemplate}' could not be created with params: ${params}`)
+  console.warn(
+    `Canonical path template '${canonicalPathTemplate}' could not be created with params: ${params}`
+  )
   return false
 }
 
@@ -147,7 +151,7 @@ export function getRouteFromPath(
   pages: Pages,
   query?: string
 ): NavigationRoute | null {
-  const queryMap = query ?  queryStringToMap(query) : {}
+  const queryMap = query ? queryStringToMap(query) : {}
   const routeMatch = routeIdFromPathAndQuery(path, queryMap, pages)
   if (!routeMatch) {
     return null
@@ -170,15 +174,12 @@ const mergePersistingQueries = (currentQuery: string, query: string) => {
   const current = queryStringToMap(currentQuery)
   const next = queryStringToMap(query)
   const has = (value?: string) => !!value || value === null
-  const persisting = KEYS.reduce(
-    (cur, key) => {
-      if (has(current[key]) && current[key] !== 'false') {
-        cur[key] = current[key]
-      }
-      return cur
-    },
-    {} as Record<string, any>
-  )
+  const persisting = KEYS.reduce<Record<string, any>>((cur, key) => {
+    if (has(current[key]) && current[key] !== 'false') {
+      cur[key] = current[key]
+    }
+    return cur
+  }, {})
   return mapToQueryString({ ...persisting, ...next })
 }
 
@@ -217,7 +218,7 @@ export function navigate(
 
   const navigationRoute = page
     ? getRouteFromPageName(page, pages, params)
-    : getRouteFromPath(to!, pages, query)
+    : getRouteFromPath(to, pages, query)
 
   if (!navigationRoute) {
     console.warn(
@@ -289,14 +290,17 @@ function polyfillScrollTo(options: ScrollToOptions) {
   }
 }
 
-function routeMatchForMappedURL(mappedSegments: string[], routes: Pages): RouteMatch | null {
+function routeMatchForMappedURL(
+  mappedSegments: string[],
+  routes: Pages
+): RouteMatch | null {
   let id: string | undefined
   let score: number
   let highScore: number = Number.NEGATIVE_INFINITY
 
   // tslint:disable-next-line:forin
   for (const name in routes) {
-    const {map = [], path: routePath} = routes[name]
+    const { map = [], path: routePath } = routes[name]
     if (!routePath || map.length === 0 || !startsWith(map, mappedSegments)) {
       continue
     }
@@ -314,14 +318,14 @@ function routeMatchForMappedURL(mappedSegments: string[], routes: Pages): RouteM
     return null
   }
 
-  const {path} = routes[id]
+  const { path } = routes[id]
   const pathSegments = path.split('/')
   const slicedPathSegments = pathSegments.slice(0, highScore + 1)
   const newPath = slicedPathSegments.join('/')
 
   return {
     id,
-    path: newPath
+    path: newPath,
   }
 }
 
@@ -358,11 +362,15 @@ function routeMatchFromPath(path: string, routes: Pages): RouteMatch | null {
   return {
     canonical: routes[id].canonical,
     id,
-    path: getPagePath(id, routes)
+    path: getPagePath(id, routes),
   }
 }
 
-function routeIdFromPathAndQuery(path: string, query: Record<string, string>, routes: Pages) {
+function routeIdFromPathAndQuery(
+  path: string,
+  query: Record<string, string>,
+  routes: Pages
+) {
   const mappedSegments = query.map ? query.map.split(',') : []
   let routeMatch: RouteMatch | null = null
 

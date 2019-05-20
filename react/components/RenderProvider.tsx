@@ -91,21 +91,18 @@ const replaceExtensionsWithDefault = (
   page: string,
   defaultExtensions: Extensions
 ) =>
-  unionKeys(extensions, defaultExtensions).reduce(
-    (acc, key) => {
-      const maybeExtension = isChildOrSelf(key, page)
-        ? defaultExtensions[key] || {
-            ...extensions[key],
-            component: null,
-          }
-        : extensions[key]
-      if (maybeExtension) {
-        acc[key] = maybeExtension
-      }
-      return acc
-    },
-    {} as Extensions
-  )
+  unionKeys(extensions, defaultExtensions).reduce<Extensions>((acc, key) => {
+    const maybeExtension = isChildOrSelf(key, page)
+      ? defaultExtensions[key] || {
+          ...extensions[key],
+          component: null,
+        }
+      : extensions[key]
+    if (maybeExtension) {
+      acc[key] = maybeExtension
+    }
+    return acc
+  }, {})
 
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
@@ -160,20 +157,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           this.getChildContext(),
           messages,
           shouldUpdateRuntime,
-          this.updateMessages,
+          this.updateMessages
         )
       }
     },
-    SEND_INFO_DEBOUNCE_MS,
+    SEND_INFO_DEBOUNCE_MS
   )
 
   private rendered!: boolean
   private sessionPromise: Promise<void>
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
-  private lastNavigatedRouteId: string
 
-  constructor(props: Props) {
+  public constructor(props: Props) {
     super(props)
     const {
       appsEtag,
@@ -190,14 +186,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       settings,
     } = props.runtime
     const { history, baseURI, cacheControl } = props
-    const ignoreCanonicalReplacement = query && query.map || !route.canonicalPath
+    const ignoreCanonicalReplacement = query && query.map
 
     if (history) {
       const renderLocation: RenderHistoryLocation = {
         ...history.location,
-        pathname: ignoreCanonicalReplacement
-          ? history.location.pathname
-          : route.canonicalPath!,
+        pathname:
+          ignoreCanonicalReplacement || !route.canonicalPath
+            ? history.location.pathname
+            : route.canonicalPath,
         state: {
           navigationRoute: {
             id: route.id,
@@ -212,7 +209,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       window.browserHistory = global.browserHistory = history
     }
 
-    this.lastNavigatedRouteId = route.id
     // todo: reload window if client-side created a segment different from server-side
     this.sessionPromise = canUseDOM
       ? window.__RENDER_8_SESSION__.sessionPromise
@@ -394,7 +390,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public setQuery = (
     query: Record<string, any> = {},
-    { merge = true, replace = false, scrollOptions = false}: SetQueryOptions = {}
+    {
+      merge = true,
+      replace = false,
+      scrollOptions = false,
+    }: SetQueryOptions = {}
   ): boolean => {
     const { history } = this.props
     const {
@@ -866,7 +866,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }),
       () => {
         this.sendInfoFromIframe()
-      },
+      }
     )
   }
 }

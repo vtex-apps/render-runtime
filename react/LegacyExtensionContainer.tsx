@@ -1,3 +1,3 @@
-import {LegacyExtensionContainer} from 'vtex.render-runtime'
+import { LegacyExtensionContainer } from 'vtex.render-runtime'
 
 export default LegacyExtensionContainer

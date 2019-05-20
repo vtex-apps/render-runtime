@@ -23,7 +23,6 @@ interface State {
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
 
-
 class ExtensionPointComponent extends PureComponent<
   Props & RenderContextProps,
   State
@@ -36,11 +35,10 @@ class ExtensionPointComponent extends PureComponent<
     treePath: PropTypes.string,
   }
 
-  // tslint:disable-next-line:variable-name
   private _isMounted!: boolean
   private mountedError!: boolean
 
-  constructor(props: Props & RenderContextProps) {
+  public constructor(props: Props & RenderContextProps) {
     super(props)
 
     this.state = {}
@@ -54,11 +52,14 @@ class ExtensionPointComponent extends PureComponent<
 
     this.setState({ error: null, errorInfo: null, lastUpdate: Date.now() })
     const { component: mounted, treePath } = this.props
+
     console.log(
       `[render] Component updated. treePath=${treePath} ${
         mounted !== component ? `mounted=${mounted} ` : ''
       }updated=${component}`
     )
+
+    return true
   }
 
   public fetchAndRerender = () => {
@@ -70,7 +71,7 @@ class ExtensionPointComponent extends PureComponent<
 
     // Let's fetch the assets and re-render.
     if (component && !Component) {
-      if (!(component in componentPromiseMap)){
+      if (!(component in componentPromiseMap)) {
         componentPromiseMap[component] = fetchComponent(component)
       } else if (componentPromiseResolvedMap[component]) {
         throw new Error(`Unable to fetch component ${component}`)
@@ -98,11 +99,11 @@ class ExtensionPointComponent extends PureComponent<
     const {
       component,
       props,
-      runtime: {production, account, workspace},
+      runtime: { production, account, workspace },
       runtime,
       treePath: path,
     } = this.props
-    const {children, __errorInstance, __clearError, ...componentProps} = props
+    const { children, __errorInstance, __clearError, ...componentProps } = props
 
     console.error('Failed to render extension point', path, component)
     // Only log 10 percent of the errors so we dont exceed our quota
@@ -166,7 +167,7 @@ class ExtensionPointComponent extends PureComponent<
       const errorInstance = (
         <ExtensionPointError
           error={error}
-          errorInfo={errorInfo!}
+          errorInfo={errorInfo}
           treePath={treePath}
         />
       )

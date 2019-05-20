@@ -1,6 +1,6 @@
-import React, {Component, ReactElement} from 'react'
+import React, { Component } from 'react'
 import Loading from './Loading'
-import {RenderContextProps, withRuntimeContext} from './RenderContext'
+import { RenderContextProps, withRuntimeContext } from './RenderContext'
 
 interface State {
   ensured: boolean
@@ -8,7 +8,7 @@ interface State {
 }
 
 class Session extends Component<RenderContextProps, State> {
-  public state = {ensured: false, error: null}
+  public state = { ensured: false, error: null }
 
   public componentDidMount() {
     this.onUpdate()
@@ -19,8 +19,8 @@ class Session extends Component<RenderContextProps, State> {
   }
 
   public render() {
-    const {children} = this.props
-    const {ensured, error} = this.state
+    const { children } = this.props
+    const { ensured, error } = this.state
 
     if (ensured) {
       return children
@@ -31,9 +31,7 @@ class Session extends Component<RenderContextProps, State> {
         <div className="bg-washed-red pa6 f5 serious-black br3 pre">
           <span>Error initializing session</span>
           <pre>
-            <code className="f6">
-              {error}
-            </code>
+            <code className="f6">{error}</code>
           </pre>
         </div>
       )
@@ -43,8 +41,10 @@ class Session extends Component<RenderContextProps, State> {
   }
 
   private onUpdate() {
-    const {runtime: {ensureSession}} = this.props
-    const {ensured, error} = this.state
+    const {
+      runtime: { ensureSession },
+    } = this.props
+    const { ensured, error } = this.state
 
     if (ensured || error) {
       return
@@ -52,10 +52,10 @@ class Session extends Component<RenderContextProps, State> {
 
     ensureSession()
       .then(() => {
-        this.setState({ensured: true})
+        this.setState({ ensured: true })
       })
       .catch((err: any) => {
-        this.setState({error: err})
+        this.setState({ error: err })
       })
   }
 }

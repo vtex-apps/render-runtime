@@ -6,13 +6,13 @@ import 'apollo-upload-client'
 import 'apollo-utilities'
 import 'classnames'
 import * as EventEmitter from 'eventemitter3'
-import {canUseDOM} from 'exenv'
+import { canUseDOM } from 'exenv'
 import 'graphql'
 import createHistory from 'history/createBrowserHistory'
-import React, {ReactElement} from 'react'
-import {getDataFromTree} from 'react-apollo'
-import {hydrate, render as renderDOM} from 'react-dom'
-import {Helmet} from 'react-helmet'
+import React, { ReactElement } from 'react'
+import { getDataFromTree } from 'react-apollo'
+import { hydrate, render as renderDOM } from 'react-dom'
+import { Helmet } from 'react-helmet'
 import NoSSR from 'react-no-ssr'
 import Loading from '../components/Loading'
 
@@ -23,7 +23,11 @@ import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
 import Link from '../components/Link'
-import { RenderContext, useRuntime, withRuntimeContext  } from '../components/RenderContext'
+import {
+  RenderContext,
+  useRuntime,
+  withRuntimeContext,
+} from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
@@ -36,7 +40,11 @@ import { addLocaleData } from '../utils/locales'
 import registerComponent from '../utils/registerComponent'
 import { withSession } from '../utils/session'
 import { TreePathContext, useTreePath } from '../utils/treePath'
-import { isStyleWritable, optimizeSrcForVtexImg, optimizeStyleForVtexImg } from '../utils/vteximg'
+import {
+  isStyleWritable,
+  optimizeSrcForVtexImg,
+  optimizeStyleForVtexImg,
+} from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
 
 let emitter: EventEmitter | null = null
@@ -50,19 +58,25 @@ if (window.IntlPolyfill) {
   }
 }
 
-const renderExtension = (extensionName: string, destination: HTMLElement, props = {}) => {
-  if(emitter) {
+const renderExtension = (
+  extensionName: string,
+  destination: HTMLElement,
+  props = {}
+) => {
+  if (emitter) {
     emitter.emit('renderExtensionLoader.addOrUpdateExtension', {
       destination,
       extensionName,
-      props
-    } as PortalRenderingRequest)
+      props,
+    })
   } else {
     throw new Error(`ExtensionPortal can't be rendered before RenderProvider`)
   }
 }
 
-function renderToStringWithData(component: ReactElement<any>): Promise<ServerRendered> {
+function renderToStringWithData(
+  component: ReactElement<any>
+): Promise<ServerRendered> {
   const startGetDataFromTree = window.hrtime()
   return getDataFromTree(component).then(() => {
     const endGetDataFromTree = window.hrtime(startGetDataFromTree)
@@ -81,8 +95,19 @@ function renderToStringWithData(component: ReactElement<any>): Promise<ServerRen
 }
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
-const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered => {
-  const { customRouting, disableSSR, page, pages, extensions, culture: { locale } } = runtime
+const render = (
+  name: string,
+  runtime: RenderRuntime,
+  element?: HTMLElement
+): Rendered => {
+  const {
+    customRouting,
+    disableSSR,
+    page,
+    pages,
+    extensions,
+    culture: { locale },
+  } = runtime
 
   const cacheControl = canUseDOM ? undefined : new PageCacheControl()
   const baseURI = getBaseURI(runtime)
@@ -90,25 +115,34 @@ const render = (name: string, runtime: RenderRuntime, element?: HTMLElement): Re
   emitter = runtime.emitter
   addLocaleData(locale)
 
-  const isPage = !!pages[name] && !!pages[name].path && !!extensions[name].component
+  const isPage =
+    !!pages[name] && !!pages[name].path && !!extensions[name].component
   const created = !element && ensureContainer(page)
-  const elem = element || getContainer(name)
+  const elem = element || getContainer()
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
   const root = (
-    <RenderProvider history={history} cacheControl={cacheControl} baseURI={baseURI} root={name} runtime={runtime}>
+    <RenderProvider
+      history={history}
+      cacheControl={cacheControl}
+      baseURI={baseURI}
+      root={name}
+      runtime={runtime}
+    >
       {!isPage ? <ExtensionPoint id={name} /> : null}
     </RenderProvider>
   )
 
   return canUseDOM
-    ? (disableSSR || created ? renderDOM<HTMLDivElement>(root, elem) : hydrate(root, elem)) as Element
+    ? ((disableSSR || created
+        ? renderDOM<HTMLDivElement>(root, elem)
+        : hydrate(root, elem)) as Element)
     : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
-      markups: getMarkups(name, markup),
-      maxAge: cacheControl!.maxAge,
-      page,
-      renderTimeMetric
-    })
-    )
+        markups: getMarkups(name, markup),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        maxAge: cacheControl!.maxAge,
+        page,
+        renderTimeMetric,
+      }))
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
@@ -136,7 +170,10 @@ function start() {
         }
         // Follow Google's security recommendations concerning target blank
         // https://developers.google.com/web/tools/lighthouse/audits/noopener
-        if (props.target === '_blank' && !(props.rel === 'noopener' || props.rel === 'noreferrer')) {
+        if (
+          props.target === '_blank' &&
+          !(props.rel === 'noopener' || props.rel === 'noreferrer')
+        ) {
           props.rel = 'noopener'
         }
       }
@@ -149,25 +186,28 @@ function start() {
       if (props && props.style && isStyleWritable(props)) {
         props.style = optimizeStyleForVtexImg(vtexImgHost, props.style)
       }
-      return ReactCreateElement.apply<typeof React, any, any>(React, arguments)
+      return ReactCreateElement.apply(React, arguments)
     }
 
     const maybeRenderPromise = render(rootName, runtime)
     if (!canUseDOM) {
       // Expose render promise to global context.
-      window.rendered = (maybeRenderPromise as Promise<NamedServerRendered>)
-        .then(({ markups, maxAge, page, renderTimeMetric }) => ({
-          extensions: markups.reduce(
-            (acc, { name, markup }) => (acc[name] = markup, acc),
-            {} as RenderedSuccess['extensions'],
-          ),
-          head: Helmet.rewind(),
-          maxAge,
-          renderMetrics: { [page]: renderTimeMetric },
-          state: getState(runtime),
-        }))
+      window.rendered = (maybeRenderPromise as Promise<
+        NamedServerRendered
+      >).then(({ markups, maxAge, page, renderTimeMetric }) => ({
+        extensions: markups.reduce<RenderedSuccess['extensions']>(
+          (acc, { name, markup }) => ((acc[name] = markup), acc),
+          {}
+        ),
+        head: Helmet.rewind(),
+        maxAge,
+        renderMetrics: { [page]: renderTimeMetric },
+        state: getState(runtime),
+      }))
     } else {
-      console.log('Welcome to Render! Want to look under the hood? https://careers.vtex.com')
+      console.log(
+        'Welcome to Render! Want to look under the hood? https://careers.vtex.com'
+      )
     }
   } catch (error) {
     console.error('Unexpected error rendering:', error)
@@ -210,6 +250,5 @@ export {
   withSession,
   Loading,
   buildCacheLocator,
-  renderExtension
+  renderExtension,
 }
-

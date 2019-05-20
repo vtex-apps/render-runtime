@@ -6,16 +6,9 @@ interface Props {
   height: number
 }
 
-const Box = ({width, height}: Props) => (
+const Box = ({ width, height }: Props) => (
   <ContentLoader width={width} height={height}>
-    <rect
-      x="0"
-      y="0"
-      rx="5"
-      ry="5"
-      width={width}
-      height={height}
-    />
+    <rect x="0" y="0" rx="5" ry="5" width={width} height={height} />
   </ContentLoader>
 )
 

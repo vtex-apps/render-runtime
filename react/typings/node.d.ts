@@ -7,10 +7,10 @@ declare var global: Window
 declare var module: Module
 
 declare module '*.graphql' {
-  import {DocumentNode} from 'graphql';
+  import { DocumentNode } from 'graphql'
 
-  const value: DocumentNode;
-  export default value;
+  const value: DocumentNode
+  export default value
 }
 
 declare module '*.png' {
@@ -19,8 +19,8 @@ declare module '*.png' {
 }
 
 declare module '*.css' {
-  const content: any;
-  export default content;
+  const content: any
+  export default content
 }
 
 declare var vtex: any

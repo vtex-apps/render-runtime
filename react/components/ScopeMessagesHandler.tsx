@@ -9,31 +9,27 @@ const removeScopeForApp = (appNameAtMajor: string) => (key: string) => {
   if (key.indexOf(appNameAtMajor) === -1) {
     return key
   }
-  const [_, unScopedKey] = key.split(APP_SPACER)
+  const unScopedKey = key.split(APP_SPACER)[1]
   return unScopedKey
 }
 
-const ScopeMessagesComponent = (app: string, Component: any) => ({children, intl, ...props}: any) => {
-  const { messages } = intl
-  const [appName, version] = app.split('@')
-  const [major] = version.split('.')
-  const appNameAtMajor = `${appName}@${major}.x`
-  const removeScope = removeScopeForApp(appNameAtMajor)
-  forEachObjIndexed(
-    (value, key, obj) => {
+export const scopeMessages = (app: string, Component: any) => {
+  const ScopeMessagesComponent = ({ children, intl, ...props }: any) => {
+    const { messages } = intl
+    const [appName, version] = app.split('@')
+    const [major] = version.split('.')
+    const appNameAtMajor = `${appName}@${major}.x`
+    const removeScope = removeScopeForApp(appNameAtMajor)
+    forEachObjIndexed((value, key, obj) => {
       const renamedKey = removeScope(key as string)
       obj[renamedKey] = value
-    },
-    messages
-  )
-  return (
-    <IntlProvider messages={messages}>
-      <Component {...props}>{children}</Component>
-    </IntlProvider>
-  )
-}
+    }, messages)
+    return (
+      <IntlProvider messages={messages}>
+        <Component {...props}>{children}</Component>
+      </IntlProvider>
+    )
+  }
 
-export const scopeMessages = (app: string, Component: any) => hoistNonReactStatics(
-  injectIntl(ScopeMessagesComponent(app, Component)),
-  Component
-)
+  return hoistNonReactStatics(injectIntl(ScopeMessagesComponent), Component)
+}

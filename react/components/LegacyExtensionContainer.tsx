@@ -6,31 +6,37 @@ import ExtensionPoint from './ExtensionPoint'
 import { RenderContext } from './RenderContext'
 
 interface Props {
-  query: any,
+  query: any
   params: any
 }
 
-class LegacyExtensionContainer extends Component<Props, {hydrate: boolean}> {
+class LegacyExtensionContainer extends Component<Props, { hydrate: boolean }> {
   public state = {
-    hydrate: false
+    hydrate: false,
   }
 
   public componentDidMount() {
-    this.setState({hydrate: true})
+    this.setState({ hydrate: true })
   }
 
   public render() {
-    const {params, query} = this.props
+    const { params, query } = this.props
     return (
       <RenderContext.Consumer>
-        {runtime =>
+        {runtime => (
           <TreePathContext.Consumer>
-            {({treePath}) =>
-              getDirectChildren(runtime.extensions, treePath)
-                .map(id => createPortal(<ExtensionPoint id={id} query={query} params={params} />, `${treePath}/${id}`, this.state.hydrate) as ReactPortal)
+            {({ treePath }) =>
+              getDirectChildren(runtime.extensions, treePath).map(
+                id =>
+                  createPortal(
+                    <ExtensionPoint id={id} query={query} params={params} />,
+                    `${treePath}/${id}`,
+                    this.state.hydrate
+                  ) as ReactPortal
+              )
             }
           </TreePathContext.Consumer>
-        }
+        )}
       </RenderContext.Consumer>
     )
   }

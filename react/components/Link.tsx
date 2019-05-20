@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React, { MouseEvent, useCallback } from 'react'
 import { NavigateOptions, pathFromPageName } from '../utils/pages'
 import { useRuntime } from './RenderContext'
@@ -14,16 +13,17 @@ const absoluteRegex = /^https?:\/\/|^\/\//i
 const isAbsoluteUrl = (url: string) => absoluteRegex.test(url)
 
 interface Props extends NavigateOptions {
-  onClick: (event: any) => void
+  onClick: (event: React.MouseEvent) => void
 }
 
 const Link: React.FunctionComponent<Props> = ({
   page,
-  onClick,
+  onClick = () => {},
   params,
   to,
   scrollOptions,
   query,
+  children,
   ...linkProps
 }) => {
   const { pages, navigate, rootPath = '' } = useRuntime()
@@ -53,7 +53,7 @@ const Link: React.FunctionComponent<Props> = ({
         event.preventDefault()
       }
     },
-    [page, params, query, to, scrollOptions, navigate]
+    [to, onClick, page, params, query, rootPath, scrollOptions, navigate]
   )
 
   const getHref = () => {
@@ -74,21 +74,11 @@ const Link: React.FunctionComponent<Props> = ({
     return '#'
   }
 
-  return <a href={getHref()} {...linkProps} onClick={handleClick} />
-}
-
-Link.defaultProps = {
-  onClick: () => {
-    return
-  },
-}
-
-Link.propTypes = {
-  onClick: PropTypes.func,
-  page: PropTypes.string,
-  params: PropTypes.object,
-  query: PropTypes.string,
-  to: PropTypes.string,
+  return (
+    <a href={getHref()} {...linkProps} onClick={handleClick}>
+      {children}
+    </a>
+  )
 }
 
 export default Link

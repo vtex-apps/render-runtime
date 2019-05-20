@@ -8,47 +8,51 @@ interface Props {
 }
 
 const sendEvent = (id: string, event: string) => {
-  window.postMessage({
-    pageComponentInteraction : {
-      blockId: id,
-      interactionType: event,
-      namespace: 'renderRuntime',
-    }
-  }, '*')
+  window.postMessage(
+    {
+      pageComponentInteraction: {
+        blockId: id,
+        interactionType: event,
+        namespace: 'renderRuntime',
+      },
+    },
+    '*'
+  )
 }
 
 class TrackEventsWrapper extends PureComponent<Props> {
-
   public eventsHandler: Record<string, () => void> = {}
 
-  public componentDidMount(){
+  public componentDidMount() {
     const { id, events } = this.props
-    if(events && events.length && id){
+    if (events && events.length && id) {
+      // eslint-disable-next-line react/no-find-dom-node
       const element = ReactDOM.findDOMNode(this)
-      if(element && element.addEventListener){
-        forEach(
-          event => {
-            this.eventsHandler[event] = () => sendEvent(id, event)
-            element.addEventListener(event, this.eventsHandler[event])
-          }
-        , events)
+      if (element && element.addEventListener) {
+        forEach(event => {
+          this.eventsHandler[event] = () => sendEvent(id, event)
+          element.addEventListener(event, this.eventsHandler[event])
+        }, events)
       }
     }
   }
 
-  public componentWillUnmount(){
+  public componentWillUnmount() {
     const { id, events } = this.props
-    if(events && events.length && id){
+    if (events && events.length && id) {
+      // eslint-disable-next-line react/no-find-dom-node
       const element = ReactDOM.findDOMNode(this)
-      if(element && element.addEventListener){
+      if (element && element.addEventListener) {
         forEach(
-          event => element.removeEventListener(event, this.eventsHandler[event])
-        , events)
+          event =>
+            element.removeEventListener(event, this.eventsHandler[event]),
+          events
+        )
       }
     }
   }
 
-  public render(){
+  public render() {
     const { children } = this.props
     return children
   }

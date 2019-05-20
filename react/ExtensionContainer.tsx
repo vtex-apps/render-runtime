@@ -1,3 +1,3 @@
-import {ExtensionContainer} from 'vtex.render-runtime'
+import { ExtensionContainer } from 'vtex.render-runtime'
 
 export default ExtensionContainer

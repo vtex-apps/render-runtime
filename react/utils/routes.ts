@@ -2,7 +2,9 @@ import navigationPageQuery from '../queries/navigationPage.graphql'
 import routePreviews from '../queries/routePreviews.graphql'
 import { parseMessages } from './messages'
 
-const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryResponse => {
+const parsePageQueryResponse = (
+  page: PageQueryResponse
+): ParsedPageQueryResponse => {
   const {
     appsEtag,
     appsSettingsJSON,
@@ -14,10 +16,7 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     page: {
       blockId,
       canonicalPath,
-      pageContext: {
-        id,
-        type,
-      }
+      pageContext: { id, type },
     },
   } = page
 
@@ -37,25 +36,22 @@ const parsePageQueryResponse = (page: PageQueryResponse): ParsedPageQueryRespons
     matchingPage: {
       blockId,
       canonicalPath,
-      pageContext: {id, type}
+      pageContext: { id, type },
     },
     messages: parseMessages(messages),
     pages,
-    settings
+    settings,
   }
 }
 
-const parseDefaultPagesQueryResponse = (defaultPages: DefaultPagesQueryResponse): ParsedDefaultPagesQueryResponse => {
-  const {
-    componentsJSON,
-    extensionsJSON,
-    messages,
-  } = defaultPages
+const parseDefaultPagesQueryResponse = (
+  defaultPages: DefaultPagesQueryResponse
+): ParsedDefaultPagesQueryResponse => {
+  const { componentsJSON, extensionsJSON, messages } = defaultPages
 
-  const [components, extensions] = [
-    componentsJSON,
-    extensionsJSON,
-  ].map(json => JSON.parse(json))
+  const [components, extensions] = [componentsJSON, extensionsJSON].map(json =>
+    JSON.parse(json)
+  )
 
   return {
     components,
@@ -71,20 +67,28 @@ export const fetchNavigationPage = ({
   production,
   paramsJSON,
   renderMajor,
-  query
-}: FetchNavigationDataInput) => apolloClient.query<{navigationPage: PageQueryResponse}>({
-  fetchPolicy: production ? 'cache-first' : 'network-only',
-  query: navigationPageQuery,
-  variables: {
-    declarer,
-    params: paramsJSON,
-    production,
-    query,
-    renderMajor,
-    routeId
-  }
-}).then<ParsedPageQueryResponse>(({data: {navigationPage: pageData}, errors}: GraphQLResult<'navigationPage', PageQueryResponse>) =>
-      errors ? Promise.reject(errors) : parsePageQueryResponse(pageData))
+  query,
+}: FetchNavigationDataInput) =>
+  apolloClient
+    .query<{ navigationPage: PageQueryResponse }>({
+      fetchPolicy: production ? 'cache-first' : 'network-only',
+      query: navigationPageQuery,
+      variables: {
+        declarer,
+        params: paramsJSON,
+        production,
+        query,
+        renderMajor,
+        routeId,
+      },
+    })
+    .then<ParsedPageQueryResponse>(
+      ({
+        data: { navigationPage: pageData },
+        errors,
+      }: GraphQLResult<'navigationPage', PageQueryResponse>) =>
+        errors ? Promise.reject(errors) : parsePageQueryResponse(pageData)
+    )
 
 const getRoutesParam = (routeIds: string[], pages: Pages) => {
   return routeIds
@@ -104,12 +108,16 @@ export const fetchDefaultPages = ({
   routeIds,
   renderMajor,
 }: FetchDefaultPages) => {
-  return apolloClient.query<{defaultPages: DefaultPagesQueryResponse}>({
-    query: routePreviews,
-    variables: { renderMajor, routes: getRoutesParam(routeIds, pages)}
-  }).then<ParsedDefaultPagesQueryResponse>(
-    ({data: {defaultPages}, errors}: DefaultPagesQueryResult) => {
-      return errors ? Promise.reject(errors) : parseDefaultPagesQueryResponse(defaultPages)
-    }
-  )
+  return apolloClient
+    .query<{ defaultPages: DefaultPagesQueryResponse }>({
+      query: routePreviews,
+      variables: { renderMajor, routes: getRoutesParam(routeIds, pages) },
+    })
+    .then<ParsedDefaultPagesQueryResponse>(
+      ({ data: { defaultPages }, errors }: DefaultPagesQueryResult) => {
+        return errors
+          ? Promise.reject(errors)
+          : parseDefaultPagesQueryResponse(defaultPages)
+      }
+    )
 }
