@@ -298,7 +298,6 @@ function routeMatchForMappedURL(
   let score: number
   let highScore: number = Number.NEGATIVE_INFINITY
 
-  // tslint:disable-next-line:forin
   for (const name in routes) {
     const { map = [], path: routePath } = routes[name]
     if (!routePath || map.length === 0 || !startsWith(map, mappedSegments)) {
@@ -334,7 +333,6 @@ function routeMatchFromPath(path: string, routes: Pages): RouteMatch | null {
   let score: number
   let highScore: number = Number.NEGATIVE_INFINITY
 
-  // tslint:disable-next-line:forin
   for (const name in routes) {
     const pagePath = getPagePath(name, routes)
     if (!pagePath) {

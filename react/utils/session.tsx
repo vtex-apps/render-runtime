@@ -4,7 +4,6 @@ import React, { ComponentType } from 'react'
 import Session from '../components/Session'
 
 export const withSession = () => {
-  // tslint:disable-next-line:only-arrow-functions
   return function<TOriginalProps>(
     Component: ComponentType<TOriginalProps>
   ): ComponentType<TOriginalProps> {
