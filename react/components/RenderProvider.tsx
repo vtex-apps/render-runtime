@@ -720,7 +720,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ...options,
     })
 
-    return new Promise<void>(resolve => {
+    await new Promise<void>(resolve => {
       this.setState(
         {
           appsEtag,
@@ -733,13 +733,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           route,
           settings,
         },
-        async () => {
-          await this.sendInfoFromIframe()
-
-          resolve()
-        }
+        resolve
       )
     })
+
+    await this.sendInfoFromIframe()
   }
 
   public createEnsureSessionLink() {
@@ -798,7 +796,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public updateExtension = async (name: string, extension: Extension) => {
     const { extensions } = this.state
 
-    return new Promise<void>(resolve => {
+    await new Promise<void>(resolve => {
       this.setState(
         {
           extensions: {
@@ -806,15 +804,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             [name]: extension,
           },
         },
-        async () => {
-          if (name !== 'store/__overlay') {
-            await this.sendInfoFromIframe()
-          }
-
-          resolve()
-        }
+        resolve
       )
     })
+
+    if (name !== 'store/__overlay') {
+      await this.sendInfoFromIframe()
+    }
   }
 
   public handleSetDevice = (device: ConfigurationDevice) => {
