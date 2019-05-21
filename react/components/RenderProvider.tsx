@@ -817,17 +817,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.setState({ device })
   }
 
-  public addMessages = (newMessages: RenderRuntime['messages']) => {
+  public addMessages = async (newMessages: RenderRuntime['messages']) => {
     const newStateMessages = { ...this.state.messages, ...newMessages }
 
-    this.setState(
-      {
-        messages: newStateMessages,
-      },
-      () => {
-        this.sendInfoFromIframe()
-      }
-    )
+    await new Promise<void>(resolve => {
+      this.setState(
+        {
+          messages: newStateMessages,
+        },
+        resolve
+      )
+    })
+
+    await this.sendInfoFromIframe()
   }
 
   public render() {
