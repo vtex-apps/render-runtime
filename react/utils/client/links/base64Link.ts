@@ -3,6 +3,8 @@ import { Base64 } from 'js-base64'
 
 export const toBase64Link = new ApolloLink(
   (operation: Operation, forward?: NextLink) => {
+    console.log('op')
+    console.log({ variables: operation.variables })
     const { extensions, variables } = operation
     if (variables && Object.keys(variables).length > 0) {
       operation.variables = {}
