@@ -106,6 +106,7 @@ const replaceExtensionsWithDefault = (
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
+    addMessages: PropTypes.func,
     components: PropTypes.object,
     culture: PropTypes.object,
     defaultExtensions: PropTypes.object,
@@ -118,6 +119,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     goBack: PropTypes.func,
     hints: PropTypes.object,
     history: PropTypes.object,
+    messages: PropTypes.object,
     navigate: PropTypes.func,
     onPageChanged: PropTypes.func,
     page: PropTypes.string,
@@ -148,17 +150,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public sendInfoFromIframe = debounce(
-    (shouldUpdateRuntime: boolean = false) => {
-      if (isStorefrontIframe) {
-        const { messages } = this.state
-
-        window.top.__provideRuntime(
-          this.getChildContext(),
-          messages,
-          shouldUpdateRuntime,
-          this.updateMessages
-        )
+    (params?: { shouldUpdateRuntime?: boolean }) => {
+      if (!isStorefrontIframe) {
+        return undefined
       }
+
+      return window.top.__provideRuntime(
+        this.getChildContext(),
+        this.state.messages,
+        (params && params.shouldUpdateRuntime) || false,
+        // Deprecated
+        this.updateMessages
+      )
     },
     SEND_INFO_DEBOUNCE_MS
   )
@@ -286,6 +289,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {
       components,
       extensions,
+      messages,
       page,
       pages,
       preview,
@@ -308,6 +312,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     return {
       account,
+      addMessages: this.addMessages,
       components,
       culture,
       defaultExtensions,
@@ -320,6 +325,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       goBack: this.goBack,
       hints,
       history,
+      messages,
       navigate: this.navigate,
       onPageChanged: this.onPageChanged,
       page,
@@ -654,7 +660,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const assetsPromise = fetchAssets(runtime, assets)
     assetsPromise.then(() => {
-      this.sendInfoFromIframe(true)
+      this.sendInfoFromIframe({ shouldUpdateRuntime: true })
     })
 
     return assetsPromise
@@ -678,7 +684,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public updateRuntime = (options?: PageContextOptions) => {
+  public updateRuntime = async (options?: PageContextOptions) => {
     const {
       runtime: { renderMajor },
     } = this.props
@@ -693,7 +699,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { pathname } = window.location
     const paramsJSON = JSON.stringify(route.params || {})
 
-    return fetchNavigationPage({
+    const {
+      appsEtag,
+      cacheHints,
+      components,
+      extensions,
+      messages,
+      pages,
+      settings,
+    } = await fetchNavigationPage({
       apolloClient: this.apolloClient,
       declarer,
       locale,
@@ -704,17 +718,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       renderMajor,
       routeId: page,
       ...options,
-    }).then(
-      ({
-        appsEtag,
-        cacheHints,
-        components,
-        extensions,
-        messages,
-        pages,
-        settings,
-      }: ParsedPageQueryResponse) => {
-        this.setState({
+    })
+
+    await new Promise<void>(resolve => {
+      this.setState(
+        {
           appsEtag,
           cacheHints,
           components,
@@ -724,9 +732,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           pages,
           route,
           settings,
-        })
-      }
-    )
+        },
+        resolve
+      )
+    })
+
+    await this.sendInfoFromIframe()
   }
 
   public createEnsureSessionLink() {
@@ -782,26 +793,43 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     })
   }
 
-  public updateExtension = (name: string, extension: Extension) => {
+  public updateExtension = async (name: string, extension: Extension) => {
     const { extensions } = this.state
 
-    this.setState(
-      {
-        extensions: {
-          ...extensions,
-          [name]: extension,
+    await new Promise<void>(resolve => {
+      this.setState(
+        {
+          extensions: {
+            ...extensions,
+            [name]: extension,
+          },
         },
-      },
-      () => {
-        if (name !== 'store/__overlay') {
-          this.sendInfoFromIframe()
-        }
-      }
-    )
+        resolve
+      )
+    })
+
+    if (name !== 'store/__overlay') {
+      await this.sendInfoFromIframe()
+    }
   }
 
   public handleSetDevice = (device: ConfigurationDevice) => {
     this.setState({ device })
+  }
+
+  public addMessages = async (newMessages: RenderRuntime['messages']) => {
+    const newStateMessages = { ...this.state.messages, ...newMessages }
+
+    await new Promise<void>(resolve => {
+      this.setState(
+        {
+          messages: newStateMessages,
+        },
+        resolve
+      )
+    })
+
+    await this.sendInfoFromIframe()
   }
 
   public render() {
@@ -855,6 +883,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     )
   }
 
+  // Deprecated
   private updateMessages = (newMessages: RenderProviderState['messages']) => {
     this.setState(
       prevState => ({

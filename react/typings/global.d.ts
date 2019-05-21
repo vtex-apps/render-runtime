@@ -180,6 +180,7 @@ declare global {
 
   interface RenderContext {
     account: RenderRuntime['account']
+    addMessages: (newMessages: RenderContext['messages']) => Promise<void>
     components: RenderRuntime['components']
     culture: RenderRuntime['culture']
     device: ConfigurationDevice
@@ -190,6 +191,7 @@ declare global {
     getSettings: (app: string) => any
     hints: RenderHints
     history: History | null
+    messages: RenderRuntime['messages']
     navigate: (options: NavigateOptions) => boolean
     onPageChanged: (location: RenderHistoryLocation) => void
     page: RenderRuntime['page']
@@ -201,8 +203,8 @@ declare global {
     publicEndpoint: RenderRuntime['publicEndpoint']
     setDevice: (device: ConfigurationDevice) => void
     updateComponentAssets: (availableComponents: Components) => void
-    updateExtension: (name: string, extension: Extension) => void
-    updateRuntime: (options?: PageContextOptions) => Subscription
+    updateExtension: (name: string, extension: Extension) => Promise<void>
+    updateRuntime: (options?: PageContextOptions) => Promise<void>
     workspace: RenderRuntime['workspace']
     route: RenderRuntime['route']
     query: RenderRuntime['query']
@@ -435,7 +437,7 @@ declare global {
       messages: Record<string, string>,
       shouldUpdateRuntime: boolean,
       setMessages: (messages: RenderRuntime['messages']) => void
-    ) => void
+    ) => Promise<void>
     browserHistory: History
     ReactIntlLocaleData: any
     IntlPolyfill: any
