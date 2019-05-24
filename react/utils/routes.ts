@@ -16,7 +16,9 @@ const parsePageQueryResponse = (
     page: {
       blockId,
       canonicalPath,
+      metaTags,
       pageContext: { id, type },
+      title,
     },
   } = page
 
@@ -36,7 +38,9 @@ const parsePageQueryResponse = (
     matchingPage: {
       blockId,
       canonicalPath,
+      metaTags,
       pageContext: { id, type },
+      title,
     },
     messages: parseMessages(messages),
     pages,

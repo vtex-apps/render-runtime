@@ -26,10 +26,15 @@ query NavigationPage (
     page {
       blockId
       canonicalPath
+      metaTags {
+        description
+        keywords
+      }
       pageContext {
         id
         type
       }
+      title
     }
     pagesJSON
   }
