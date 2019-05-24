@@ -1,7 +1,7 @@
 {
   "vendor": "vtex",
   "name": "render-runtime",
-  "version": "8.30.0",
+  "version": "8.31.0",
   "title": "VTEX Render runtime",
   "description": "The VTEX Render framework runtime",
   "defaultLocale": "pt-BR",
@@ -20,5 +20,6 @@
   "scripts": {
     "prereleasy": "bash lint.sh",
     "postreleasy": "vtex publish --verbose"
-  }
+  },
+  "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }

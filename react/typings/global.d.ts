@@ -129,10 +129,12 @@ declare global {
   interface Route {
     blockId: string
     canonicalPath?: string
-    path: string
-    params: Record<string, any>
-    pageContext: PageDataContext
     id: string
+    metaTags?: RouteMetaTags
+    pageContext: PageDataContext
+    params: Record<string, any>
+    path: string
+    title?: string
   }
 
   interface RelativeScrollToOptions extends ScrollToOptions {
@@ -282,10 +284,17 @@ declare global {
     id: string
   }
 
+  interface RouteMetaTags {
+    description?: string
+    keywords?: string[]
+  }
+
   interface MatchingPage {
     blockId: string
     canonicalPath?: string
+    metaTags?: RouteMetaTags
     pageContext: PageDataContext
+    title?: string
   }
 
   interface PageQueryResponse {

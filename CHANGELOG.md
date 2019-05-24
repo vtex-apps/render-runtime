@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.31.0] - 2019-05-24
+### Added
+- Support metatags for custom routes.
+
 ## [8.30.0] - 2019-05-21
 ### Added
 
