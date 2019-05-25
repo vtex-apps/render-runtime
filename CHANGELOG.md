@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.31.1] - 2019-05-25
+
+### Removed
+- scopeMessages.
+
 ## [8.31.0] - 2019-05-24
 ### Added
 - Support metatags for custom routes.
