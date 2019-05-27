@@ -2,8 +2,6 @@ interface Module {
   hot: any
 }
 
-declare var global: Window
-
 declare var module: Module
 
 declare module '*.graphql' {

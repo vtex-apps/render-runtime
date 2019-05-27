@@ -5,11 +5,14 @@ import {
 } from 'apollo-cache-inmemory'
 import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
+import { onError } from 'apollo-link-error'
 import { createHttpLink } from 'apollo-link-http'
 import { createPersistedQueryLink } from 'apollo-link-persisted-queries'
 import { createUploadLink } from 'apollo-upload-client'
 import { canUseDOM } from 'exenv'
+
 import PageCacheControl from '../cacheControl'
+import graphQLErrorsStore from '../graphQLErrorsStore'
 import { generateHash } from './generateHash'
 import { toBase64Link } from './links/base64Link'
 import { cachingLink } from './links/cachingLink'
@@ -99,7 +102,14 @@ export const getClient = (
 
     const cacheLink = cacheControl ? [cachingLink(cacheControl)] : []
 
+    const errorLink = onError(({ graphQLErrors }) => {
+      if (graphQLErrors) {
+        graphQLErrorsStore.addOperationIds(graphQLErrors)
+      }
+    })
+
     const link = ApolloLink.from([
+      errorLink,
       omitTypenameLink,
       versionSplitterLink,
       runtimeContextLink,

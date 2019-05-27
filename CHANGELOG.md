@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.32.0] - 2019-05-27
+
+### Added
+- Link to catch GraphQL errors, store and show them when a component crashes.
+- Sending `domain` and `page` to Sentry as tags.
+
+### Changed
+- Hide some runtime keys before sending it to Sentry.
+- Broke the runtime extra sent to Sentry into smaller `runtime.${key}` extras.
+- Inlined sentry config to remove one file from pages fetching phase.
+
+### Fixed
+- Global typings.
+
 ## [8.31.1] - 2019-05-25
 
 ### Removed

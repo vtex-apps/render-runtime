@@ -1,8 +1,10 @@
 import * as Sentry from '@sentry/browser'
 import PropTypes from 'prop-types'
+import { forEachObjIndexed, pickBy } from 'ramda'
 import React, { ErrorInfo, PureComponent } from 'react'
 
 import { getImplementation } from '../utils/assets'
+import graphQLErrorsStore from '../utils/graphQLErrorsStore'
 
 import ExtensionPointError from './ExtensionPointError'
 import Loading from './Loading'
@@ -17,6 +19,7 @@ interface Props {
 interface State {
   error?: Error | null
   errorInfo?: ErrorInfo | null
+  operationIds: string[]
   lastUpdate?: number
 }
 
@@ -41,7 +44,9 @@ class ExtensionPointComponent extends PureComponent<
   public constructor(props: Props & RenderContextProps) {
     super(props)
 
-    this.state = {}
+    this.state = {
+      operationIds: [],
+    }
     this.mountedError = false
   }
 
@@ -92,6 +97,7 @@ class ExtensionPointComponent extends PureComponent<
     this.setState({
       error: null,
       errorInfo: null,
+      operationIds: [],
     })
   }
 
@@ -106,23 +112,46 @@ class ExtensionPointComponent extends PureComponent<
     const { children, __errorInstance, __clearError, ...componentProps } = props
 
     console.error('Failed to render extension point', path, component)
+    const operationIds = graphQLErrorsStore.getOperationIds()
     // Only log 10 percent of the errors so we dont exceed our quota
     if (production && Math.random() < 0.1) {
-      Sentry.configureScope(scope => {
-        scope.setExtra('runtime', runtime)
+      Sentry.withScope(scope => {
+        const blacklistedRuntimeKeys = [
+          'cacheHints',
+          'components',
+          'culture',
+          'emitter',
+          'history',
+          'messages',
+        ]
+
+        const filteredRuntime = pickBy((val, key) => {
+          return (
+            typeof val !== 'function' && !blacklistedRuntimeKeys.includes(key)
+          )
+        }, runtime)
+
+        forEachObjIndexed((value, key) => {
+          scope.setExtra(`runtime.${key}`, value)
+        }, filteredRuntime)
+
         scope.setExtra('treePath', path)
         scope.setExtra('props', componentProps)
+        scope.setExtra('operationIds', operationIds)
 
         scope.setTag('account', account)
         scope.setTag('workspace', workspace)
         scope.setTag('component', component || '')
+        scope.setTag('domain', runtime.route.domain)
+        scope.setTag('page', runtime.page)
+        Sentry.captureException(error)
       })
-      Sentry.captureException(error)
     }
 
     this.setState({
       error,
       errorInfo,
+      operationIds,
     })
   }
 
@@ -154,7 +183,7 @@ class ExtensionPointComponent extends PureComponent<
       treePath,
       runtime: { production, pages, page },
     } = this.props
-    const { error, errorInfo } = this.state
+    const { error, errorInfo, operationIds } = this.state
     const Component = component && getImplementation(component)
 
     // A children of this extension point throwed an uncaught error
@@ -168,6 +197,7 @@ class ExtensionPointComponent extends PureComponent<
         <ExtensionPointError
           error={error}
           errorInfo={errorInfo}
+          operationIds={operationIds}
           treePath={treePath}
         />
       )

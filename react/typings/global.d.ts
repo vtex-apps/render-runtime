@@ -127,6 +127,7 @@ declare global {
   }
 
   interface Route {
+    domain: string
     blockId: string
     canonicalPath?: string
     id: string
@@ -454,5 +455,15 @@ declare global {
     hrtime: NodeJS.Process['hrtime']
     myvtexSSE: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
+  }
+
+  namespace NodeJS {
+    interface Global extends Window {
+      myvtexSSE: any
+    }
+  }
+
+  interface NodeModule {
+    hot: any
   }
 }
