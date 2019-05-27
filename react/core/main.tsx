@@ -177,15 +177,21 @@ function start() {
           props.rel = 'noopener'
         }
       }
+
       if (type === 'img') {
         props.src = optimizeSrcForVtexImg(vtexImgHost, props.src)
-        if (props.src && props.src.startsWith(vtexImgHost)) {
+        if (
+          typeof props.src === 'string' &&
+          props.src.startsWith(vtexImgHost)
+        ) {
           props.crossOrigin = props.crossOrigin || 'anonymous'
         }
       }
+
       if (props && props.style && isStyleWritable(props)) {
         props.style = optimizeStyleForVtexImg(vtexImgHost, props.style)
       }
+
       return ReactCreateElement.apply(React, arguments)
     }
 
