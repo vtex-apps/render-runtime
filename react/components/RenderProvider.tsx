@@ -11,7 +11,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
 
-import { fetchAssets, getImplementation, preloadAssets } from '../utils/assets'
+import { fetchAssets, getImplementation, prefetchAssets } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { traverseComponent } from '../utils/components'
@@ -587,7 +587,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       const { runtime } = this.props
       const { components } = this.state
       const { assets } = traverseComponent(components, component)
-      return preloadAssets(runtime, assets)
+      return prefetchAssets(runtime, assets)
     }
   }
 
@@ -616,7 +616,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     await Promise.all(
       Object.keys(defaultComponents).map((component: string) => {
         const { assets } = traverseComponent(defaultComponents, component)
-        return preloadAssets(runtime, assets)
+        return prefetchAssets(runtime, assets)
       })
     )
 
