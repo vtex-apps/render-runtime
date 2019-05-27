@@ -1,14 +1,15 @@
 import * as Sentry from '@sentry/browser'
 import { canUseDOM } from 'exenv'
 
+const sentryDSN = 'https://2fac72ea180d48ae9bf1dbb3104b4000@sentry.io/1292015'
+
 if (canUseDOM && window.__RUNTIME__.production) {
-  const { config = null, version = '' } = window.__RUNTIME__.runtimeMeta || {}
-  const dsn = config && config.sentryDSN
+  const { version = '' } = window.__RUNTIME__.runtimeMeta || {}
   Sentry.init({
     beforeSend: (event: Sentry.SentryEvent) =>
       event.tags && event.tags.component ? event : null,
     defaultIntegrations: true,
-    dsn,
+    dsn: sentryDSN,
     environment: canUseDOM ? 'browser' : 'ssr',
     release: version,
   })
