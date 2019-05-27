@@ -59,28 +59,28 @@ function addStyleToPage(href: string) {
   document.head.appendChild(link)
 }
 
-function preloadStyle(href: string) {
+function prefetchStyle(href: string) {
   if (!document || !document.head) {
     throw new ServerSideAssetLoadingError()
   }
   const link = document.createElement('link')
   link.href = href
   link.as = 'style'
-  link.rel = 'preload'
+  link.rel = 'prefetch'
   if (isAbsolute(href)) {
     link.crossOrigin = 'anonymous'
   }
   document.head.appendChild(link)
 }
 
-function preloadScript(href: string) {
+function prefetchScript(href: string) {
   if (!document || !document.head) {
     throw new ServerSideAssetLoadingError()
   }
   const link = document.createElement('link')
   link.href = href
   link.as = 'script'
-  link.rel = 'preload'
+  link.rel = 'prefetch'
   if (isAbsolute(href)) {
     link.crossOrigin = 'anonymous'
   }
@@ -112,12 +112,12 @@ function getExistingStyleHrefs() {
   return hrefs
 }
 
-function getExistingPreloadLinks() {
+function getExistingPrefetchLinks() {
   const paths: string[] = []
   const links = document.getElementsByTagName('link')
   for (let i = 0; i < links.length; i++) {
     const item = links.item(i)
-    if (item && item.rel === 'preload') {
+    if (item && item.rel === 'prefetch') {
       paths.push(item.href)
     }
   }
@@ -183,20 +183,20 @@ export function fetchAssets(runtime: RenderRuntime, assets: string[]) {
   })
 }
 
-export function preloadAssets(runtime: RenderRuntime, assets: string[]) {
+export function prefetchAssets(runtime: RenderRuntime, assets: string[]) {
   const { account, production } = runtime
   const absoluteAssets = assets.map(url =>
     getAbsoluteURL(account, url, production)
   )
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
-  const existingPreloads = getExistingPreloadLinks()
+  const existingPrefetches = getExistingPrefetchLinks()
   const scripts = absoluteAssets.filter(a =>
-    shouldAddScriptToPage(a, [...existingScripts, ...existingPreloads])
+    shouldAddScriptToPage(a, [...existingScripts, ...existingPrefetches])
   )
   const styles = absoluteAssets.filter(a =>
-    shouldAddStyleToPage(a, [...existingStyles, ...existingPreloads])
+    shouldAddStyleToPage(a, [...existingStyles, ...existingPrefetches])
   )
-  scripts.forEach(preloadScript)
-  styles.forEach(preloadStyle)
+  scripts.forEach(prefetchScript)
+  styles.forEach(prefetchStyle)
 }
