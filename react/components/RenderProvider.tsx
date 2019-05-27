@@ -77,7 +77,6 @@ try {
 
 const noop = () => {}
 
-
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
