@@ -12,18 +12,27 @@ export interface ExtendedGraphQLError extends GraphQLError {
   }
 }
 
-export function isExtendedGraphQLError (error: GraphQLError): error is ExtendedGraphQLError {
+export function isExtendedGraphQLError(
+  error: GraphQLError
+): error is ExtendedGraphQLError {
   return 'operationId' in error
 }
 
-const ignoredErrorTypes = ['UserInputError', 'AuthenticationError', 'ForbiddenError']
+const ignoredErrorTypes = [
+  'UserInputError',
+  'AuthenticationError',
+  'ForbiddenError',
+]
 
 class GraphQLErrorsStore {
   private operationIds: string[] = []
 
-  public addOperationIds(errors: ReadonlyArray<GraphQLError>) {
+  public addOperationIds(errors: readonly GraphQLError[]) {
     const operationIds = errors.reduce<string[]>((acc, error) => {
-      if (isExtendedGraphQLError(error) && !ignoredErrorTypes.includes(error.extensions.exception.name || '')) {
+      if (
+        isExtendedGraphQLError(error) &&
+        !ignoredErrorTypes.includes(error.extensions.exception.name || '')
+      ) {
         return acc.concat(error.operationId)
       }
       return acc

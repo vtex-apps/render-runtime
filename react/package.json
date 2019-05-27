@@ -1,9 +1,7 @@
 {
-  "name": "vtex.render-runtime",
-  "version": null,
   "license": "UNLICENSED",
   "scripts": {
-    "lint": "tsc --noEmit --pretty && eslint --ext ts,tsx .",
+    "lint": "tsc --noEmit --pretty && eslint --fix --ext ts,tsx .",
     "test": "jest"
   },
   "dependencies": {

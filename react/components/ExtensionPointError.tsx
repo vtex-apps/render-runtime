@@ -51,13 +51,12 @@ class ExtensionPointError extends PureComponent<Props, State> {
         {errorDetails && error && (
           <>
             <ul className="f6 list pl0">
-              {operationIds.map(
-                (operationId) => (
-                  <li key={operationId}>
-                    <span>Operation ID:</span> <span className="i">{operationId}</span>
-                  </li>
-                )
-              )}
+              {operationIds.map(operationId => (
+                <li key={operationId}>
+                  <span>Operation ID:</span>{' '}
+                  <span className="i">{operationId}</span>
+                </li>
+              ))}
             </ul>
             <pre>
               <code className="f6">{error.stack}</code>

@@ -116,10 +116,19 @@ class ExtensionPointComponent extends PureComponent<
     // Only log 10 percent of the errors so we dont exceed our quota
     if (production && Math.random() < 0.1) {
       Sentry.withScope(scope => {
-        const blacklistedRuntimeKeys = ['cacheHints', 'components', 'culture', 'emitter', 'history', 'messages']
+        const blacklistedRuntimeKeys = [
+          'cacheHints',
+          'components',
+          'culture',
+          'emitter',
+          'history',
+          'messages',
+        ]
 
         const filteredRuntime = pickBy((val, key) => {
-          return typeof val !== 'function' && !blacklistedRuntimeKeys.includes(key)
+          return (
+            typeof val !== 'function' && !blacklistedRuntimeKeys.includes(key)
+          )
         }, runtime)
 
         forEachObjIndexed((value, key) => {

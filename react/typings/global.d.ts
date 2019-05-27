@@ -458,8 +458,11 @@ declare global {
   }
 
   namespace NodeJS {
-    interface Global extends Window {}
+    interface Global extends Window {
+      myvtexSSE: any
+    }
   }
+
   interface NodeModule {
     hot: any
   }
