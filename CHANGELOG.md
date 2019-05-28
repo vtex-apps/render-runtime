@@ -7,12 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [8.32.3] - 2019-05-27
+## [8.32.3] - 2019-05-27 [YANKED]
 
 ### Changed
 - Removed replaceExtensionsWithDefault on page change.
 
 ## [8.32.2] - 2019-05-27
+
 ### Fixed
 - Error when img `src` attribute isn't a string.
 
