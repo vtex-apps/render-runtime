@@ -16,6 +16,9 @@ query NavigationPage (
   ) {
     appsEtag
     appsSettingsJSON
+    blocksJSON
+    blocksTreeJSON
+    contentMapJSON
     cacheHintsJSON
     componentsJSON
     extensionsJSON
