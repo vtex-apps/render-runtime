@@ -547,6 +547,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query: JSON.stringify(query),
       renderMajor,
       routeId,
+      skipCache: false,
     }).then(
       ({
         appsEtag,
@@ -717,6 +718,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query: '',
       renderMajor,
       routeId: page,
+      skipCache: true,
       ...options,
     })
 

@@ -71,11 +71,12 @@ export const fetchNavigationPage = ({
   production,
   paramsJSON,
   renderMajor,
+  skipCache,
   query,
 }: FetchNavigationDataInput) =>
   apolloClient
     .query<{ navigationPage: PageQueryResponse }>({
-      fetchPolicy: production ? 'cache-first' : 'network-only',
+      fetchPolicy: production && !skipCache ? 'cache-first' : 'network-only',
       query: navigationPageQuery,
       variables: {
         declarer,
