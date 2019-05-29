@@ -39,8 +39,8 @@ interface OperationContext {
   fetchOptions: any
   runtime: RenderRuntime
   http: {
-    includeQuery: string,
-    includeExtensions: string,
+    includeQuery: string
+    includeExtensions: string
   }
 }
 
@@ -57,50 +57,58 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
     hints = { ...meta, scope: 'private' }
   }
 
-  const { maxAge = 'long', scope = 'public', version = 1, provider, sender } = hints
+  const {
+    maxAge = 'long',
+    scope = 'public',
+    version = 1,
+    provider,
+    sender,
+  } = hints
   return {
     maxAge: maxAge.toLowerCase(),
     operationType,
     scope: scope.toLowerCase(),
     version,
     provider,
-    sender
+    sender,
   }
 }
 
 export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
-
     operation.setContext((oldContext: OperationContext) => {
-      const {
-        fetchOptions = {},
-        http: originalHttp,
-      } = oldContext
+      const { fetchOptions = {}, http: originalHttp } = oldContext
       const { extensions } = operation
       const { cacheHints, workspace, appsEtag } = runtime
       const hash = generateHash(operation.query)
-      const { maxAge, scope, version, operationType, provider, sender } = extractHints(
-        operation.query,
-        cacheHints[hash]
-      )
+      const {
+        maxAge,
+        scope,
+        version,
+        operationType,
+        provider,
+        sender,
+      } = extractHints(operation.query, cacheHints[hash])
       const oldMethod = fetchOptions.method || 'POST'
       const protocol = canUseDOM ? 'https:' : 'http:'
-      const method = equals(scope, 'private') && equals(operationType, 'query')
-        ? 'POST'
-        : oldMethod
+      const method =
+        equals(scope, 'private') && equals(operationType, 'query')
+          ? 'POST'
+          : oldMethod
       extensions.persistedQuery = {
         ...extensions.persistedQuery,
         sender,
-        provider
+        provider,
       }
       const http = !canUseDOM
         ? {
-          includeQuery: true,
-          includeExtensions: true,
-        } : {
-          ...originalHttp,
-          includeExtensions: true,
-        }
+            includeQuery: true,
+            includeExtensions: true,
+          }
+        : {
+            ...originalHttp,
+            includeExtensions: true,
+          }
       return {
         ...oldContext,
         fetchOptions: { ...fetchOptions, method },
