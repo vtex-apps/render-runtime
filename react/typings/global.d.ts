@@ -249,6 +249,7 @@ declare global {
     paramsJSON?: string
     path?: string
     renderMajor: number
+    skipCache: boolean
     query: string
   }
 
