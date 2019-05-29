@@ -135,7 +135,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
     const shouldHaveChildBlocks = !!(isCompositionChildren && extension.blocks)
 
-    const childBlocks = shouldHaveChildBlocks && this.getChildExtensions(runtime, newTreePath)
+    const childBlocks = shouldHaveChildBlocks && this.renderChildBlocks(runtime, newTreePath)
 
     return this.withOuterExtensions(
       after,
@@ -162,7 +162,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     )
   }
 
-  private getChildExtensions(runtime: RenderContext, treePath: string) {
+  private renderChildBlocks(runtime: RenderContext, treePath: string) {
     const extension = runtime.extensions && runtime.extensions[treePath]
 
     if (!extension || !extension.blocks) {
