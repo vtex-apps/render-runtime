@@ -547,7 +547,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query: JSON.stringify(query),
       renderMajor,
       routeId,
-      skipCache: false
+      skipCache: false,
     }).then(
       ({
         appsEtag,
