@@ -394,6 +394,8 @@ declare global {
     scope?: string
     maxAge?: string
     version?: number
+    provider?: string
+    sender?: string
   }
 
   interface CacheHintsMap {

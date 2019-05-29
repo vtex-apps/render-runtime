@@ -38,6 +38,10 @@ const assetsFromQuery = (query: ASTNode) => {
 interface OperationContext {
   fetchOptions: any
   runtime: RenderRuntime
+  http: {
+    includeQuery: string,
+    includeExtensions: string,
+  }
 }
 
 const equals = (a: string, b: string) =>
@@ -53,37 +57,55 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
     hints = { ...meta, scope: 'private' }
   }
 
-  const { maxAge = 'long', scope = 'public', version = 1 } = hints
+  const { maxAge = 'long', scope = 'public', version = 1, provider, sender } = hints
   return {
     maxAge: maxAge.toLowerCase(),
     operationType,
     scope: scope.toLowerCase(),
     version,
+    provider,
+    sender
   }
 }
 
-export const createUriSwitchLink = (baseURI: string, workspace: string) =>
+export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
+
     operation.setContext((oldContext: OperationContext) => {
       const {
         fetchOptions = {},
-        runtime: { appsEtag, cacheHints },
+        http: originalHttp,
       } = oldContext
-      const oldMethod = fetchOptions.method || 'POST'
+      const { extensions } = operation
+      const { cacheHints, workspace, appsEtag } = runtime
       const hash = generateHash(operation.query)
-      const protocol = canUseDOM ? 'https:' : 'http:'
-      const { maxAge, scope, version, operationType } = extractHints(
+      const { maxAge, scope, version, operationType, provider, sender } = extractHints(
         operation.query,
         cacheHints[hash]
       )
-      const method =
-        equals(scope, 'private') && equals(operationType, 'query')
-          ? 'POST'
-          : oldMethod
+      const oldMethod = fetchOptions.method || 'POST'
+      const protocol = canUseDOM ? 'https:' : 'http:'
+      const method = equals(scope, 'private') && equals(operationType, 'query')
+        ? 'POST'
+        : oldMethod
+      extensions.persistedQuery = {
+        ...extensions.persistedQuery,
+        sender,
+        provider
+      }
+      const http = !canUseDOM
+        ? {
+          includeQuery: true,
+          includeExtensions: true,
+        } : {
+          ...originalHttp,
+          includeExtensions: true,
+        }
       return {
         ...oldContext,
         fetchOptions: { ...fetchOptions, method },
         uri: `${protocol}//${baseURI}/_v/${scope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
+        http,
       }
     })
     return forward ? forward(operation) : null
