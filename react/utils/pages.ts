@@ -3,6 +3,7 @@ import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
 import { difference, is, isEmpty, keys, startsWith } from 'ramda'
 import RouteParser from 'route-parser'
+import {map} from 'ramda'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
@@ -97,10 +98,17 @@ export function getPageParams(path: string, routePath: string) {
   return (routePath && getParams(pagePathWithRest, path)) || EMPTY_OBJECT
 }
 
+function encodeHash(params: Record<string, string>) {
+  return map<any, Record<string, string>>((value: string) => value.replace('#', '%23'), params)
+}
+
 function getParams(template: string, target: string) {
   const properTemplate = adjustTemplate(template)
   const properTarget = adjustPath(target)
-  return new RouteParser(properTemplate).match(properTarget)
+  const params = new RouteParser(properTemplate).match(properTarget)
+  return params
+    ? encodeHash(params)
+    : params
 }
 
 function getPagePath(name: string, pages: Pages) {
