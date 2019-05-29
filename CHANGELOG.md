@@ -9,11 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Renders preview while child blocks are being loaded, as opposed to just rendering the wrapper and thus bringing back our old friend the accordion.
 
-## [8.32.3] - 2019-05-27 
+### Changed
+- Removed replaceExtensionsWithDefault on page change (for real this time around).
+
+## [8.32.3] - 2019-05-27 [YANKED]
 ### Changed
 - Removed replaceExtensionsWithDefault on page change.
-
-## [8.32.2] - 2019-05-27
 
 ### Fixed
 - Error when img `src` attribute isn't a string.
@@ -91,6 +92,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [8.25.0] - 2019-05-08
 ### Added
 - Added preview support for top-level blocks.
+
+### Changed
+- Removed replaceExtensionsWithDefault on page change.
 
 ## [8.24.0] - 2019-05-07
 
