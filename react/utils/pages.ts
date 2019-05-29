@@ -157,6 +157,7 @@ function getCanonicalPath(
 export function getRouteFromPath(
   path: string,
   pages: Pages,
+  hash?: string,
   query?: string
 ): NavigationRoute | null {
   const queryMap = query ? queryStringToMap(query) : {}
@@ -173,7 +174,9 @@ export function getRouteFromPath(
   return {
     id: routeMatch.id,
     params,
-    path: navigationPath,
+    path: hash
+      ? `${navigationPath}#${hash}`
+      : navigationPath,
   }
 }
 
@@ -222,11 +225,12 @@ export function navigate(
   }
 
   const [to, extractedQuery] = (is(String, inputTo) ? inputTo : '').split('?')
+  const [toPath, toHash] = to.split('#')
   const query = inputQuery || extractedQuery
 
   const navigationRoute = page
     ? getRouteFromPageName(page, pages, params)
-    : getRouteFromPath(to, pages, query)
+    : getRouteFromPath(toPath, pages, query, toHash)
 
   if (!navigationRoute) {
     console.warn(
