@@ -11,6 +11,8 @@ import Loading from './Loading'
 import { RenderContext } from './RenderContext'
 import TrackEventsWrapper from './TrackEventsWrapper'
 
+const implies = (p: boolean, q: boolean) => !p || q
+
 interface Props {
   id: string
   params?: any
@@ -131,10 +133,9 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const isCompositionChildren =
       extension && extension.composition === 'children'
 
-    const componentChildren =
-      isCompositionChildren && extension.blocks
-        ? this.getChildExtensions(runtime, newTreePath)
-        : children
+    const shouldHaveChildBlocks = !!(isCompositionChildren && extension.blocks)
+
+    const childBlocks = shouldHaveChildBlocks && this.getChildExtensions(runtime, newTreePath)
 
     return this.withOuterExtensions(
       after,
@@ -144,14 +145,14 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       props,
       <TrackEventsWrapper events={track} id={id}>
         <TreePathContext.Provider value={{ treePath: newTreePath }}>
-          {component ? (
+          {component && implies(shouldHaveChildBlocks, !!childBlocks) ? (
             <ExtensionPointComponent
               component={component}
               props={props}
               runtime={runtime}
               treePath={newTreePath}
             >
-              {componentChildren}
+              {shouldHaveChildBlocks ? childBlocks : children}
             </ExtensionPointComponent>
           ) : (
             <Loading />
@@ -165,16 +166,21 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     const extension = runtime.extensions && runtime.extensions[treePath]
 
     if (!extension || !extension.blocks) {
-      return
+      return null
     }
 
-    return extension.blocks.map((child, i) => {
+    const childBlocks = extension.blocks.map((child, i) => {
       const childTreePath = ExtensionPoint.mountTreePath(
         child.extensionPointId,
         treePath
       )
       const childExtension =
         runtime.extensions && runtime.extensions[childTreePath]
+
+      if (!childExtension) {
+        return null
+      }
+
       const childProps = childExtension ? childExtension.props : {}
 
       /* This ExtensionPointWrapper thing is done so the user can read
@@ -199,6 +205,12 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
       return <ExtensionPointWrapper key={i} {...childProps} />
     })
+
+    if (childBlocks.some(block => block == null)) {
+      return null
+    }
+
+    return childBlocks
   }
 
   private withOuterExtensions(
