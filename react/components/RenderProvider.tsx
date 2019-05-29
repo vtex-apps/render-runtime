@@ -50,7 +50,6 @@ export interface RenderProviderState {
   cacheHints: RenderRuntime['cacheHints']
   components: RenderRuntime['components']
   culture: RenderRuntime['culture']
-  defaultExtensions: RenderRuntime['defaultExtensions']
   device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
   messages: RenderRuntime['messages']
@@ -77,39 +76,12 @@ try {
 
 const noop = () => {}
 
-const unionKeys = (record1: any, record2: any) => [
-  ...new Set([...Object.keys(record1), ...Object.keys(record2)]),
-]
-
-const isChildOrSelf = (child: string, parent: string) =>
-  child === parent ||
-  (child.startsWith(`${parent}/`) && !child.startsWith(`${parent}/$`))
-
-const replaceExtensionsWithDefault = (
-  extensions: Extensions,
-  page: string,
-  defaultExtensions: Extensions
-) =>
-  unionKeys(extensions, defaultExtensions).reduce<Extensions>((acc, key) => {
-    const maybeExtension = isChildOrSelf(key, page)
-      ? defaultExtensions[key] || {
-          ...extensions[key],
-          component: null,
-        }
-      : extensions[key]
-    if (maybeExtension) {
-      acc[key] = maybeExtension
-    }
-    return acc
-  }, {})
-
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
     addMessages: PropTypes.func,
     components: PropTypes.object,
     culture: PropTypes.object,
-    defaultExtensions: PropTypes.object,
     device: PropTypes.string,
     emitter: PropTypes.object,
     ensureSession: PropTypes.func,
@@ -230,7 +202,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       cacheHints,
       components,
       culture,
-      defaultExtensions: {},
       device: 'any',
       extensions,
       loadedPages: new Set([page]),
@@ -297,7 +268,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       device,
       route,
       query,
-      defaultExtensions,
     } = this.state
     const {
       account,
@@ -315,7 +285,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       addMessages: this.addMessages,
       components,
       culture,
-      defaultExtensions,
       device,
       emitter,
       ensureSession: this.ensureSession,
@@ -480,7 +449,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture: { locale },
       pages: pagesState,
       production,
-      defaultExtensions,
       route,
       loadedPages,
     } = this.state
@@ -495,10 +463,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { id: page, params } = navigationRoute
     const transientRoute = { ...route, ...navigationRoute }
     const {
-      [page]: { allowConditions, declarer },
+      [page]: { declarer },
     } = pagesState
-    const shouldSkipFetchNavigationData =
-      (!allowConditions && loadedPages.has(page)) || !fetchPage
+    const shouldSkipFetchNavigationData = loadedPages.has(page) || !fetchPage
     const query = queryStringToMap(location.search) as RenderRuntime['query']
 
     if (shouldSkipFetchNavigationData) {
@@ -514,11 +481,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     this.setState(
       {
-        extensions: replaceExtensionsWithDefault(
-          this.state.extensions,
-          page,
-          defaultExtensions
-        ),
         page,
         preview: true,
         query,
@@ -559,6 +521,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         settings,
       }: ParsedPageQueryResponse) => {
         const updatedRoute = { ...transientRoute, ...matchingPage }
+
+        // TODO loadedPages with conditions should be reset every 5 minutes
+        if (pages[page] && pages[page].allowConditions) {
+          setTimeout(() => {
+            this.setState(({loadedPages}) => {
+              loadedPages.delete(page)
+              return {loadedPages}
+            })
+          }, 5 * 60 * 1000)
+        }
         this.setState(
           {
             appsEtag,
@@ -603,8 +575,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const {
       components: defaultComponents,
-      extensions: defaultExtensions,
-      messages: defaultMessages,
     } = await fetchDefaultPages({
       apolloClient: this.apolloClient,
       locale,
@@ -619,16 +589,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         return prefetchAssets(runtime, assets)
       })
     )
-
-    this.setState(({ components, messages }) => ({
-      components: {
-        ...defaultComponents,
-        ...this.state.components,
-        ...components,
-      },
-      defaultExtensions,
-      messages: { ...defaultMessages, ...this.state.messages, ...messages },
-    }))
   }
 
   public updateComponentAssets = (availableComponents: Components) => {

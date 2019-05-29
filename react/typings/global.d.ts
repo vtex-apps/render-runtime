@@ -211,7 +211,6 @@ declare global {
     workspace: RenderRuntime['workspace']
     route: RenderRuntime['route']
     query: RenderRuntime['query']
-    defaultExtensions: RenderRuntime['defaultExtensions']
     rootPath?: string
   }
 
@@ -385,7 +384,6 @@ declare global {
     }
     cacheHints: CacheHintsMap
     segmentToken: string
-    defaultExtensions: Extensions
     rootPath?: string
   }
 
