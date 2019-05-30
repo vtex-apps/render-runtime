@@ -454,7 +454,7 @@ declare global {
     Intl: any
     hrtime: NodeJS.Process['hrtime']
     myvtexSSE: any
-    rendered: Promise<RenderedSuccess> | RenderedFailure
+    rendered: Promise<RenderedSuccess | RenderedFailure>
   }
 
   namespace NodeJS {

@@ -198,18 +198,21 @@ function start() {
     const maybeRenderPromise = render(rootName, runtime)
     if (!canUseDOM) {
       // Expose render promise to global context.
-      window.rendered = (maybeRenderPromise as Promise<
-        NamedServerRendered
-      >).then(({ markups, maxAge, page, renderTimeMetric }) => ({
-        extensions: markups.reduce<RenderedSuccess['extensions']>(
-          (acc, { name, markup }) => ((acc[name] = markup), acc),
-          {}
-        ),
-        head: Helmet.rewind(),
-        maxAge,
-        renderMetrics: { [page]: renderTimeMetric },
-        state: getState(runtime),
-      }))
+      window.rendered = (maybeRenderPromise as Promise<NamedServerRendered>)
+        .then(({ markups, maxAge, page, renderTimeMetric }) => ({
+          extensions: markups.reduce<RenderedSuccess['extensions']>(
+            (acc, { name, markup }) => ((acc[name] = markup), acc),
+            {}
+          ),
+          head: Helmet.rewind(),
+          maxAge,
+          renderMetrics: { [page]: renderTimeMetric },
+          state: getState(runtime),
+        }))
+        .catch(error => {
+          console.error('Unexpected error rendering:', error)
+          throw error
+        })
     } else {
       console.log(
         'Welcome to Render! Want to look under the hood? https://careers.vtex.com'
@@ -218,7 +221,7 @@ function start() {
   } catch (error) {
     console.error('Unexpected error rendering:', error)
     if (!canUseDOM) {
-      window.rendered = { error }
+      window.rendered = Promise.reject({ error })
     }
   }
 }
