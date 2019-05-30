@@ -109,6 +109,7 @@ class ExtensionPointComponent extends PureComponent<
       runtime,
       treePath: path,
     } = this.props
+    // eslint-disable-next-line
     const { children, __errorInstance, __clearError, ...componentProps } = props
 
     console.error('Failed to render extension point', path, component)

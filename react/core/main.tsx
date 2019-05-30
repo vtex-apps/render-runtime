@@ -18,7 +18,6 @@ import Loading from '../components/Loading'
 
 import { ChildBlock, useChildBlock } from '../components/ChildBlock'
 import ExtensionContainer from '../components/ExtensionContainer'
-import { PortalRenderingRequest } from '../components/ExtensionManager'
 import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/LegacyExtensionContainer'

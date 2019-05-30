@@ -135,7 +135,8 @@ export default class Preview extends React.PureComponent<Props, State> {
       (typeof initialWidth === 'number'
         ? Math.min(maxWidth, initialWidth)
         : maxWidth) -
-        padding * 2, 0
+        padding * 2,
+      0
     )
     const height =
       initialHeight && initialHeight > padding * 2
