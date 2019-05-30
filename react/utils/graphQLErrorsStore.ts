@@ -1,5 +1,4 @@
 import { GraphQLError } from 'graphql'
-import { pluck } from 'ramda'
 
 export interface ExtendedGraphQLError extends GraphQLError {
   operationId: string
