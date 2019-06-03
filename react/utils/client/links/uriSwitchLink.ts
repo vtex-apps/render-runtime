@@ -38,10 +38,6 @@ const assetsFromQuery = (query: ASTNode) => {
 interface OperationContext {
   fetchOptions: any
   runtime: RenderRuntime
-  http: {
-    includeQuery: string
-    includeExtensions: string
-  }
 }
 
 const equals = (a: string, b: string) =>
@@ -77,9 +73,13 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
 export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     operation.setContext((oldContext: OperationContext) => {
-      const { fetchOptions = {}, http: originalHttp } = oldContext
+      const {
+        fetchOptions = {},
+        // Fetches from context for not fetching a stale version of runtime
+        runtime: { appsEtag, cacheHints }
+      } = oldContext
       const { extensions } = operation
-      const { cacheHints, workspace, appsEtag } = runtime
+      const { workspace } = runtime
       const hash = generateHash(operation.query)
       const {
         maxAge,
