@@ -6,6 +6,7 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
+import { merge, mergeWith } from 'ramda'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -563,7 +564,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         this.setState(
           {
             appsEtag,
-            cacheHints,
+            cacheHints: mergeWith(merge, this.state.cacheHints, cacheHints),
             components: { ...this.state.components, ...components },
             extensions: { ...this.state.extensions, ...extensions },
             loadedPages: loadedPages.add(page),
