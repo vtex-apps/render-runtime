@@ -100,20 +100,10 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
         sender,
         provider,
       }
-      const http = !canUseDOM
-        ? {
-            includeQuery: true,
-            includeExtensions: true,
-          }
-        : {
-            ...originalHttp,
-            includeExtensions: true,
-          }
       return {
         ...oldContext,
         fetchOptions: { ...fetchOptions, method },
         uri: `${protocol}//${baseURI}/_v/${scope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
-        http,
       }
     })
     return forward ? forward(operation) : null

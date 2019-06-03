@@ -113,7 +113,7 @@ export const getClient = (
       versionSplitterLink,
       runtimeContextLink,
       ensureSessionLink,
-      ...(canUseDOM ? [persistedQueryLink] : []),
+      persistedQueryLink,
       uriSwitchLink,
       ...cacheLink,
       fetcherLink,
