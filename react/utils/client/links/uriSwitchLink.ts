@@ -53,33 +53,53 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
     hints = { ...meta, scope: 'private' }
   }
 
-  const { maxAge = 'long', scope = 'public', version = 1 } = hints
+  const {
+    maxAge = 'long',
+    scope = 'public',
+    version = 1,
+    provider,
+    sender,
+  } = hints
   return {
     maxAge: maxAge.toLowerCase(),
     operationType,
     scope: scope.toLowerCase(),
     version,
+    provider,
+    sender,
   }
 }
 
-export const createUriSwitchLink = (baseURI: string, workspace: string) =>
+export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     operation.setContext((oldContext: OperationContext) => {
       const {
         fetchOptions = {},
+        // Fetches from context for not fetching a stale version of runtime
         runtime: { appsEtag, cacheHints },
       } = oldContext
-      const oldMethod = fetchOptions.method || 'POST'
+      const { extensions } = operation
+      const { workspace } = runtime
       const hash = generateHash(operation.query)
+      const {
+        maxAge,
+        scope,
+        version,
+        operationType,
+        provider,
+        sender,
+      } = extractHints(operation.query, cacheHints[hash])
+      const oldMethod = fetchOptions.method || 'POST'
       const protocol = canUseDOM ? 'https:' : 'http:'
-      const { maxAge, scope, version, operationType } = extractHints(
-        operation.query,
-        cacheHints[hash]
-      )
       const method =
         equals(scope, 'private') && equals(operationType, 'query')
           ? 'POST'
           : oldMethod
+      extensions.persistedQuery = {
+        ...extensions.persistedQuery,
+        sender,
+        provider,
+      }
       return {
         ...oldContext,
         fetchOptions: { ...fetchOptions, method },

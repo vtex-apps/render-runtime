@@ -18,7 +18,6 @@ import { toBase64Link } from './links/base64Link'
 import { cachingLink } from './links/cachingLink'
 import { createIOFetchLink } from './links/ioFetchLink'
 import { omitTypenameLink } from './links/omitVariableTypenameLink'
-import { persistedQueryVersionLink } from './links/persistedQueryVersionLink'
 import { createUriSwitchLink } from './links/uriSwitchLink'
 import { versionSplitterLink } from './links/versionSplitterLink'
 
@@ -98,7 +97,7 @@ export const getClient = (
       useGETForHashedQueries: true,
     })
 
-    const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
+    const uriSwitchLink = createUriSwitchLink(baseURI, runtime)
 
     const cacheLink = cacheControl ? [cachingLink(cacheControl)] : []
 
@@ -115,7 +114,6 @@ export const getClient = (
       runtimeContextLink,
       ensureSessionLink,
       persistedQueryLink,
-      persistedQueryVersionLink,
       uriSwitchLink,
       ...cacheLink,
       fetcherLink,
