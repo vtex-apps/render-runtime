@@ -16,8 +16,19 @@ import { fetchAssets, getImplementation, prefetchAssets } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { traverseComponent } from '../utils/components'
-import { RENDER_CONTAINER_CLASS, ROUTE_CLASS_PREFIX, routeClass } from '../utils/dom'
-import { goBack as pageGoBack, mapToQueryString, navigate as pageNavigate, NavigateOptions, queryStringToMap, scrollTo as pageScrollTo } from '../utils/pages'
+import {
+  RENDER_CONTAINER_CLASS,
+  ROUTE_CLASS_PREFIX,
+  routeClass,
+} from '../utils/dom'
+import {
+  goBack as pageGoBack,
+  mapToQueryString,
+  navigate as pageNavigate,
+  NavigateOptions,
+  queryStringToMap,
+  scrollTo as pageScrollTo,
+} from '../utils/pages'
 import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
 import { TreePathContext } from '../utils/treePath'
 import BuildStatus from './BuildStatus'
