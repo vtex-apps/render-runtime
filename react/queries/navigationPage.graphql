@@ -16,7 +16,6 @@ query NavigationPage (
   ) {
     appsEtag
     appsSettingsJSON
-    cacheHintsJSON
     componentsJSON
     extensionsJSON
     messages {

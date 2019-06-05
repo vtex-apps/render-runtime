@@ -8,7 +8,6 @@ const parsePageQueryResponse = (
   const {
     appsEtag,
     appsSettingsJSON,
-    cacheHintsJSON,
     componentsJSON,
     extensionsJSON,
     messages,
@@ -22,8 +21,7 @@ const parsePageQueryResponse = (
     },
   } = page
 
-  const [cacheHints, components, extensions, pages, settings] = [
-    cacheHintsJSON,
+  const [components, extensions, pages, settings] = [
     componentsJSON,
     extensionsJSON,
     pagesJSON,
@@ -32,7 +30,6 @@ const parsePageQueryResponse = (
 
   return {
     appsEtag,
-    cacheHints,
     components,
     extensions,
     matchingPage: {

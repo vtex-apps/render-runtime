@@ -328,7 +328,6 @@ declare global {
     pages: RenderRuntime['pages']
     appsEtag: RenderRuntime['appsEtag']
     settings: RenderRuntime['settings']
-    cacheHints: RenderRuntime['cacheHints']
     matchingPage: MatchingPage
   }
 
