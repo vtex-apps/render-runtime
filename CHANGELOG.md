@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.34.2] - 2019-06-06
+### Changed
+- Downgraded `query-string` to version 5.x, for IE11 support. (https://www.npmjs.com/package/query-string#install)
+
 ## [8.34.1] - 2019-06-03
 
 ## [8.34.0] - 2019-06-03
