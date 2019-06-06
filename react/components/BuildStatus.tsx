@@ -77,13 +77,13 @@ class BuildStatus extends Component<RenderContextProps, State> {
     this.clearTimeouts()
   }
 
-  renderLoading = () => (
+  private renderLoading = () => (
     <svg
       width="26px"
       height="26px"
       viewBox="0 0 100 100"
       preserveAspectRatio="xMidYMid"
-      >
+    >
       <style>{`
         @keyframes build-status-rotate {
             0% {
@@ -101,12 +101,29 @@ class BuildStatus extends Component<RenderContextProps, State> {
 
         `}</style>
       <g>
-        <circle cx="50" opacity="0.4" cy="50" fill="none" stroke="#F71963" r="40" strokeWidth="14"></circle>
-        <circle cx="50" cy="50" fill="none" stroke="#F71963" r="40" strokeDasharray="60 900" strokeWidth="12" strokeLinecap="round" className="build-status-rotate"></circle>
+        <circle
+          cx="50"
+          opacity="0.4"
+          cy="50"
+          fill="none"
+          stroke="#F71963"
+          r="40"
+          strokeWidth="14"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          fill="none"
+          stroke="#F71963"
+          r="40"
+          strokeDasharray="60 900"
+          strokeWidth="12"
+          strokeLinecap="round"
+          className="build-status-rotate"
+        />
       </g>
     </svg>
   )
-
 
   public render() {
     const { status, animateOut, anchor } = this.state
