@@ -7,47 +7,6 @@ interface State {
   anchor: 'left' | 'right'
 }
 
-const buildStatusLoading = (
-  <svg
-    width="26px"
-    height="26px"
-    viewBox="0 0 100 100"
-    preserveAspectRatio="xMidYMid"
-  >
-    <circle
-      cx="50"
-      opacity="0.2"
-      cy="50"
-      fill="none"
-      stroke="#F71963"
-      strokeWidth="14"
-      r="40"
-    />
-    <circle
-      cx="50"
-      cy="50"
-      fill="none"
-      stroke="#F71963"
-      strokeWidth="12"
-      r="40"
-      strokeDasharray="60 900"
-      strokeLinecap="round"
-      transform="rotate(96 50 50)"
-    >
-      <animateTransform
-        attributeName="transform"
-        type="rotate"
-        calcMode="linear"
-        values="0 50 50;360 50 50"
-        keyTimes="0;1"
-        dur="0.7s"
-        begin="0s"
-        repeatCount="indefinite"
-      />
-    </circle>
-  </svg>
-)
-
 class BuildStatus extends Component<RenderContextProps, State> {
   private animateOutHandle!: number
   private hideHandle!: number
@@ -118,6 +77,54 @@ class BuildStatus extends Component<RenderContextProps, State> {
     this.clearTimeouts()
   }
 
+  private renderLoading = () => (
+    <svg
+      width="26px"
+      height="26px"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid"
+    >
+      <style>{`
+        @keyframes build-status-rotate {
+            0% {
+              transform: rotate(0);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+
+          .build-status-rotate {
+            transform-origin: 50px 50px;
+            animation: build-status-rotate 0.7s infinite linear;
+          }
+
+        `}</style>
+      <g>
+        <circle
+          cx="50"
+          opacity="0.4"
+          cy="50"
+          fill="none"
+          stroke="#F71963"
+          r="40"
+          strokeWidth="14"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          fill="none"
+          stroke="#F71963"
+          r="40"
+          strokeDasharray="60 900"
+          strokeWidth="12"
+          strokeLinecap="round"
+          className="build-status-rotate"
+        />
+      </g>
+    </svg>
+  )
+
   public render() {
     const { status, animateOut, anchor } = this.state
 
@@ -154,7 +161,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
           ? fail
           : status === 'reload'
           ? reload
-          : buildStatusLoading}
+          : this.renderLoading()}
       </div>
     )
   }

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.34.3] - 2019-06-06
+### Changed
+- Change BuildStatus animation from SMIL-based to CSS-based, for performance.
+
 ## [8.34.2] - 2019-06-06
 ### Changed
 - Downgraded `query-string` to version 5.x, for IE11 support. (https://www.npmjs.com/package/query-string#install)
