@@ -26,10 +26,11 @@ function trimEndingSlash(token: string) {
 function createLocationDescriptor(
   navigationRoute: NavigationRoute,
   {
+    hash,
     query,
     scrollOptions,
     fetchPage,
-  }: Pick<NavigateOptions, 'query' | 'scrollOptions' | 'fetchPage'>
+  }: Pick<NavigateOptions, 'hash' | 'query' | 'scrollOptions' | 'fetchPage'>
 ): LocationDescriptorObject {
   return {
     pathname: navigationRoute.path,
@@ -40,6 +41,7 @@ function createLocationDescriptor(
       scrollOptions,
     },
     ...(query && { search: query }),
+    ...(hash && { hash }),
   }
 }
 
@@ -149,9 +151,10 @@ function getCanonicalPath(
 export function getRouteFromPath(
   path: string,
   pages: Pages,
-  query?: string
+  query?: string,
+  hash?: string
 ): NavigationRoute | null {
-  const queryMap = query ? queryStringToMap(query) : {}
+  const queryMap = query ? queryStringToMap(hash ? query + hash : query) : {}
   const routeMatch = routeIdFromPathAndQuery(path, queryMap, pages)
   if (!routeMatch) {
     return null
@@ -214,11 +217,13 @@ export function navigate(
   }
 
   const [to, extractedQuery] = (is(String, inputTo) ? inputTo : '').split('?')
-  const query = inputQuery || extractedQuery
+  const [realQuery, hash] = (is(String, extractedQuery) ? extractedQuery : '').split('#')
+  const realHash = `#${hash}`
+  const query = inputQuery || realQuery
 
   const navigationRoute = page
     ? getRouteFromPageName(page, pages, params)
-    : getRouteFromPath(to, pages, query)
+    : getRouteFromPath(to, pages, query, realHash)
 
   if (!navigationRoute) {
     console.warn(
@@ -240,6 +245,7 @@ export function navigate(
       fetchPage,
       query: nextQuery,
       scrollOptions,
+      hash: realHash,
     })
     const method = replace ? 'replace' : 'push'
     window.setTimeout(() => history[method](location), 0)
@@ -390,6 +396,7 @@ interface RouteMatch {
 }
 
 export interface NavigateOptions {
+  hash?: string
   page?: string
   params?: any
   query?: any
