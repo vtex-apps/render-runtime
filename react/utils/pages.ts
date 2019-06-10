@@ -218,7 +218,7 @@ export function navigate(
 
   const [to, extractedQuery] = (is(String, inputTo) ? inputTo : '').split('?')
   const [realQuery, hash] = (is(String, extractedQuery) ? extractedQuery : '').split('#')
-  const realHash = `#${hash}`
+  const realHash = is(String, hash) ? `#${hash}` : ''
   const query = inputQuery || realQuery
 
   const navigationRoute = page
