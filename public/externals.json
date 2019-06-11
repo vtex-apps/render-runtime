@@ -53,6 +53,11 @@
         "serverOnly": true
       },
       {
+        "clientOnly": true,
+        "path": "npm:fg-loadcss@2.1.0/dist/cssrelpreload.min.js"
+      },
+      {
+        "cssRelPreload": true,
         "path": "npm:animate.css@3.7.0/animate.css"
       },
       {
@@ -116,6 +121,11 @@
         "serverOnly": true
       },
       {
+        "clientOnly": true,
+        "path": "npm:fg-loadcss@2.1.0/dist/cssrelpreload.min.js"
+      },
+      {
+        "cssRelPreload": true,
         "path": "npm:animate.css@3.7.0/animate.min.css"
       },
       {
