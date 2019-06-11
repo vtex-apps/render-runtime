@@ -484,6 +484,7 @@ declare global {
       props?: Record<string, any>
     }
     implements: string[]
+    originalBlockId?: string
     preview?: Preview
     render: RenderStrategy
     track?: string[]
@@ -491,7 +492,7 @@ declare global {
   }
 
   interface TreeEntry {
-    blockId: BlockId,
+    blockIdMap: Record<string, BlockId>,
     contentIdMap: Record<string, string>
   }
 
