@@ -388,6 +388,7 @@ declare global {
     segmentToken: string
     defaultExtensions: Extensions
     rootPath?: string
+    workspaceCookie: string
   }
 
   interface CacheHints {

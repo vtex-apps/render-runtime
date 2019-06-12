@@ -134,15 +134,15 @@ const render = (
 
   return canUseDOM
     ? ((disableSSR || created
-        ? renderDOM<HTMLDivElement>(root, elem)
-        : hydrate(root, elem)) as Element)
+      ? renderDOM<HTMLDivElement>(root, elem)
+      : hydrate(root, elem)) as Element)
     : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
-        markups: getMarkups(name, markup),
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        maxAge: cacheControl!.maxAge,
-        page,
-        renderTimeMetric,
-      }))
+      markups: getMarkups(name, markup),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      maxAge: cacheControl!.maxAge,
+      page,
+      renderTimeMetric,
+    }))
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
@@ -152,6 +152,12 @@ function validateRootComponent(rootName: string, extensions: Extensions) {
 
   if (!extensions[rootName].component) {
     throw new Error(`Missing component for extension point ${rootName}`)
+  }
+}
+
+function setLazyCookie(setCookie: string) {
+  if (setCookie) {
+    document.cookie = setCookie
   }
 }
 
@@ -211,6 +217,7 @@ function start() {
         state: getState(runtime),
       }))
     } else {
+      setLazyCookie(runtime.workspaceCookie)
       console.log(
         'Welcome to Render! Want to look under the hood? https://careers.vtex.com'
       )
