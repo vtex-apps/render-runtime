@@ -1,63 +1,64 @@
-import React, { Component } from 'react'
+import React, { FunctionComponent, Fragment, useEffect, useRef, useState } from 'react'
 import Loading from './Loading'
-import { RenderContextProps, withRuntimeContext } from './RenderContext'
+import { useRuntime } from './RenderContext'
 
-interface State {
-  ensured: boolean
-  error: any
+function useSafeState(initialState: any) {
+  const [state, setState] = useState(initialState)
+  const mountedRef = useRef(false)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
+  const safeSetState = (value: any) => {
+    mountedRef.current && setState(value)
+  }
+
+  return [state, safeSetState]
 }
 
-class Session extends Component<RenderContextProps, State> {
-  public state = { ensured: false, error: null }
+const Session: FunctionComponent = ({ children }) => {
+  const [ensured, setEnsured] = useSafeState(false)
+  const [error, setError] = useSafeState(null)
+  const { ensureSession } = useRuntime()
 
-  public componentDidMount() {
-    this.onUpdate()
-  }
-
-  public componentDidUpdate() {
-    this.onUpdate()
-  }
-
-  public render() {
-    const { children } = this.props
-    const { ensured, error } = this.state
-
-    if (ensured) {
-      return children
-    }
-
-    if (error) {
-      return (
-        <div className="bg-washed-red pa6 f5 serious-black br3 pre">
-          <span>Error initializing session</span>
-          <pre>
-            <code className="f6">{error}</code>
-          </pre>
-        </div>
-      )
-    }
-
-    return <Loading />
-  }
-
-  private onUpdate() {
-    const {
-      runtime: { ensureSession },
-    } = this.props
-    const { ensured, error } = this.state
-
+  useEffect(() => {
     if (ensured || error) {
       return
     }
 
     ensureSession()
       .then(() => {
-        this.setState({ ensured: true })
+        setEnsured(true)
       })
       .catch((err: any) => {
-        this.setState({ error: err })
+        setError(err)
       })
+  }, [ensureSession, ensured, error])
+
+  if (ensured) {
+    return (
+      <Fragment>
+        {children}
+      </Fragment>
+    )
   }
+
+  if (error) {
+    return (
+      <div className="bg-washed-red pa6 f5 serious-black br3 pre">
+        <span>Error initializing session</span>
+        <pre>
+          <code className="f6">{error}</code>
+        </pre>
+      </div>
+    )
+  }
+
+  return <Loading />
 }
 
-export default withRuntimeContext<{}>(Session)
+export default Session
