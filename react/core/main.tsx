@@ -186,7 +186,9 @@ function start() {
 
       if (type === 'img') {
         props.dataSrc = optimizeSrcForVtexImg(vtexImgHost, props.src)
-        props.className = props.className ? props.className + ' lazyload' : 'lazyload'
+        props.className = props.className
+          ? props.className + ' lazyload'
+          : 'lazyload'
         if (
           typeof props.dataSrc === 'string' &&
           props.dataSrc.startsWith(vtexImgHost)
