@@ -156,7 +156,7 @@ function validateRootComponent(rootName: string, extensions: Extensions) {
 }
 
 function setLazyCookie(setCookie: string) {
-  if (setCookie !== null) {
+  if (setCookie) {
     document.cookie = setCookie
   }
 }
