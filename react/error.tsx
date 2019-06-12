@@ -39,7 +39,8 @@ if (window.__ERROR__) {
       window.__RENDER_8_RUNTIME__.LayoutContainer = hotGlobals.LayoutContainer
       window.__RENDER_8_RUNTIME__.Link = hotGlobals.Link
       window.__RENDER_8_RUNTIME__.Loading = hotGlobals.Loading
-      window.__RENDER_8_RUNTIME__.buildCacheLocator = hotGlobals.buildCacheLocator
+      window.__RENDER_8_RUNTIME__.buildCacheLocator =
+        hotGlobals.buildCacheLocator
       start()
     })
   } else {

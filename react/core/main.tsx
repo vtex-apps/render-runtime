@@ -134,15 +134,15 @@ const render = (
 
   return canUseDOM
     ? ((disableSSR || created
-      ? renderDOM<HTMLDivElement>(root, elem)
-      : hydrate(root, elem)) as Element)
+        ? renderDOM<HTMLDivElement>(root, elem)
+        : hydrate(root, elem)) as Element)
     : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
-      markups: getMarkups(name, markup),
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      maxAge: cacheControl!.maxAge,
-      page,
-      renderTimeMetric,
-    }))
+        markups: getMarkups(name, markup),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        maxAge: cacheControl!.maxAge,
+        page,
+        renderTimeMetric,
+      }))
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
