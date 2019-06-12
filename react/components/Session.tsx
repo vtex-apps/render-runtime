@@ -1,42 +1,33 @@
-import React, { FunctionComponent, Fragment, useEffect, useRef, useState } from 'react'
+import React, { FunctionComponent, Fragment, useEffect, useState } from 'react'
 import Loading from './Loading'
 import { useRuntime } from './RenderContext'
 
-function useSafeState(initialState: any) {
-  const [state, setState] = useState(initialState)
-  const mountedRef = useRef(false)
-
-  useEffect(() => {
-    mountedRef.current = true
-    return () => {
-      mountedRef.current = false
-    }
-  }, [])
-
-  const safeSetState = (value: any) => {
-    mountedRef.current && setState(value)
-  }
-
-  return [state, safeSetState]
-}
-
 const Session: FunctionComponent = ({ children }) => {
-  const [ensured, setEnsured] = useSafeState(false)
-  const [error, setError] = useSafeState(null)
+  const [ensured, setEnsured] = useState(false)
+  const [error, setError] = useState(null)
   const { ensureSession } = useRuntime()
 
   useEffect(() => {
+    let isCurrent = true
     if (ensured || error) {
       return
     }
 
     ensureSession()
       .then(() => {
-        setEnsured(true)
+        if (isCurrent) {
+          setEnsured(true)
+        }
       })
       .catch((err: any) => {
-        setError(err)
+        if (isCurrent) {
+          setError(err)
+        }
       })
+
+    return () => {
+      isCurrent = false
+    }
   }, [ensureSession, ensured, error])
 
   if (ensured) {
