@@ -40,6 +40,8 @@ import registerComponent from '../utils/registerComponent'
 import { withSession } from '../utils/session'
 import { TreePathContext, useTreePath } from '../utils/treePath'
 import {
+  createSrcSetFromSrc,
+  DEFAULT_SIZES,
   isStyleWritable,
   optimizeSrcForVtexImg,
   optimizeStyleForVtexImg,
@@ -185,8 +187,16 @@ function start() {
       }
 
       if (type === 'img') {
-        props['data-src'] = optimizeSrcForVtexImg(vtexImgHost, props.src)
+        const optimizedSrc = optimizeSrcForVtexImg(vtexImgHost, runtime.appsEtag, props.src)
+        props['data-src'] = optimizedSrc
         delete props.src
+
+        const maybeSrcSet = createSrcSetFromSrc(optimizedSrc)
+        if (maybeSrcSet) {
+          props['data-srcset'] = maybeSrcSet
+          props.sizes = DEFAULT_SIZES
+        }
+
         props.className = props.className
           ? props.className + ' lazyload'
           : 'lazyload'
