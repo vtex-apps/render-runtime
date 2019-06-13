@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.35.5] - 2019-06-13
+
 ### Fixed
 
 - Make it possible to have a link with attribute `rel="noopener nofollow"`.
