@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- Support for lazy loading of images using lazysizes
+- Defer render start for quicker onload
+
 ## [8.35.5] - 2019-06-13
 
 ### Fixed
