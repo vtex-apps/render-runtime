@@ -185,13 +185,14 @@ function start() {
       }
 
       if (type === 'img') {
-        props.dataSrc = optimizeSrcForVtexImg(vtexImgHost, props.src)
+        props['data-src'] = optimizeSrcForVtexImg(vtexImgHost, props.src)
+        delete props.src
         props.className = props.className
           ? props.className + ' lazyload'
           : 'lazyload'
         if (
-          typeof props.dataSrc === 'string' &&
-          props.dataSrc.startsWith(vtexImgHost)
+          typeof props['data-src'] === 'string' &&
+          props['data-src'].startsWith(vtexImgHost)
         ) {
           props.crossOrigin = props.crossOrigin || 'anonymous'
         }
