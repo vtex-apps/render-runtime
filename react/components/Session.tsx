@@ -1,63 +1,55 @@
-import React, { Component } from 'react'
+import React, { FunctionComponent, Fragment, useEffect, useState } from 'react'
 import Loading from './Loading'
-import { RenderContextProps, withRuntimeContext } from './RenderContext'
+import { useRuntime } from './RenderContext'
 
-interface State {
-  ensured: boolean
-  error: any
-}
+const Session: FunctionComponent = ({ children }) => {
+  const [ensured, setEnsured] = useState(false)
+  const [error, setError] = useState(null)
+  const { ensureSession } = useRuntime()
 
-class Session extends Component<RenderContextProps, State> {
-  public state = { ensured: false, error: null }
-
-  public componentDidMount() {
-    this.onUpdate()
-  }
-
-  public componentDidUpdate() {
-    this.onUpdate()
-  }
-
-  public render() {
-    const { children } = this.props
-    const { ensured, error } = this.state
-
-    if (ensured) {
-      return children
-    }
-
-    if (error) {
-      return (
-        <div className="bg-washed-red pa6 f5 serious-black br3 pre">
-          <span>Error initializing session</span>
-          <pre>
-            <code className="f6">{error}</code>
-          </pre>
-        </div>
-      )
-    }
-
-    return <Loading />
-  }
-
-  private onUpdate() {
-    const {
-      runtime: { ensureSession },
-    } = this.props
-    const { ensured, error } = this.state
-
+  useEffect(() => {
+    let isCurrent = true
     if (ensured || error) {
       return
     }
 
     ensureSession()
       .then(() => {
-        this.setState({ ensured: true })
+        if (isCurrent) {
+          setEnsured(true)
+        }
       })
       .catch((err: any) => {
-        this.setState({ error: err })
+        if (isCurrent) {
+          setError(err)
+        }
       })
+
+    return () => {
+      isCurrent = false
+    }
+  }, [ensureSession, ensured, error])
+
+  if (ensured) {
+    return (
+      <Fragment>
+        {children}
+      </Fragment>
+    )
   }
+
+  if (error) {
+    return (
+      <div className="bg-washed-red pa6 f5 serious-black br3 pre">
+        <span>Error initializing session</span>
+        <pre>
+          <code className="f6">{error}</code>
+        </pre>
+      </div>
+    )
+  }
+
+  return <Loading />
 }
 
-export default withRuntimeContext<{}>(Session)
+export default Session
