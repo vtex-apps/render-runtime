@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+- Revert setting `data-src` and removing `src` for every image (but continue supporting lazysizes as opt-in).
+
 ## [8.37.0] - 2019-06-13
 ### Added
 - Sets every URI scope to `private` whenever the workspace's root interface declarer has a `requiresAuthorization` setting with value `true`.
