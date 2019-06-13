@@ -1,4 +1,5 @@
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
+import { path } from 'ramda'
 import { canUseDOM } from 'exenv'
 import {
   ASTNode,
@@ -89,6 +90,8 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
         provider,
         sender,
       } = extractHints(operation.query, cacheHints[hash])
+      const requiresAuthorization = path(['settings', `vtex.${runtime.route.domain}`, 'requiresAuthorization'], runtime)
+      const customScope = requiresAuthorization ? 'private' : scope
       const oldMethod = fetchOptions.method || 'POST'
       const protocol = canUseDOM ? 'https:' : 'http:'
       const method =
@@ -103,7 +106,7 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
       return {
         ...oldContext,
         fetchOptions: { ...fetchOptions, method },
-        uri: `${protocol}//${baseURI}/_v/${scope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
+        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
       }
     })
     return forward ? forward(operation) : null
