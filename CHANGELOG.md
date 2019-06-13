@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.37.1] - 2019-06-13
+
 ### Changed
 - Revert setting `data-src` and removing `src` for every image (but continue supporting lazysizes as opt-in).
 
