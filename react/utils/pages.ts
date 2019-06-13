@@ -309,7 +309,11 @@ function routeMatchForMappedURL(
 
   for (const name in routes) {
     const { map = [], path: routePath } = routes[name]
-    if (!routePath || map.length === 0 || !includes(map.join(','), mappedSegments.join(','))) {
+    if (
+      !routePath ||
+      map.length === 0 ||
+      !includes(map.join(','), mappedSegments.join(','))
+    ) {
       continue
     }
 
