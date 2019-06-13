@@ -131,12 +131,17 @@ export default class Preview extends React.PureComponent<Props, State> {
       containerWidth || (window && window.innerWidth) || initialWidth || 0
 
     const padding = 20
-    const width =
+    const width = Math.max(
       (typeof initialWidth === 'number'
         ? Math.min(maxWidth, initialWidth)
         : maxWidth) -
-      padding * 2
-    const height = initialHeight ? initialHeight - padding * 2 : 0
+        padding * 2,
+      0
+    )
+    const height =
+      initialHeight && initialHeight > padding * 2
+        ? initialHeight - padding * 2
+        : 0
 
     return (
       /** TODO: remove this div in favor of the Container component,

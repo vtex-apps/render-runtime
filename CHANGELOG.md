@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.36.2] - 2019-06-13
+### Fixed
+- Remove negative values for preview width and height.
+
 ## [8.36.1] - 2019-06-13
 
 ### Fixed

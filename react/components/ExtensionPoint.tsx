@@ -94,6 +94,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       params,
       query,
       id,
+      // eslint-disable-next-line
       treePath,
       blockProps,
       ...parentProps
