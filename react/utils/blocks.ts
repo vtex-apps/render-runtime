@@ -20,8 +20,7 @@ const createExtensions = (
   const {blockIdMap, contentIdMap} = blocksTree[blockTreePath]
   const mappedBlockId = blockIdMap[extensionPath] || blockIdMap['*']
   const block = blocksMap[mappedBlockId]
-  const {after = [], around = [], before = [], blocks = []} = block
-  const blockId = block.blockId
+  const {blockId, after = [], around = [], before = [], blocks = []} = block
   const contentId = contentIdMap[bindingPath] || blockId
   const blockContentId = `${contentId}+${blockId}`
 
@@ -31,7 +30,7 @@ const createExtensions = (
       after: after.map(insertion => insertion.extensionPointId),
       around: around.map(insertion => insertion.extensionPointId),
       before: before.map(insertion => insertion.extensionPointId),
-      blockId: block.originalBlockId || block.blockId,
+      blockId: block.originalBlockId || blockId,
       blocks: blocks,
       component: block.component,
       composition: block.composition,
@@ -44,29 +43,14 @@ const createExtensions = (
     }
   }]
 
-  const afterExtensions = after.reduce((acc, {extensionPointId}) => {
-    const afterBlockTreePath = extensionPointId
-    const afterExtensionPath = `${extensionPath}/${extensionPointId}`
-    const afterResults = createExtensions(afterBlockTreePath, afterExtensionPath, bindingPath, true, blocksTree, blocksMap, contentMap)
-    acc.push(...afterResults)
-    return acc
-  }, [] as ExtensionResult[])
-
-  const aroundExtensions = around.reduce((acc, {extensionPointId}) => {
-    const aroundBlockTreePath = extensionPointId
-    const aroundExtensionPath = `${extensionPath}/${extensionPointId}`
-    const aroundResults = createExtensions(aroundBlockTreePath, aroundExtensionPath, bindingPath, true, blocksTree, blocksMap, contentMap)
-    acc.push(...aroundResults)
-    return acc
-  }, [] as ExtensionResult[])
-
-  const beforeExtensions = before.reduce((acc, {extensionPointId}) => {
-    const beforeBlockTreePath = extensionPointId
-    const beforeExtensionPath = `${extensionPath}/${extensionPointId}`
-    const beforeResults = createExtensions(beforeBlockTreePath, beforeExtensionPath, bindingPath, true, blocksTree, blocksMap, contentMap)
-    acc.push(...beforeResults)
-    return acc
-  }, [] as ExtensionResult[])
+  const [afterExtensions, aroundExtensions, beforeExtensions] = [after, around, before].map(outer => {
+    return outer.reduce((acc, {extensionPointId}) => {
+      const outerExtensionPath = `${extensionPath}/${extensionPointId}`
+      const outerResults = createExtensions(extensionPointId, outerExtensionPath, bindingPath, true, blocksTree, blocksMap, contentMap)
+      acc.push(...outerResults)
+      return acc
+    }, [] as ExtensionResult[])
+  })
 
   const innerExtensions = blocks.reduce((acc, {extensionPointId}) => {
     const innerBlockTreePath = `${blockTreePath}/${extensionPointId}`
