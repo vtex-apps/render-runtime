@@ -65,7 +65,7 @@
       },
       {
         "clientOnly": true,
-        "path": "npm:vtex-render-session@1.2.0/dist/index.js"
+        "path": "npm:vtex-render-session@1.2.1/dist/index.js"
       }
     ],
     "prod": [
@@ -133,7 +133,7 @@
       },
       {
         "clientOnly": true,
-        "path": "npm:vtex-render-session@1.2.0/dist/index.min.js"
+        "path": "npm:vtex-render-session@1.2.1/dist/index.min.js"
       }
     ]
   },
