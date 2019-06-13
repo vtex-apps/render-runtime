@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix navigation to a URL that have a search term as the first path, followed by the subcategory paths.
+
 ## [8.36.0] - 2019-06-13
 
 ### Added
