@@ -31,11 +31,7 @@ const Session: FunctionComponent = ({ children }) => {
   }, [ensureSession, ensured, error])
 
   if (ensured) {
-    return (
-      <Fragment>
-        {children}
-      </Fragment>
-    )
+    return <Fragment>{children}</Fragment>
   }
 
   if (error) {

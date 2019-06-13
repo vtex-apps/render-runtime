@@ -134,15 +134,15 @@ const render = (
 
   return canUseDOM
     ? ((disableSSR || created
-      ? renderDOM<HTMLDivElement>(root, elem)
-      : hydrate(root, elem)) as Element)
+        ? renderDOM<HTMLDivElement>(root, elem)
+        : hydrate(root, elem)) as Element)
     : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
-      markups: getMarkups(name, markup),
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      maxAge: cacheControl!.maxAge,
-      page,
-      renderTimeMetric,
-    }))
+        markups: getMarkups(name, markup),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        maxAge: cacheControl!.maxAge,
+        page,
+        renderTimeMetric,
+      }))
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
@@ -176,11 +176,12 @@ function start() {
         }
         // Follow Google's security recommendations concerning target blank
         // https://developers.google.com/web/tools/lighthouse/audits/noopener
+        const rel = props.rel ? props.rel.split(' ') : []
         if (
           props.target === '_blank' &&
-          !(props.rel === 'noopener' || props.rel === 'noreferrer')
+          !(rel.indexOf('noopener') !== -1 || rel.indexOf('noreferrer') !== -1)
         ) {
-          props.rel = 'noopener'
+          props.rel = rel.concat('noopener').join(' ')
         }
       }
 
