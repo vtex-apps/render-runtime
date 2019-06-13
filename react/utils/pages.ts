@@ -1,7 +1,7 @@
 import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
-import { difference, is, isEmpty, keys, startsWith } from 'ramda'
+import { difference, is, isEmpty, keys, includes } from 'ramda'
 import RouteParser from 'route-parser'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
@@ -309,7 +309,7 @@ function routeMatchForMappedURL(
 
   for (const name in routes) {
     const { map = [], path: routePath } = routes[name]
-    if (!routePath || map.length === 0 || !startsWith(map, mappedSegments)) {
+    if (!routePath || map.length === 0 || !includes(map.join(','), mappedSegments.join(','))) {
       continue
     }
 
