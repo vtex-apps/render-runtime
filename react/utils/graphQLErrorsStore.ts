@@ -30,7 +30,9 @@ class GraphQLErrorsStore {
     const operationIds = errors.reduce<string[]>((acc, error) => {
       if (
         isExtendedGraphQLError(error) &&
-        !ignoredErrorTypes.includes(error.extensions.exception.name || '')
+        !ignoredErrorTypes.includes(
+          (error.extensions.exception && error.extensions.exception.name) || ''
+        )
       ) {
         return acc.concat(error.operationId)
       }
