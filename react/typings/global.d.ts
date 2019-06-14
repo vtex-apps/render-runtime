@@ -112,6 +112,8 @@ declare global {
     title?: string
     conditional?: boolean
     map?: string[]
+    routeId: string
+    blockId: string
   }
 
   interface NavigationRoute {
@@ -297,6 +299,7 @@ declare global {
     metaTags?: RouteMetaTags
     pageContext: PageDataContext
     title?: string
+    routeId: string
   }
 
   interface PageQueryResponse {
@@ -398,6 +401,7 @@ declare global {
     defaultExtensions: Extensions
     rootPath?: string
     workspaceCookie: string
+    hasNewExtensions: boolean
   }
 
   interface CacheHints {

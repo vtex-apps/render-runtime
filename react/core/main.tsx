@@ -165,11 +165,12 @@ function setLazyCookie(setCookie: string) {
 function start() {
   try {
     if (window.__RUNTIME__.blocksTree && !isEmpty(window.__RUNTIME__.blocksTree)) {
+      window.__RUNTIME__.hasNewExtensions = true
       window.__RUNTIME__.extensions = generateExtensions(
         window.__RUNTIME__.blocksTree,
         window.__RUNTIME__.blocks!,
         window.__RUNTIME__.contentMap!,
-        window.__RUNTIME__.pages,
+        window.__RUNTIME__.pages[window.__RUNTIME__.page],
       )
     }
 

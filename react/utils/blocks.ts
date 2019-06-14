@@ -74,13 +74,14 @@ export const generateExtensions = (
   blocksTree: BlockContentTree,
   blocks: Blocks,
   contentMap: ContentMap,
-  pages: Pages
+  page: Page
 ): Extensions => {
-  return Object.keys(pages).reduce((acc, routeId) => {
-    const routeResult = createExtensions(routeId, routeId, routeId, false, blocksTree, blocks, contentMap)
-    routeResult.forEach(eachResult => {
-      acc[eachResult.treePath] = eachResult.extension
-    })
-    return acc
-  }, {} as Extensions)
+  const extensions: Extensions = {}
+  const routeId = page.routeId
+  const routeResult = createExtensions(routeId, routeId, routeId, false, blocksTree, blocks, contentMap)
+  routeResult.forEach(eachResult => {
+    extensions[eachResult.treePath] = eachResult.extension
+  })
+  
+  return extensions
 }
