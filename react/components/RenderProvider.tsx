@@ -36,6 +36,7 @@ import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContext } from './RenderContext'
 import RenderPage from './RenderPage'
+import { generateExtensions } from '../utils/blocks';
 
 interface Props {
   children: ReactElement<any> | null
@@ -63,6 +64,9 @@ export interface RenderProviderState {
   settings: RenderRuntime['settings']
   route: RenderRuntime['route']
   loadedPages: Set<string>
+  blocksTree?:  RenderRuntime['blocksTree']
+  blocks?: RenderRuntime['blocks']
+  contentMap?: RenderRuntime['contentMap']
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
@@ -108,6 +112,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
     addMessages: PropTypes.func,
+    blocks: PropTypes.object,
+    blocksTree: PropTypes.object,
+    contentMap: PropTypes.object,
     components: PropTypes.object,
     culture: PropTypes.object,
     defaultExtensions: PropTypes.object,
@@ -176,7 +183,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     super(props)
     const {
       appsEtag,
+      blocks,
+      blocksTree,
       cacheHints,
+      contentMap,
       culture,
       messages,
       components,
@@ -228,7 +238,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     this.state = {
       appsEtag,
+      blocks,
+      blocksTree,
       cacheHints,
+      contentMap,
       components,
       culture,
       defaultExtensions: {},
@@ -478,6 +491,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       runtime: { renderMajor },
     } = this.props
     const {
+      blocks,
+      blocksTree,
+      contentMap,
       culture: { locale },
       pages: pagesState,
       production,
@@ -513,10 +529,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
     }
 
+    let updatedExtensions: Extensions = {}
+
+    if (window.__RUNTIME__.hasNewExtensions) { // TODO: Remove this when new pages-graphql get released
+      updatedExtensions = generateExtensions(blocksTree!, blocks!, contentMap!, pagesState[page])
+    }
+
     this.setState(
       {
         extensions: replaceExtensionsWithDefault(
-          this.state.extensions,
+          {...updatedExtensions, ...this.state.extensions},
           page,
           defaultExtensions
         ),

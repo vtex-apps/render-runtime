@@ -76,7 +76,7 @@ declare global {
     track?: string[]
     props?: any
     content?: Record<string, any>
-    shouldRender?: boolean
+    render?: RenderStrategy
     preview?: Preview
     composition?: Composition
   }
@@ -112,6 +112,8 @@ declare global {
     title?: string
     conditional?: boolean
     map?: string[]
+    routeId: string
+    blockId: string
   }
 
   interface NavigationRoute {
@@ -297,9 +299,13 @@ declare global {
     metaTags?: RouteMetaTags
     pageContext: PageDataContext
     title?: string
+    routeId: string
   }
 
   interface PageQueryResponse {
+    blocksJSON: string
+    blocksTreeJSON: string
+    contentMapJSON: string
     componentsJSON: string
     extensionsJSON: string
     messages: KeyedString[]
@@ -322,6 +328,9 @@ declare global {
   }
 
   interface ParsedPageQueryResponse {
+    blocks: RenderRuntime['blocks']
+    blocksTree: RenderRuntime['blocksTree']
+    contentMap: RenderRuntime['contentMap']
     components: RenderRuntime['components']
     extensions: RenderRuntime['extensions']
     messages: RenderRuntime['messages']
@@ -358,6 +367,9 @@ declare global {
     account: string
     accountId: string
     appsEtag: string
+    blocks?: Blocks
+    blocksTree?: BlockContentTree
+    contentMap?: ContentMap
     customRouting?: boolean
     emitter: EventEmitter
     workspace: string
@@ -389,6 +401,7 @@ declare global {
     defaultExtensions: Extensions
     rootPath?: string
     workspaceCookie: string
+    hasNewExtensions: boolean
   }
 
   interface CacheHints {
@@ -460,6 +473,40 @@ declare global {
     myvtexSSE: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
   }
+
+  interface BlockEntry {
+    after?: BlockInsertion[]
+    around?: BlockInsertion[]
+    before?: BlockInsertion[]
+    blockId: string
+    blocks?: BlockInsertion[]
+    component: string
+    composition?: Composition
+    props?: Record<string, any>
+    context?: {
+      component: string
+      props?: Record<string, any>
+    }
+    implements: string[]
+    originalBlockId?: string
+    preview?: Preview
+    render: RenderStrategy
+    track?: string[]
+    title?: string
+  }
+
+  interface TreeEntry {
+    blockIdMap: Record<string, BlockId>,
+    contentIdMap: Record<string, string>
+  }
+
+  interface ContentMap {
+    [contentId: string]: Record<string, any>
+  }
+
+  type RenderStrategy = 'client' | 'lazy' | 'server'
+  type BlockContentTree = Record<string, TreeEntry>
+  type Blocks = Record<string, BlockEntry>
 
   namespace NodeJS {
     interface Global extends Window {

@@ -1,6 +1,8 @@
 import navigationPageQuery from '../queries/navigationPage.graphql'
 import routePreviews from '../queries/routePreviews.graphql'
 import { parseMessages } from './messages'
+import { generateExtensions } from './blocks'
+import { isEmpty } from 'ramda'
 
 const parsePageQueryResponse = (
   page: PageQueryResponse
@@ -8,6 +10,9 @@ const parsePageQueryResponse = (
   const {
     appsEtag,
     appsSettingsJSON,
+    blocksJSON,
+    blocksTreeJSON,
+    contentMapJSON,
     cacheHintsJSON,
     componentsJSON,
     extensionsJSON,
@@ -18,21 +23,31 @@ const parsePageQueryResponse = (
       canonicalPath,
       metaTags,
       pageContext: { id, type },
+      routeId,
       title,
     },
   } = page
 
-  const [cacheHints, components, extensions, pages, settings] = [
+  const [blocks, blocksTree, contentMap, cacheHints, components, pages, settings] = [
+    blocksJSON,
+    blocksTreeJSON,
+    contentMapJSON,
     cacheHintsJSON,
     componentsJSON,
-    extensionsJSON,
     pagesJSON,
     appsSettingsJSON,
   ].map(json => JSON.parse(json))
 
+  const extensions = isEmpty(blocksTree)
+    ? JSON.parse(extensionsJSON)
+    : generateExtensions(blocksTree, blocks, contentMap, pages[routeId])
+
   return {
     appsEtag,
     cacheHints,
+    blocks,
+    blocksTree,
+    contentMap,
     components,
     extensions,
     matchingPage: {
@@ -40,6 +55,7 @@ const parsePageQueryResponse = (
       canonicalPath,
       metaTags,
       pageContext: { id, type },
+      routeId,
       title,
     },
     messages: parseMessages(messages),

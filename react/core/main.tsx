@@ -14,6 +14,7 @@ import { getDataFromTree } from 'react-apollo'
 import { hydrate, render as renderDOM } from 'react-dom'
 import { Helmet } from 'react-helmet'
 import NoSSR from 'react-no-ssr'
+import { isEmpty } from 'ramda'
 import Loading from '../components/Loading'
 
 import { ChildBlock, useChildBlock } from '../components/ChildBlock'
@@ -45,6 +46,7 @@ import {
   optimizeStyleForVtexImg,
 } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
+import { generateExtensions } from '../utils/blocks';
 
 let emitter: EventEmitter | null = null
 
@@ -162,6 +164,16 @@ function setLazyCookie(setCookie: string) {
 
 function start() {
   try {
+    if (window.__RUNTIME__.blocksTree && !isEmpty(window.__RUNTIME__.blocksTree)) {
+      window.__RUNTIME__.hasNewExtensions = true
+      window.__RUNTIME__.extensions = generateExtensions(
+        window.__RUNTIME__.blocksTree,
+        window.__RUNTIME__.blocks!,
+        window.__RUNTIME__.contentMap!,
+        window.__RUNTIME__.pages[window.__RUNTIME__.page],
+      )
+    }
+
     const runtime = window.__RUNTIME__
     const rootName = runtime.page
     validateRootComponent(rootName, runtime.extensions)
