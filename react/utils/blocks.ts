@@ -3,6 +3,12 @@ interface ExtensionResult {
   extension: Extension
 }
 
+export const withStar = (treePath: string) => {
+  const parts = treePath.split('/')
+  parts[0] = '*'
+  return parts.join('/')
+}
+
 const createExtensions = (
   blockTreePath: string,
   extensionPath: string,
@@ -18,10 +24,10 @@ const createExtensions = (
   }
 
   const {blockIdMap, contentIdMap} = blocksTree[blockTreePath]
-  const mappedBlockId = blockIdMap[extensionPath] || blockIdMap['*']
+  const mappedBlockId =  blockIdMap[extensionPath] || blockIdMap[withStar(extensionPath)] || blockIdMap['*']
   const block = blocksMap[mappedBlockId]
   const {blockId, after = [], around = [], before = [], blocks = []} = block
-  const contentId = contentIdMap[bindingPath] || blockId
+  const contentId = contentIdMap[bindingPath] || contentIdMap[withStar(bindingPath)] || blockId
   const blockContentId = `${contentId}+${blockId}`
 
   const self = [{
