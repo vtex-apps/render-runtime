@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- Upgrade react-apollo and apollo-client
+- Upgrade react-apollo, apollo-client and apollo-cache-inmemory
 
 ## [8.38.0] - 2019-06-14
 ### Added
