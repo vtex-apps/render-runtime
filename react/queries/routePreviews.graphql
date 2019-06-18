@@ -5,9 +5,5 @@ query RoutePreviews($routes: [PreviewRouteInput], $renderMajor: Int) {
   ) {
     componentsJSON
     extensionsJSON
-    # messages {
-    #   key
-    #   message
-    # }
   }
 }
