@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade react-apollo and apollo-client
+
 ## [8.38.0] - 2019-06-14
 ### Added
 - Strategy to unpack compressed `pages-graphql` extensions
