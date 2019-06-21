@@ -72,7 +72,26 @@
     "react-intl": "^2.4.0",
     "react-testing-library": "^5.6.0",
     "regenerator-runtime": "^0.13.1",
-    "ts-jest": "^23.10.5",
+    "ts-jest": "^24.0.1",
     "typescript": "3.5.2"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest",
+      "\\.(gql|graphql)$": "jest-transform-graphql",
+      "^.+\\.(js|jsx|mjs)$": "<rootDir>/node_modules/babel-jest"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "testUtils"
+    ]
   }
 }
