@@ -12,13 +12,9 @@ export function getComparablePrecedence(path: string): string {
     .reduce((acc, pathSegment) => {
       if (pathSegment.startsWith('*')) {
         acc.push(3);
-      }
-
-      if (pathSegment.startsWith(':')) {
+      } else if (pathSegment.startsWith(':')) {
         acc.push(2)
-      }
-
-      if (pathSegment) {
+      } else if (pathSegment) {
         acc.push(1)
       }
 
