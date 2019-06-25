@@ -20,7 +20,7 @@ export function getComparablePrecedence(path: string): string {
 
       return acc
     }, [] as number[])
-    .join('.')
+    .join()
 }
 
 function isHost(hostname: string) {
