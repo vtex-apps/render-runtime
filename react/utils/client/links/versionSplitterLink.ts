@@ -187,7 +187,7 @@ const observableFromOperations = (operations: Operation[], forward: NextLink) =>
   }) as Observable<FetchResult<{ [key: string]: any }, Record<string, any>, Record<string, any>>>
 
 export const versionSplitterLink = new ApolloLink(
-  (operation: Operation, forward?: NextLink) => {
+  (operation: Operation, forward?: NextLink) : any => {
     if (forward) {
       const query = operation.query
       const operations = operationByRuntimeMetaDirective(operation)
