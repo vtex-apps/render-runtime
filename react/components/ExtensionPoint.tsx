@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { mergeDeepRight, reduce } from 'ramda'
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment, FunctionComponent } from 'react'
 import ReactDOM from 'react-dom'
 
 import { getImplementation } from '../utils/assets'
@@ -178,27 +178,13 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
         runtime.extensions && runtime.extensions[childTreePath]
       const childProps = childExtension ? childExtension.props : {}
 
-      /* This ExtensionPointWrapper thing is done so the user can read
-       * the props that were passed through the blocks.json file to
-       * its children in a standard, React-ish way; that is:
-       * `React.Children.map(children, child => child.props)`
-       *
-       * The problem was, if the user passed a prop that conflicted with
-       * ExtensionPoint props (most notabily, `id`), just destructuring
-       * the `childProps` over ExtensionPoint would override the
-       * ExtensionPoint props, which would break the rendering.
-       * (or vice versa, which would cause wrong values being read by
-       * the user component).
-       */
-      const ExtensionPointWrapper = (blockProps: object) => (
-        <ExtensionPoint
+      return (
+        <ExtensionPointWrapper
+          key={i}
           id={child.extensionPointId}
           treePath={treePath}
-          blockProps={blockProps}
-        />
+          blockProps={childProps} />
       )
-
-      return <ExtensionPointWrapper key={i} {...childProps} />
     })
   }
 
@@ -283,6 +269,33 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       element.removeAttribute('data-extension-point')
     }
   }
+}
+
+ /* This ExtensionPointWrapper thing is done so the user can read
+  * the props that were passed through the blocks.json file to
+  * its children in a standard, React-ish way; that is:
+  * `React.Children.map(children, child => child.props)`
+  *
+  * The problem was, if the user passed a prop that conflicted with
+  * ExtensionPoint props (most notabily, `id`), just destructuring
+  * the `childProps` over ExtensionPoint would override the
+  * ExtensionPoint props, which would break the rendering.
+  * (or vice versa, which would cause wrong values being read by
+  * the user component).
+  */
+const ExtensionPointWrapper: FunctionComponent<ExtensionPointWrapperProps> = ({ id, treePath, blockProps } ) => {
+  return (
+    <ExtensionPoint
+      id={id}
+      treePath={treePath}
+      blockProps={blockProps} />
+  )
+}
+
+interface ExtensionPointWrapperProps {
+  id: string
+  treePath: string
+  blockProps: object
 }
 
 export default withTreePath(ExtensionPoint)
