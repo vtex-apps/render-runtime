@@ -6,11 +6,21 @@ import RouteParser from 'route-parser'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
-function getScore(path: string) {
-  const catchAll = (path.match(/\*/g) || []).length
-  const catchOne = (path.match(/:/g) || []).length
-  const fixed = (path.match(/\/[\w_-]+/g) || []).length
-  return ~((catchAll << 12) + (catchOne << 6) + ((1 << 6) - fixed - 1))
+export function getComparablePrecedence(path: string): string {
+  return path
+    .split('/')
+    .reduce((acc, pathSegment) => {
+      if (pathSegment.startsWith('*')) {
+        acc.push(3);
+      } else if (pathSegment.startsWith(':')) {
+        acc.push(2)
+      } else if (pathSegment) {
+        acc.push(1)
+      }
+
+      return acc
+    }, [] as number[])
+    .join()
 }
 
 function isHost(hostname: string) {
@@ -343,8 +353,8 @@ function routeMatchForMappedURL(
 
 function routeMatchFromPath(path: string, routes: Pages): RouteMatch | null {
   let id: string | undefined
-  let score: number
-  let highScore: number = Number.NEGATIVE_INFINITY
+  let pathPrecedence: string
+  let chosenPathPrecedence: string | null = null
 
   for (const name in routes) {
     const pagePath = getPagePath(name, routes)
@@ -357,12 +367,12 @@ function routeMatchFromPath(path: string, routes: Pages): RouteMatch | null {
       continue
     }
 
-    score = getScore(pagePath)
-    if (highScore > score) {
+    pathPrecedence = getComparablePrecedence(pagePath)
+    if (chosenPathPrecedence !== null && chosenPathPrecedence < pathPrecedence) {
       continue
     }
 
-    highScore = score
+    chosenPathPrecedence = pathPrecedence
     id = name
   }
 

@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Change routing precedence algorithm to match the server-side one.
 
 ## [8.38.3] - 2019-06-26
 ### Fixed
@@ -39,7 +41,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Sets every URI scope to `private` whenever the workspace's root interface declarer has a `requiresAuthorization` setting with value `true`.
 
 ## [8.36.3] - 2019-06-13
-### Fixed 
+### Fixed
 - Fix data-src attribute for lazy image loading.
 
 ## [8.36.2] - 2019-06-13

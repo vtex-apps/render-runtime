@@ -2,7 +2,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "lint": "tsc --noEmit --pretty && eslint --fix --ext ts,tsx .",
-    "test": "jest"
+    "test": "vtex-test-tools test"
   },
   "dependencies": {
     "@types/react-content-loader": "^3.1.4",
@@ -54,6 +54,7 @@
     "@types/react-hot-loader": "^4.1.0",
     "@types/react-intl": "^2.3.5",
     "@types/route-parser": "^0.1.1",
+    "@vtex/test-tools": "^0.3.2",
     "babel-core": "^6.26.3",
     "babel-jest": "^24.1.0",
     "babel-preset-env": "^1.7.0",
@@ -72,7 +73,7 @@
     "react-intl": "^2.4.0",
     "react-testing-library": "^5.6.0",
     "regenerator-runtime": "^0.13.1",
-    "ts-jest": "^23.10.5",
+    "ts-jest": "^24.0.1",
     "typescript": "3.5.2"
   }
 }
