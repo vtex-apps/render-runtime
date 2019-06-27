@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Build assets with new builder hub.
+
 ## [8.39.0] - 2019-06-26
 ### Changed
 - Change routing precedence algorithm to match the server-side one.
