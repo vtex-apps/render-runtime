@@ -2,16 +2,16 @@ import React, { FunctionComponent, useContext, useMemo } from 'react'
 import { useTreePath } from '../utils/treePath'
 import { useRuntime } from './RenderContext'
 
-interface HostAppValue {
+interface OwnerExtensionValue {
   identifier: string
   name: string
   vendor: string
   version: string
 }
 
-const HostAppContext = React.createContext<HostAppValue | undefined>(undefined)
+const OwnerExtensionContext = React.createContext<OwnerExtensionValue | undefined>(undefined)
 
-export const HostAppProvider: FunctionComponent = (props) => {
+export const OwnerExtensionProvider: FunctionComponent = (props) => {
   const runtime = useRuntime()
   const { treePath } = useTreePath()
 
@@ -19,7 +19,7 @@ export const HostAppProvider: FunctionComponent = (props) => {
 
   if (!extension || !extension.blockId) {
     return (
-      <HostAppContext.Provider value={undefined} />
+      <OwnerExtensionContext.Provider value={undefined} />
     )
   }
 
@@ -39,15 +39,15 @@ export const HostAppProvider: FunctionComponent = (props) => {
   }, [blockId])
 
   return (
-    <HostAppContext.Provider value={value} {...props} />
+    <OwnerExtensionContext.Provider value={value} {...props} />
   )
 }
 
-export const useHostApp = () => {
-  const context = useContext(HostAppContext)
+export const useOwnerExtension = () => {
+  const context = useContext(OwnerExtensionContext)
 
   if (!context) {
-    throw new Error('useHostApp must be used within a HostAppProvider')
+    throw new Error('useOwnerExtension must be used within a OwnerExtensionProvider')
   }
 
   return context
