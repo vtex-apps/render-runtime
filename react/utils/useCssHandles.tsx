@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useHostApp } from '../components/HostApp'
+import { useHostExtension } from '../components/HostExtension'
 
 /**
  * Useful for creating CSS handles without creating a CSS file with empty
@@ -8,7 +8,7 @@ import { useHostApp } from '../components/HostApp'
  * { foo: 'vendor-appname-1-x-foo', bar: 'vendor-appname-1-x-bar' }.
  */
 const useCssHandles = (handles: string[] = []): { [key: string]: string } => {
-  const { identifier } = useHostApp()
+  const { identifier } = useHostExtension()
 
   if (!identifier) {
     // Fallback to empty strings
