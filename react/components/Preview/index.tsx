@@ -143,6 +143,10 @@ export default class Preview extends React.PureComponent<Props, State> {
         ? initialHeight - padding * 2
         : 0
 
+    if (height === 0) {
+      return null
+    }
+
     return (
       /** TODO: remove this div in favor of the Container component,
        * currently on store-components
