@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- New hook `useOwnerBlockCssHandles` capable of creating CSS handles in runtime.
+
 ## [8.39.3] - 2019-06-28
 
 ### Fixed
