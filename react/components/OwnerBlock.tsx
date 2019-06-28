@@ -2,16 +2,19 @@ import React, { FunctionComponent, useContext, useMemo } from 'react'
 import { useTreePath } from '../utils/treePath'
 import { useRuntime } from './RenderContext'
 
-interface OwnerExtensionValue {
+interface OwnerBlockValue {
   identifier: string
   name: string
   vendor: string
   version: string
 }
 
-const OwnerExtensionContext = React.createContext<OwnerExtensionValue | undefined>(undefined)
+const OwnerBlockContext = React.createContext<OwnerBlockValue | undefined>(undefined)
 
-export const OwnerExtensionProvider: FunctionComponent = (props) => {
+/**
+ * This is adds a context of which block the current tree is owned by.
+ */
+export const OwnerBlockProvider: FunctionComponent = (props) => {
   const runtime = useRuntime()
   const { treePath } = useTreePath()
 
@@ -19,7 +22,7 @@ export const OwnerExtensionProvider: FunctionComponent = (props) => {
 
   if (!extension || !extension.blockId) {
     return (
-      <OwnerExtensionContext.Provider value={undefined} />
+      <OwnerBlockContext.Provider value={undefined} />
     )
   }
 
@@ -39,15 +42,15 @@ export const OwnerExtensionProvider: FunctionComponent = (props) => {
   }, [blockId])
 
   return (
-    <OwnerExtensionContext.Provider value={value} {...props} />
+    <OwnerBlockContext.Provider value={value} {...props} />
   )
 }
 
-export const useOwnerExtension = () => {
-  const context = useContext(OwnerExtensionContext)
+export const useOwnerBlock = () => {
+  const context = useContext(OwnerBlockContext)
 
   if (!context) {
-    throw new Error('useOwnerExtension must be used within a OwnerExtensionProvider')
+    throw new Error('useOwnerBlock must be used within a OwnerBlockProvider')
   }
 
   return context
