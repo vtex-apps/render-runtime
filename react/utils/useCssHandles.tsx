@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useHostExtension } from '../components/HostExtension'
+import { useOwnerBlock } from '../components/OwnerBlock'
 
 /**
  * Useful for creating CSS handles without creating a CSS file with empty
@@ -7,22 +7,21 @@ import { useHostExtension } from '../components/HostExtension'
  * Receives an array of strings ('foo', 'bar') and returns an object with
  * { foo: 'vendor-appname-1-x-foo', bar: 'vendor-appname-1-x-bar' }.
  */
-const useCssHandles = (handles: string[] = []): { [key: string]: string } => {
-  const { identifier } = useHostExtension()
-
-  if (!identifier) {
-    // Fallback to empty strings
-    const fallbackValues = useMemo(() => {
-      return handles.reduce((acc: { [key: string]: string }, handle) => {
-        acc[handle] = ''
-        return acc
-      }, {})
-    }, [handles])
-
-    return fallbackValues
-  }
+export const useOwnerBlockCssHandles = (handles: string[] = []): CssHandles => {
+  const { identifier } = useOwnerBlock()
 
   const values = useMemo(() => {
+    if (!identifier) {
+      const fallbackValues = useMemo(() => {
+        return handles.reduce((acc: { [key: string]: string }, handle) => {
+          acc[handle] = ''
+          return acc
+        }, {})
+      }, [handles])
+
+      return fallbackValues
+    }
+
     const namespace = identifier
       .replace(/\./gi, '-')
       .replace('@', '-')
@@ -31,9 +30,11 @@ const useCssHandles = (handles: string[] = []): { [key: string]: string } => {
       acc[handle] = namespace + '-' + handle
       return acc
     }, {})
-  }, [handles])
+  }, [identifier, handles])
 
   return values
 }
 
-export default useCssHandles
+interface CssHandles {
+  [key: string]: string
+}

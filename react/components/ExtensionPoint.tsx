@@ -2,7 +2,7 @@ import { mergeDeepRight, reduce } from 'ramda'
 import React, { FC, Fragment } from 'react'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
-import { OwnerExtensionProvider } from './OwnerExtension'
+import { OwnerBlockProvider } from './OwnerBlock'
 import Loading from './Loading'
 import { useRuntime } from './RenderContext'
 import { useTreePath } from '../utils/treePath'
@@ -179,9 +179,9 @@ const ExtensionPoint: FC<Props> = props => {
   )
 
   return (
-    <OwnerExtensionProvider>
+    <OwnerBlockProvider>
       {extensionPointComponent}
-    </OwnerExtensionProvider>
+    </OwnerBlockProvider>
   )
 }
 
