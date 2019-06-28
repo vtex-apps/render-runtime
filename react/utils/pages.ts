@@ -226,6 +226,13 @@ export function navigate(
     )
   }
 
+  // If the prop `to` is something like `to="#header"`
+  // just change the hash using location, avoid doing a history navigation
+  if (inputTo.indexOf('#') === 0 && inputTo.indexOf('?') === -1) {
+    window.location.hash = inputTo
+    return true
+  }
+
   const [to, extractedQuery] = (is(String, inputTo) ? inputTo : '').split('?')
   const [realQuery, hash] = (is(String, extractedQuery)
     ? extractedQuery
