@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import { any, map, append } from 'ramda'
 import React, { Component } from 'react'
 
 import ExtensionPortal from './ExtensionPortal'
@@ -69,16 +69,16 @@ class ExtensionManager extends Component<Props, State> {
     extensionsList: PortalRenderingRequest[],
     newExtension: PortalRenderingRequest
   ): PortalRenderingRequest[] => {
-    const exists = R.any((el: PortalRenderingRequest) => {
+    const exists = any((el: PortalRenderingRequest) => {
       return el.extensionName === newExtension.extensionName
     })(extensionsList)
     const newExtensionsList = exists
-      ? R.map((el: PortalRenderingRequest) => {
+      ? map((el: PortalRenderingRequest) => {
           return el.extensionName === newExtension.extensionName
             ? newExtension
             : el
         }, extensionsList)
-      : R.append(newExtension, extensionsList)
+      : append(newExtension, extensionsList)
     return newExtensionsList
   }
 }
