@@ -1,39 +1,30 @@
-import React, { PureComponent } from 'react'
+import React, { FC, memo } from 'react'
 import ExtensionPoint from './ExtensionPoint'
 import MaybeContext from './MaybeContext'
-import { RenderContext } from './RenderContext'
+import { useRuntime } from './RenderContext'
 
 interface Props {
   page: string
   query?: Record<string, string>
 }
 
-export default class RenderPage extends PureComponent<Props> {
-  public render() {
-    return (
-      <RenderContext.Consumer>
-        {runtime => {
-          const {
-            route: { params },
-          } = runtime
-          const { page, query } = this.props
-          return (
-            <MaybeContext
-              nestedPage={page}
-              query={query}
-              params={params}
-              runtime={runtime}
-            >
-              <ExtensionPoint
-                id={page}
-                query={query}
-                params={params}
-                {...this.props}
-              />
-            </MaybeContext>
-          )
-        }}
-      </RenderContext.Consumer>
-    )
-  }
+const RenderPage: FC<Props> = props => {
+  const { page, query } = props
+  const { route: { params } } = useRuntime()
+  return (
+    <MaybeContext
+      nestedPage={page}
+      query={query}
+      params={params}
+    >
+      <ExtensionPoint
+        id={page}
+        query={query}
+        params={params}
+        {...props}
+      />
+    </MaybeContext>
+  )
 }
+
+export default memo(RenderPage)
