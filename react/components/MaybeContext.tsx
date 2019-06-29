@@ -2,7 +2,7 @@ import React, { useMemo, Fragment, FC } from 'react'
 import ExtensionPointComponent from '../components/ExtensionPointComponent'
 import { useRuntime, RenderContextProps } from './RenderContext'
 
-interface Props {
+interface Props extends RenderContextProps{
   nestedPage: string
   params?: Record<string, any>
   query?: Record<string, string>
@@ -30,9 +30,7 @@ const useContextComponent = ({ nestedPage, query, params, runtime }: Props & Ren
   return [contextProps, contextComponent]
 }
 
-const MaybeContext: FC<Props> = ({ children, nestedPage, query, params }) => {
-  const runtime = useRuntime()
-
+const MaybeContext: FC<Props> = ({ children, nestedPage, query, params, runtime }) => {
   const [contextProps, contextComponent] = useContextComponent({
     nestedPage,
     query,
@@ -50,7 +48,9 @@ const MaybeContext: FC<Props> = ({ children, nestedPage, query, params }) => {
       {children}
     </ExtensionPointComponent>
   ) : (
-    <Fragment>{children}</Fragment>
+    <Fragment>
+      {children}
+    </Fragment>
   )
 }
 

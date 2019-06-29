@@ -1,45 +1,34 @@
-import React, { Component, ReactPortal } from 'react'
+import React, { ReactPortal, FC, useState, useEffect, Fragment } from 'react'
 
 import { createPortal } from '../utils/dom'
-import { getDirectChildren, TreePathContext } from '../utils/treePath'
+import { getDirectChildren, useTreePath } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
-import { RenderContext } from './RenderContext'
+import { useRuntime } from './RenderContext'
 
 interface Props {
   query: any
   params: any
 }
 
-class LegacyExtensionContainer extends Component<Props, { hydrate: boolean }> {
-  public state = {
-    hydrate: false,
-  }
-
-  public componentDidMount() {
-    this.setState({ hydrate: true })
-  }
-
-  public render() {
-    const { params, query } = this.props
-    return (
-      <RenderContext.Consumer>
-        {runtime => (
-          <TreePathContext.Consumer>
-            {({ treePath }) =>
-              getDirectChildren(runtime.extensions, treePath).map(
-                id =>
-                  createPortal(
-                    <ExtensionPoint id={id} query={query} params={params} />,
-                    `${treePath}/${id}`,
-                    this.state.hydrate
-                  ) as ReactPortal
-              )
-            }
-          </TreePathContext.Consumer>
-        )}
-      </RenderContext.Consumer>
-    )
-  }
+const LegacyExtensionContainer: FC<Props> = ({ query, params }) => {
+  const [hydrate, setHydrate] = useState(false)
+  useEffect(() => {
+    setHydrate(true)
+  }, [])
+  const { extensions } = useRuntime()
+  const { treePath } = useTreePath()
+  return (
+    <Fragment>
+      {getDirectChildren(extensions, treePath).map(
+        id =>
+          createPortal(
+            <ExtensionPoint id={id} query={query} params={params} />,
+            `${treePath}/${id}`,
+            hydrate
+          ) as ReactPortal
+      )}
+    </Fragment>
+  )
 }
 
 export default LegacyExtensionContainer
