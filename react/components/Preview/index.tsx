@@ -154,7 +154,7 @@ export default class Preview extends React.PureComponent<Props, State> {
        */
       <div
         ref={this.container}
-        className={fullWidth ? '' : 'mw9 center'}
+        className={fullWidth ? '' : 'mw9 center w-100'}
         style={{ padding }}
       >
         {this.renderPreviewGraphic(width, height, type)}
