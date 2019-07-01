@@ -12,14 +12,16 @@ interface Props {
 }
 
 const ExtensionContainer: FC<Props> = props => {
-  const runtime = useRuntime()
+  const { id } = props
+  const { extensions } = useRuntime()
+
   const { treePath } = useTreePath()
-  const containerTreePath = join(treePath, props.id)
+  const containerTreePath = join(treePath, id)
 
   return (
     <>
-      {getDirectChildren(runtime.extensions, containerTreePath).map(cid => {
-        const childTreePath = join(props.id, cid)
+      {getDirectChildren(extensions, containerTreePath).map(cid => {
+        const childTreePath = join(id, cid)
         return (
           <ExtensionPoint {...props} key={childTreePath} id={childTreePath} />
         )
