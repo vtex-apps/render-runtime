@@ -1,46 +1,57 @@
-import React, { PureComponent } from 'react'
+import React, { useMemo, Fragment, FC } from 'react'
 import ExtensionPointComponent from '../components/ExtensionPointComponent'
-import { RenderContextProps } from './RenderContext'
+import { useRuntime, RenderContextProps } from './RenderContext'
 
 interface Props {
   nestedPage: string
-  params?: any
-  query?: any
+  params?: Record<string, any>
+  query?: Record<string, string>
 }
 
-export default class MaybeContext extends PureComponent<
-  Props & RenderContextProps
-> {
-  public render() {
-    const { children, runtime, nestedPage, query, params } = this.props
-    const { context, props: pageProps } = runtime.extensions[nestedPage]
-    const pageContextProps = pageProps && pageProps.context
+const useContextComponent = ({ nestedPage, query, params, runtime }: Props & RenderContextProps) => {
+  const { extensions } = runtime
 
-    let contextComponent
-    let props
+  const { context, props: pageProps } = extensions[nestedPage]
+  const pageContextProps = pageProps && pageProps.context
 
-    if (context) {
-      contextComponent = context.component
-      props = {
-        ...pageContextProps,
-        nextTreePath: nestedPage,
-        params,
-        query,
-        ...context.props,
-      }
+  const contextProps = useMemo(() => {
+    if (!context) {
+      return undefined
     }
-
-    return contextComponent ? (
-      <ExtensionPointComponent
-        component={contextComponent}
-        props={props}
-        runtime={runtime}
-        treePath={nestedPage}
-      >
-        {children}
-      </ExtensionPointComponent>
-    ) : (
-      children
-    )
-  }
+    return {
+      pageContextProps,
+      nextTreePath: nestedPage,
+      params,
+      query,
+      ...context.props,
+    }
+  }, [context, nestedPage, params, query, pageContextProps])
+  const contextComponent = context ? context.component : undefined
+  return [contextProps, contextComponent]
 }
+
+const MaybeContext: FC<Props> = ({ children, nestedPage, query, params }) => {
+  const runtime = useRuntime()
+
+  const [contextProps, contextComponent] = useContextComponent({
+    nestedPage,
+    query,
+    params,
+    runtime,
+  })
+
+  return contextComponent ? (
+    <ExtensionPointComponent
+      component={contextComponent}
+      props={contextProps}
+      runtime={runtime}
+      treePath={nestedPage}
+    >
+      {children}
+    </ExtensionPointComponent>
+  ) : (
+    <Fragment>{children}</Fragment>
+  )
+}
+
+export default MaybeContext

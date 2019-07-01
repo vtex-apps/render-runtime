@@ -20,7 +20,6 @@ function RenderPage(props: Props) {
       nestedPage={page}
       query={query}
       params={params}
-      runtime={runtime}
     >
       <ExtensionPoint
         id={page}
