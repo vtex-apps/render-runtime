@@ -79,6 +79,7 @@ declare global {
     render?: RenderStrategy
     preview?: Preview
     composition?: Composition
+    hasContentSchema?: boolean
   }
 
   interface Extensions {
@@ -482,6 +483,7 @@ declare global {
     blocks?: BlockInsertion[]
     component: string
     composition?: Composition
+    hasContentSchema: boolean
     props?: Record<string, any>
     context?: {
       component: string
