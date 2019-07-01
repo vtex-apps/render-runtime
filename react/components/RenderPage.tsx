@@ -10,19 +10,12 @@ interface Props {
 
 const RenderPage: FC<Props> = props => {
   const { page, query } = props
-  const { route: { params } } = useRuntime()
+  const {
+    route: { params },
+  } = useRuntime()
   return (
-    <MaybeContext
-      nestedPage={page}
-      query={query}
-      params={params}
-    >
-      <ExtensionPoint
-        id={page}
-        query={query}
-        params={params}
-        {...props}
-      />
+    <MaybeContext nestedPage={page} query={query} params={params}>
+      <ExtensionPoint id={page} query={query} params={params} {...props} />
     </MaybeContext>
   )
 }

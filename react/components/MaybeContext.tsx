@@ -31,7 +31,11 @@ const useContextComponent = ({ nestedPage, query, params }: Props) => {
 const MaybeContext: FC<Props> = ({ children, nestedPage, query, params }) => {
   const runtime = useRuntime()
 
-  const [contextProps, contextComponent] = useContextComponent({ nestedPage, query, params })
+  const [contextProps, contextComponent] = useContextComponent({
+    nestedPage,
+    query,
+    params,
+  })
 
   return contextComponent ? (
     <ExtensionPointComponent
@@ -43,9 +47,7 @@ const MaybeContext: FC<Props> = ({ children, nestedPage, query, params }) => {
       {children}
     </ExtensionPointComponent>
   ) : (
-    <Fragment>
-      {children}
-    </Fragment>
+    <Fragment>{children}</Fragment>
   )
 }
 
