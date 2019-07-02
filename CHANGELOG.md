@@ -7,33 +7,452 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [7.39.1] - 2019-04-02
+## [7.39.2] - 2019-07-02
+
+## [8.40.1] - 2019-07-02
+### Fixed
+- Support for optional parameters in routes containing `map`
+
+## [8.40.0] - 2019-07-01
+### Add
+- Add hasContentSchema information to extensions
+
+## [8.39.4] - 2019-07-01
+### Fixed
+- Width of the Preview component under the adjusted store wrapper.
+
+## [8.39.3] - 2019-06-28
+
+### Fixed
+- Hash navigation in Link component.
+
+## [8.39.2] - 2019-06-27
+### Fixed
+- Refrain from rendering Preview if its height is 0.
+
+## [8.39.1] - 2019-06-27
+
+### Fixed
+- Build assets with new builder hub.
+
+## [8.39.0] - 2019-06-26
+### Changed
+- Change routing precedence algorithm to match the server-side one.
+
+## [8.38.3] - 2019-06-26
+### Fixed
+- Avoid recreating React elements when block has composition children.
+
+## [8.38.2] - 2019-06-21
+
+## [8.38.1] - 2019-06-18
+
+### Changed
+
+- Upgrade react-apollo, apollo-client and apollo-cache-inmemory
+
+## [8.38.0] - 2019-06-14
+### Added
+- Strategy to unpack compressed `pages-graphql` extensions
+
+## [8.37.3] - 2019-06-14
+### Fixed
+- Prevent graphQLErrorsStore from swallowing up errors when exception is undefined
+
+## [8.37.2] - 2019-06-14
+
+## [8.37.1] - 2019-06-13
+
+### Changed
+- Revert setting `data-src` and removing `src` for every image (but continue supporting lazysizes as opt-in).
+
+## [8.37.0] - 2019-06-13
+### Added
+- Sets every URI scope to `private` whenever the workspace's root interface declarer has a `requiresAuthorization` setting with value `true`.
+
+## [8.36.3] - 2019-06-13
+### Fixed
+- Fix data-src attribute for lazy image loading.
+
+## [8.36.2] - 2019-06-13
+### Fixed
+- Remove negative values for preview width and height.
+
+## [8.36.1] - 2019-06-13
+
+### Fixed
+
+- Fix navigation to a URL that have a search term as the first path, followed by the subcategory paths.
+
+## [8.36.0] - 2019-06-13
+
+### Added
+- Support for lazy loading of images using lazysizes
+- Defer render start for quicker onload
+
+## [8.35.5] - 2019-06-13
+
+### Fixed
+
+- Make it possible to have a link with attribute `rel="noopener nofollow"`.
+
+## [8.35.4] - 2019-06-13
+
+### Fixed
+
+- Error of trying to setState in a unmounted component.
+
+## [8.35.3] - 2019-06-13
+### Changed
+- Upgrades render-session
+
+## [8.35.2] - 2019-06-12
+
+## [8.35.1] - 2019-06-11
+
+## [8.35.0] - 2019-06-11
+
+## [8.35.0-beta] - 2019-06-11
+
+## [8.34.6] - 2019-06-10
+
+## [8.34.5] - 2019-06-10
+
+## [8.34.4] - 2019-06-07
+
+## [8.34.3] - 2019-06-06
+### Changed
+- Change BuildStatus animation from SMIL-based to CSS-based, for performance.
+
+## [8.34.2] - 2019-06-06
+### Changed
+- Downgraded `query-string` to version 5.x, for IE11 support. (https://www.npmjs.com/package/query-string#install)
+
+## [8.34.1] - 2019-06-03
+
+## [8.34.0] - 2019-06-03
+
+## [8.32.4] - 2019-05-29
+### Fixed
+- Add skipCache to updateRuntime
+
+## [8.32.3] - 2019-05-27 [YANKED]
+
+### Changed
+- Removed replaceExtensionsWithDefault on page change.
+
+## [8.32.2] - 2019-05-27
+
+### Fixed
+- Error when img `src` attribute isn't a string.
+
+## [8.32.1] - 2019-05-27
+
+## [8.32.0] - 2019-05-27
+
+### Added
+- Link to catch GraphQL errors, store and show them when a component crashes.
+- Sending `domain` and `page` to Sentry as tags.
+
+### Changed
+- Hide some runtime keys before sending it to Sentry.
+- Broke the runtime extra sent to Sentry into smaller `runtime.${key}` extras.
+- Inlined sentry config to remove one file from pages fetching phase.
+
+### Fixed
+- Global typings.
+
+## [8.31.1] - 2019-05-25
+
+### Removed
+- scopeMessages.
+
+## [8.31.0] - 2019-05-24
+### Added
+- Support metatags for custom routes.
+
+## [8.30.0] - 2019-05-21
+### Added
+
+- Method to add messages to Runtime (`addMessages`).
+- `addMessages` and `messages` to Render context.
+
+### Changed
+
+- `sendInfoFromIframe` signature.
+- `updateExtension` and `updateRuntime` now await for `setState` to be finished.
+
+### Deprecated
+
+- `RenderProvider`'s `updateMessages` private method.
+- `sendInfoFromIframe`'s 4th argument (`setMessages`).
+
+## [8.29.3] - 2019-05-20
+### Fixed
+- Fixed `paramsJSON` when refetching page due to `updateRuntime`.
+
+## [8.29.2] - 2019-05-20
+### Fixed
+- Linting errors.
+
+## [8.29.1] - 2019-05-17
+
+## [8.29.0] - 2019-05-16
+### Added
+- Use `?map` to do route matching.
+- Add first class support to canonical routes.
+
+## [8.28.0] - 2019-05-10
+### Added
+- Scope messages.
+
+## [8.27.0] - 2019-05-09
+### Fixed
+- Extracted query params from `to` path, for the query object.
+
+## [8.26.0] - 2019-05-09
+
+## [8.25.1] - 2019-05-09
+### Fixed
+- Checks for invalid params in route and throws a warning.
+
+## [8.25.0] - 2019-05-08
+### Added
+- Added preview support for top-level blocks.
+
+## [8.24.0] - 2019-05-07
+
+### Added
+- Added support for `rootPath` property in runtime, which causes links and navigation to be scoped by a prefix (e.g. when serving your store from a specific path in a domain). See https://github.com/vtex/render-root-path-example
+
+## [8.23.0] - 2019-05-07
+
+## [8.22.0] - 2019-05-03
+### Added
+- Template blocks can now configure their context providers.
+
+## [8.21.0] - 2019-05-03
+
+## [8.20.0] - 2019-05-03
+
+## [8.19.0] - 2019-04-24
+### Added
+- Export useTreePath hook.
+
+## [8.18.4] - 2019-04-24
+
+## [8.18.3] - 2019-04-18
+### Changed
+- Updated React packages to version 16.8.6
+
+## [8.18.2] - 2019-04-12
+### Added
+- Support for `scrollOptions` on `setQuery`.
+
+### Changed
+- Removing `navigationRoute` check for the back button functionality.
+
+## [8.18.1] - 2019-04-11
+### Changed
+- Allow hash on direct children regexp
+
+## [8.18.0] - 2019-04-10
+### Added
+- Export ChildBlock and useChildBlock APIs, without unstable flag.
+- ChildBlock now returns the props of the block, inserted via the `blocks.json` file.
+- Send props inserted via the `blocks.json` file to the `props` object of each child (when `composition` is set to `children`).
+- Export Block component, which is an alias of the ExtensionPoint component, and is now the preferred nomenclature.
+
+### Deprecated
+- Unstable__ChildBlock and useChildBlock__unstable.
+- ExtensionPoint component--prefer using the Block component, which has exactly the same API and functionality.
+
+## [8.17.4] - 2019-04-05
+### Changed
+- Update vtex-tachyons to 3.1.0
+
+## [8.17.3] - 2019-04-04
+
+## [8.17.2] - 2019-04-02
 ### Changed
 - Make the query string part of the `href` in Render's Link component.
 
-## [7.39.0] - 2019-03-13
+## [8.17.1] - 2019-04-02
+### Added
+- Support for `replace` option in setQuery for using that method in navigation.
 
-## [7.38.13] - 2019-03-08
+## [8.17.0] - 2019-03-29
+### Added
+- Add setQuery method for changing query string without remounting.
 
-## [7.38.12] - 2019-02-27
+## [8.16.3] - 2019-03-27
+
+### Changed
+- Changed from `unstable__layoutMode` to `composition`.
+
+## [8.16.2] - 2019-03-27
+
+- Add support to disable user blocks QueryString `disableUserLand`
+
+## [8.16.1] - 2019-03-25
+
+### Fixed
+
+- `ExtensionPoint` now does a deep merge of props.
+
+## [8.16.0] - 2019-03-22
 
 ### Added
-- query to Render Runtime Context
 
-## [7.38.11] - 2019-02-21
+- Add experimental features `useChildBlock__unstable` and `Unstable__ChildBlock`. It allows checking whether a child block was included or not.
 
-## [7.38.11-beta] - 2019-02-20
+## [8.15.0] - 2019-03-21
+### Added
+- Added support for `unstable__layoutMode`.
 
-## [7.38.10] - 2019-02-13
+## [8.14.0] - 2019-03-21
+### Added
+- `TrackEventsWrapper` to add event listener based in track field of interface
+
+## [8.13.2] - 2019-03-20
+
+### Changed
+
+- Change ErrorPage component to use CSS Modules
+
+## [8.13.1] - 2019-03-15
+
+## [8.13.0] - 2019-03-15
+
+## [8.12.0] - 2019-03-13
+### Changed
+- Update Apollo Client and React Apollo.
+
+## [8.11.3] - 2019-03-12
+### Fixed
+- Fixed bug where functions would be wrapped around components on HMR, thus losing the ability to be called.
+
+## [8.11.3-beta] - 2019-03-12
+
+## [8.11.2] - 2019-03-01
+
+## [8.11.1] - 2019-03-01
+
+### Removed
+- Removed default spinners when the component is loading
+
+## [8.11.0] - 2019-02-28
+### Changed
+- Improve error page with json viewer and remove crazy red box
+
+## [8.10.0] - 2019-02-28
+### Added
+- Avoid feching navigation data if route declares `allowConditions: false`
+
+## [8.9.2] - 2019-02-28
+### Changed
+- Stop creating `<span>` when using react intl's `<FormattedMessage>`
+
+## [8.9.1] - 2019-02-27
+### Changed
+- React version from v16.8.0 to v16.8.3
+
+## [8.9.0] - 2019-02-27
+### Added
+- query to Render Runtime Context.
+
+## [8.8.1] - 2019-2-22
+### Fixed
+- Fix initial history replacement
+
+## [8.8.0] - 2019-2-22
+### Added
+- Update `pageContext` on navigation
+- Extension now has a content field that is merged with block component props.
+
+## [8.7.1] - 2019-02-21
+
+## [8.7.1-beta] - 2019-02-20
+
+## [8.7.0] - 2019-02-19
+
+- Add `renderExtension` function to render runtime
+
+## [8.6.4] - 2019-02-15
+### Fixed
+- Escaping string that is used to make dynamic Regex in `isDirectChild`.
+
+## [8.6.3] - 2019-02-13
 
 ### Fixed
-- Check if `props.style` is `writable` before assigning 
+- Check if `props.style` is `writable` before assigning
 
-## [7.38.9] - 2019-01-24
+## [8.6.2] - 2019-2-7
+### Changed
+- `LayoutContainer` now gets elements to be rendered from `blocks` directly.
 
-## [7.38.8] - 2019-01-21
+## [8.6.1] - 2019-02-06
+### Added
+- `replace` option to use `history`'s replace instead of `push`.
+
+## [8.6.0] - 2019-02-06
+### Added
+- `goBack` method to the provided context.
+
+## [8.5.0] - 2019-02-06
+
+## [8.4.1] - 2019-02-06
+### Removed
+- RC external script.
+
+## [8.4.0] - 2019-02-06
+### Added
+- Add support to React Hooks
+- Create hook `useRuntime`.
+
+## [8.3.2] - 2019-02-06
+### Fixed
+- Props `query` and `params` not being passed to `before` and `after` blocks.
+
+## [8.3.1] - 2019-02-05
+
+## [8.3.0] - 2019-02-01
+
+## [8.2.0] - 2019-01-28
+### Removed
+- `MaybeAuth` component.
+
+## [8.1.0] - 2019-01-25
+### Added
+- Apollo Link State support.
+
+## [8.0.6] - 2019-1-22
+### Changed
+- Loading svg is loaded by Icon Pack.
+- Change position of the building indicator when it is hovered.
+
+## [8.0.5] - 2019-1-21
+
+## [8.0.4] - 2019-01-21
 ### Fixed
 - Add the `crossOrigin` attribute **only to img tags with src from vteximg**.
+
+## [8.0.3] - 2019-1-18
+### Changed
+- Get context as extension property instead of `__context`.
+- Add wrappers when loading preview
+
+## [8.0.2] - 2019-01-18
+### Changed
+- Now, import from `render` is `vtex.render-runtime`.
+
+## [8.0.1] - 2019-1-17
+
+## [8.0.0] - 2019-1-16
+### Changed
+- Adapt to use new blocks language to build pages.
+- Remove support to legacy extensions.
+- Remove support for old pages protocol.
 
 ## [7.38.7] - 2018-12-26
 ### Fixed
