@@ -1,10 +1,14 @@
 import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
-import { difference, is, isEmpty, keys, includes } from 'ramda'
+import { difference, includes, is, isEmpty, keys } from 'ramda'
 import RouteParser from 'route-parser'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
+
+const removeTrailingParenthesis = (path: string) => path.endsWith('(')
+  ? path.substr(0, path.length-1)
+  : path
 
 export function getComparablePrecedence(path: string): string {
   return path
@@ -354,7 +358,7 @@ function routeMatchForMappedURL(
 
   return {
     id,
-    path: newPath,
+    path: removeTrailingParenthesis(newPath)
   }
 }
 
