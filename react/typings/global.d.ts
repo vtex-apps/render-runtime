@@ -97,6 +97,7 @@ declare global {
     language: string
     country: string
     currency: string
+    customCurrencySymbol: string
   }
 
   interface Page {
@@ -498,7 +499,7 @@ declare global {
   }
 
   interface TreeEntry {
-    blockIdMap: Record<string, BlockId>,
+    blockIdMap: Record<string, BlockId>
     contentIdMap: Record<string, string>
   }
 
