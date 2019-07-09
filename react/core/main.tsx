@@ -13,7 +13,8 @@ import React, { ReactElement } from 'react'
 import { getDataFromTree } from 'react-apollo'
 import { hydrate, render as renderDOM } from 'react-dom'
 import { Helmet } from 'react-helmet'
-import NoSSR from 'react-no-ssr'
+import NoSSR, { useSSR } from '../components/NoSSR'
+import { useDevice, DeviceQuery } from '../components/Device'
 import { isEmpty } from 'ramda'
 import Loading from '../components/Loading'
 
@@ -257,6 +258,9 @@ export {
   Helmet,
   Link,
   NoSSR,
+  useSSR,
+  DeviceQuery,
+  useDevice,
   RenderContextConsumer,
   TreePathContextConsumer,
   canUseDOM,
