@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - `useSSR` hook, as a counterpart for the `NoSSR` component.
+- `phone` on the RenderHints type.
 
 ### Changed
 - Use internal `NoSSR` component logic instead of using the `react-no-ssr` package.
