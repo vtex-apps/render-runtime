@@ -71,6 +71,7 @@
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.3.12",
     "react-intl": "^2.4.0",
+    "react-no-ssr": "^1.1.0",
     "react-testing-library": "^5.6.0",
     "regenerator-runtime": "^0.13.1",
     "ts-jest": "^24.0.1",
