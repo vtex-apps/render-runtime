@@ -14,7 +14,7 @@ import { getDataFromTree } from 'react-apollo'
 import { hydrate, render as renderDOM } from 'react-dom'
 import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
-import { useDevice, DeviceQuery } from '../components/Device'
+import { useDevice, Device } from '../components/Device'
 import { isEmpty } from 'ramda'
 import Loading from '../components/Loading'
 
@@ -47,7 +47,7 @@ import {
   optimizeStyleForVtexImg,
 } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
-import { generateExtensions } from '../utils/blocks';
+import { generateExtensions } from '../utils/blocks'
 
 let emitter: EventEmitter | null = null
 
@@ -165,13 +165,16 @@ function setLazyCookie(setCookie: string) {
 
 function start() {
   try {
-    if (window.__RUNTIME__.blocksTree && !isEmpty(window.__RUNTIME__.blocksTree)) {
+    if (
+      window.__RUNTIME__.blocksTree &&
+      !isEmpty(window.__RUNTIME__.blocksTree)
+    ) {
       window.__RUNTIME__.hasNewExtensions = true
       window.__RUNTIME__.extensions = generateExtensions(
         window.__RUNTIME__.blocksTree,
         window.__RUNTIME__.blocks!,
         window.__RUNTIME__.contentMap!,
-        window.__RUNTIME__.pages[window.__RUNTIME__.page],
+        window.__RUNTIME__.pages[window.__RUNTIME__.page]
       )
     }
 
@@ -259,7 +262,7 @@ export {
   Link,
   NoSSR,
   useSSR,
-  DeviceQuery,
+  Device,
   useDevice,
   RenderContextConsumer,
   TreePathContextConsumer,
