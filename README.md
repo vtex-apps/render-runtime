@@ -21,13 +21,26 @@ This app handles runtime execution of React apps in the VTEX IO Platform.
 Navigation related component that, when clicked, redirects to another route. Details [here](#link-1).
 
 ### NoSSR
-This wrapper component removes its children from the subject of the Server Side Rendering(SSR). It may be useful for Components that use DOM related data _(e.g: document)_. We use [`react-no-ssr`](https://github.com/kadirahq/react-no-ssr) under the hood. You can provide an optional prop _noSSR_ with a component to render instead when in SSR mode.
+This wrapper component removes its children from the subject of the Server Side Rendering(SSR). It may be useful for Components that use DOM related data _(e.g: document)_. You can provide an optional prop _onSSR_ with a component to render instead when in SSR mode.
 
 ```javascript
 <NoSSR onSSR={<div>Loading...</div>}>
   <DomRelatedComponent/> 
 </NoSSR>
 ```
+
+In addition, you can use it as a React hook, with `useSSR`.
+
+```javascript
+const isSSR = useSSR()
+
+if (isSSR) {
+  return <div>Loading...</div>
+}
+
+return <DomRelatedComponent/>
+```
+
 
 ## Navigation
 The Render framework provides a built-in navigation solution that provides great experience and modularity for our sites. Building a store, alongside `blocks.json` and ` interfaces.json`, you can provide a `routes.json` file that describes **routes** that a user is able to access. A route looks like this:
