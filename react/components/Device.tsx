@@ -4,11 +4,11 @@ import { useSSR } from './NoSSR'
 import { useRuntime } from './RenderContext'
 
 interface DeviceInfo {
-  device: DeviceType
+  device: Device
   isMobile: boolean
 }
 
-enum DeviceType {
+enum Device {
   phone = 'phone',
   tablet = 'tablet',
   desktop = 'desktop',
@@ -27,25 +27,25 @@ const useDevice = () => {
   if (isSSR) {
     return {
       device: hints.phone
-        ? DeviceType.phone
+        ? Device.phone
         : hints.tablet
-        ? DeviceType.tablet
-        : DeviceType.desktop,
+        ? Device.tablet
+        : Device.desktop,
       isMobile: hints.mobile,
     }
   }
 
   return {
     device: isScreenLarge
-      ? DeviceType.desktop
+      ? Device.desktop
       : isScreenMedium
-      ? DeviceType.tablet
-      : DeviceType.phone,
+      ? Device.tablet
+      : Device.phone,
     isMobile: !isScreenLarge,
   }
 }
 
-const Device = ({
+const DeviceDetector = ({
   children,
 }: {
   children: (deviceInfo: DeviceInfo) => React.ReactNode
@@ -55,4 +55,4 @@ const Device = ({
   return children({ device, isMobile })
 }
 
-export { useDevice, Device }
+export { useDevice, DeviceDetector }

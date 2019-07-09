@@ -14,7 +14,7 @@ import { getDataFromTree } from 'react-apollo'
 import { hydrate, render as renderDOM } from 'react-dom'
 import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
-import { useDevice, Device } from '../components/Device'
+import { useDevice, DeviceDetector } from '../components/Device'
 import { isEmpty } from 'ramda'
 import Loading from '../components/Loading'
 
@@ -262,7 +262,7 @@ export {
   Link,
   NoSSR,
   useSSR,
-  Device,
+  DeviceDetector,
   useDevice,
   RenderContextConsumer,
   TreePathContextConsumer,
