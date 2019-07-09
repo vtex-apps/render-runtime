@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-- `DeviceDetector` component and `useDevice` hooks, for consistent device detection both on SSR and CSR.
-- `useSSR` hook, as a hook counterpart for the `NoSSR` component.
+- `DeviceDetector` component and `useDevice` hook, for consistent device detection on both SSR and CSR.
+- `useSSR` hook, as a counterpart for the `NoSSR` component.
 
 ### Changed
 - Use internal `NoSSR` component logic instead of using the `react-no-ssr` package.
