@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `DeviceDetector` component and `useDevice` hook, for consistent device detection on both SSR and CSR.
+- `useSSR` hook, as a counterpart for the `NoSSR` component.
+
+### Changed
+- Use internal `NoSSR` component logic instead of using the `react-no-ssr` package.
 
 ## [8.40.3] - 2019-07-10
 
