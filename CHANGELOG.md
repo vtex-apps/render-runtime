@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-- `DeviceQuery` component and `useDevice` hooks, for consistent device detection both on SSR and CSR.
+- `DeviceDetector` component and `useDevice` hooks, for consistent device detection both on SSR and CSR.
 - `useSSR` hook, as a hook counterpart for the `NoSSR` component.
 
 ### Changed
