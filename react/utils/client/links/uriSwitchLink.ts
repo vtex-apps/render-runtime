@@ -90,7 +90,10 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
         provider,
         sender,
       } = extractHints(operation.query, cacheHints[hash])
-      const requiresAuthorization = path(['settings', `vtex.${runtime.route.domain}`, 'requiresAuthorization'], runtime)
+      const requiresAuthorization = path(
+        ['settings', `vtex.${runtime.route.domain}`, 'requiresAuthorization'],
+        runtime
+      )
       const customScope = requiresAuthorization ? 'private' : scope
       const oldMethod = fetchOptions.method || 'POST'
       const protocol = canUseDOM ? 'https:' : 'http:'

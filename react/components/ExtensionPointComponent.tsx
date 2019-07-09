@@ -9,6 +9,7 @@ import graphQLErrorsStore from '../utils/graphQLErrorsStore'
 import ExtensionPointError from './ExtensionPointError'
 import Loading from './Loading'
 import { RenderContextProps } from './RenderContext'
+import { TreePathContext } from '../utils/treePath'
 
 interface Props {
   component: string | null
@@ -85,6 +86,7 @@ class ExtensionPointComponent extends PureComponent<
       componentPromiseMap[component]
         .then(() => {
           componentPromiseResolvedMap[component] = true
+          console.log(componentPromiseResolvedMap)
           this.updateComponentsWithEvent(component)
         })
         .catch(() => {
@@ -213,10 +215,26 @@ class ExtensionPointComponent extends PureComponent<
       delete props.__clearError
     }
 
-    return Component ? (
-      <Component {...props}>{children}</Component>
-    ) : (
-      children || <Loading />
+    // if (Component) {
+    //   if (Component.prototype && Component.prototype.isReactComponent) {
+    //     return <Component {...props} treepath={treePath}>{children}</Component>
+    //   } else {
+    //     return <Component {...props} treepath={treePath}>{children}</Component>
+    //     // return React.createElement(Component, {...props, treepath: treePath, children})
+    //     console.log(Component)
+    //     // return Component({...props, treepath: treePath, children})
+    //   }
+    // }
+
+    // return children || <Loading />
+    return (
+      <TreePathContext.Provider value={{ treePath }}>
+        {Component ? (
+          <Component {...props}>{children}</Component>
+        ) : (
+          children || <Loading />
+        )}
+      </TreePathContext.Provider>
     )
   }
 }

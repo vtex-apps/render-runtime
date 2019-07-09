@@ -183,7 +183,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
           key={i}
           id={child.extensionPointId}
           treePath={treePath}
-          blockProps={childProps} />
+          blockProps={childProps}
+        />
       )
     })
   }
@@ -271,25 +272,24 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   }
 }
 
- /* This ExtensionPointWrapper thing is done so the user can read
-  * the props that were passed through the blocks.json file to
-  * its children in a standard, React-ish way; that is:
-  * `React.Children.map(children, child => child.props)`
-  *
-  * The problem was, if the user passed a prop that conflicted with
-  * ExtensionPoint props (most notabily, `id`), just destructuring
-  * the `childProps` over ExtensionPoint would override the
-  * ExtensionPoint props, which would break the rendering.
-  * (or vice versa, which would cause wrong values being read by
-  * the user component).
-  */
-const ExtensionPointWrapper: FunctionComponent<ExtensionPointWrapperProps> = ({ id, treePath, blockProps } ) => {
-  return (
-    <ExtensionPoint
-      id={id}
-      treePath={treePath}
-      blockProps={blockProps} />
-  )
+/* This ExtensionPointWrapper thing is done so the user can read
+ * the props that were passed through the blocks.json file to
+ * its children in a standard, React-ish way; that is:
+ * `React.Children.map(children, child => child.props)`
+ *
+ * The problem was, if the user passed a prop that conflicted with
+ * ExtensionPoint props (most notabily, `id`), just destructuring
+ * the `childProps` over ExtensionPoint would override the
+ * ExtensionPoint props, which would break the rendering.
+ * (or vice versa, which would cause wrong values being read by
+ * the user component).
+ */
+const ExtensionPointWrapper: FunctionComponent<ExtensionPointWrapperProps> = ({
+  id,
+  treePath,
+  blockProps,
+}) => {
+  return <ExtensionPoint id={id} treePath={treePath} blockProps={blockProps} />
 }
 
 interface ExtensionPointWrapperProps {
