@@ -1,25 +1,32 @@
 import PropTypes from 'prop-types'
 import { mergeDeepRight, reduce } from 'ramda'
-import React, { Component, Fragment, FunctionComponent } from 'react'
+import React, {
+  Component,
+  Fragment,
+  FunctionComponent,
+  ComponentType,
+  FC,
+} from 'react'
 import ReactDOM from 'react-dom'
 
 import { getImplementation } from '../utils/assets'
-import { TreePathContext, TreePathProps, withTreePath } from '../utils/treePath'
+import { TreePathContext, TreePathProps, useTreePath } from '../utils/treePath'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
 import Loading from './Loading'
-import { RenderContext } from './RenderContext'
+import { useRuntime, RenderContextProps } from './RenderContext'
 import TrackEventsWrapper from './TrackEventsWrapper'
 
 interface Props {
   id: string
   params?: any
   query?: any
-  treePath?: string
   blockProps?: object
 }
 
-type ExtendedProps = Props & TreePathProps
+type ContextProps = TreePathProps & RenderContextProps
+
+type ExtendedProps = Props & ContextProps
 
 interface State {
   newTreePath: string
@@ -80,14 +87,6 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   }
 
   public render() {
-    return (
-      <RenderContext.Consumer>
-        {this.getExtensionPointComponent}
-      </RenderContext.Consumer>
-    )
-  }
-
-  private getExtensionPointComponent = (runtime: RenderContext) => {
     const { newTreePath } = this.state
     const {
       children,
@@ -97,6 +96,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
       // eslint-disable-next-line
       treePath,
       blockProps,
+      runtime,
       ...parentProps
     } = this.props
 
@@ -126,7 +126,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
        */
       blockProps,
       content,
-      { params, query },
+      { params, query, runtime },
     ])
 
     const isCompositionChildren =
@@ -158,7 +158,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
             <Loading />
           )}
         </TreePathContext.Provider>
-      </TrackEventsWrapper>
+      </TrackEventsWrapper>,
+      runtime
     )
   }
 
@@ -183,7 +184,9 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
           key={i}
           id={child.extensionPointId}
           treePath={treePath}
-          blockProps={childProps} />
+          blockProps={childProps}
+          runtime={runtime}
+        />
       )
     })
   }
@@ -194,7 +197,8 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
     before: string[],
     treePath: string,
     props: any,
-    element: JSX.Element
+    element: JSX.Element,
+    runtime: RenderContext
   ) {
     const beforeElements = (
       <Fragment>
@@ -205,6 +209,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
             treePath={treePath}
             params={props.params}
             query={props.query}
+            runtime={runtime}
           />
         ))}
       </Fragment>
@@ -219,6 +224,7 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
             treePath={treePath}
             params={props.params}
             query={props.query}
+            runtime={runtime}
           />
         ))}
       </Fragment>
@@ -234,7 +240,12 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
 
     return around.reduce(
       (acc, aroundId) => (
-        <ExtensionPoint id={aroundId} treePath={treePath} {...props}>
+        <ExtensionPoint
+          id={aroundId}
+          treePath={treePath}
+          runtime={runtime}
+          {...props}
+        >
           {acc}
         </ExtensionPoint>
       ),
@@ -271,24 +282,31 @@ class ExtensionPoint extends Component<ExtendedProps, State> {
   }
 }
 
- /* This ExtensionPointWrapper thing is done so the user can read
-  * the props that were passed through the blocks.json file to
-  * its children in a standard, React-ish way; that is:
-  * `React.Children.map(children, child => child.props)`
-  *
-  * The problem was, if the user passed a prop that conflicted with
-  * ExtensionPoint props (most notabily, `id`), just destructuring
-  * the `childProps` over ExtensionPoint would override the
-  * ExtensionPoint props, which would break the rendering.
-  * (or vice versa, which would cause wrong values being read by
-  * the user component).
-  */
-const ExtensionPointWrapper: FunctionComponent<ExtensionPointWrapperProps> = ({ id, treePath, blockProps } ) => {
+/* This ExtensionPointWrapper thing is done so the user can read
+ * the props that were passed through the blocks.json file to
+ * its children in a standard, React-ish way; that is:
+ * `React.Children.map(children, child => child.props)`
+ *
+ * The problem was, if the user passed a prop that conflicted with
+ * ExtensionPoint props (most notabily, `id`), just destructuring
+ * the `childProps` over ExtensionPoint would override the
+ * ExtensionPoint props, which would break the rendering.
+ * (or vice versa, which would cause wrong values being read by
+ * the user component).
+ */
+const ExtensionPointWrapper: FunctionComponent<ExtensionPointWrapperProps> = ({
+  id,
+  treePath,
+  blockProps,
+  runtime,
+}) => {
   return (
     <ExtensionPoint
       id={id}
       treePath={treePath}
-      blockProps={blockProps} />
+      blockProps={blockProps}
+      runtime={runtime}
+    />
   )
 }
 
@@ -296,6 +314,16 @@ interface ExtensionPointWrapperProps {
   id: string
   treePath: string
   blockProps: object
+  runtime: RenderContext
 }
 
-export default withTreePath(ExtensionPoint)
+const withContextProps = <P extends object>(
+  WrappedComponent: ComponentType<P & ContextProps>
+): FC<P> => props => {
+  const { treePath } = useTreePath()
+  const runtime = useRuntime()
+
+  return <WrappedComponent {...props} treePath={treePath} runtime={runtime} />
+}
+
+export default withContextProps<Props>(ExtensionPoint)
