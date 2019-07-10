@@ -17,6 +17,9 @@ interface Props {
 }
 
 function mountTreePath(currentId: string, parentTreePath: string) {
+  if (parentTreePath === currentId) {
+    return parentTreePath
+  }
   return [parentTreePath, currentId].filter(id => !!id).join('/')
 }
 
