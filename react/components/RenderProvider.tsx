@@ -17,6 +17,7 @@ import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { traverseComponent } from '../utils/components'
 import {
+  isSiteEditorIframe,
   RENDER_CONTAINER_CLASS,
   ROUTE_CLASS_PREFIX,
   routeClass,
@@ -70,15 +71,6 @@ export interface RenderProviderState {
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
-let isStorefrontIframe: boolean
-
-try {
-  if (canUseDOM && window.top !== window.self && window.top.__provideRuntime) {
-    isStorefrontIframe = !!window.top.__provideRuntime
-  }
-} catch (e) {
-  console.error(e)
-}
 
 const noop = () => {}
 
@@ -161,7 +153,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public sendInfoFromIframe = debounce(
     (params?: { shouldUpdateRuntime?: boolean }) => {
-      if (!isStorefrontIframe) {
+      if (!isSiteEditorIframe) {
         return undefined
       }
 
@@ -907,9 +899,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             >
               <Fragment>
                 <ExtensionManager runtime={this.props.runtime} />
-                {!production && !isStorefrontIframe && <BuildStatus />}
+                {!production && !isSiteEditorIframe && <BuildStatus />}
                 {component}
-                {isStorefrontIframe ? (
+                {isSiteEditorIframe ? (
                   <ExtensionPoint id="store/__overlay" />
                 ) : null}
               </Fragment>
