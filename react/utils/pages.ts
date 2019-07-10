@@ -6,24 +6,26 @@ import RouteParser from 'route-parser'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
-const removeTrailingParenthesis = (path: string) => path.endsWith('(')
-  ? path.substr(0, path.length-1)
-  : path
+const removeTrailingParenthesis = (path: string) =>
+  path.endsWith('(') ? path.substr(0, path.length - 1) : path
 
 export function getComparablePrecedence(path: string): string {
   return path
     .split('/')
-    .reduce((acc, pathSegment) => {
-      if (pathSegment.startsWith('*')) {
-        acc.push(3);
-      } else if (pathSegment.startsWith(':')) {
-        acc.push(2)
-      } else if (pathSegment) {
-        acc.push(1)
-      }
+    .reduce(
+      (acc, pathSegment) => {
+        if (pathSegment.startsWith('*')) {
+          acc.push(3)
+        } else if (pathSegment.startsWith(':')) {
+          acc.push(2)
+        } else if (pathSegment) {
+          acc.push(1)
+        }
 
-      return acc
-    }, [] as number[])
+        return acc
+      },
+      [] as number[]
+    )
     .join()
 }
 
@@ -358,7 +360,7 @@ function routeMatchForMappedURL(
 
   return {
     id,
-    path: removeTrailingParenthesis(newPath)
+    path: removeTrailingParenthesis(newPath),
   }
 }
 
@@ -379,7 +381,10 @@ function routeMatchFromPath(path: string, routes: Pages): RouteMatch | null {
     }
 
     pathPrecedence = getComparablePrecedence(pagePath)
-    if (chosenPathPrecedence !== null && chosenPathPrecedence < pathPrecedence) {
+    if (
+      chosenPathPrecedence !== null &&
+      chosenPathPrecedence < pathPrecedence
+    ) {
       continue
     }
 
