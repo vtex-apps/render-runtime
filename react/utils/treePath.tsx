@@ -44,6 +44,7 @@ export const getDirectChildren = (extensions: Extensions, treePath: string) => {
 export const TreePathContext = React.createContext<TreePathProps>({
   treePath: '',
 })
+TreePathContext.displayName = 'TreePathContext'
 
 export const useTreePath = () => {
   return useContext(TreePathContext)

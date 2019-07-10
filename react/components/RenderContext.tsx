@@ -10,6 +10,7 @@ export interface EmitterProps {
 }
 
 export const RenderContext = React.createContext<RenderContext>({} as any)
+RenderContext.displayName = 'RenderContext'
 
 export const useRuntime = () => {
   return useContext(RenderContext)
