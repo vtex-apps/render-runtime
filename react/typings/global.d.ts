@@ -182,6 +182,7 @@ declare global {
     desktop: boolean
     mobile: boolean
     tablet: boolean
+    phone: boolean
   }
 
   interface RenderContext {
@@ -498,7 +499,7 @@ declare global {
   }
 
   interface TreeEntry {
-    blockIdMap: Record<string, BlockId>,
+    blockIdMap: Record<string, BlockId>
     contentIdMap: Record<string, string>
   }
 

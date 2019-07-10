@@ -13,7 +13,7 @@ import React, { ReactElement } from 'react'
 import { getDataFromTree } from 'react-apollo'
 import { hydrate, render as renderDOM } from 'react-dom'
 import { Helmet } from 'react-helmet'
-import NoSSR from 'react-no-ssr'
+import NoSSR, { useSSR } from '../components/NoSSR'
 import { isEmpty } from 'ramda'
 import Loading from '../components/Loading'
 
@@ -46,7 +46,7 @@ import {
   optimizeStyleForVtexImg,
 } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
-import { generateExtensions } from '../utils/blocks';
+import { generateExtensions } from '../utils/blocks'
 
 let emitter: EventEmitter | null = null
 
@@ -164,13 +164,16 @@ function setLazyCookie(setCookie: string) {
 
 function start() {
   try {
-    if (window.__RUNTIME__.blocksTree && !isEmpty(window.__RUNTIME__.blocksTree)) {
+    if (
+      window.__RUNTIME__.blocksTree &&
+      !isEmpty(window.__RUNTIME__.blocksTree)
+    ) {
       window.__RUNTIME__.hasNewExtensions = true
       window.__RUNTIME__.extensions = generateExtensions(
         window.__RUNTIME__.blocksTree,
         window.__RUNTIME__.blocks!,
         window.__RUNTIME__.contentMap!,
-        window.__RUNTIME__.pages[window.__RUNTIME__.page],
+        window.__RUNTIME__.pages[window.__RUNTIME__.page]
       )
     }
 
@@ -257,6 +260,7 @@ export {
   Helmet,
   Link,
   NoSSR,
+  useSSR,
   RenderContextConsumer,
   TreePathContextConsumer,
   canUseDOM,
@@ -267,13 +271,13 @@ export {
   withRuntimeContext,
   ChildBlock,
   useChildBlock,
-  // These unstable APIs should be deprecated shortly
-  ChildBlock as Unstable__ChildBlock,
-  useChildBlock as useChildBlock__unstable,
   useRuntime,
   useTreePath,
   withSession,
   Loading,
   buildCacheLocator,
   renderExtension,
+  // These unstable APIs should be deprecated shortly
+  ChildBlock as Unstable__ChildBlock,
+  useChildBlock as useChildBlock__unstable,
 }
