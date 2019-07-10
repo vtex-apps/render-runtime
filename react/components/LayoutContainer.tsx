@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { useTreePath } from '../utils/treePath'
-import ExtensionPoint from './ExtensionPoint'
+// import ExtensionPoint from './ExtensionPoint'
+import ExtensionPoint from './ExtensionPointFC'
 import { useRuntime } from './RenderContext'
 
 type Element = string | ElementArray

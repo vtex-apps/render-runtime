@@ -19,7 +19,8 @@ import Loading from '../components/Loading'
 
 import { ChildBlock, useChildBlock } from '../components/ChildBlock'
 import ExtensionContainer from '../components/ExtensionContainer'
-import ExtensionPoint from '../components/ExtensionPoint'
+// import ExtensionPoint from '../components/ExtensionPoint'
+import ExtensionPoint from '../components/ExtensionPointFC'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
 import Link from '../components/Link'
@@ -129,7 +130,7 @@ const render = (
       root={name}
       runtime={runtime}
     >
-      {!isPage ? <ExtensionPoint id={name} /> : null}
+      {!isPage ? <ExtensionPoint id={name} treePath="" /> : null}
     </RenderProvider>
   )
 
@@ -171,7 +172,9 @@ function start() {
       window.__RUNTIME__.hasNewExtensions = true
       window.__RUNTIME__.extensions = generateExtensions(
         window.__RUNTIME__.blocksTree,
+        // eslint-disable-next-line
         window.__RUNTIME__.blocks!,
+        // eslint-disable-next-line
         window.__RUNTIME__.contentMap!,
         window.__RUNTIME__.pages[window.__RUNTIME__.page]
       )
