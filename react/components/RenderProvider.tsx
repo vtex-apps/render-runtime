@@ -36,7 +36,7 @@ import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContext } from './RenderContext'
 import RenderPage from './RenderPage'
-import { generateExtensions } from '../utils/blocks';
+import { generateExtensions } from '../utils/blocks'
 
 interface Props {
   children: ReactElement<any> | null
@@ -64,7 +64,7 @@ export interface RenderProviderState {
   settings: RenderRuntime['settings']
   route: RenderRuntime['route']
   loadedPages: Set<string>
-  blocksTree?:  RenderRuntime['blocksTree']
+  blocksTree?: RenderRuntime['blocksTree']
   blocks?: RenderRuntime['blocks']
   contentMap?: RenderRuntime['contentMap']
 }
@@ -531,14 +531,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     let updatedExtensions: Extensions = {}
 
-    if (window.__RUNTIME__.hasNewExtensions) { // TODO: Remove this when new pages-graphql get released
-      updatedExtensions = generateExtensions(blocksTree!, blocks!, contentMap!, pagesState[page])
+    if (window.__RUNTIME__.hasNewExtensions) {
+      // TODO: Remove this when new pages-graphql get released
+      updatedExtensions = generateExtensions(
+        blocksTree!,
+        blocks!,
+        contentMap!,
+        pagesState[page]
+      )
     }
 
     this.setState(
       {
         extensions: replaceExtensionsWithDefault(
-          {...updatedExtensions, ...this.state.extensions},
+          { ...updatedExtensions, ...this.state.extensions },
           page,
           defaultExtensions
         ),

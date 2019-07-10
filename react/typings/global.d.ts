@@ -97,6 +97,7 @@ declare global {
     language: string
     country: string
     currency: string
+    customCurrencySymbol: string
   }
 
   interface Page {
