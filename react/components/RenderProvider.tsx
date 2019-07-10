@@ -36,7 +36,7 @@ import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContext } from './RenderContext'
 import RenderPage from './RenderPage'
-import { generateExtensions } from '../utils/blocks';
+import { generateExtensions } from '../utils/blocks'
 
 interface Props {
   children: ReactElement<any> | null
@@ -64,7 +64,7 @@ export interface RenderProviderState {
   settings: RenderRuntime['settings']
   route: RenderRuntime['route']
   loadedPages: Set<string>
-  blocksTree?:  RenderRuntime['blocksTree']
+  blocksTree?: RenderRuntime['blocksTree']
   blocks?: RenderRuntime['blocks']
   contentMap?: RenderRuntime['contentMap']
 }
@@ -81,6 +81,8 @@ try {
 }
 
 const noop = () => {}
+
+const initialTreePath = { treePath: '' }
 
 const unionKeys = (record1: any, record2: any) => [
   ...new Set([...Object.keys(record1), ...Object.keys(record2)]),
@@ -532,14 +534,23 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     let updatedExtensions: Extensions = {}
 
-    if (window.__RUNTIME__.hasNewExtensions) { // TODO: Remove this when new pages-graphql get released
-      updatedExtensions = generateExtensions(blocksTree!, blocks!, contentMap!, pagesState[page])
+    if (window.__RUNTIME__.hasNewExtensions) {
+      // TODO: Remove this when new pages-graphql get released
+      updatedExtensions = generateExtensions(
+        // eslint-disable-next-line
+        blocksTree!,
+        // eslint-disable-next-line
+        blocks!,
+        // eslint-disable-next-line
+        contentMap!,
+        pagesState[page]
+      )
     }
 
     this.setState(
       {
         extensions: replaceExtensionsWithDefault(
-          {...updatedExtensions, ...this.state.extensions},
+          { ...updatedExtensions, ...this.state.extensions },
           page,
           defaultExtensions
         ),
@@ -887,7 +898,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     return (
       <RenderContext.Provider value={context}>
-        <TreePathContext.Provider value={{ treePath: '' }}>
+        <TreePathContext.Provider value={initialTreePath}>
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider
               locale={locale}
