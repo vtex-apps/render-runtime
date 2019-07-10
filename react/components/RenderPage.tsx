@@ -1,5 +1,5 @@
 import React from 'react'
-import ExtensionPoint from './ExtensionPointFC'
+import ExtensionPoint from './ExtensionPoint'
 import MaybeContext from './MaybeContext'
 import { useRuntime } from './RenderContext'
 
@@ -32,4 +32,5 @@ function RenderPage(props: Props) {
     </MaybeContext>
   )
 }
+
 export default RenderPage
