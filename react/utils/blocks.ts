@@ -46,6 +46,7 @@ const createExtensions = (
       preview: block.preview,
       props: block.props,
       render: block.render,
+      title: block.title,
       track: block.track,
     }
   }]
@@ -83,6 +84,6 @@ export const generateExtensions = (
   routeResult.forEach(eachResult => {
     extensions[eachResult.treePath] = eachResult.extension
   })
-  
+
   return extensions
 }
