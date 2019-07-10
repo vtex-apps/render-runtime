@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Pass `block.title` to extensions.
+
 ## [8.40.2] - 2019-07-05
 
 ## [8.40.1] - 2019-07-02
