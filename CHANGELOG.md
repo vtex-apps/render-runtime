@@ -7,11 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+- Reduce number of `Context` created by `ExtensionPoint` to improve mount time.
+
 ## [8.41.3] - 2019-07-11
 ### Fixed
 - Fix canonical replacement using rootPath
 
-## [8.42.0] - 2019-07-11
+## [DEPRECATED] [8.42.0] - 2019-07-11
 
 ## [8.41.2] - 2019-07-11
 
