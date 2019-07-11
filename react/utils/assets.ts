@@ -12,10 +12,14 @@ export const getVTEXImgHost = (account: string) => {
   return `https://${account}.vteximg.com.br`
 }
 
-const getAbsoluteURL = (account: string, url: string, production: boolean) => {
-  return isRelative(url) && production
+const getAbsoluteURL = (account: string, url: string, production: boolean, rootPath: string) => {
+  if (!isRelative(url)) {
+    return url
+  }
+
+  return production
     ? `${getVTEXImgHost(account)}${url}`
-    : url
+    : rootPath + url
 }
 
 class ServerSideAssetLoadingError extends Error {
@@ -165,9 +169,9 @@ export function getExtensionImplementation<P = {}, S = {}>(
 }
 
 export function fetchAssets(runtime: RenderRuntime, assets: string[]) {
-  const { account, production } = runtime
+  const { account, production, rootPath = '' } = runtime
   const absoluteAssets = assets.map(url =>
-    getAbsoluteURL(account, url, production)
+    getAbsoluteURL(account, url, production, rootPath)
   )
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
@@ -184,9 +188,9 @@ export function fetchAssets(runtime: RenderRuntime, assets: string[]) {
 }
 
 export function prefetchAssets(runtime: RenderRuntime, assets: string[]) {
-  const { account, production } = runtime
+  const { account, production, rootPath = '' } = runtime
   const absoluteAssets = assets.map(url =>
-    getAbsoluteURL(account, url, production)
+    getAbsoluteURL(account, url, production, rootPath)
   )
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
