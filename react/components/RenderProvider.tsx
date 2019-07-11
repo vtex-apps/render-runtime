@@ -195,6 +195,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       page,
       query,
       production,
+      rootPath = '',
       route,
       settings,
     } = props.runtime
@@ -207,7 +208,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         pathname:
           ignoreCanonicalReplacement || !route.canonicalPath
             ? history.location.pathname
-            : route.canonicalPath,
+            : rootPath + route.canonicalPath,
         state: {
           navigationRoute: {
             id: route.id,
