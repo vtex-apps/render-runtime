@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Fix canonical replacement using rootPath
 
+## [8.42.0] - 2019-07-11
+
 ## [8.41.2] - 2019-07-11
 
 ## [8.41.1] - 2019-07-11
