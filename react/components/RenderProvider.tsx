@@ -31,7 +31,7 @@ import {
   scrollTo as pageScrollTo,
 } from '../utils/pages'
 import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
-import { TreePathContext } from '../utils/treePath'
+import { TreePathContextProvider } from '../utils/treePath'
 import BuildStatus from './BuildStatus'
 import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
@@ -73,8 +73,6 @@ export interface RenderProviderState {
 const SEND_INFO_DEBOUNCE_MS = 100
 
 const noop = () => {}
-
-const initialTreePath = { treePath: '' }
 
 const unionKeys = (record1: any, record2: any) => [
   ...new Set([...Object.keys(record1), ...Object.keys(record2)]),
@@ -889,7 +887,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     return (
       <RenderContext.Provider value={context}>
-        <TreePathContext.Provider value={initialTreePath}>
+        <TreePathContextProvider treePath="">
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider
               locale={locale}
@@ -906,7 +904,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
               </Fragment>
             </IntlProvider>
           </ApolloProvider>
-        </TreePathContext.Provider>
+        </TreePathContextProvider>
       </RenderContext.Provider>
     )
   }

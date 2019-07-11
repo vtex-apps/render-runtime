@@ -129,7 +129,7 @@ const render = (
       root={name}
       runtime={runtime}
     >
-      {!isPage ? <ExtensionPoint id={name} treePath="" /> : null}
+      {!isPage ? <ExtensionPoint id={name} /> : null}
     </RenderProvider>
   )
 

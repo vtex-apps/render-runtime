@@ -22,13 +22,7 @@ const RenderPage: FC<Props> = props => {
       params={params}
       runtime={runtime}
     >
-      <ExtensionPoint
-        id={page}
-        query={query}
-        params={params}
-        treePath=""
-        {...props}
-      />
+      <ExtensionPoint id={page} query={query} params={params} {...props} />
     </MaybeContext>
   )
 }
