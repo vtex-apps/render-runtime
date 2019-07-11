@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react'
+import React, { FC } from 'react'
 import ExtensionPoint from './ExtensionPoint'
 import MaybeContext from './MaybeContext'
 import { useRuntime } from './RenderContext'
@@ -11,7 +11,9 @@ interface Props {
 const RenderPage: FC<Props> = props => {
   const runtime = useRuntime()
   const { page, query } = props
-  const { route: { params } } = runtime
+  const {
+    route: { params },
+  } = runtime
 
   return (
     <MaybeContext
@@ -31,6 +33,4 @@ const RenderPage: FC<Props> = props => {
   )
 }
 
-
 export default RenderPage
-
