@@ -1,12 +1,8 @@
 import React from 'react'
 
-import { useExtension } from '../utils/extension'
-
 import Preview from './Preview'
 
-const Loading = () => {
-  const extension = useExtension()
-
+const Loading = ({extension}: {extension?: Extension}) => {
   if (!extension) {
     return null
   }

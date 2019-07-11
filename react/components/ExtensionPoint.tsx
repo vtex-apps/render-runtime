@@ -165,7 +165,7 @@ const ExtensionPoint: FC<Props> = props => {
         {componentChildren}
       </ExtensionPointComponent>
     ) : (
-      <Loading />
+      <Loading extension={extension} />
     )
   )
 
