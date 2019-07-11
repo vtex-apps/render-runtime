@@ -7,7 +7,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [7.39.2] - 2019-07-02
+## [7.39.3] - 2019-07-11
+
+## [8.41.0] - 2019-07-10
+### Added
+- `useSSR` hook, as a counterpart for the `NoSSR` component.
+- `phone` on the RenderHints type.
+
+### Changed
+- Use internal `NoSSR` component logic instead of using the `react-no-ssr` package.
+
+## [8.40.3] - 2019-07-10
+
+### Fixed
+- Pass `block.title` to extensions.
+
+## [8.40.2] - 2019-07-05
 
 ## [8.40.1] - 2019-07-02
 ### Fixed
