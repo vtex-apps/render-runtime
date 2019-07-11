@@ -10,7 +10,7 @@ import graphQLErrorsStore from '../utils/graphQLErrorsStore'
 import ExtensionPointError from './ExtensionPointError'
 import Loading from './Loading'
 import { RenderContextProps } from './RenderContext'
-import { TreePathContext } from '../utils/treePath'
+import { TreePathContextProvider } from '../utils/treePath'
 import { isSiteEditorIframe } from '../utils/dom'
 
 interface Props {
@@ -220,13 +220,13 @@ class ExtensionPointComponent extends PureComponent<
     }
 
     return (
-      <TreePathContext.Provider value={{ treePath }}>
+      <TreePathContextProvider treePath={treePath}>
         {Component ? (
           <Component {...props}>{children}</Component>
         ) : (
           children || <Loading />
         )}
-      </TreePathContext.Provider>
+      </TreePathContextProvider>
     )
   }
 
