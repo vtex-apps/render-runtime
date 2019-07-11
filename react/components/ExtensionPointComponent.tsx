@@ -234,7 +234,8 @@ class ExtensionPointComponent extends PureComponent<
     if (!isSiteEditorIframe) {
       return
     }
-    const ComponentImpl = this.props.component && getImplementation(this.props.component)
+    const ComponentImpl =
+      this.props.component && getImplementation(this.props.component)
     const isEditable =
       ComponentImpl &&
       (ComponentImpl.hasOwnProperty('schema') ||
