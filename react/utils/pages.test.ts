@@ -17,7 +17,9 @@ describe('#getPrecedence', () => {
       '/*a',
     ]
 
-    const result = routes.sort((a, b) => getComparablePrecedence(b) > getComparablePrecedence(a) ? -1 : 1)
+    const result = routes.sort((a, b) =>
+      getComparablePrecedence(b) > getComparablePrecedence(a) ? -1 : 1
+    )
 
     expect(result).toEqual([
       '/a/b/c',

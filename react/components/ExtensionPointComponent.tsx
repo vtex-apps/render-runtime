@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom'
 import * as Sentry from '@sentry/browser'
 import PropTypes from 'prop-types'
 import { forEachObjIndexed, pickBy } from 'ramda'
@@ -9,6 +10,8 @@ import graphQLErrorsStore from '../utils/graphQLErrorsStore'
 import ExtensionPointError from './ExtensionPointError'
 import Loading from './Loading'
 import { RenderContextProps } from './RenderContext'
+import { TreePathContextProvider } from '../utils/treePath'
+import { isSiteEditorIframe } from '../utils/dom'
 
 interface Props {
   component: string | null
@@ -159,6 +162,7 @@ class ExtensionPointComponent extends PureComponent<
   public componentDidMount() {
     this._isMounted = true
     this.fetchAndRerender()
+    this.addDataToElementIfEditable()
   }
 
   public componentDidUpdate() {
@@ -170,9 +174,11 @@ class ExtensionPointComponent extends PureComponent<
         this.mountedError = true
       }
     }
+    this.addDataToElementIfEditable()
   }
 
   public componentWillUnmount() {
+    this.removeDataFromElement()
     this._isMounted = false
   }
 
@@ -213,11 +219,50 @@ class ExtensionPointComponent extends PureComponent<
       delete props.__clearError
     }
 
-    return Component ? (
-      <Component {...props}>{children}</Component>
-    ) : (
-      children || <Loading />
+    return (
+      <TreePathContextProvider treePath={treePath}>
+        {Component ? (
+          <Component {...props}>{children}</Component>
+        ) : (
+          children || <Loading />
+        )}
+      </TreePathContextProvider>
     )
+  }
+
+  private addDataToElementIfEditable = () => {
+    if (!isSiteEditorIframe) {
+      return
+    }
+    const ComponentImpl =
+      this.props.component && getImplementation(this.props.component)
+    const isEditable =
+      ComponentImpl &&
+      (ComponentImpl.hasOwnProperty('schema') ||
+        ComponentImpl.hasOwnProperty('getSchema'))
+
+    if (!isEditable) {
+      return
+    }
+
+    // eslint-disable-next-line react/no-find-dom-node
+    const element = ReactDOM.findDOMNode(this) as Element
+
+    if (element && element.setAttribute) {
+      element.setAttribute('data-extension-point', this.props.treePath)
+    }
+  }
+
+  private removeDataFromElement = () => {
+    if (!isSiteEditorIframe) {
+      return
+    }
+    // eslint-disable-next-line react/no-find-dom-node
+    const element = ReactDOM.findDOMNode(this) as Element
+
+    if (element && element.removeAttribute) {
+      element.removeAttribute('data-extension-point')
+    }
   }
 }
 
