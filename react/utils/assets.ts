@@ -12,14 +12,17 @@ export const getVTEXImgHost = (account: string) => {
   return `https://${account}.vteximg.com.br`
 }
 
-const getAbsoluteURL = (account: string, url: string, production: boolean, rootPath: string) => {
+const getAbsoluteURL = (
+  account: string,
+  url: string,
+  production: boolean,
+  rootPath: string
+) => {
   if (!isRelative(url)) {
     return url
   }
 
-  return production
-    ? `${getVTEXImgHost(account)}${url}`
-    : rootPath + url
+  return production ? `${getVTEXImgHost(account)}${url}` : rootPath + url
 }
 
 class ServerSideAssetLoadingError extends Error {

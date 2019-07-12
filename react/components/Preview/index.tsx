@@ -13,6 +13,8 @@ interface State {
   containerWidth?: number | null
 }
 
+export const TEST_ID = 'loading-preview'
+
 export default class Preview extends React.PureComponent<Props, State> {
   private container: RefObject<HTMLDivElement>
 
@@ -155,6 +157,7 @@ export default class Preview extends React.PureComponent<Props, State> {
       <div
         ref={this.container}
         className={fullWidth ? '' : 'mw9 center w-100'}
+        data-testid={TEST_ID}
         style={{ padding }}
       >
         {this.renderPreviewGraphic(width, height, type)}

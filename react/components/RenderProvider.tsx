@@ -35,7 +35,7 @@ import { TreePathContextProvider } from '../utils/treePath'
 import BuildStatus from './BuildStatus'
 import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
-import { RenderContext } from './RenderContext'
+import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
 import { generateExtensions } from '../utils/blocks'
 
@@ -887,7 +887,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const context = this.getChildContext()
 
     return (
-      <RenderContext.Provider value={context}>
+      <RenderContextProvider runtime={context}>
         <TreePathContextProvider treePath="">
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider
@@ -906,7 +906,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             </IntlProvider>
           </ApolloProvider>
         </TreePathContextProvider>
-      </RenderContext.Provider>
+      </RenderContextProvider>
     )
   }
 

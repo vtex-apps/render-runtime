@@ -15,7 +15,7 @@ This app handles runtime execution of React apps in the VTEX IO Platform.
   - [Other methods](#other-methods)
      - [goBack](#goback)
      - [setQuery](#setQuery)
-## Exported Components 
+## Exported Components
 
 ### Link
 Navigation related component that, when clicked, redirects to another route. Details [here](#link-1).
@@ -25,7 +25,7 @@ This wrapper component removes its children from the subject of the Server Side 
 
 ```javascript
 <NoSSR onSSR={<div>Loading...</div>}>
-  <DomRelatedComponent/> 
+  <DomRelatedComponent/>
 </NoSSR>
 ```
 
@@ -51,7 +51,7 @@ The Render framework provides a built-in navigation solution that provides great
 ```
 _Extracted from [vtex-store](https://github.com/vtex-apps/store/blob/master/store/routes.json)_
 
-In this example, `store.product` represents a **block** that renders a specific template, and `/:slug/p` represents the URL path that match with that product block. 
+In this example, `store.product` represents a **block** that renders a specific template, and `/:slug/p` represents the URL path that match with that product block.
 
 **We provide two solutions for navigation inside our Render apps:** the `navigate` method exported from `render-runtime`, and the `Link` component. You can also only set query parameters using the `setQuery` method.
 
@@ -72,11 +72,11 @@ const MyOtherComponent = ({ navigate }) => {
 export withRuntimeContext(MyOtherComponent)
 ```
 
-You can pass a handful of configuration props to navigate: 
+You can pass a handful of configuration props to navigate:
 
 #### Navigate options
 
-| Name      | Type          | Default  | Description | 
+| Name      | Type          | Default  | Description |
 | :------------- |:-------------| :-----|:-----|
 | fallbackToWindowLocation     | `boolean`   | `false`  |If `true`, sets the href of `window.location` with the future path
 | fetchPage     | `boolean`   | `true`  | If `false`, won't fetch navigation assets in `pages-graphql`
@@ -90,7 +90,7 @@ You can pass a handful of configuration props to navigate:
 navigate({
   page: 'store.search',
   params: { department: 'accessories' },
-  query: 'order=OrderByPrice', 
+  query: 'order=OrderByPrice',
   scrollOptions: { baseElementId: 'search-result-anchor', top: -HEADER_SCROLL_OFFSET },
 })
 ```
@@ -100,7 +100,7 @@ Link is a custom React component that renders an `a` HTML element that, when cli
 
 #### Props
 
-| Name      | Type          | Default  | Description | 
+| Name      | Type          | Default  | Description |
 | :------------- |:-------------| :-----|:-----|
 | page     | `string`  | --  | Name of the page that will be redirect to. Maps to a `blocks.json` block. Example: `'store.product'`
 | to     | `string`    |  --  | Alternatively to `page`, you can pass the whole URL directly instead of the page name (Useful for the `search-result`). Example: `/shirt/p?skuId=1`
@@ -139,13 +139,13 @@ This auxiliary method changes the current page's query string without fetching n
 setQuery(query, options)
 ```
 ##### Parameters
-| Name      | Type          | Default  | Description | 
+| Name      | Type          | Default  | Description |
 | :------------- |:-------------| :-----|:-----|
 | query     | `object`  | -- | Object describing the query E.g: `{ order: 'price' }`
 | options     | `object`  | -- | Configuration. _Described below_
 ##### Options
-| Name      | Type          | Default  | Description | 
+| Name      | Type          | Default  | Description |
 | :------------- |:-------------| :-----|:-----|
 | merge     | `boolean`  | `true` | Set if the passed queries will be merged into the current ones.
 | replace  | `boolean`  | `false` | If `true`, it uses _history_'s replace method instead of push.
-| scrollOptions  | `RenderScrollOptions`  | `false` | After the navigation, if the page should be scrolled to a specific position, or should stay still (use `false`) 
+| scrollOptions  | `RenderScrollOptions`  | `false` | After the navigation, if the page should be scrolled to a specific position, or should stay still (use `false`)

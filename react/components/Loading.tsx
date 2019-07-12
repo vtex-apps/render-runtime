@@ -2,7 +2,7 @@ import React from 'react'
 
 import Preview from './Preview'
 
-const Loading = ({extension}: {extension?: Extension}) => {
+const Loading = ({ extension }: { extension?: Extension }) => {
   if (!extension) {
     return null
   }
