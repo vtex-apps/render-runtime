@@ -82,9 +82,7 @@ export default class ErrorPage extends Component {
     return (
       <div>
         <div
-          className={`${
-            style.errorStack
-          } bg-danger--faded pa7 mt4 br3 t-body lh-copy`}
+          className={`${style.errorStack} bg-danger--faded pa7 mt4 br3 t-body lh-copy`}
         >
           {error.stack.split('\n').map((item: string, key: number) => {
             return (
@@ -96,9 +94,7 @@ export default class ErrorPage extends Component {
           })}
         </div>
         <div
-          className={`${
-            style.errorDetails
-          } bg-warning--faded pa7 mt4 br3 lh-copy`}
+          className={`${style.errorDetails} bg-warning--faded pa7 mt4 br3 lh-copy`}
         >
           <ReactJson src={error.details} />
         </div>

@@ -8,7 +8,6 @@ if (canUseDOM && window.__RUNTIME__.production) {
   Sentry.init({
     beforeSend: (event: Sentry.SentryEvent) =>
       event.tags && event.tags.component ? event : null,
-    defaultIntegrations: true,
     dsn: sentryDSN,
     environment: canUseDOM ? 'browser' : 'ssr',
     release: version,

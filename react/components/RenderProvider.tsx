@@ -17,6 +17,7 @@ import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { traverseComponent } from '../utils/components'
 import {
+  isSiteEditorIframe,
   RENDER_CONTAINER_CLASS,
   ROUTE_CLASS_PREFIX,
   routeClass,
@@ -30,13 +31,13 @@ import {
   scrollTo as pageScrollTo,
 } from '../utils/pages'
 import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
-import { TreePathContext } from '../utils/treePath'
+import { TreePathContextProvider } from '../utils/treePath'
 import BuildStatus from './BuildStatus'
 import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
-import { RenderContext } from './RenderContext'
+import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
-import { generateExtensions } from '../utils/blocks';
+import { generateExtensions } from '../utils/blocks'
 
 interface Props {
   children: ReactElement<any> | null
@@ -64,21 +65,12 @@ export interface RenderProviderState {
   settings: RenderRuntime['settings']
   route: RenderRuntime['route']
   loadedPages: Set<string>
-  blocksTree?:  RenderRuntime['blocksTree']
+  blocksTree?: RenderRuntime['blocksTree']
   blocks?: RenderRuntime['blocks']
   contentMap?: RenderRuntime['contentMap']
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
-let isStorefrontIframe: boolean
-
-try {
-  if (canUseDOM && window.top !== window.self && window.top.__provideRuntime) {
-    isStorefrontIframe = !!window.top.__provideRuntime
-  }
-} catch (e) {
-  console.error(e)
-}
 
 const noop = () => {}
 
@@ -159,7 +151,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public sendInfoFromIframe = debounce(
     (params?: { shouldUpdateRuntime?: boolean }) => {
-      if (!isStorefrontIframe) {
+      if (!isSiteEditorIframe) {
         return undefined
       }
 
@@ -532,14 +524,23 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     let updatedExtensions: Extensions = {}
 
-    if (window.__RUNTIME__.hasNewExtensions) { // TODO: Remove this when new pages-graphql get released
-      updatedExtensions = generateExtensions(blocksTree!, blocks!, contentMap!, pagesState[page])
+    if (window.__RUNTIME__.hasNewExtensions) {
+      // TODO: Remove this when new pages-graphql get released
+      updatedExtensions = generateExtensions(
+        // eslint-disable-next-line
+        blocksTree!,
+        // eslint-disable-next-line
+        blocks!,
+        // eslint-disable-next-line
+        contentMap!,
+        pagesState[page]
+      )
     }
 
     this.setState(
       {
         extensions: replaceExtensionsWithDefault(
-          {...updatedExtensions, ...this.state.extensions},
+          { ...updatedExtensions, ...this.state.extensions },
           page,
           defaultExtensions
         ),
@@ -886,8 +887,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const context = this.getChildContext()
 
     return (
-      <RenderContext.Provider value={context}>
-        <TreePathContext.Provider value={{ treePath: '' }}>
+      <RenderContextProvider runtime={context}>
+        <TreePathContextProvider treePath="">
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider
               locale={locale}
@@ -896,16 +897,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             >
               <Fragment>
                 <ExtensionManager runtime={this.props.runtime} />
-                {!production && !isStorefrontIframe && <BuildStatus />}
+                {!production && !isSiteEditorIframe && <BuildStatus />}
                 {component}
-                {isStorefrontIframe ? (
+                {isSiteEditorIframe ? (
                   <ExtensionPoint id="store/__overlay" />
                 ) : null}
               </Fragment>
             </IntlProvider>
           </ApolloProvider>
-        </TreePathContext.Provider>
-      </RenderContext.Provider>
+        </TreePathContextProvider>
+      </RenderContextProvider>
     )
   }
 

@@ -61,9 +61,7 @@ export default (module: Module, InitialImplementer: any) => {
       }
 
       console.log(
-        `[render] Component updated. treePath=${treePath} updated=${
-          HMRComponent.displayName
-        }`
+        `[render] Component updated. treePath=${treePath} updated=${HMRComponent.displayName}`
       )
     }
 

@@ -171,7 +171,9 @@ function start() {
       window.__RUNTIME__.hasNewExtensions = true
       window.__RUNTIME__.extensions = generateExtensions(
         window.__RUNTIME__.blocksTree,
+        // eslint-disable-next-line
         window.__RUNTIME__.blocks!,
+        // eslint-disable-next-line
         window.__RUNTIME__.contentMap!,
         window.__RUNTIME__.pages[window.__RUNTIME__.page]
       )

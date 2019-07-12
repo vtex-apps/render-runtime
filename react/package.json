@@ -53,7 +53,7 @@
     "@types/react-hot-loader": "^4.1.0",
     "@types/react-intl": "^2.3.5",
     "@types/route-parser": "^0.1.1",
-    "@vtex/test-tools": "^0.3.2",
+    "@vtex/test-tools": "^1.0.0",
     "babel-core": "^6.26.3",
     "babel-jest": "^24.1.0",
     "babel-preset-env": "^1.7.0",

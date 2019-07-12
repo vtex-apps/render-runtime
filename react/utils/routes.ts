@@ -28,7 +28,15 @@ const parsePageQueryResponse = (
     },
   } = page
 
-  const [blocks, blocksTree, contentMap, cacheHints, components, pages, settings] = [
+  const [
+    blocks,
+    blocksTree,
+    contentMap,
+    cacheHints,
+    components,
+    pages,
+    settings,
+  ] = [
     blocksJSON,
     blocksTreeJSON,
     contentMapJSON,
