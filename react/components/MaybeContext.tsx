@@ -24,7 +24,7 @@ const useContextComponent = ({
       return undefined
     }
     return {
-      pageContextProps,
+      ...pageContextProps,
       nextTreePath: nestedPage,
       params,
       query,
