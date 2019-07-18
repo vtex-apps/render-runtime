@@ -2,7 +2,7 @@ import React from 'react'
 
 import Preview from './Preview'
 
-import { useExtension } from '../utils/extension'
+import { useExtension } from '../hooks/extension'
 
 const Loading = () => {
   const extension = useExtension()

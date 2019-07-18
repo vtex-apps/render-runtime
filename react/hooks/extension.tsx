@@ -1,7 +1,7 @@
 import { ReactElement } from 'react'
 
 import { useRuntime } from '../components/RenderContext'
-import { useTreePath } from './treePath'
+import { useTreePath } from '../utils/treePath'
 
 function mountTreePath(base: string, children: string[]) {
   return [base, ...children].filter(id => !!id).join('/')

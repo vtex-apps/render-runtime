@@ -1,5 +1,5 @@
 import React from 'react'
-import { useExtension } from '../utils/extension'
+import { useExtension } from '../hooks/extension'
 
 export function useChildBlock(childBlock: ChildBlock): Block | null {
   if (typeof childBlock === 'string') {
