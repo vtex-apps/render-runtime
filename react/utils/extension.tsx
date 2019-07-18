@@ -3,11 +3,26 @@ import { ReactElement } from 'react'
 import { useRuntime } from '../components/RenderContext'
 import { useTreePath } from './treePath'
 
-const useExtension = () => {
+function mountTreePath(base: string, children: string[]) {
+  return [base, ...children].filter(id => !!id).join('/')
+}
+
+interface Options {
+  children?: string[] | string
+}
+
+const useExtension = ({ children }: Options = {}): Extension | null => {
   const runtime = useRuntime()
   const { extensions } = runtime
 
-  const { treePath } = useTreePath()
+  const { treePath: baseTreePath } = useTreePath()
+
+  const treePath = children
+    ? mountTreePath(
+        baseTreePath,
+        Array.isArray(children) ? children : [children]
+      )
+    : baseTreePath
 
   const extension = treePath && extensions[treePath]
 
