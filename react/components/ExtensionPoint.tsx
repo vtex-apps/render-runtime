@@ -143,8 +143,12 @@ const ExtensionPoint: FC<Props> = props => {
 
   const isSSR = useSSR()
 
-  /* Prevents a client-only block from being inserted into the wrong element */
-  if (renderStrategy === 'client' && isSSR) {
+  if (
+    /* Prevents a client-only block from being inserted into the wrong element */
+    renderStrategy === 'client' && isSSR
+    /* Stops rendering if the extension is not found. Useful for optional ExtensionPoints */
+    || !extension
+   ) {
     return null
   }
 
@@ -162,18 +166,14 @@ const ExtensionPoint: FC<Props> = props => {
     before,
     newTreePath,
     mergedProps,
-    component ? (
-      <ExtensionPointComponent
-        component={component}
-        props={mergedProps}
-        runtime={runtime}
-        treePath={newTreePath}
-      >
-        {componentChildren}
-      </ExtensionPointComponent>
-    ) : (
-      <Loading extension={extension} />
-    )
+    <ExtensionPointComponent
+      component={component}
+      props={mergedProps}
+      runtime={runtime}
+      treePath={newTreePath}
+    >
+      {component ? componentChildren : <Loading />}
+    </ExtensionPointComponent>
   )
 
   return extensionPointComponent
