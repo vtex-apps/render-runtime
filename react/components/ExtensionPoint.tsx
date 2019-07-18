@@ -6,7 +6,6 @@ import Loading from './Loading'
 import { useRuntime } from './RenderContext'
 import { useTreePath } from '../utils/treePath'
 import { useSSR } from './NoSSR'
-// import TrackEventsWrapper from './TrackEventsWrapper'
 
 interface Props {
   id: string
@@ -122,7 +121,6 @@ const ExtensionPoint: FC<Props> = props => {
     content = {},
     render: renderStrategy = null,
     props: extensionProps = {},
-    // track = [],
   } = extension || {}
 
   const mergedProps = React.useMemo(() => {
