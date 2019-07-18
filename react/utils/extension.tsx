@@ -1,10 +1,13 @@
 import { ReactElement } from 'react'
 
 import { useRuntime } from '../components/RenderContext'
+import { useTreePath } from './treePath'
 
-const useExtension = (treePath: string) => {
+const useExtension = () => {
   const runtime = useRuntime()
   const { extensions } = runtime
+
+  const { treePath } = useTreePath()
 
   const extension = treePath && extensions[treePath]
 
@@ -17,11 +20,10 @@ interface ExtensionContext {
 
 interface Props {
   children({ extension }: ExtensionContext): ReactElement<any> | null
-  treePath: string
 }
 
-const ExtensionConsumer = ({ children, treePath }: Props) => {
-  const extension = useExtension(treePath)
+const ExtensionConsumer = ({ children }: Props) => {
+  const extension = useExtension()
 
   return children({ extension })
 }
