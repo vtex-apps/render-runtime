@@ -40,7 +40,6 @@ import { addLocaleData } from '../utils/locales'
 import registerComponent from '../utils/registerComponent'
 import { withSession } from '../utils/session'
 import { TreePathContext, useTreePath } from '../utils/treePath'
-import { useExtension, ExtensionConsumer } from '../utils/extension'
 import {
   isStyleWritable,
   optimizeSrcForVtexImg,
@@ -276,8 +275,6 @@ export {
   useChildBlock,
   useRuntime,
   useTreePath,
-  useExtension,
-  ExtensionConsumer,
   withSession,
   Loading,
   buildCacheLocator,
