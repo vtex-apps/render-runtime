@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `ExtensionPoint` render is interrupted earlier if no extension is found, and refrains from rendering `ExtensionPointComponent` if so.
 
 ### Fixed
-- `Loading` gets its block props from context again.
+- `Loading` gets its block props from context again, thus fixing issue where it wouldn't appear if inserted on a component.
 
 ## [8.76.0] - 2019-10-30
 ### Changed
