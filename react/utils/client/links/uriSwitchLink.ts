@@ -80,7 +80,7 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
         runtime: { appsEtag, cacheHints },
       } = oldContext
       const { extensions } = operation
-      const { workspace } = runtime
+      const { workspace, route: { domain } } = runtime
       const hash = generateHash(operation.query)
       const {
         maxAge,
@@ -91,7 +91,7 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
         sender,
       } = extractHints(operation.query, cacheHints[hash])
       const requiresAuthorization = path(
-        ['settings', `vtex.${runtime.route.domain}`, 'requiresAuthorization'],
+        ['settings', `vtex.${domain}`, 'requiresAuthorization'],
         runtime
       )
       const customScope = requiresAuthorization ? 'private' : scope
@@ -109,7 +109,7 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
       return {
         ...oldContext,
         fetchOptions: { ...fetchOptions, method },
-        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
+        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&session_path=/${domain}&session_host=${baseURI}`,
       }
     })
     return forward ? forward(operation) : null
