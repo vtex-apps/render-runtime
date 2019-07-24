@@ -76,7 +76,7 @@ const Link: React.FunctionComponent<Props> = ({
 
   const href = getHref()
   // Href inside admin iframe should omit the `/app/` path
-  const hrefWithoutIframePrefix = domain === 'admin' && href.startsWith('/admin/app/') ? href.replace('/admin/app/', '/admin/') : href
+  const hrefWithoutIframePrefix = domain && domain === 'admin' && href.startsWith('/admin/app/') ? href.replace('/admin/app/', '/admin/') : href
 
   return (
     <a href={hrefWithoutIframePrefix} {...linkProps} onClick={handleClick}>
