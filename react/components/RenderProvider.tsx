@@ -408,7 +408,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       scrollOptions = false,
     }: SetQueryOptions = {}
   ): boolean => {
-    const { history } = this.props
+    const { history, runtime: { rootPath } } = this.props
     const {
       pages,
       page,
@@ -429,12 +429,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query: nextQuery,
       replace,
       scrollOptions,
+      rootPath,
     })
   }
 
   public navigate = (options: NavigateOptions) => {
-    const { history } = this.props
+    const { history, runtime: { rootPath } } = this.props
     const { pages } = this.state
+    options.rootPath = rootPath
     return pageNavigate(history, pages, options)
   }
 
