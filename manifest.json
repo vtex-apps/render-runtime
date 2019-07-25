@@ -1,7 +1,7 @@
 {
   "vendor": "vtex",
   "name": "render-runtime",
-  "version": "8.42.5",
+  "version": "8.42.6",
   "title": "VTEX Render runtime",
   "description": "The VTEX Render framework runtime",
   "defaultLocale": "pt-BR",
