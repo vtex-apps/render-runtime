@@ -12,8 +12,7 @@ interface Options {
 }
 
 const useExtension = ({ children }: Options = {}): Extension | null => {
-  const runtime = useRuntime()
-  const { extensions } = runtime
+  const { extensions } = useRuntime()
 
   const { treePath: baseTreePath } = useTreePath()
 
