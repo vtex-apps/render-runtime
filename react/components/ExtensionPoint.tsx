@@ -145,10 +145,10 @@ const ExtensionPoint: FC<Props> = props => {
 
   if (
     /* Prevents a client-only block from being inserted into the wrong element */
-    renderStrategy === 'client' && isSSR
+    (renderStrategy === 'client' && isSSR) ||
     /* Stops rendering if the extension is not found. Useful for optional ExtensionPoints */
-    || !extension
-   ) {
+    !extension
+  ) {
     return null
   }
 
