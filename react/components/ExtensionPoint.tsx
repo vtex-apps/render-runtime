@@ -5,6 +5,7 @@ import ExtensionPointComponent from './ExtensionPointComponent'
 import Loading from './Loading'
 import { useRuntime } from './RenderContext'
 import { useTreePath } from '../utils/treePath'
+import { useSSR } from './NoSSR'
 // import TrackEventsWrapper from './TrackEventsWrapper'
 
 interface Props {
@@ -119,6 +120,7 @@ const ExtensionPoint: FC<Props> = props => {
     around = [],
     before = [],
     content = {},
+    render: renderStrategy = null,
     props: extensionProps = {},
     // track = [],
   } = extension || {}
@@ -140,6 +142,13 @@ const ExtensionPoint: FC<Props> = props => {
       { params, query },
     ])
   }, [parentProps, extensionProps, blockProps, content, params, query])
+
+  const isSSR = useSSR()
+
+  /* Prevents a client-only block from being inserted into the wrong element */
+  if (renderStrategy === 'client' && isSSR) {
+    return null
+  }
 
   const isCompositionChildren =
     extension && extension.composition === 'children'
