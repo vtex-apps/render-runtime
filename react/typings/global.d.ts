@@ -377,6 +377,7 @@ declare global {
     workspace: string
     disableSSR: boolean
     hints: any
+    introspectionResult: IntrospectionResult
     page: string
     route: Route
     version: string
@@ -404,6 +405,18 @@ declare global {
     rootPath?: string
     workspaceCookie: string
     hasNewExtensions: boolean
+  }
+
+  interface IntrospectionResult {
+    __schema: {
+      types: Array<{
+        kind: string
+        name: string
+        possibleTypes: Array<{
+          name: string
+        }>
+      }>
+    }
   }
 
   interface CacheHints {
