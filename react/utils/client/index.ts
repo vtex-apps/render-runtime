@@ -82,7 +82,6 @@ export const getClient = (
     introspectionResult: IntrospectionResultData
   } = runtime
 
-  console.log(introspectionResult)
   let fragmentMatcher: FragmentMatcher
   if (introspectionResult) {
     fragmentMatcher = new IntrospectionFragmentMatcher({
