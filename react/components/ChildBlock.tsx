@@ -1,6 +1,5 @@
 import React from 'react'
-import { useTreePath } from '../utils/treePath'
-import { useRuntime } from './RenderContext'
+import { useExtension } from '../hooks/extension'
 
 export function useChildBlock(childBlock: ChildBlock): Block | null {
   if (typeof childBlock === 'string') {
@@ -15,16 +14,12 @@ export function useChildBlock(childBlock: ChildBlock): Block | null {
     throw new Error('The id you are sending to useChildBlock is empty')
   }
 
-  const runtime = useRuntime()
-  const { treePath } = useTreePath()
-
-  const childPath = mountTreePath(id, treePath)
-  const block = runtime.extensions && runtime.extensions[childPath]
+  const extension = useExtension({ children: id })
 
   // We are explicitly not exposing the private API here
-  return block
+  return extension
     ? {
-        props: block.props,
+        props: extension.props,
       }
     : null
 }
@@ -45,8 +40,4 @@ interface Block {}
 
 interface ChildBlockProps extends ChildBlock {
   children(block: Block | null): React.ReactNode
-}
-
-function mountTreePath(currentId: string, parentTreePath: string) {
-  return [parentTreePath, currentId].filter(id => !!id).join('/')
 }
