@@ -83,7 +83,8 @@ export const isSiteEditorIframe =
   canUseDOM &&
   window.top !== window.self &&
   window.top.__provideRuntime &&
-  !!window.top.__provideRuntime
+  !!window.top.__provideRuntime &&
+  window.__RUNTIME__.route.domain === 'store'
 
 export const getContainer = () => {
   return canUseDOM

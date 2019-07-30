@@ -694,21 +694,28 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return assetsPromise
   }
 
-  public onLocaleSelected = (locale: string) => {
+  public onLocaleSelected = (locale: string, domain?: string) => {
     if (locale !== this.state.culture.locale) {
-      const sessionData = {
-        public: {
-          cultureInfo: {
-            value: locale,
+      const sessionData = { public: { } }
+      if(domain && domain === 'admin'){
+        sessionData.public = {
+            admin_cultureInfo: {
+              value: locale,
           },
-        },
+        }
+      } else {
+        sessionData.public = {
+            cultureInfo: {
+              value: locale,
+            },
+        }
       }
       Promise.all([this.patchSession(sessionData)])
         .then(() => window.location.reload())
         .catch(e => {
           console.log('Failed to fetch new locale file.')
           console.error(e)
-        })
+      })
     }
   }
 
