@@ -9,6 +9,7 @@ import { History, Location } from 'history'
 import { HelmetData } from 'react-helmet'
 import { TreePathProps } from '../utils/treePath'
 import { LayoutContainer } from '../core/main'
+import { IntrospectionResultData } from 'apollo-cache-inmemory'
 
 declare global {
   interface RenderMetric {
@@ -260,7 +261,7 @@ declare global {
   interface RenderComponent<P = {}, S = {}> {
     getCustomMessages?: (locale: string) => any
     WrappedComponent?: RenderComponent
-    new (): Component<P, S>
+    new(): Component<P, S>
   }
 
   interface ComponentsRegistry {
@@ -377,7 +378,7 @@ declare global {
     workspace: string
     disableSSR: boolean
     hints: any
-    introspectionResult: IntrospectionResult
+    introspectionResult: IntrospectionResultData
     page: string
     route: Route
     version: string
@@ -405,18 +406,6 @@ declare global {
     rootPath?: string
     workspaceCookie: string
     hasNewExtensions: boolean
-  }
-
-  interface IntrospectionResult {
-    __schema: {
-      types: Array<{
-        kind: string
-        name: string
-        possibleTypes: Array<{
-          name: string
-        }>
-      }>
-    }
   }
 
   interface CacheHints {
