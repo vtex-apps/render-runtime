@@ -1,5 +1,4 @@
 import {
-  HeuristicFragmentMatcher,
   IntrospectionFragmentMatcher,
   IntrospectionResultData,
   InMemoryCache,
@@ -63,8 +62,6 @@ export const getState = (runtime: RenderRuntime) => {
   return apolloClient ? apolloClient.cache.extract() : {}
 }
 
-type FragmentMatcher = IntrospectionFragmentMatcher | HeuristicFragmentMatcher
-
 export const getClient = (
   runtime: RenderRuntime,
   baseURI: string,
@@ -82,20 +79,13 @@ export const getClient = (
     introspectionResult: IntrospectionResultData
   } = runtime
 
-  let fragmentMatcher: FragmentMatcher
-  if (introspectionResult) {
-    fragmentMatcher = new IntrospectionFragmentMatcher({
-      introspectionQueryResultData: introspectionResult,
-    })
-  } else {
-    fragmentMatcher = new HeuristicFragmentMatcher()
-  }
-
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
     const cache = new InMemoryCache({
       addTypename: true,
       dataIdFromObject,
-      fragmentMatcher: fragmentMatcher,
+      fragmentMatcher: new IntrospectionFragmentMatcher({
+        introspectionQueryResultData: introspectionResult,
+      }),
     })
 
     const httpLink = ApolloLink.from([
