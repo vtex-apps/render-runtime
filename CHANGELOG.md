@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Add support for GraphQL `Unions` and `Interfaces`in ApolloClient's cache. This is done by using `IntrospectionFragmentMatcher` instead of `HeuristicFragmentMatcher` (https://www.apollographql.com/docs/react/advanced/fragments/).
+
 ## [8.43.0] - 2019-07-30
 ### Added
 - Separate admin language from store language
