@@ -1,5 +1,6 @@
 import {
-  HeuristicFragmentMatcher,
+  IntrospectionFragmentMatcher,
+  IntrospectionResultData,
   InMemoryCache,
   NormalizedCacheObject,
 } from 'apollo-cache-inmemory'
@@ -68,13 +69,23 @@ export const getClient = (
   ensureSessionLink: ApolloLink,
   cacheControl?: PageCacheControl
 ) => {
-  const { account, workspace } = runtime
+  const {
+    account,
+    workspace,
+    introspectionResult,
+  }: {
+    account: string
+    workspace: string
+    introspectionResult: IntrospectionResultData
+  } = runtime
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
     const cache = new InMemoryCache({
       addTypename: true,
       dataIdFromObject,
-      fragmentMatcher: new HeuristicFragmentMatcher(),
+      fragmentMatcher: new IntrospectionFragmentMatcher({
+        introspectionQueryResultData: introspectionResult,
+      }),
     })
 
     const httpLink = ApolloLink.from([
