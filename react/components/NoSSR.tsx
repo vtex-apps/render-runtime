@@ -1,9 +1,14 @@
-import React, { useState, useEffect, FunctionComponent } from 'react'
+import React, { useState, useEffect, useLayoutEffect, FunctionComponent } from 'react'
+
+const useEnhancedEffect =
+  typeof window !== 'undefined'
+    ? useLayoutEffect
+    : useEffect
 
 const useSSR = () => {
   const [isCSRAvailable, setCSR] = useState(false)
 
-  useEffect(() => {
+  useEnhancedEffect(() => {
     setCSR(true)
   }, [])
 
