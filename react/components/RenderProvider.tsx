@@ -626,43 +626,44 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public prefetchDefaultPages = async (routeIds: string[]) => {
-    const {
-      runtime,
-      runtime: { renderMajor },
-    } = this.props
-    const {
-      culture: { locale },
-      pages,
-    } = this.state
+    console.log(routeIds)
+    // const {
+    //   runtime,
+    //   runtime: { renderMajor },
+    // } = this.props
+    // const {
+    //   culture: { locale },
+    //   pages,
+    // } = this.state
 
-    const {
-      components: defaultComponents,
-      extensions: defaultExtensions,
-      messages: defaultMessages,
-    } = await fetchDefaultPages({
-      apolloClient: this.apolloClient,
-      locale,
-      pages,
-      renderMajor,
-      routeIds,
-    })
+    // const {
+    //   components: defaultComponents,
+    //   extensions: defaultExtensions,
+    //   messages: defaultMessages,
+    // } = await fetchDefaultPages({
+    //   apolloClient: this.apolloClient,
+    //   locale,
+    //   pages,
+    //   renderMajor,
+    //   routeIds,
+    // })
 
-    await Promise.all(
-      Object.keys(defaultComponents).map((component: string) => {
-        const { assets } = traverseComponent(defaultComponents, component)
-        return prefetchAssets(runtime, assets)
-      })
-    )
+    // await Promise.all(
+    //   Object.keys(defaultComponents).map((component: string) => {
+    //     const { assets } = traverseComponent(defaultComponents, component)
+    //     return prefetchAssets(runtime, assets)
+    //   })
+    // )
 
-    this.setState(({ components, messages }) => ({
-      components: {
-        ...defaultComponents,
-        ...this.state.components,
-        ...components,
-      },
-      defaultExtensions,
-      messages: { ...defaultMessages, ...this.state.messages, ...messages },
-    }))
+    // this.setState(({ components, messages }) => ({
+    //   components: {
+    //     ...defaultComponents,
+    //     ...this.state.components,
+    //     ...components,
+    //   },
+    //   defaultExtensions,
+    //   messages: { ...defaultMessages, ...this.state.messages, ...messages },
+    // }))
   }
 
   public updateComponentAssets = (availableComponents: Components) => {
