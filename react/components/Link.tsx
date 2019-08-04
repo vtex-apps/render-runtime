@@ -26,7 +26,12 @@ const Link: React.FunctionComponent<Props> = ({
   children,
   ...linkProps
 }) => {
-  const { pages, navigate, rootPath = '', route: { domain } } = useRuntime()
+  const {
+    pages,
+    navigate,
+    rootPath = '',
+    route: { domain },
+  } = useRuntime()
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLAnchorElement>) => {
@@ -76,7 +81,10 @@ const Link: React.FunctionComponent<Props> = ({
 
   const href = getHref()
   // Href inside admin iframe should omit the `/app/` path
-  const hrefWithoutIframePrefix = domain && domain === 'admin' && href.startsWith('/admin/app/') ? href.replace('/admin/app/', '/admin/') : href
+  const hrefWithoutIframePrefix =
+    domain && domain === 'admin' && href.startsWith('/admin/app/')
+      ? href.replace('/admin/app/', '/admin/')
+      : href
 
   return (
     <a href={hrefWithoutIframePrefix} {...linkProps} onClick={handleClick}>

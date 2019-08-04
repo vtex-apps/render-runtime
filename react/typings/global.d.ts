@@ -261,7 +261,7 @@ declare global {
   interface RenderComponent<P = {}, S = {}> {
     getCustomMessages?: (locale: string) => any
     WrappedComponent?: RenderComponent
-    new(): Component<P, S>
+    new (): Component<P, S>
   }
 
   interface ComponentsRegistry {
