@@ -161,12 +161,12 @@ class ExtensionPointComponent extends PureComponent<
 
   public componentDidMount() {
     this._isMounted = true
-    this.fetchAndRerender()
-    this.addDataToElementIfEditable()
+    // this.fetchAndRerender()
+    // this.addDataToElementIfEditable()
   }
 
   public componentDidUpdate() {
-    this.fetchAndRerender()
+    // this.fetchAndRerender()
     if (this.state.error) {
       if (this.mountedError) {
         this.clearError()
@@ -174,7 +174,7 @@ class ExtensionPointComponent extends PureComponent<
         this.mountedError = true
       }
     }
-    this.addDataToElementIfEditable()
+    // this.addDataToElementIfEditable()
   }
 
   public componentWillUnmount() {
