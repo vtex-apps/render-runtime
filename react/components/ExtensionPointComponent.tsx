@@ -196,7 +196,7 @@ class ExtensionPointComponent extends PureComponent<
     // A children of this extension point throwed an uncaught error
     // Only show errors in production if the entire page explodes. (Ignore nested extension points)
     if (error) {
-      if (production && !pages[treePath] && !page.startsWith('admin/')) {
+      if (production && !page.startsWith('admin/')) {
         return null
       }
 

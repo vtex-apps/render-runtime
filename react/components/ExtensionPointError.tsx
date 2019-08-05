@@ -2,10 +2,10 @@ import PropTypes from 'prop-types'
 import React, { ErrorInfo, PureComponent } from 'react'
 
 interface Props {
-  treePath: string
+  treePath?: string
   error?: Error
   errorInfo?: ErrorInfo | null
-  operationIds: string[]
+  operationIds?: string[]
 }
 
 interface State {
@@ -51,7 +51,7 @@ class ExtensionPointError extends PureComponent<Props, State> {
         {errorDetails && error && (
           <>
             <ul className="f6 list pl0">
-              {operationIds.map(operationId => (
+              {operationIds && operationIds.map(operationId => (
                 <li key={operationId}>
                   <span>Operation ID:</span>{' '}
                   <span className="i">{operationId}</span>

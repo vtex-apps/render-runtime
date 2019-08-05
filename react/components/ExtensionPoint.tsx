@@ -6,6 +6,7 @@ import Loading from './Loading'
 import { useRuntime } from './RenderContext'
 import { useTreePath } from '../utils/treePath'
 import { useSSR } from './NoSSR'
+import { withErrorBoundary } from './ErrorBoundary'
 
 interface Props {
   id: string
@@ -184,4 +185,4 @@ ExtensionPoint.defaultProps = {
   treePath: '',
 }
 
-export default ExtensionPoint
+export default withErrorBoundary(ExtensionPoint)
