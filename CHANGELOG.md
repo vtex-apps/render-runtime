@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [8.45.0] - 2019-08-05
 ### Changed
 - Added error boundaries on the ExtensionPoint component, limiting crashes to the component instead of breaking most of the page.
 - Hide errors on production mode.
