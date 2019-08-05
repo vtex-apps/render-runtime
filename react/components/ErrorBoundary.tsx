@@ -55,8 +55,22 @@ export default ErrorBoundaryWithContext
 
 export const withErrorBoundary = <P extends object>(
   Component: React.ComponentType<P>
-) => (props: P) => (
-  <ErrorBoundaryWithContext>
-    <Component {...props} />
-  </ErrorBoundaryWithContext>
-)
+) => {
+  const WithErrorBoundary = (props: P) => {
+    const runtime = useRuntime()
+
+    return (
+      <ErrorBoundary runtime={runtime}>
+        <Component {...props} />
+      </ErrorBoundary>
+    )
+  }
+
+  const displayName = Component.displayName || Component.name
+
+  if (displayName) {
+    WithErrorBoundary.displayName = `withErrorBoundary(${displayName})`
+  }
+
+  return WithErrorBoundary
+}
