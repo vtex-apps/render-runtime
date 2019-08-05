@@ -3,7 +3,7 @@ import ExtensionPointError from './ExtensionPointError'
 import { useRuntime } from './RenderContext'
 
 interface Props {
-  runtime: any
+  runtime: RenderContext
 }
 
 class ErrorBoundary extends React.Component<Props> {
