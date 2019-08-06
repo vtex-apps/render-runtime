@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Prevent extensions overwriting after an `updateRuntime`
+
 ## [8.45.1] - 2019-08-05
 ### Fixed
 - Add displayName to ErrorBoundary HOC.
