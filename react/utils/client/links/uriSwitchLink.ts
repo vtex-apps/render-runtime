@@ -77,7 +77,11 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
       const {
         fetchOptions = {},
         // Fetches from context for not fetching a stale version of runtime
-        runtime: { appsEtag, cacheHints },
+        runtime: {
+          appsEtag,
+          cacheHints,
+          culture: { locale },
+        },
       } = oldContext
       const { extensions } = operation
       const { workspace, route: { domain } } = runtime
@@ -109,7 +113,7 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
       return {
         ...oldContext,
         fetchOptions: { ...fetchOptions, method },
-        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}`,
+        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}&locale=${locale}`,
       }
     })
     return forward ? forward(operation) : null
