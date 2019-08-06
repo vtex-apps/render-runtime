@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Prevent extensions overwriting after an `updateRuntime`
 
+## [8.45.2] - 2019-08-06
+### Fixed
+- undefined@undefined in Apollo cache
+
 ## [8.45.1] - 2019-08-05
 ### Fixed
 - Add displayName to ErrorBoundary HOC.
