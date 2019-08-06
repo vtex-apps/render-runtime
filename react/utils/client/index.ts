@@ -1,9 +1,4 @@
-import {
-  IntrospectionFragmentMatcher,
-  IntrospectionResultData,
-  InMemoryCache,
-  NormalizedCacheObject,
-} from 'apollo-cache-inmemory'
+import { InMemoryCache, IntrospectionFragmentMatcher, IntrospectionResultData, NormalizedCacheObject } from 'apollo-cache-inmemory'
 import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
 import { onError } from 'apollo-link-error'
@@ -27,19 +22,22 @@ interface ApolloClientsRegistry {
 }
 
 const buildCacheId = (
-  vendor: string,
-  app: string,
-  major: string,
+  vendor: string | undefined,
+  app: string | undefined,
+  major: string | undefined,
   type: string,
   cacheId: string
-) => `${vendor}.${app}@${major}.x:${type}:${cacheId}`
+) => app && major
+  ? `${vendor}.${app}@${major}.x:${type}:${cacheId}`
+  : `${type}:${cacheId}`
 
 const dataIdFromObject = (value: any) => {
   const { cacheId, __typename } = value || ({} as any)
   if (value && __typename && cacheId) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [vendor, app, major, minor, patch, ...type] = __typename.split('_')
-    return buildCacheId(vendor, app, major, type, cacheId)
+    const [vendor, app, major, ...type] = __typename.split('_')
+    const typename = type.join('_') || __typename
+    return buildCacheId(vendor, app, major, typename, cacheId)
   }
   return null
 }
