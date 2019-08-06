@@ -758,17 +758,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     await new Promise<void>(resolve => {
       this.setState(
-        {
+        (state) => ({
           appsEtag,
           cacheHints,
           components,
-          extensions,
+          extensions: {
+            ...state.extensions,
+            ...extensions,
+          },
           messages,
           page,
           pages,
           route,
           settings,
-        },
+        }),
         resolve
       )
     })
