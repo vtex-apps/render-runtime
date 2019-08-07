@@ -1,25 +1,40 @@
-const prependUniq = (arrOne: any[], arrTwo: any[]) => {
-  return [...arrOne, ...arrTwo.filter(item => !arrOne.includes(item))]
-}
+import path from 'path'
+import { merge } from "ramda"
 
 export const traverseComponent = (
-  components: Components | Record<string, string[]>,
+  components: Components | ComponentTraversalResult,
   component: string
 ): ComponentTraversalResult => {
   const entry = components[component]
   const [app] = component.split('/')
   if (Array.isArray(entry)) {
-    return { apps: [app], assets: entry }
+    return { [app]: entry.map(asset => createAssetFile(app, asset))  } as ComponentTraversalResult
   }
 
   const { dependencies, assets } = entry
-  return dependencies
-    .map(dep => traverseComponent(components, dep))
-    .reduce(
-      (acc, dependency) => ({
-        apps: prependUniq(dependency.apps, acc.apps),
-        assets: prependUniq(dependency.assets, acc.assets),
-      }),
-      { apps: [app], assets }
-    )
+  const dependenciesTraversalResult = dependencies.map(dep => traverseComponent(components, dep))
+  const traversalResult: ComponentTraversalResult = dependenciesTraversalResult.reduce((acc, dependencyTraversalResult) => {
+    return {...acc, ...dependencyTraversalResult}
+  }, { [app]: assets.map(asset => assetFileFromPath(app, asset) ) } )
+
+  return traversalResult
+}
+
+const assetFileFromPath = (app: string, assetPath: string): AssetFile => {
+  const fileName = path.basename(assetPath)
+  const filePath = assetPath.replace(`/${app}/`, '/').replace(fileName,'')
+  const bundleFilePath = filePath.replace('published/public', 'published/bundle/public')
+  return {
+    app,
+    fileName,
+    filePath,
+    bundleFilePath
+  }
+}
+
+const createAssetFile = (app: string, assetFile: AssetFile): AssetFile => {
+  return {
+    ...assetFile,
+    app
+  }
 }

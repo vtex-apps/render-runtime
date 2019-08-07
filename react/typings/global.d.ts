@@ -352,9 +352,13 @@ declare global {
 
   type Rendered = ClientRendered | Promise<NamedServerRendered>
 
-  interface ComponentTraversalResult {
-    apps: string[]
-    assets: string[]
+  type ComponentTraversalResult = Record<string, AssetFile[]>
+
+  interface AssetFile {
+    app: string
+    fileName: string
+    filePath: string
+    bundleFilePath: string
   }
 
   interface ComponentEntry {

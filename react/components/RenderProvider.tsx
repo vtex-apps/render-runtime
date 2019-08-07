@@ -614,8 +614,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     if (component) {
       const { runtime } = this.props
       const { components } = this.state
-      const { assets } = traverseComponent(components, component)
-      return prefetchAssets(runtime, assets)
+      const componentAssetsTree = traverseComponent(components, component)
+      console.log('prefetchPage.apps', componentAssetsTree)
+      prefetchAssets(componentAssetsTree)
     }
   }
 
@@ -641,12 +642,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       routeIds,
     })
 
-    await Promise.all(
-      Object.keys(defaultComponents).map((component: string) => {
-        const { assets } = traverseComponent(defaultComponents, component)
-        return prefetchAssets(runtime, assets)
-      })
-    )
+    
+    const componentAssetsTree = Object.keys(defaultComponents).reduce(
+      (acc, component: string) => merge(acc, traverseComponent(defaultComponents, component)), {})
+    console.log('prefetchDefaultPages.apps', componentAssetsTree)
+      
+    await prefetchAssets(componentAssetsTree)
 
     this.setState(({ components, messages }) => ({
       components: {
@@ -675,18 +676,21 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const { runtime } = this.props
     const { components } = this.state
-    const { apps, assets } = traverseComponent(components, component)
-    const unfetchedApps = apps.filter(
+    const componentAssetsTree = traverseComponent(components, component)
+
+    console.log('fetchComponent.apps', componentAssetsTree)
+    
+    const unfetchedApps = Object.keys(componentAssetsTree).filter(
       app =>
         !Object.keys(window.__RENDER_8_COMPONENTS__).some(c =>
           c.startsWith(app)
         )
     )
     if (unfetchedApps.length === 0) {
-      return fetchAssets(runtime, assets)
+      return fetchAssets(componentAssetsTree)
     }
 
-    const assetsPromise = fetchAssets(runtime, assets)
+    const assetsPromise = fetchAssets(componentAssetsTree)
     assetsPromise.then(() => {
       this.sendInfoFromIframe({ shouldUpdateRuntime: true })
     })
