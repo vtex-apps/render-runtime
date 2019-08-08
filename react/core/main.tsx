@@ -137,9 +137,7 @@ const render = async (
   if (canUseDOM) {
     const renderFn = disableSSR || created ? renderDOM : hydrate
 
-    renderFn(root, elem)
-
-    return (undefined as unknown) as Element
+    return (renderFn(root, elem) as unknown) as Element
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
