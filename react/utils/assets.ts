@@ -1,3 +1,5 @@
+import { queryStringToMap } from "./pages"
+
 function getExtension(path: string) {
   const adjPath = path.split('?')[0]
   const result = /\.\w+$/.exec(adjPath)
@@ -119,12 +121,19 @@ function getExistingStyleHrefs() {
   return hrefs
 }
 
-function getExistingPrefetchLinks() {
+function getExistingPrefetchScriptLinks(){
+  return getExistingPrefetchLinks('script')
+}
+function getExistingPrefetchStyleLinks(){
+  return getExistingPrefetchLinks('style')
+}
+
+function getExistingPrefetchLinks(prefetchType: string[] | string) {
   const paths: string[] = []
   const links = document.getElementsByTagName('link')
   for (let i = 0; i < links.length; i++) {
     const item = links.item(i)
-    if (item && item.rel === 'prefetch') {
+    if (item && item.rel === 'prefetch' && prefetchType.includes(item.as)) {
       paths.push(item.href)
     }
   }
@@ -139,22 +148,11 @@ function isScript(path: string) {
   return getExtension(path) === '.js'
 }
 
-function isStyle(path: string) {
-  return getExtension(path) === '.css'
-}
-
 export function shouldAddScriptToPage(
   path: string,
   scripts: string[] = getExistingScriptSrcs()
 ) {
   return isScript(path) && !assetOnList(path, scripts)
-}
-
-function shouldAddStyleToPage(
-  path: string,
-  styles: string[] = getExistingStyleHrefs()
-) {
-  return isStyle(path) && !assetOnList(path, styles)
 }
 
 export function getImplementation<P = {}, S = {}>(component: string) {
@@ -171,39 +169,81 @@ export function getExtensionImplementation<P = {}, S = {}>(
     : null
 }
 
-export function fetchAssets(runtime: RenderRuntime, assets: string[]) {
-  const { account, production, rootPath = '' } = runtime
-  const absoluteAssets = assets.map(url =>
-    getAbsoluteURL(account, url, production, rootPath)
-  )
+export function fetchAssets(runtime: RenderRuntime, componentsAssetsMap: ComponentTraversalResult) {
+  const { assets } = componentsAssetsMap
+
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
-  const scripts = absoluteAssets.filter(a =>
-    shouldAddScriptToPage(a, existingScripts)
-  )
-  const styles = absoluteAssets.filter(a =>
-    shouldAddStyleToPage(a, existingStyles)
-  )
+
+  const scripts = getAssetsToAdd(runtime, assets, '.js', existingScripts)
+  const styles = getAssetsToAdd(runtime, assets, '.css', existingStyles)
   styles.forEach(addStyleToPage)
   return Promise.all(scripts.map(addScriptToPage)).then(() => {
     return
   })
 }
 
-export function prefetchAssets(runtime: RenderRuntime, assets: string[]) {
-  const { account, production, rootPath = '' } = runtime
-  const absoluteAssets = assets.map(url =>
-    getAbsoluteURL(account, url, production, rootPath)
-  )
+export function prefetchAssets(runtime: RenderRuntime, componentsAssetsMap: ComponentTraversalResult) {
+  const { assets } = componentsAssetsMap
+
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
-  const existingPrefetches = getExistingPrefetchLinks()
-  const scripts = absoluteAssets.filter(a =>
-    shouldAddScriptToPage(a, [...existingScripts, ...existingPrefetches])
-  )
-  const styles = absoluteAssets.filter(a =>
-    shouldAddStyleToPage(a, [...existingStyles, ...existingPrefetches])
-  )
+  const existingScriptsPrefetches = getExistingPrefetchScriptLinks()
+  const existingStylesPrefetches = getExistingPrefetchStyleLinks()
+
+  const scripts = getAssetsToAdd(runtime, assets, '.js', [...existingScripts, ...existingScriptsPrefetches])
+  const styles = getAssetsToAdd(runtime, assets, '.css', [...existingStyles, ...existingStylesPrefetches])
   scripts.forEach(prefetchScript)
   styles.forEach(prefetchStyle)
+}
+
+function getAssetsToAdd(runtime: RenderRuntime, assets: AssetEntry[], assetExtension: string, existingAssets: string[]){
+  const { account, production, rootPath = '' } = runtime
+
+  const existingBundledAssetsByApp = groupAssetsByApp(existingAssets)
+
+  return Array.from(assets.reduce((acc, asset) => {
+    if(shouldAddAssetToPage(asset, assetExtension, existingBundledAssetsByApp, existingAssets)){
+      const absoluteAsset = getAbsoluteURL(account, asset.path, production, rootPath)
+      acc.add(absoluteAsset)
+    }
+    return acc
+  }, new Set<string>()))
+}
+
+function shouldAddAssetToPage(asset: AssetEntry, assetExtension: string,
+  existingBundledAssetsByApp: Record<string, string[]>, existingAssets: string[]){
+  return hasExtension(asset.path, assetExtension) &&
+    !hasBundledAsset(asset.app, asset.name, existingBundledAssetsByApp) &&
+    !assetOnList(asset.path, existingAssets)
+}
+
+function hasExtension(path: string, fileExtension: string) {
+  return getExtension(path) === fileExtension
+}
+
+function groupAssetsByApp(assets: string[]){
+  return assets.reduce((acc, asset) => {
+    const parsedQuery = queryStringToMap(asset)
+
+    if(!parsedQuery || !parsedQuery.files){
+      return acc
+    }
+    
+    const queryFiles = Array.isArray(parsedQuery.files)? parsedQuery.files: [parsedQuery.files]
+    const parsedFilesByApp = queryFiles.reduce((assetsByApp: Record<string, string[]>, files: string) => {
+      if(!files){
+        return assetsByApp
+      }
+      const [app, assets] = files.split(';')
+      return {...assetsByApp, [app]: assets.split(',')}
+    }, {} )
+
+    acc = {...acc, ...parsedFilesByApp }
+    return acc
+  }, {} as Record<string, string[]>)
+}
+
+function hasBundledAsset(app: string, asset: string, assetsByApp: Record<string, string[]>) {
+  return !!assetsByApp[app] && assetsByApp[app].indexOf(asset) !== -1
 }

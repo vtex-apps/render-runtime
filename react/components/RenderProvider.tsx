@@ -624,8 +624,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     if (component) {
       const { runtime } = this.props
       const { components } = this.state
-      const { assets } = traverseComponent(components, component)
-      return prefetchAssets(runtime, assets)
+      const componentsAssetsMap = traverseComponent(components, component)
+      return prefetchAssets(runtime, componentsAssetsMap)
     }
   }
 
@@ -653,8 +653,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     await Promise.all(
       Object.keys(defaultComponents).map((component: string) => {
-        const { assets } = traverseComponent(defaultComponents, component)
-        return prefetchAssets(runtime, assets)
+        const componentsAssetsMap = traverseComponent(defaultComponents, component)
+        return prefetchAssets(runtime, componentsAssetsMap)
       })
     )
 
@@ -685,7 +685,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const { runtime } = this.props
     const { components } = this.state
-    const { apps, assets } = traverseComponent(components, component)
+    const componentsAssetsMap = traverseComponent(components, component)
+    const { apps } = componentsAssetsMap
+  
     const unfetchedApps = apps.filter(
       app =>
         !Object.keys(window.__RENDER_8_COMPONENTS__).some(c =>
@@ -693,10 +695,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         )
     )
     if (unfetchedApps.length === 0) {
-      return fetchAssets(runtime, assets)
+      return fetchAssets(runtime, componentsAssetsMap)
     }
 
-    const assetsPromise = fetchAssets(runtime, assets)
+    const assetsPromise = fetchAssets(runtime, componentsAssetsMap)
     assetsPromise.then(() => {
       this.sendInfoFromIframe({ shouldUpdateRuntime: true })
     })
