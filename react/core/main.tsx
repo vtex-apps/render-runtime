@@ -173,7 +173,7 @@ const render = async (
           markups: getMarkups(name, markup),
           renderTimeMetric,
           ampScripts: scriptsMarkup,
-          ampHeaderBoilerplate: boilerplateMarkup,
+          ampHeadBoilerplate: boilerplateMarkup,
         }
       }
     )
