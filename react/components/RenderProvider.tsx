@@ -12,10 +12,10 @@ import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
 
-import { fetchAssets, getImplementation, prefetchAssets } from '../utils/assets'
+import { fetchAssets, getImplementation, prefetchAssets, prefetchBundledAssets } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
-import { traverseComponent } from '../utils/components'
+import { traverseComponent, getComponentsDependencyTree } from '../utils/components'
 import {
   isSiteEditorIframe,
   RENDER_CONTAINER_CLASS,
@@ -641,12 +641,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       routeIds,
     })
 
-    await Promise.all(
-      Object.keys(defaultComponents).map((component: string) => {
-        const { assets } = traverseComponent(defaultComponents, component)
-        return prefetchAssets(runtime, assets)
-      })
-    )
+    if(!runtime.production){
+      const componentsDependencyTree = getComponentsDependencyTree(defaultComponents)
+      prefetchBundledAssets(componentsDependencyTree)
+      await Promise.all(
+        Object.keys(defaultComponents).map((component: string) => {
+          const { assets } = traverseComponent(defaultComponents, component)
+          return prefetchAssets(runtime, assets)
+        })
+      )
+    }else{
+      const componentsDependencyTree = getComponentsDependencyTree(defaultComponents)
+      prefetchBundledAssets(componentsDependencyTree)
+    }
 
     this.setState(({ components, messages }) => ({
       components: {

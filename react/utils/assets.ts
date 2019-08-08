@@ -1,3 +1,9 @@
+import path from 'path'
+import { ComponentDependencyTree } from './components'
+import { isEmpty, clone } from 'ramda';
+
+const MAX_URL_SIZE = 2048
+
 function getExtension(path: string) {
   const adjPath = path.split('?')[0]
   const result = /\.\w+$/.exec(adjPath)
@@ -119,12 +125,23 @@ function getExistingStyleHrefs() {
   return hrefs
 }
 
-function getExistingPrefetchLinks() {
+function getAllExistingPrefetchLinks(){
+  return getExistingPrefetchLinks(['script', 'style'])
+}
+
+function getExistingPrefetchScriptLinks(){
+  return getExistingPrefetchLinks('script')
+}
+function getExistingPrefetchStyleLinks(){
+  return getExistingPrefetchLinks('style')
+}
+
+function getExistingPrefetchLinks(prefetchType: string[] | string) {
   const paths: string[] = []
   const links = document.getElementsByTagName('link')
   for (let i = 0; i < links.length; i++) {
     const item = links.item(i)
-    if (item && item.rel === 'prefetch') {
+    if (item && item.rel === 'prefetch' && prefetchType.includes(item.as)) {
       paths.push(item.href)
     }
   }
@@ -197,7 +214,7 @@ export function prefetchAssets(runtime: RenderRuntime, assets: string[]) {
   )
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
-  const existingPrefetches = getExistingPrefetchLinks()
+  const existingPrefetches = getAllExistingPrefetchLinks()
   const scripts = absoluteAssets.filter(a =>
     shouldAddScriptToPage(a, [...existingScripts, ...existingPrefetches])
   )
@@ -206,4 +223,110 @@ export function prefetchAssets(runtime: RenderRuntime, assets: string[]) {
   )
   scripts.forEach(prefetchScript)
   styles.forEach(prefetchStyle)
+}
+
+
+export function prefetchBundledAssets(componentsDependencyTree: ComponentDependencyTree ) {
+  
+  const existingScripts = getExistingScriptSrcs()
+  const existingStyles = getExistingStyleHrefs()
+  const existingScriptsPrefetches = getExistingPrefetchScriptLinks()
+  const existingStylesPrefetches = getExistingPrefetchStyleLinks()
+
+  const bundledScriptsSrcs = getBundledScriptsSrcs(clone(componentsDependencyTree), [...existingScripts, ...existingScriptsPrefetches])
+  const bundledStylesSrcs = getBundledStylesSrcs(clone(componentsDependencyTree), [...existingStyles, ...existingStylesPrefetches])
+  bundledScriptsSrcs.forEach(prefetchScript)
+  bundledStylesSrcs.forEach(prefetchStyle)
+}
+
+function getBundledStylesSrcs(componentDependencyTable: ComponentDependencyTree, existingScripts: string[]): string[]{
+  const bundledStylesSrcs = getBundledSrcs(componentDependencyTable, existingScripts, '.css')
+  return Object.values(bundledStylesSrcs).reduce((acc, bundledSrcs) => acc.concat(bundledSrcs), [] as string[])
+}
+
+function getBundledScriptsSrcs(componentDependencyTable: ComponentDependencyTree, existingScripts: string[]): string[]{
+  const bundledScriptsSrcs = getBundledSrcs(componentDependencyTable, existingScripts, '.js')
+  return Object.values(bundledScriptsSrcs).reduce((acc, bundledSrcs) => acc.concat(bundledSrcs), [] as string[])
+}
+
+function getBundledSrcs(componentsDependencyTree: ComponentDependencyTree, existingSources: string[], fileExtension: string): Record<string, string[]>{
+  let bundledAssetRequests: Record<string, string[]> = {}
+  while(!isEmpty(componentsDependencyTree)){
+    const nodes = Object.values(componentsDependencyTree).filter( node => node.length === 0 )
+      nodes.forEach(node => {
+        const { app, dependents } = node
+        node.component.assets.forEach(asset => {
+          composeBundledSrcs(app, asset, fileExtension, existingSources, bundledAssetRequests)
+        })
+
+        if(!isEmpty(dependents)){
+          Object.values(dependents).forEach(dependentNode => dependentNode.length--)
+        }
+        delete componentsDependencyTree[app]
+      })
+  }
+  return bundledAssetRequests
+}
+
+function hasExtension(path: string, fileExtension: string) {
+  return getExtension(path) === fileExtension
+}
+
+function composeBundledSrcs(app: string, asset: string, fileExtension:string, existingSources: string[], bundledAssetSrcs: Record<string, string[]>) {
+  const fileName = path.basename(asset)
+  const filePath = asset.replace(`/${app}/`, '/').replace(fileName,'')
+  const bundleFilePath = filePath.replace('published/public', 'published/bundle/public')
+  const bundledSrcFilePath = `${bundleFilePath}?`
+  const noExtFileName = path.basename(fileName, fileExtension)
+
+  if(!hasExtension(fileName, fileExtension) || !shouldAddBundledAssetToPage(app, noExtFileName, existingSources)){
+    return
+  }
+
+  if (!bundledAssetSrcs[bundledSrcFilePath]) {
+    bundledAssetSrcs[bundledSrcFilePath] = [ bundledSrcFilePath ]
+  }
+
+  const bundledSrcsByPath = bundledAssetSrcs[bundledSrcFilePath]
+  const bundledSrcsTailIdx = bundledSrcsByPath.length - 1
+  const bundledSrcTail = bundledSrcsByPath[bundledSrcsTailIdx]
+  let nextBundledSrc = composeAssetsBundledURL(bundledSrcTail, app, noExtFileName)
+
+  if (nextBundledSrc.length >= MAX_URL_SIZE) {
+    nextBundledSrc = composeAssetsBundledURL(bundledSrcFilePath, app, noExtFileName)
+    const bundledSrcsNextTailIdx = bundledSrcsTailIdx + 1
+    const bundledSrcNextTail = bundledSrcFilePath
+    bundledAssetSrcs[bundledSrcFilePath][bundledSrcsNextTailIdx] = bundledSrcNextTail
+  }
+  else {
+    bundledAssetSrcs[bundledSrcFilePath][bundledSrcsTailIdx] = nextBundledSrc
+  }
+}
+
+const composeAssetsBundledURL = (previousURL: string, app: string, fileName: string) => {
+  return previousURL.includes(app)? `${previousURL},${fileName}`:
+    previousURL.includes('files=')? `${previousURL}&files=${app};${fileName}`:
+      `${previousURL}files=${app};${fileName}`
+}
+
+function shouldAddBundledAssetToPage(
+  app: string,
+  asset: string,
+  scripts: string[] = getExistingScriptSrcs()
+){
+  return !hasBundledAsset(getBundledAssetRegex(app, asset), scripts)
+}
+
+function hasBundledAsset(rex: RegExp, assets: string[]) {
+  return assets.some(asset => asset.search(rex) !== -1)
+}
+
+function regexScape(s: string){
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+function getBundledAssetRegex(app: string, asset: string){
+  // https://regex101.com/r/vdZGJU/4/
+  const scapedAsset = regexScape(asset) 
+  return new RegExp(`files\=${regexScape(app)};(\w+,)*?(${scapedAsset},|${scapedAsset}($|\&files\=))`)
 }
