@@ -25,6 +25,7 @@
     "prop-types": "^15.6.0",
     "query-string": "^5.1.1",
     "ramda": "^0.26.1",
+    "react-amphtml": "^4.0.1",
     "react-apollo": "^2.5.6",
     "react-content-loader": "^4.0.1",
     "react-helmet": "^5.2.0",
