@@ -38,6 +38,7 @@ import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
 import { generateExtensions } from '../utils/blocks'
+import { OperationContext } from '../utils/client/links/uriSwitchLink'
 
 interface Props {
   children: ReactElement<any> | null
@@ -820,17 +821,19 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         appsEtag,
         cacheHints,
         components,
+        culture,
         extensions,
         messages,
         pages,
       } = this.state
-      operation.setContext((currentContext: Record<string, any>) => {
+      operation.setContext((currentContext: OperationContext): OperationContext => {
         return {
           ...currentContext,
           runtime: {
             appsEtag,
             cacheHints,
             components,
+            culture,
             extensions,
             messages,
             pages,
