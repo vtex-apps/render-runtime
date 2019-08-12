@@ -77,10 +77,7 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
       const {
         fetchOptions = {},
         // Fetches from context for not fetching a stale version of runtime
-        runtime: {
-          appsEtag,
-          cacheHints,
-        },
+        runtime: { appsEtag, cacheHints },
       } = oldContext
       const { extensions } = operation
       const {
