@@ -36,9 +36,9 @@ const assetsFromQuery = (query: ASTNode) => {
   return assets
 }
 
-interface OperationContext {
+export interface OperationContext {
   fetchOptions: any
-  runtime: RenderRuntime
+  runtime: Pick<RenderRuntime, 'appsEtag' | 'cacheHints' | 'components' | 'culture' | 'extensions' | 'messages' | 'pages'>
 }
 
 const equals = (a: string, b: string) =>
@@ -71,16 +71,23 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
   }
 }
 
-export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
+export const createUriSwitchLink = (baseURI: string, initialRuntime: RenderRuntime) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     operation.setContext((oldContext: OperationContext) => {
       const {
         fetchOptions = {},
         // Fetches from context for not fetching a stale version of runtime
-        runtime: { appsEtag, cacheHints },
+        runtime: {
+          appsEtag,
+          cacheHints,
+          culture: { locale },
+        },
       } = oldContext
       const { extensions } = operation
-      const { workspace, route: { domain } } = runtime
+      const {
+        workspace,
+        route: { domain },
+      } = initialRuntime
       const hash = generateHash(operation.query)
       const {
         maxAge,
@@ -92,7 +99,7 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
       } = extractHints(operation.query, cacheHints[hash])
       const requiresAuthorization = path(
         ['settings', `vtex.${domain}`, 'requiresAuthorization'],
-        runtime
+        initialRuntime
       )
       const customScope = requiresAuthorization ? 'private' : scope
       const oldMethod = fetchOptions.method || 'POST'
@@ -109,7 +116,7 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
       return {
         ...oldContext,
         fetchOptions: { ...fetchOptions, method },
-        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}`,
+        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}&locale=${locale}`,
       }
     })
     return forward ? forward(operation) : null
