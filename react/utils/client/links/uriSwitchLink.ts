@@ -80,11 +80,14 @@ export const createUriSwitchLink = (baseURI: string, runtime: RenderRuntime) =>
         runtime: {
           appsEtag,
           cacheHints,
-          culture: { locale },
         },
       } = oldContext
       const { extensions } = operation
-      const { workspace, route: { domain } } = runtime
+      const {
+        culture: { locale },
+        workspace,
+        route: { domain },
+      } = runtime
       const hash = generateHash(operation.query)
       const {
         maxAge,
