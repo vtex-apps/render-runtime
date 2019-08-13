@@ -355,9 +355,15 @@ declare global {
 
   interface ComponentTraversalResult {
     apps: string[]
-    assets: string[]
+    assets: AssetEntry[]
   }
 
+  interface AssetEntry{
+    name: string
+    path: string
+    app: string
+  }
+  
   interface ComponentEntry {
     assets: string[]
     dependencies: string[]
