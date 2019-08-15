@@ -229,17 +229,25 @@ function groupAssetsByApp(assets: string[]){
     if(!parsedQuery || !parsedQuery.files){
       return acc
     }
-    
-    const queryFiles = Array.isArray(parsedQuery.files)? parsedQuery.files: [parsedQuery.files]
-    const parsedFilesByApp = queryFiles.reduce((assetsByApp: Record<string, string[]>, files: string) => {
-      if(!files){
-        return assetsByApp
-      }
-      const [app, assets] = files.split(';')
-      return {...assetsByApp, [app]: assets.split(',')}
-    }, {} )
 
-    acc = {...acc, ...parsedFilesByApp }
+    const queryFiles: string[] = Array.isArray(parsedQuery.files)? parsedQuery.files: [parsedQuery.files]
+    queryFiles.forEach((files: string) => {
+      if (!files) {
+        return
+      }
+
+      const [app, assets] = files.split(';')
+      if (!assets) {
+        return
+      }
+
+      const appAssets = assets.split(',')
+      if (!acc[app]) {
+        acc[app] = appAssets
+      } else {
+        acc[app].push(...appAssets)
+      }
+    })
     return acc
   }, {} as Record<string, string[]>)
 }
