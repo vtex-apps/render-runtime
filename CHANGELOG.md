@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.48.1] - 2019-08-19
+
 ## [8.48.0] - 2019-08-13
 ### Added
 - Support to assets bundle
