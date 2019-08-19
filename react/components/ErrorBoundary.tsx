@@ -7,32 +7,25 @@ interface Props {
 }
 
 class ErrorBoundary extends React.Component<Props> {
-  state = {
+  public state = {
     error: undefined,
     errorInfo: undefined,
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({
       error,
       errorInfo,
     })
   }
 
-  render() {
-    const {
-      production
-    } = this.props.runtime
+  public render() {
+    const { production } = this.props.runtime
 
     const { error, errorInfo } = this.state
     if (error) {
       if (!production) {
-        return (
-          <ExtensionPointError
-            error={error}
-            errorInfo={errorInfo}
-          />
-        )
+        return <ExtensionPointError error={error} errorInfo={errorInfo} />
       }
       return null
     }
@@ -41,14 +34,10 @@ class ErrorBoundary extends React.Component<Props> {
   }
 }
 
-const ErrorBoundaryWithContext:FunctionComponent = ({children}) => {
+const ErrorBoundaryWithContext: FunctionComponent = ({ children }) => {
   const runtime = useRuntime()
 
-  return (
-    <ErrorBoundary runtime={runtime}>
-      {children}
-    </ErrorBoundary>
-  )
+  return <ErrorBoundary runtime={runtime}>{children}</ErrorBoundary>
 }
 
 export default ErrorBoundaryWithContext

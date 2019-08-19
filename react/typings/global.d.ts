@@ -358,12 +358,12 @@ declare global {
     assets: AssetEntry[]
   }
 
-  interface AssetEntry{
+  interface AssetEntry {
     name: string
     path: string
     app: string
   }
-  
+
   interface ComponentEntry {
     assets: string[]
     dependencies: string[]
