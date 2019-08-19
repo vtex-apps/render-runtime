@@ -188,7 +188,7 @@ class ExtensionPointComponent extends PureComponent<
       props,
       children,
       treePath,
-      runtime: { production, pages, page },
+      runtime: { production, page },
     } = this.props
     const { error, errorInfo, operationIds } = this.state
     const Component = component && getImplementation(component)

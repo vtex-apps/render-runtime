@@ -1,4 +1,9 @@
-import { InMemoryCache, IntrospectionFragmentMatcher, IntrospectionResultData, NormalizedCacheObject } from 'apollo-cache-inmemory'
+import {
+  InMemoryCache,
+  IntrospectionFragmentMatcher,
+  IntrospectionResultData,
+  NormalizedCacheObject,
+} from 'apollo-cache-inmemory'
 import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
 import { onError } from 'apollo-link-error'
@@ -27,9 +32,10 @@ const buildCacheId = (
   major: string | undefined,
   type: string,
   cacheId: string
-) => app && major
-  ? `${vendor}.${app}@${major}.x:${type}:${cacheId}`
-  : `${type}:${cacheId}`
+) =>
+  app && major
+    ? `${vendor}.${app}@${major}.x:${type}:${cacheId}`
+    : `${type}:${cacheId}`
 
 const dataIdFromObject = (value: any) => {
   const { cacheId, __typename } = value || ({} as any)

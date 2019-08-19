@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useLayoutEffect, FunctionComponent } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  FunctionComponent,
+} from 'react'
 
 const useEnhancedEffect =
-  typeof window !== 'undefined'
-    ? useLayoutEffect
-    : useEffect
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect
 
 const useSSR = () => {
   const [isCSRAvailable, setCSR] = useState(false)

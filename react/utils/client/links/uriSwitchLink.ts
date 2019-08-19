@@ -38,7 +38,16 @@ const assetsFromQuery = (query: ASTNode) => {
 
 export interface OperationContext {
   fetchOptions: any
-  runtime: Pick<RenderRuntime, 'appsEtag' | 'cacheHints' | 'components' | 'culture' | 'extensions' | 'messages' | 'pages'>
+  runtime: Pick<
+    RenderRuntime,
+    | 'appsEtag'
+    | 'cacheHints'
+    | 'components'
+    | 'culture'
+    | 'extensions'
+    | 'messages'
+    | 'pages'
+  >
 }
 
 const equals = (a: string, b: string) =>
@@ -71,7 +80,10 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
   }
 }
 
-export const createUriSwitchLink = (baseURI: string, initialRuntime: RenderRuntime) =>
+export const createUriSwitchLink = (
+  baseURI: string,
+  initialRuntime: RenderRuntime
+) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     operation.setContext((oldContext: OperationContext) => {
       const {
