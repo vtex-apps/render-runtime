@@ -653,7 +653,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     await Promise.all(
       Object.keys(defaultComponents).map((component: string) => {
-        const componentsAssetsMap = traverseComponent(defaultComponents, component)
+        const componentsAssetsMap = traverseComponent(
+          defaultComponents,
+          component
+        )
         return prefetchAssets(runtime, componentsAssetsMap)
       })
     )
@@ -687,7 +690,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { components } = this.state
     const componentsAssetsMap = traverseComponent(components, component)
     const { apps } = componentsAssetsMap
-  
+
     const unfetchedApps = apps.filter(
       app =>
         !Object.keys(window.__RENDER_8_COMPONENTS__).some(c =>
@@ -828,20 +831,22 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         messages,
         pages,
       } = this.state
-      operation.setContext((currentContext: OperationContext): OperationContext => {
-        return {
-          ...currentContext,
-          runtime: {
-            appsEtag,
-            cacheHints,
-            components,
-            culture,
-            extensions,
-            messages,
-            pages,
-          },
+      operation.setContext(
+        (currentContext: OperationContext): OperationContext => {
+          return {
+            ...currentContext,
+            runtime: {
+              appsEtag,
+              cacheHints,
+              components,
+              culture,
+              extensions,
+              messages,
+              pages,
+            },
+          }
         }
-      })
+      )
       return forward ? forward(operation) : null
     })
   }

@@ -9,7 +9,7 @@ const TEST_STRING = 'This is category '
 
 beforeAll(() => {
   window.__RENDER_8_COMPONENTS__ = {
-    product: function (props: any) {
+    product: function MockProduct(props: any) {
       return (
         <div>
           <h1>{props.title}</h1>
@@ -22,7 +22,7 @@ beforeAll(() => {
 
 test(`it should pass props defined in extensions[path]context.props to the underlying component`, () => {
   const PAGE = 'store.product'
-  const mockContextProps = {categoryId: 1, title: 'Product!'}
+  const mockContextProps = { categoryId: 1, title: 'Product!' }
   const mockExtensions: Record<string, Partial<Extension>> = {
     [PAGE]: {
       context: {
@@ -35,13 +35,12 @@ test(`it should pass props defined in extensions[path]context.props to the under
   const mockRuntime: any = { extensions: mockExtensions }
 
   const { getByText } = render(
-    <MaybeContext
-      nestedPage={PAGE}
-      runtime={mockRuntime}
-    />
+    <MaybeContext nestedPage={PAGE} runtime={mockRuntime} />
   )
   expect(getByText(new RegExp(mockContextProps.title, 'i'))).toBeInTheDocument()
-  expect(getByText(new RegExp(TEST_STRING + mockContextProps.categoryId, 'i'))).toBeInTheDocument()
+  expect(
+    getByText(new RegExp(TEST_STRING + mockContextProps.categoryId, 'i'))
+  ).toBeInTheDocument()
 })
 
 afterAll(() => {
