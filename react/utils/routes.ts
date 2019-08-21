@@ -128,10 +128,18 @@ const runtimeFields = [
   'settings',
 ].join(',')
 
-export const fetchNavigationPage = ({ path }: { path: string }) =>
-  fetch(`${path}?__pickRuntime=${runtimeFields}`)
+export const fetchNavigationPage = ({
+  path,
+  query,
+}: {
+  path: string
+  query: string
+}) => {
+  console.log({ query })
+  return fetch(`${path}?${query}&__pickRuntime=${runtimeFields}`)
     .then(response => response.json())
     .then(parsePageQueryResponse)
+}
 
 export const fetchNavigationPageOld = ({
   apolloClient,

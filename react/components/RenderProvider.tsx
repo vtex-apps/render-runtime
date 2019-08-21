@@ -18,6 +18,8 @@ import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { OperationContext } from '../utils/client/links/uriSwitchLink'
 import { traverseComponent } from '../utils/components'
+import queryString from 'query-string'
+
 import {
   isSiteEditorIframe,
   RENDER_CONTAINER_CLASS,
@@ -559,7 +561,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // well as the fields that need to be retrieved, but the logic
     // that the new state (extensions and assets) will be derived from
     // the results of this query will probably remain the same.
-    return fetchNavigationPage({ path: navigationRoute.path }).then(
+    return fetchNavigationPage({
+      path: navigationRoute.path,
+      query: queryString.stringify(query || {}),
+    }).then(
       ({
         appsEtag,
         components,
@@ -706,7 +711,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public updateRuntime = async () => {
-    const { page, route } = this.state
+    const { page, route, query } = this.state
     const {
       appsEtag,
       cacheHints,
@@ -717,6 +722,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       settings,
     } = await fetchNavigationPage({
       path: route.path,
+      query: queryString.stringify(query || {}),
     })
 
     await new Promise<void>(resolve => {
