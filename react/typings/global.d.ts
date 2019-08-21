@@ -307,17 +307,17 @@ declare global {
   }
 
   interface PageQueryResponse {
-    blocksJSON: string
-    blocksTreeJSON: string
-    contentMapJSON: string
-    componentsJSON: string
-    extensionsJSON: string
-    messages: KeyedString[]
-    pagesJSON: string
-    appsSettingsJSON: string
-    appsEtag: string
-    cacheHintsJSON: string
-    page: MatchingPage
+    appsEtag: RenderRuntime['appsEtag']
+    blocks: RenderRuntime['blocks']
+    blocksTree: RenderRuntime['blocksTree']
+    cacheHints: RenderRuntime['cacheHints']
+    contentMap: RenderRuntime['contentMap']
+    components: RenderRuntime['components']
+    extensions: RenderRuntime['extensions']
+    messages: RenderRuntime['messages']
+    pages: RenderRuntime['pages']
+    route: MatchingPage
+    settings: RenderRuntime['settings']
   }
 
   interface DefaultPagesQueryResponse {
@@ -331,17 +331,7 @@ declare global {
     message: string
   }
 
-  interface ParsedPageQueryResponse {
-    blocks: RenderRuntime['blocks']
-    blocksTree: RenderRuntime['blocksTree']
-    contentMap: RenderRuntime['contentMap']
-    components: RenderRuntime['components']
-    extensions: RenderRuntime['extensions']
-    messages: RenderRuntime['messages']
-    pages: RenderRuntime['pages']
-    appsEtag: RenderRuntime['appsEtag']
-    settings: RenderRuntime['settings']
-    cacheHints: RenderRuntime['cacheHints']
+  interface ParsedPageQueryResponse extends PageQueryResponse {
     matchingPage: MatchingPage
   }
 
