@@ -32,7 +32,6 @@ declare global {
     maxAge: number
     page: string
     renderTimeMetric: RenderMetric
-    ampScripts?: string[]
   }
 
   type ClientRendered = Element
@@ -262,7 +261,7 @@ declare global {
   interface RenderComponent<P = {}, S = {}> {
     getCustomMessages?: (locale: string) => any
     WrappedComponent?: RenderComponent
-    new (): Component<P, S>
+    new(): Component<P, S>
   }
 
   interface ComponentsRegistry {
@@ -351,7 +350,7 @@ declare global {
     messages: RenderRuntime['messages']
   }
 
-  type Rendered = Promise<ClientRendered | NamedServerRendered>
+  type Rendered = ClientRendered | Promise<NamedServerRendered>
 
   interface ComponentTraversalResult {
     apps: string[]
@@ -374,7 +373,6 @@ declare global {
   }
 
   interface RenderRuntime {
-    amp: boolean
     account: string
     accountId: string
     appsEtag: string

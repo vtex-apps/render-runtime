@@ -105,7 +105,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
     addMessages: PropTypes.func,
-    amp: PropTypes.bool,
     blocks: PropTypes.object,
     blocksTree: PropTypes.object,
     contentMap: PropTypes.object,
@@ -250,7 +249,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       production,
       query,
       route,
-      settings: settings || {},
+      settings,
     }
   }
 
@@ -310,7 +309,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = this.state
     const {
       account,
-      amp,
       emitter,
       hints,
       production,
@@ -323,7 +321,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return {
       account,
       addMessages: this.addMessages,
-      amp,
       components,
       culture,
       defaultExtensions,
@@ -412,10 +409,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       scrollOptions = false,
     }: SetQueryOptions = {}
   ): boolean => {
-    const {
-      history,
-      runtime: { rootPath },
-    } = this.props
+    const { history, runtime: { rootPath } } = this.props
     const {
       pages,
       page,
@@ -441,10 +435,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public navigate = (options: NavigateOptions) => {
-    const {
-      history,
-      runtime: { rootPath },
-    } = this.props
+    const { history, runtime: { rootPath } } = this.props
     const { pages } = this.state
     options.rootPath = rootPath
     return pageNavigate(history, pages, options)
@@ -711,18 +702,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onLocaleSelected = (locale: string, domain?: string) => {
     if (locale !== this.state.culture.locale) {
-      const sessionData = { public: {} }
-      if (domain && domain === 'admin') {
+      const sessionData = { public: { } }
+      if(domain && domain === 'admin'){
         sessionData.public = {
-          admin_cultureInfo: {
-            value: locale,
+            admin_cultureInfo: {
+              value: locale,
           },
         }
       } else {
         sessionData.public = {
-          cultureInfo: {
-            value: locale,
-          },
+            cultureInfo: {
+              value: locale,
+            },
         }
       }
       Promise.all([this.patchSession(sessionData)])
@@ -730,7 +721,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         .catch(e => {
           console.log('Failed to fetch new locale file.')
           console.error(e)
-        })
+      })
     }
   }
 
@@ -773,7 +764,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     await new Promise<void>(resolve => {
       this.setState(
-        state => ({
+        (state) => ({
           appsEtag,
           cacheHints,
           components,
