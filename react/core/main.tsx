@@ -76,15 +76,14 @@ const renderExtension = (
 }
 
 function renderToStringWithData(
-  component: ReactElement<any>,
-  renderFn: (root: ReactElement) => string
+  component: ReactElement<any>
 ): Promise<ServerRendered> {
   const startGetDataFromTree = window.hrtime()
   return getDataFromTree(component).then(() => {
     const endGetDataFromTree = window.hrtime(startGetDataFromTree)
 
     const startRenderToString = window.hrtime()
-    const markup = renderFn(component)
+    const markup = require('react-dom/server').renderToString(component)
     const endRenderToString = window.hrtime(startRenderToString)
     return {
       markup,
@@ -97,7 +96,7 @@ function renderToStringWithData(
 }
 
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
-const render = async (
+const render = (
   name: string,
   runtime: RenderRuntime,
   element?: HTMLElement
@@ -134,58 +133,17 @@ const render = async (
     </RenderProvider>
   )
 
-  if (canUseDOM) {
-    const renderFn = disableSSR || created ? renderDOM : hydrate
-
-    return (renderFn(root, elem) as unknown) as Element
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { renderToStaticMarkup, renderToString } = require('react-dom/server')
-
-  const commonRenderResult = {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    maxAge: cacheControl!.maxAge,
-    page,
-  }
-
-  if (runtime.amp) {
-    const {
-      AmpScriptsManager,
-      AmpScripts,
-      headerBoilerplate,
-    } = require('react-amphtml/setup') // eslint-disable-line @typescript-eslint/no-var-requires
-    const scripts = new AmpScripts()
-
-    const ampRoot = (
-      <AmpScriptsManager ampScripts={scripts}>{root}</AmpScriptsManager>
-    )
-
-    return renderToStringWithData(ampRoot, renderToStaticMarkup).then(
-      ({ markup, renderTimeMetric }) => {
-        const scriptsMarkup = renderToStaticMarkup(scripts.getScriptElements())
-        const boilerplateMarkup = renderToStaticMarkup(
-          headerBoilerplate(runtime.route.canonicalPath)
-        )
-
-        return {
-          ...commonRenderResult,
-          markups: getMarkups(name, markup),
-          renderTimeMetric,
-          ampScripts: scriptsMarkup,
-          ampHeadBoilerplate: boilerplateMarkup,
-        }
-      }
-    )
-  }
-
-  return renderToStringWithData(root, renderToString).then(
-    ({ markup, renderTimeMetric }) => ({
-      ...commonRenderResult,
-      markups: getMarkups(name, markup),
-      renderTimeMetric,
-    })
-  )
+  return canUseDOM
+    ? ((disableSSR || created
+        ? renderDOM<HTMLDivElement>(root, elem)
+        : hydrate(root, elem)) as Element)
+    : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
+        markups: getMarkups(name, markup),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        maxAge: cacheControl!.maxAge,
+        page,
+        renderTimeMetric,
+      }))
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
@@ -265,7 +223,7 @@ function start() {
       // Expose render promise to global context.
       window.rendered = (maybeRenderPromise as Promise<
         NamedServerRendered
-      >).then(({ markups, maxAge, page, renderTimeMetric, ...rendered }) => ({
+      >).then(({ markups, maxAge, page, renderTimeMetric }) => ({
         extensions: markups.reduce<RenderedSuccess['extensions']>(
           (acc, { name, markup }) => ((acc[name] = markup), acc),
           {}
@@ -274,7 +232,6 @@ function start() {
         maxAge,
         renderMetrics: { [page]: renderTimeMetric },
         state: getState(runtime),
-        ...rendered,
       }))
     } else {
       setLazyCookie(runtime.workspaceCookie)
