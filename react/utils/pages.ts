@@ -247,19 +247,18 @@ export function navigate(
   const realHash = is(String, hash) ? `#${hash}` : ''
   const query = inputQuery || realQuery
 
-  const internalRoute = page
+  const navigationRoute = page
     ? getRouteFromPageName(page, pages, params)
-    : getRouteFromPath(to, pages, query, realHash)
-  const navigationRoute = internalRoute || { path: to, params: {}, id: '' }
+    : { path: to, params: {}, id: '' }
 
-  // if (!navigationRoute) {
-  //   console.warn(
-  //     `Unable to find route for ${
-  //       page ? `page '${page}' and the passed parameters` : `path '${to}'`
-  //     }`
-  //   )
-  //   return false
-  // }
+  if (!navigationRoute) {
+    console.warn(
+      `Unable to find route for ${
+        page ? `page '${page}' and the passed parameters` : `path '${to}'`
+      }`
+    )
+    return false
+  }
 
   // Prefix any non-absolute paths (e.g. http:// or https://) with runtime.rootPath
   if (rootPath && !navigationRoute.path.startsWith('http')) {

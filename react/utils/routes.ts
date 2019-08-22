@@ -136,7 +136,7 @@ export const fetchNavigationPage = ({
   query: string
 }) => {
   console.log({ query })
-  return fetch(`${path}?${query}&__pickRuntime=${runtimeFields}`)
+  return fetch(`${path}?__pickRuntime=${runtimeFields}${query && '&' + query}`)
     .then(response => response.json())
     .then(parsePageQueryResponse)
 }
