@@ -259,6 +259,19 @@ function hasExtension(path: string, fileExtension: string) {
   return getExtension(path) === fileExtension
 }
 
+function parseFilesQueryString(filesQueryString: string) {
+  const hasSemicolon = filesQueryString.indexOf(';') !== -1
+
+  if (hasSemicolon) {
+    const [app, joinedPaths] = filesQueryString.split(';')
+    const assets = joinedPaths ? joinedPaths.split(',') : []
+    return { app, assets }
+  } else {
+    const [app, ...assets] = filesQueryString.split(',')
+    return { app, assets }
+  }
+}
+
 function groupAssetsByApp(assets: string[]): Record<string, string[]> {
   return assets.reduce((acc: Record<string, string[]>, asset) => {
     const parsedQuery = queryStringToMap(asset)
@@ -275,16 +288,15 @@ function groupAssetsByApp(assets: string[]): Record<string, string[]> {
         return
       }
 
-      const [app, assets] = files.split(';')
-      if (!assets) {
+      const { app, assets } = parseFilesQueryString(files)
+      if (!app || !assets || assets.length === 0) {
         return
       }
 
-      const appAssets = assets.split(',')
       if (!acc[app]) {
-        acc[app] = appAssets
+        acc[app] = assets
       } else {
-        acc[app].push(...appAssets)
+        acc[app].push(...assets)
       }
     })
     return acc
