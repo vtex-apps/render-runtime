@@ -4,7 +4,6 @@
   "version": "8.51.0-beta.1",
   "title": "VTEX Render runtime",
   "description": "The VTEX Render framework runtime",
-  "defaultLocale": "pt-BR",
   "builders": {
     "react": "3.x"
   },
@@ -12,14 +11,9 @@
     "vtex.pages-graphql": "2.x"
   },
   "mustUpdateAt": "2018-09-05",
-  "categories": [],
-  "registries": [
-    "smartcheckout"
-  ],
   "settingsSchema": {},
   "scripts": {
-    "prereleasy": "bash lint.sh",
-    "postreleasy": "vtex publish --verbose"
+    "prereleasy": "bash lint.sh"
   },
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }
