@@ -1,74 +1,32 @@
-import navigationPageQuery from '../queries/navigationPage.graphql'
-import routePreviews from '../queries/routePreviews.graphql'
-import { parseMessages } from './messages'
-import { generateExtensions } from './blocks'
 import { isEmpty } from 'ramda'
+import { stringify } from 'query-string'
+
+import routePreviews from '../queries/routePreviews.graphql'
+import { generateExtensions } from './blocks'
+import { parseMessages } from './messages'
 
 const parsePageQueryResponse = (
   page: PageQueryResponse
 ): ParsedPageQueryResponse => {
   const {
-    appsEtag,
-    appsSettingsJSON,
-    blocksJSON,
-    blocksTreeJSON,
-    contentMapJSON,
-    cacheHintsJSON,
-    componentsJSON,
-    extensionsJSON,
-    messages,
-    pagesJSON,
-    page: {
-      blockId,
-      canonicalPath,
-      metaTags,
-      pageContext: { id, type },
-      routeId,
-      title,
-    },
+    blocksTree,
+    blocks,
+    contentMap,
+    extensions: pageExtensions,
+    pages,
+    route,
+    route: { routeId },
   } = page
 
-  const [
-    blocks,
-    blocksTree,
-    contentMap,
-    cacheHints,
-    components,
-    pages,
-    settings,
-  ] = [
-    blocksJSON,
-    blocksTreeJSON,
-    contentMapJSON,
-    cacheHintsJSON,
-    componentsJSON,
-    pagesJSON,
-    appsSettingsJSON,
-  ].map(json => JSON.parse(json))
-
-  const extensions = isEmpty(blocksTree)
-    ? JSON.parse(extensionsJSON)
-    : generateExtensions(blocksTree, blocks, contentMap, pages[routeId])
+  const extensions =
+    !isEmpty(blocksTree) && blocksTree && blocks && contentMap
+      ? generateExtensions(blocksTree, blocks, contentMap, pages[routeId])
+      : pageExtensions
 
   return {
-    appsEtag,
-    cacheHints,
-    blocks,
-    blocksTree,
-    contentMap,
-    components,
+    ...page,
     extensions,
-    matchingPage: {
-      blockId,
-      canonicalPath,
-      metaTags,
-      pageContext: { id, type },
-      routeId,
-      title,
-    },
-    messages: parseMessages(messages),
-    pages,
-    settings,
+    matchingPage: route,
   }
 }
 
@@ -88,36 +46,38 @@ const parseDefaultPagesQueryResponse = (
   }
 }
 
+const runtimeFields = [
+  'appsEtag',
+  'blocks',
+  'blocksTree',
+  'components',
+  'contentMap',
+  'extensions',
+  'messages',
+  'page',
+  'pages',
+  'query',
+  'route',
+  'runtimeMeta',
+  'settings',
+].join(',')
+
 export const fetchNavigationPage = ({
-  apolloClient,
-  routeId,
-  declarer,
-  production,
-  paramsJSON,
-  renderMajor,
-  skipCache,
-  query,
-}: FetchNavigationDataInput) =>
-  apolloClient
-    .query<{ navigationPage: PageQueryResponse }>({
-      fetchPolicy: production && !skipCache ? 'cache-first' : 'network-only',
-      query: navigationPageQuery,
-      variables: {
-        declarer,
-        params: paramsJSON,
-        production,
-        query,
-        renderMajor,
-        routeId,
-      },
-    })
-    .then<ParsedPageQueryResponse>(
-      ({
-        data: { navigationPage: pageData },
-        errors,
-      }: GraphQLResult<'navigationPage', PageQueryResponse>) =>
-        errors ? Promise.reject(errors) : parsePageQueryResponse(pageData)
-    )
+  path,
+  query: rawQuery,
+}: {
+  path: string
+  query?: Record<string, string>
+}) => {
+  const query = stringify({
+    ...rawQuery,
+    __pickRuntime: runtimeFields,
+  })
+  const url = `${path}?${query}`
+  return fetch(url)
+    .then(response => response.json())
+    .then(parsePageQueryResponse)
+}
 
 const getRoutesParam = (routeIds: string[], pages: Pages) => {
   return routeIds
