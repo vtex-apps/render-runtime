@@ -1,13 +1,9 @@
-import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
-import { difference, is, isEmpty, keys, startsWith } from 'ramda'
+import { difference, is, isEmpty, keys } from 'ramda'
 import RouteParser from 'route-parser'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
-
-const removeTrailingParenthesis = (path: string) =>
-  path.endsWith('(') ? path.substr(0, path.length - 1) : path
 
 export function getComparablePrecedence(path: string): string {
   return path
@@ -27,12 +23,6 @@ export function getComparablePrecedence(path: string): string {
       [] as number[]
     )
     .join()
-}
-
-function isHost(hostname: string) {
-  return (
-    hostname === (canUseDOM ? window.location.hostname : window.__hostname__)
-  )
 }
 
 function trimEndingSlash(token: string) {
@@ -121,11 +111,6 @@ function getParams(template: string, target: string) {
   return new RouteParser(properTemplate).match(properTarget)
 }
 
-function getPagePath(name: string, pages: Pages) {
-  const { path: pagePath, cname } = pages[name]
-  return cname && isHost(cname) ? '/' : pagePath
-}
-
 function checkValidParams(id: string, pages: Pages, path: string, params: any) {
   const template = getValidTemplate(id, pages) || ''
   const validParams = getParams(template, path) as Record<string, any>
@@ -146,46 +131,6 @@ function getRouteFromPageName(
   const path = pathFromPageName(id, pages, params) || ''
   checkValidParams(id, pages, path, params)
   return path ? { id, path, params } : null
-}
-
-function getCanonicalPath(
-  canonicalPathTemplate: string,
-  params: Record<string, string>
-): string | false {
-  const properPathTemplate = adjustTemplate(canonicalPathTemplate)
-  const canonicalPath = new RouteParser(properPathTemplate).reverse(params)
-  if (canonicalPath) {
-    return canonicalPath
-  }
-
-  console.warn(
-    `Canonical path template '${canonicalPathTemplate}' could not be created with params: ${params}`
-  )
-  return false
-}
-
-export function getRouteFromPath(
-  path: string,
-  pages: Pages,
-  query?: string,
-  hash?: string
-): NavigationRoute | null {
-  const queryMap = query ? queryStringToMap(hash ? query + hash : query) : {}
-  const routeMatch = routeIdFromPathAndQuery(path, queryMap, pages)
-  if (!routeMatch) {
-    return null
-  }
-
-  const params = getPageParams(path, routeMatch.path)
-  const navigationPath = routeMatch.canonical
-    ? getCanonicalPath(routeMatch.canonical, params) || path
-    : path
-
-  return {
-    id: routeMatch.id,
-    params,
-    path: navigationPath,
-  }
 }
 
 const mergePersistingQueries = (currentQuery: string, query: string) => {
@@ -320,108 +265,6 @@ function polyfillScrollTo(options: ScrollToOptions) {
     const y = options.top == null ? window.scrollY : options.top
     window.scrollTo(x, y)
   }
-}
-
-function routeMatchForMappedURL(
-  mappedSegments: string[],
-  routes: Pages
-): RouteMatch | null {
-  let id: string | undefined
-  let score: number
-  let highScore: number = Number.NEGATIVE_INFINITY
-
-  for (const name in routes) {
-    const { map = [], path: routePath } = routes[name]
-    if (!routePath || map.length === 0 || !startsWith(map, mappedSegments)) {
-      continue
-    }
-
-    score = map.length
-    if (highScore > score) {
-      continue
-    }
-
-    highScore = score
-    id = name
-  }
-
-  if (!id) {
-    return null
-  }
-
-  const { path } = routes[id]
-  const pathSegments = path.split('/')
-  const slicedPathSegments = pathSegments.slice(0, highScore + 1)
-  const newPath = slicedPathSegments.join('/')
-
-  return {
-    id,
-    path: removeTrailingParenthesis(newPath),
-  }
-}
-
-function routeMatchFromPath(path: string, routes: Pages): RouteMatch | null {
-  let id: string | undefined
-  let pathPrecedence: string
-  let chosenPathPrecedence: string | null = null
-
-  for (const name in routes) {
-    const pagePath = getPagePath(name, routes)
-    if (!pagePath) {
-      continue
-    }
-
-    const matches = !!getParams(pagePath, path)
-    if (!matches) {
-      continue
-    }
-
-    pathPrecedence = getComparablePrecedence(pagePath)
-    if (
-      chosenPathPrecedence !== null &&
-      chosenPathPrecedence < pathPrecedence
-    ) {
-      continue
-    }
-
-    chosenPathPrecedence = pathPrecedence
-    id = name
-  }
-
-  if (!id) {
-    return null
-  }
-
-  return {
-    canonical: routes[id].canonical,
-    id,
-    path: getPagePath(id, routes),
-  }
-}
-
-function routeIdFromPathAndQuery(
-  path: string,
-  query: Record<string, string>,
-  routes: Pages
-) {
-  const mappedSegments = query.map ? query.map.split(',') : []
-  let routeMatch: RouteMatch | null = null
-
-  if (mappedSegments.length > 0) {
-    routeMatch = routeMatchForMappedURL(mappedSegments, routes)
-  }
-
-  if (!routeMatch) {
-    routeMatch = routeMatchFromPath(path, routes)
-  }
-
-  return routeMatch
-}
-
-interface RouteMatch {
-  canonical?: string
-  id: string
-  path: string
 }
 
 export interface NavigateOptions {
