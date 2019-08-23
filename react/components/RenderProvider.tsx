@@ -72,6 +72,7 @@ export interface RenderProviderState {
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
+const DISABLE_PREFETCH_PAGES = '__disablePrefetchPages'
 
 const noop = () => {}
 
@@ -171,6 +172,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private sessionPromise: Promise<void>
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
+  private prefetchRoutes: Set<string>
 
   public constructor(props: Props) {
     super(props)
@@ -251,6 +253,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       route,
       settings,
     }
+
+    this.prefetchRoutes = new Set<string>()
   }
 
   public componentDidMount() {
@@ -266,6 +270,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     this.sendInfoFromIframe()
+    this.prefetchPages()
   }
 
   public componentWillReceiveProps(nextProps: Props) {
@@ -409,7 +414,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       scrollOptions = false,
     }: SetQueryOptions = {}
   ): boolean => {
-    const { history, runtime: { rootPath } } = this.props
+    const {
+      history,
+      runtime: { rootPath },
+    } = this.props
     const {
       pages,
       page,
@@ -435,7 +443,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public navigate = (options: NavigateOptions) => {
-    const { history, runtime: { rootPath } } = this.props
+    const {
+      history,
+      runtime: { rootPath },
+    } = this.props
     const { pages } = this.state
     options.rootPath = rootPath
     return pageNavigate(history, pages, options)
@@ -622,45 +633,22 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public prefetchDefaultPages = async (routeIds: string[]) => {
     const {
-      runtime,
-      runtime: { renderMajor },
+      runtime: { query },
     } = this.props
-    const {
-      culture: { locale },
-      pages,
-    } = this.state
 
-    const {
-      components: defaultComponents,
-      extensions: defaultExtensions,
-      messages: defaultMessages,
-    } = await fetchDefaultPages({
-      apolloClient: this.apolloClient,
-      locale,
-      pages,
-      renderMajor,
-      routeIds,
-    })
-
-    await Promise.all(
-      Object.keys(defaultComponents).map((component: string) => {
-        const componentsAssetsMap = traverseComponent(
-          defaultComponents,
-          component
+    const disablePrefetch =
+      query &&
+      DISABLE_PREFETCH_PAGES in query &&
+      query[DISABLE_PREFETCH_PAGES] !== 'false'
+    if (!disablePrefetch) {
+      if (this.rendered) {
+        console.warn(
+          "prefetchDefaultPages should only be called before RenderProvider's render."
         )
-        return prefetchAssets(runtime, componentsAssetsMap)
-      })
-    )
-
-    this.setState(({ components, messages }) => ({
-      components: {
-        ...defaultComponents,
-        ...this.state.components,
-        ...components,
-      },
-      defaultExtensions,
-      messages: { ...defaultMessages, ...this.state.messages, ...messages },
-    }))
+        return
+      }
+      routeIds.forEach(routeId => this.prefetchRoutes.add(routeId))
+    }
   }
 
   public updateComponentAssets = (availableComponents: Components) => {
@@ -702,18 +690,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onLocaleSelected = (locale: string, domain?: string) => {
     if (locale !== this.state.culture.locale) {
-      const sessionData = { public: { } }
-      if(domain && domain === 'admin'){
+      const sessionData = { public: {} }
+      if (domain && domain === 'admin') {
         sessionData.public = {
-            admin_cultureInfo: {
-              value: locale,
+          admin_cultureInfo: {
+            value: locale,
           },
         }
       } else {
         sessionData.public = {
-            cultureInfo: {
-              value: locale,
-            },
+          cultureInfo: {
+            value: locale,
+          },
         }
       }
       Promise.all([this.patchSession(sessionData)])
@@ -721,7 +709,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         .catch(e => {
           console.log('Failed to fetch new locale file.')
           console.error(e)
-      })
+        })
     }
   }
 
@@ -764,7 +752,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     await new Promise<void>(resolve => {
       this.setState(
-        (state) => ({
+        state => ({
           appsEtag,
           cacheHints,
           components,
@@ -943,6 +931,58 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         this.sendInfoFromIframe()
       }
     )
+  }
+
+  private prefetchPages = () => {
+    if (this.prefetchRoutes.size >= 0) {
+      window.requestIdleCallback
+        ? window.requestIdleCallback(this.execPrefetchPages)
+        : setTimeout(this.execPrefetchPages, 3000)
+    }
+  }
+
+  private execPrefetchPages = async () => {
+    const {
+      runtime,
+      runtime: { renderMajor },
+    } = this.props
+
+    const {
+      pages,
+      culture: { locale },
+    } = this.state
+
+    const {
+      components: defaultComponents,
+      extensions: defaultExtensions,
+      messages: defaultMessages,
+    } = await fetchDefaultPages({
+      apolloClient: this.apolloClient,
+      locale,
+      pages,
+      renderMajor,
+      routeIds: Array.from(this.prefetchRoutes),
+    })
+
+    await Promise.all(
+      Object.keys(defaultComponents).map((component: string) => {
+        const componentsAssetsMap = traverseComponent(
+          defaultComponents,
+          component
+        )
+        return prefetchAssets(runtime, componentsAssetsMap)
+      })
+    )
+
+    this.setState(({ components, messages }) => ({
+      components: {
+        ...defaultComponents,
+        ...this.state.components,
+        ...components,
+      },
+      defaultExtensions,
+      messages: { ...defaultMessages, ...this.state.messages, ...messages },
+    }))
   }
 }
 

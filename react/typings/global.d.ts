@@ -261,7 +261,7 @@ declare global {
   interface RenderComponent<P = {}, S = {}> {
     getCustomMessages?: (locale: string) => any
     WrappedComponent?: RenderComponent
-    new(): Component<P, S>
+    new (): Component<P, S>
   }
 
   interface ComponentsRegistry {
@@ -482,6 +482,7 @@ declare global {
     hrtime: NodeJS.Process['hrtime']
     myvtexSSE: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
+    requestIdleCallback: (callback: (...args) => any | void) => number
   }
 
   interface BlockEntry {
