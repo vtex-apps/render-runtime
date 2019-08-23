@@ -41,8 +41,10 @@ class Container extends Component<ContainerProps> {
       if (elements === '__children__') {
         return children
       }
-      return (
-        <div className={isRow ? '' : className}>
+      return isRow ? (
+        <ExtensionPoint id={elements} {...props} />
+      ) : (
+        <div className={className}>
           <ExtensionPoint id={elements} {...props} />
         </div>
       )
