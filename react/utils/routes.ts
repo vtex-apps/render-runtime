@@ -1,12 +1,36 @@
-import navigationPageQuery from '../queries/navigationPage.graphql'
-import routePreviews from '../queries/routePreviews.graphql'
-import { parseMessages } from './messages'
-import { generateExtensions } from './blocks'
 import { isEmpty } from 'ramda'
+
+import routePreviews from '../queries/routePreviews.graphql'
+import navigationPageQuery from '../queries/navigationPage.graphql'
+import { generateExtensions } from './blocks'
+import { parseMessages } from './messages'
 
 const parsePageQueryResponse = (
   page: PageQueryResponse
 ): ParsedPageQueryResponse => {
+  const {
+    blocksTree,
+    blocks,
+    contentMap,
+    extensions: pageExtensions,
+    pages,
+    route,
+    route: { routeId },
+  } = page
+
+  const extensions =
+    !isEmpty(blocksTree) && blocksTree && blocks && contentMap
+      ? generateExtensions(blocksTree, blocks, contentMap, pages[routeId])
+      : pageExtensions
+
+  return {
+    ...page,
+    extensions,
+    matchingPage: route,
+  } as any
+}
+
+const parsePageQueryResponseOld = (page: any): any => {
   const {
     appsEtag,
     appsSettingsJSON,
@@ -88,7 +112,36 @@ const parseDefaultPagesQueryResponse = (
   }
 }
 
+const runtimeFields = [
+  'appsEtag',
+  'blocks',
+  'blocksTree',
+  'components',
+  'contentMap',
+  'extensions',
+  'messages',
+  'page',
+  'pages',
+  'query',
+  'route',
+  'runtimeMeta',
+  'settings',
+].join(',')
+
 export const fetchNavigationPage = ({
+  path,
+  query,
+}: {
+  path: string
+  query: string
+}) => {
+  console.log({ query })
+  return fetch(`${path}?__pickRuntime=${runtimeFields}${query && '&' + query}`)
+    .then(response => response.json())
+    .then(parsePageQueryResponse)
+}
+
+export const fetchNavigationPageOld = ({
   apolloClient,
   routeId,
   declarer,
@@ -116,7 +169,7 @@ export const fetchNavigationPage = ({
         data: { navigationPage: pageData },
         errors,
       }: GraphQLResult<'navigationPage', PageQueryResponse>) =>
-        errors ? Promise.reject(errors) : parsePageQueryResponse(pageData)
+        errors ? Promise.reject(errors) : parsePageQueryResponseOld(pageData)
     )
 
 const getRoutesParam = (routeIds: string[], pages: Pages) => {
