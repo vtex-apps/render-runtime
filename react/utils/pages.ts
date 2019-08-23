@@ -249,7 +249,7 @@ export function navigate(
 
   const navigationRoute = page
     ? getRouteFromPageName(page, pages, params)
-    : getRouteFromPath(to, pages, query, realHash)
+    : { path: to, params: {}, id: '' }
 
   if (!navigationRoute) {
     console.warn(
