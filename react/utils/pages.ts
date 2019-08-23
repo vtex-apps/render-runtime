@@ -265,6 +265,8 @@ export function navigate(
     navigationRoute.path = rootPath + navigationRoute.path
   }
 
+  navigationRoute.path = navigationRoute.path.toLowerCase()
+
   if (history) {
     const nextQuery = mergePersistingQueries(history.location.search, query)
     const location = createLocationDescriptor(navigationRoute, {
