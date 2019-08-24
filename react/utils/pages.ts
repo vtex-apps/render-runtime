@@ -4,6 +4,8 @@ import queryString from 'query-string'
 import { difference, is, isEmpty, keys, startsWith } from 'ramda'
 import RouteParser from 'route-parser'
 
+import { isEnabled } from './flags'
+
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
 const removeTrailingParenthesis = (path: string) =>
@@ -247,9 +249,18 @@ export function navigate(
   const realHash = is(String, hash) ? `#${hash}` : ''
   const query = inputQuery || realQuery
 
-  const navigationRoute = page
-    ? getRouteFromPageName(page, pages, params)
-    : getRouteFromPath(to, pages, query, realHash)
+  let navigationRoute: any = {}
+
+  if (isEnabled('RENDER_NAVIGATION')) {
+    const fallbackPage = { path: to, params: {}, id: '' }
+    const routeFromPage = page && getRouteFromPageName(page, pages, params)
+    const routeFromPath = getRouteFromPath(to, pages, query, realHash)
+    navigationRoute = routeFromPage || routeFromPath || fallbackPage
+  } else {
+    navigationRoute = page
+      ? getRouteFromPageName(page, pages, params)
+      : getRouteFromPath(to, pages, query, realHash)
+  }
 
   if (!navigationRoute) {
     console.warn(
@@ -407,7 +418,9 @@ function routeIdFromPathAndQuery(
   const mappedSegments = query.map ? query.map.split(',') : []
   let routeMatch: RouteMatch | null = null
 
-  if (mappedSegments.length > 0) {
+  // Don't use map segments to match a route when Render
+  // navigation is enabled
+  if (mappedSegments.length > 0 && !isEnabled('RENDER_NAVIGATION')) {
     routeMatch = routeMatchForMappedURL(mappedSegments, routes)
   }
 

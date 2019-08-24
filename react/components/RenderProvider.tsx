@@ -6,15 +6,17 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { merge, mergeWith } from 'ramda'
+import { merge, mergeDeepRight, mergeWith } from 'ramda'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
 
 import { fetchAssets, getImplementation, prefetchAssets } from '../utils/assets'
+import { generateExtensions } from '../utils/blocks'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
+import { OperationContext } from '../utils/client/links/uriSwitchLink'
 import { traverseComponent } from '../utils/components'
 import {
   isSiteEditorIframe,
@@ -22,6 +24,7 @@ import {
   ROUTE_CLASS_PREFIX,
   routeClass,
 } from '../utils/dom'
+import { isEnabled } from '../utils/flags'
 import {
   goBack as pageGoBack,
   mapToQueryString,
@@ -30,15 +33,17 @@ import {
   queryStringToMap,
   scrollTo as pageScrollTo,
 } from '../utils/pages'
-import { fetchDefaultPages, fetchNavigationPage } from '../utils/routes'
+import {
+  fetchDefaultPages,
+  fetchNavigationPage,
+  fetchServerPage,
+} from '../utils/routes'
 import { TreePathContextProvider } from '../utils/treePath'
 import BuildStatus from './BuildStatus'
 import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
-import { generateExtensions } from '../utils/blocks'
-import { OperationContext } from '../utils/client/links/uriSwitchLink'
 
 interface Props {
   children: ReactElement<any> | null
@@ -516,13 +521,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     const { navigationRoute, fetchPage } = state
-    const { id: page, params } = navigationRoute
+    const { id: maybePage, params } = navigationRoute
     const transientRoute = { ...route, ...navigationRoute }
+
+    // We always have to navigate to a page. If none was found, we
+    // navigate to the current page with preview
+    const page = maybePage || route.id
+
     const {
       [page]: { allowConditions, declarer },
     } = pagesState
     const shouldSkipFetchNavigationData =
-      (!allowConditions && loadedPages.has(page)) || !fetchPage
+      (!allowConditions && loadedPages.has(maybePage)) || !fetchPage
     const query = queryStringToMap(location.search) as RenderRuntime['query']
 
     if (shouldSkipFetchNavigationData) {
@@ -561,7 +571,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         page,
         preview: true,
         query,
-        route: transientRoute,
+        route: isEnabled('RENDER_NAVIGATION')
+          ? mergeDeepRight(route, navigationRoute)
+          : transientRoute,
       },
       () => {
         this.replaceRouteClass(page)
@@ -577,47 +589,79 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // well as the fields that need to be retrieved, but the logic
     // that the new state (extensions and assets) will be derived from
     // the results of this query will probably remain the same.
-    return fetchNavigationPage({
-      apolloClient,
-      declarer,
-      locale,
-      paramsJSON,
-      production,
-      query: JSON.stringify(query),
-      renderMajor,
-      routeId,
-      skipCache: false,
-    }).then(
-      ({
-        appsEtag,
-        cacheHints,
-        components,
-        extensions,
-        matchingPage,
-        messages,
-        pages,
-        settings,
-      }: ParsedPageQueryResponse) => {
-        const updatedRoute = { ...transientRoute, ...matchingPage }
-        this.setState(
-          {
+    return isEnabled('RENDER_NAVIGATION')
+      ? fetchServerPage({
+          path: navigationRoute.path,
+          query,
+        }).then(
+          ({
             appsEtag,
-            cacheHints: mergeWith(merge, this.state.cacheHints, cacheHints),
-            components: { ...this.state.components, ...components },
-            extensions: { ...this.state.extensions, ...extensions },
-            loadedPages: loadedPages.add(page),
-            messages: { ...this.state.messages, ...messages },
-            page,
+            components,
+            extensions,
+            matchingPage,
+            messages,
             pages,
-            preview: false,
-            query,
-            route: updatedRoute,
             settings,
-          },
-          () => this.sendInfoFromIframe()
+          }: ParsedServerPageResponse) => {
+            this.setState(
+              {
+                appsEtag,
+                components: { ...this.state.components, ...components },
+                extensions: { ...this.state.extensions, ...extensions },
+                loadedPages: loadedPages.add(matchingPage.routeId),
+                messages: { ...this.state.messages, ...messages },
+                page: matchingPage.routeId,
+                pages,
+                preview: false,
+                query,
+                route: matchingPage,
+                settings,
+              },
+              () => this.sendInfoFromIframe()
+            )
+          }
         )
-      }
-    )
+      : fetchNavigationPage({
+          apolloClient,
+          declarer,
+          locale,
+          paramsJSON,
+          production,
+          query: JSON.stringify(query),
+          renderMajor,
+          routeId,
+          skipCache: false,
+        }).then(
+          ({
+            appsEtag,
+            cacheHints,
+            components,
+            extensions,
+            matchingPage,
+            messages,
+            pages,
+            settings,
+          }: ParsedPageQueryResponse) => {
+            const updatedRoute = { ...transientRoute, ...matchingPage }
+            this.setState(
+              {
+                appsEtag,
+                cacheHints: mergeWith(merge, this.state.cacheHints, cacheHints),
+                components: { ...this.state.components, ...components },
+                extensions: { ...this.state.extensions, ...extensions },
+                loadedPages: loadedPages.add(page),
+                messages: { ...this.state.messages, ...messages },
+                page,
+                pages,
+                preview: false,
+                query,
+                route: updatedRoute,
+                settings,
+              },
+              () => this.sendInfoFromIframe()
+            )
+          }
+        )
   }
 
   public prefetchPage = (pageName: string) => {
@@ -723,6 +767,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       production,
       culture: { locale },
       route,
+      query,
     } = this.state
     const declarer = pagesState[page] && pagesState[page].declarer
     const { pathname } = window.location
@@ -736,25 +781,32 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       messages,
       pages,
       settings,
-    } = await fetchNavigationPage({
-      apolloClient: this.apolloClient,
-      declarer,
-      locale,
-      paramsJSON,
-      path: pathname,
-      production,
-      query: '',
-      renderMajor,
-      routeId: page,
-      skipCache: true,
-      ...options,
-    })
+    } = isEnabled('RENDER_NAVIGATION')
+      ? await fetchServerPage({
+          path: route.path,
+          query,
+        })
+      : await fetchNavigationPage({
+          apolloClient: this.apolloClient,
+          declarer,
+          locale,
+          paramsJSON,
+          path: pathname,
+          production,
+          query: '',
+          renderMajor,
+          routeId: page,
+          skipCache: true,
+          ...options,
+        })
 
     await new Promise<void>(resolve => {
       this.setState(
         state => ({
           appsEtag,
-          cacheHints,
+          cacheHints: isEnabled('RENDER_NAVIGATION')
+            ? state.cacheHints
+            : cacheHints,
           components,
           extensions: {
             ...state.extensions,
