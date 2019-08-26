@@ -526,14 +526,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     // We always have to navigate to a page. If none was found, we
     // navigate to the current page with preview
-    const page = maybePage || route.id
-
-    const {
-      [page]: { allowConditions, declarer },
-    } = pagesState
+    const allowConditions =
+      pagesState[maybePage] && pagesState[maybePage].allowConditions
+    const declarer = pagesState[maybePage] && pagesState[maybePage].declarer
     const shouldSkipFetchNavigationData =
       (!allowConditions && loadedPages.has(maybePage)) || !fetchPage
     const query = queryStringToMap(location.search) as RenderRuntime['query']
+    const page = maybePage || route.id
 
     if (shouldSkipFetchNavigationData) {
       return this.setState(
