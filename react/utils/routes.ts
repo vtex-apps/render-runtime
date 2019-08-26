@@ -4,6 +4,7 @@ import { isEmpty } from 'ramda'
 import navigationPageQuery from '../queries/navigationPage.graphql'
 import routePreviews from '../queries/routePreviews.graphql'
 import { generateExtensions } from './blocks'
+import { fetchWithRetry } from './fetch'
 import { parseMessages } from './messages'
 
 const parsePageQueryResponse = (
@@ -118,11 +119,12 @@ export const fetchServerPage = async ({
     __pickRuntime: runtimeFields,
   })
   const url = `${path}?${query}`
-  const page: ServerPageResponse = await fetch(url, {
+  const page: ServerPageResponse = await fetchWithRetry(url, {
+    credentials: 'same-origin',
     headers: {
       accept: 'application/json',
     },
-  }).then(response => response.json())
+  }).then(({ response }) => response.json())
   const {
     blocksTree,
     blocks,
