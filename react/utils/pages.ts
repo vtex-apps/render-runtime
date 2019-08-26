@@ -168,12 +168,33 @@ function getCanonicalPath(
 
 export function getRouteFromPath(
   path: string,
+  pages: Pages
+): NavigationRoute | null {
+  const routeMatch = routeMatchFromPath(path, pages)
+  if (!routeMatch) {
+    return null
+  }
+
+  const params = getPageParams(path, routeMatch.path)
+  const navigationPath = routeMatch.canonical
+    ? getCanonicalPath(routeMatch.canonical, params) || path
+    : path
+
+  return {
+    id: routeMatch.id,
+    params,
+    path: navigationPath,
+  }
+}
+
+export function getRouteFromPathOld(
+  path: string,
   pages: Pages,
   query?: string,
   hash?: string
 ): NavigationRoute | null {
   const queryMap = query ? queryStringToMap(hash ? query + hash : query) : {}
-  const routeMatch = routeIdFromPathAndQuery(path, queryMap, pages)
+  const routeMatch = routeIdFromPathAndQueryOld(path, queryMap, pages)
   if (!routeMatch) {
     return null
   }
@@ -254,12 +275,12 @@ export function navigate(
   if (isEnabled('RENDER_NAVIGATION')) {
     const fallbackPage = { path: to, params: {}, id: '' }
     const routeFromPage = page && getRouteFromPageName(page, pages, params)
-    const routeFromPath = getRouteFromPath(to, pages, query, realHash)
+    const routeFromPath = getRouteFromPath(to, pages)
     navigationRoute = routeFromPage || routeFromPath || fallbackPage
   } else {
     navigationRoute = page
       ? getRouteFromPageName(page, pages, params)
-      : getRouteFromPath(to, pages, query, realHash)
+      : getRouteFromPathOld(to, pages, query, realHash)
   }
 
   if (!navigationRoute) {
@@ -410,7 +431,7 @@ function routeMatchFromPath(path: string, routes: Pages): RouteMatch | null {
   }
 }
 
-function routeIdFromPathAndQuery(
+function routeIdFromPathAndQueryOld(
   path: string,
   query: Record<string, string>,
   routes: Pages
