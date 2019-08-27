@@ -134,6 +134,7 @@ export const fetchServerPage = async ({
     route,
     route: { routeId },
   } = page
+  const routePath = `${path}?${stringify(rawQuery || {})}`
 
   const extensions =
     !isEmpty(blocksTree) && blocksTree && blocks && contentMap
@@ -143,7 +144,10 @@ export const fetchServerPage = async ({
   return {
     ...page,
     extensions,
-    matchingPage: route,
+    matchingPage: {
+      ...route,
+      path: routePath,
+    },
   }
 }
 
