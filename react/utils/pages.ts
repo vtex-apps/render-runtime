@@ -106,7 +106,7 @@ export function queryStringToMap(query: string): Record<string, any> {
 }
 
 export function mapToQueryString(query: Record<string, any> = {}): string {
-  return queryString.stringify(query)
+  return queryString.stringify(query, { encode: false })
 }
 
 export function getPageParams(path: string, routePath: string) {
@@ -215,6 +215,7 @@ const mergePersistingQueries = (currentQuery: string, query: string) => {
   const KEYS = ['disableUserLand']
   const current = queryStringToMap(currentQuery)
   const next = queryStringToMap(query)
+
   const has = (value?: string) => !!value || value === null
   const persisting = KEYS.reduce<Record<string, any>>((cur, key) => {
     if (has(current[key]) && current[key] !== 'false') {
