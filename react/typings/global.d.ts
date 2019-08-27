@@ -305,6 +305,33 @@ declare global {
     routeId: string
   }
 
+  interface MatchingServerPage {
+    blockId: string
+    canonicalPath?: string
+    metaTags?: RouteMetaTags
+    pageContext: PageDataContext
+    title?: string
+    routeId: string
+    params: Record<string, string>
+    id: string
+    path: string
+    domain: string
+  }
+
+  interface ServerPageResponse {
+    appsEtag: RenderRuntime['appsEtag']
+    blocks: RenderRuntime['blocks']
+    blocksTree: RenderRuntime['blocksTree']
+    cacheHints: RenderRuntime['cacheHints']
+    contentMap: RenderRuntime['contentMap']
+    components: RenderRuntime['components']
+    extensions: RenderRuntime['extensions']
+    messages: RenderRuntime['messages']
+    pages: RenderRuntime['pages']
+    route: MatchingServerPage
+    settings: RenderRuntime['settings']
+  }
+
   interface PageQueryResponse {
     blocksJSON: string
     blocksTreeJSON: string
@@ -328,6 +355,10 @@ declare global {
   interface KeyedString {
     key: string
     message: string
+  }
+
+  interface ParsedServerPageResponse extends ServerPageResponse {
+    matchingPage: MatchingServerPage
   }
 
   interface ParsedPageQueryResponse {
@@ -483,6 +514,7 @@ declare global {
     myvtexSSE: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
     requestIdleCallback: (callback: (...args) => any | void) => number
+    flags: Record<string, boolean>
   }
 
   interface BlockEntry {
