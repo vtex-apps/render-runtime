@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.51.0] - 2019-08-27
+
 ## [8.50.0] - 2019-08-23
 ### Added
 - Pool to prefetch pages
