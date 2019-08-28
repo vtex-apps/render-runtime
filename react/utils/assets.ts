@@ -1,4 +1,4 @@
-import { queryStringToMap } from './pages'
+import queryString from 'query-string'
 
 function getExtension(path: string) {
   const adjPath = path.split('?')[0]
@@ -274,8 +274,11 @@ function parseFilesQueryString(filesQueryString: string) {
 
 function groupAssetsByApp(assets: string[]): Record<string, string[]> {
   return assets.reduce((acc: Record<string, string[]>, asset) => {
-    const parsedQuery = queryStringToMap(asset)
+    if (!asset) {
+      return acc
+    }
 
+    const { query: parsedQuery } = queryString.parseUrl(asset)
     if (!parsedQuery || !parsedQuery.files) {
       return acc
     }
