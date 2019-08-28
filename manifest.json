@@ -5,7 +5,8 @@
   "title": "VTEX Render runtime",
   "description": "The VTEX Render framework runtime",
   "builders": {
-    "react": "3.x"
+    "react": "3.x",
+    "docs": "0.x"
   },
   "dependencies": {
     "vtex.pages-graphql": "2.x"
