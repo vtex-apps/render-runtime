@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Fixed
 - Fix bundled assets discovery.
+### Changed
+- Increase number of users to 50 navigating using render server
 
 ## [8.52.0] - 2019-08-27
 
