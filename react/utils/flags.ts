@@ -1,5 +1,5 @@
 const flags = {
-  RENDER_NAVIGATION: false,
+  RENDER_NAVIGATION: Math.random() < 0.5,
 }
 
 window.flags = flags
