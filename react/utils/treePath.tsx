@@ -1,5 +1,5 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
-import React, { ComponentType, useContext } from 'react'
+import React, { ComponentType, useContext, useMemo, FC } from 'react'
 
 const relative = (parent: string, id: string) => id.replace(`${parent}/`, '')
 
@@ -46,13 +46,17 @@ export const TreePathContext = React.createContext<TreePathProps>({
 })
 TreePathContext.displayName = 'TreePathContext'
 
-export const TreePathContextProvider = React.memo<
-  React.PropsWithChildren<TreePathProps>
->(({ treePath, children }) => (
-  <TreePathContext.Provider value={{ treePath }}>
-    {children}
-  </TreePathContext.Provider>
-))
+export const TreePathContextProvider: FC<TreePathProps> = ({
+  treePath,
+  children,
+}) => {
+  const value = useMemo(() => ({ treePath }), [treePath])
+  return (
+    <TreePathContext.Provider value={value}>
+      {children}
+    </TreePathContext.Provider>
+  )
+}
 TreePathContextProvider.displayName = 'TreePathContextProvider'
 
 export const useTreePath = () => {

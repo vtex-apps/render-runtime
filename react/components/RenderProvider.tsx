@@ -7,7 +7,7 @@ import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
 import { merge, mergeDeepRight, mergeWith } from 'ramda'
-import React, { Component, Fragment, ReactElement } from 'react'
+import React, { Component, Fragment, ReactElement, useMemo } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
@@ -944,11 +944,27 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         <RenderPage page={page} query={query} />
       </div>
     )
-
-    const context = this.getChildContext()
-
     return (
-      <RenderContextProvider runtime={context}>
+      <CachedRenderContextProvider
+        runtime={this.props.runtime}
+        fatherState={this.state}
+        history={this.props.history}
+        addMessages={this.addMessages}
+        ensureSession={this.ensureSession}
+        fetchComponent={this.fetchComponent}
+        getSettings={this.getSettings}
+        goBack={this.goBack}
+        navigate={this.navigate}
+        onPageChanged={this.onPageChanged}
+        patchSession={this.patchSession}
+        prefetchDefaultPages={this.prefetchDefaultPages}
+        prefetchPage={this.prefetchPage}
+        handleSetDevice={this.handleSetDevice}
+        setQuery={this.setQuery}
+        updateComponentAssets={this.updateComponentAssets}
+        updateExtension={this.updateExtension}
+        updateRuntime={this.updateRuntime}
+      >
         <TreePathContextProvider treePath="">
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider
@@ -967,7 +983,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             </IntlProvider>
           </ApolloProvider>
         </TreePathContextProvider>
-      </RenderContextProvider>
+      </CachedRenderContextProvider>
     )
   }
 
@@ -1035,6 +1051,130 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       messages: { ...defaultMessages, ...this.state.messages, ...messages },
     }))
   }
+}
+
+const CachedRenderContextProvider = ({
+  runtime,
+  fatherState,
+  history,
+  addMessages,
+  ensureSession,
+  fetchComponent,
+  getSettings,
+  goBack,
+  navigate,
+  onPageChanged,
+  patchSession,
+  prefetchDefaultPages,
+  prefetchPage,
+  handleSetDevice,
+  setQuery,
+  updateComponentAssets,
+  updateExtension,
+  updateRuntime,
+  children,
+}: any) => {
+  const {
+    components,
+    extensions,
+    messages,
+    page,
+    pages,
+    preview,
+    culture,
+    device,
+    route,
+    query,
+    defaultExtensions,
+  } = fatherState
+  const {
+    account,
+    emitter,
+    hints,
+    production,
+    publicEndpoint,
+    renderMajor,
+    rootPath,
+    workspace,
+  } = runtime
+
+  const context = useMemo(
+    () => ({
+      account,
+      addMessages,
+      components,
+      culture,
+      defaultExtensions,
+      device,
+      emitter,
+      ensureSession,
+      extensions,
+      fetchComponent,
+      getSettings,
+      goBack,
+      hints,
+      history,
+      messages,
+      navigate,
+      onPageChanged,
+      page,
+      pages,
+      patchSession,
+      prefetchDefaultPages,
+      prefetchPage,
+      preview,
+      production,
+      publicEndpoint,
+      query,
+      renderMajor,
+      rootPath,
+      route,
+      setDevice: handleSetDevice,
+      setQuery,
+      updateComponentAssets,
+      updateExtension,
+      updateRuntime,
+      workspace,
+    }),
+    [
+      account,
+      addMessages,
+      components,
+      culture,
+      defaultExtensions,
+      device,
+      emitter,
+      ensureSession,
+      extensions,
+      fetchComponent,
+      getSettings,
+      goBack,
+      hints,
+      history,
+      messages,
+      navigate,
+      onPageChanged,
+      page,
+      pages,
+      patchSession,
+      prefetchDefaultPages,
+      prefetchPage,
+      preview,
+      production,
+      publicEndpoint,
+      query,
+      renderMajor,
+      rootPath,
+      route,
+      handleSetDevice,
+      setQuery,
+      updateComponentAssets,
+      updateExtension,
+      updateRuntime,
+      workspace,
+    ]
+  )
+  return <RenderContextProvider runtime={context}></RenderContextProvider>
 }
 
 export default RenderProvider
