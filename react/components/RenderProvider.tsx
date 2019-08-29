@@ -1174,7 +1174,7 @@ const CachedRenderContextProvider = ({
       workspace,
     ]
   )
-  return <RenderContextProvider runtime={context}></RenderContextProvider>
+  return <RenderContextProvider runtime={context}>{children}</RenderContextProvider>
 }
 
 export default RenderProvider
