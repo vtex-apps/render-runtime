@@ -947,28 +947,29 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const context = this.getChildContext()
 
-    return (
-      <RenderContextProvider runtime={context}>
-        <TreePathContextProvider treePath="">
-          <ApolloProvider client={this.apolloClient}>
-            <IntlProvider
-              locale={locale}
-              messages={mergedMessages}
-              textComponent={Fragment}
-            >
-              <Fragment>
-                <ExtensionManager runtime={this.props.runtime} />
-                {!production && !isSiteEditorIframe && <BuildStatus />}
-                {component}
-                {isSiteEditorIframe ? (
-                  <ExtensionPoint id="store/__overlay" />
-                ) : null}
-              </Fragment>
-            </IntlProvider>
-          </ApolloProvider>
-        </TreePathContextProvider>
-      </RenderContextProvider>
-    )
+    // return (
+    //   <RenderContextProvider runtime={context}>
+    //     <TreePathContextProvider treePath="">
+    //       <ApolloProvider client={this.apolloClient}>
+    //         <IntlProvider
+    //           locale={locale}
+    //           messages={mergedMessages}
+    //           textComponent={Fragment}
+    //         >
+    //           <Fragment>
+    //             <ExtensionManager runtime={this.props.runtime} />
+    //             {!production && !isSiteEditorIframe && <BuildStatus />}
+    //             {component}
+    //             {isSiteEditorIframe ? (
+    //               <ExtensionPoint id="store/__overlay" />
+    //             ) : null}
+    //           </Fragment>
+    //         </IntlProvider>
+    //       </ApolloProvider>
+    //     </TreePathContextProvider>
+    //   </RenderContextProvider>
+    // )
+    return <div>Hello World</div>
   }
 
   // Deprecated
@@ -985,55 +986,52 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   private prefetchPages = () => {
-    if (this.prefetchRoutes.size >= 0) {
-      window.requestIdleCallback
-        ? window.requestIdleCallback(this.execPrefetchPages)
-        : setTimeout(this.execPrefetchPages, 3000)
-    }
+    // if (this.prefetchRoutes.size >= 0) {
+    //   window.requestIdleCallback
+    //     ? window.requestIdleCallback(this.execPrefetchPages)
+    //     : setTimeout(this.execPrefetchPages, 3000)
+    // }
   }
 
   private execPrefetchPages = async () => {
-    const {
-      runtime,
-      runtime: { renderMajor },
-    } = this.props
-
-    const {
-      pages,
-      culture: { locale },
-    } = this.state
-
-    const {
-      components: defaultComponents,
-      extensions: defaultExtensions,
-      messages: defaultMessages,
-    } = await fetchDefaultPages({
-      apolloClient: this.apolloClient,
-      locale,
-      pages,
-      renderMajor,
-      routeIds: Array.from(this.prefetchRoutes),
-    })
-
-    await Promise.all(
-      Object.keys(defaultComponents).map((component: string) => {
-        const componentsAssetsMap = traverseComponent(
-          defaultComponents,
-          component
-        )
-        return prefetchAssets(runtime, componentsAssetsMap)
-      })
-    )
-
-    this.setState(({ components, messages }) => ({
-      components: {
-        ...defaultComponents,
-        ...this.state.components,
-        ...components,
-      },
-      defaultExtensions,
-      messages: { ...defaultMessages, ...this.state.messages, ...messages },
-    }))
+    // const {
+    //   runtime,
+    //   runtime: { renderMajor },
+    // } = this.props
+    // const {
+    //   pages,
+    //   culture: { locale },
+    // } = this.state
+    // const {
+    //   components: defaultComponents,
+    //   extensions: defaultExtensions,
+    //   messages: defaultMessages,
+    // } = await fetchDefaultPages({
+    //   apolloClient: this.apolloClient,
+    //   locale,
+    //   pages,
+    //   renderMajor,
+    //   routeIds: Array.from(this.prefetchRoutes),
+    // })
+    // await Promise.all(
+    //   Object.keys(defaultComponents).map((component: string) => {
+    //     const componentsAssetsMap = traverseComponent(
+    //       defaultComponents,
+    //       component
+    //     )
+    //     return prefetchAssets(runtime, componentsAssetsMap)
+    //   })
+    // )
+    // debugger
+    // this.setState(({ components, messages }) => ({
+    //   components: {
+    //     ...defaultComponents,
+    //     ...this.state.components,
+    //     ...components,
+    //   },
+    //   defaultExtensions,
+    //   messages: { ...defaultMessages, ...this.state.messages, ...messages },
+    // }))
   }
 }
 
