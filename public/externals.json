@@ -70,6 +70,11 @@
       {
         "clientOnly": true,
         "path": "npm:vtex-render-session@1.4.0/dist/index.js"
+      },
+      {
+        "path": "npm:react-amphtml@4.0.2/index.js",
+        "import": "react-amphtml",
+        "serverOnly": true
       }
     ],
     "prod": [
@@ -142,6 +147,11 @@
       {
         "clientOnly": true,
         "path": "npm:vtex-render-session@1.4.0/dist/index.min.js"
+      },
+      {
+        "path": "npm:react-amphtml@4.0.2/index.js",
+        "import": "react-amphtml",
+        "serverOnly": true
       }
     ]
   },
