@@ -16,7 +16,9 @@ if (canUseDOM && window.__RUNTIME__.production) {
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
   if (canUseDOM) {
-    setTimeout(() => window.__RENDER_8_RUNTIME__.start(), 0)
+    document.addEventListener('DOMContentLoaded', () =>
+      window.__RENDER_8_RUNTIME__.start()
+    )
   } else {
     window.__RENDER_8_RUNTIME__.start()
   }
