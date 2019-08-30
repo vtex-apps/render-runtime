@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.56.0-beta] - 2019-08-30
+
 ## [8.55.0] - 2019-08-29
 ### Changed
 - Adds 100% of navigation to render server
