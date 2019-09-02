@@ -10,7 +10,6 @@ import { merge, mergeDeepRight, mergeWith } from 'ramda'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
-import { IntlProvider } from 'react-intl'
 
 import { fetchAssets, getImplementation, prefetchAssets } from '../utils/assets'
 import { generateExtensions } from '../utils/blocks'
@@ -44,6 +43,7 @@ import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
+import MessagesProvider from './MessagesProvider'
 
 interface Props {
   children: ReactElement<any> | null
@@ -78,8 +78,6 @@ export interface RenderProviderState {
 
 const SEND_INFO_DEBOUNCE_MS = 100
 const DISABLE_PREFETCH_PAGES = '__disablePrefetchPages'
-
-const noop = () => {}
 
 const unionKeys = (record1: any, record2: any) => [
   ...new Set([...Object.keys(record1), ...Object.keys(record2)]),
@@ -380,30 +378,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return this.sessionPromise.then(() =>
       canUseDOM ? window.__RENDER_8_SESSION__.patchSession(data) : undefined
     )
-  }
-
-  public getCustomMessages = (locale: string) => {
-    const { components } = this.state
-    const componentsArray = Object.keys(components)
-
-    const customMessages = componentsArray
-      .map(getImplementation)
-      .filter(
-        component =>
-          component &&
-          (component.getCustomMessages || component.WrappedComponent)
-      )
-      .map(component => {
-        const getCustomMessages =
-          component.getCustomMessages ||
-          (component.WrappedComponent &&
-            component.WrappedComponent.getCustomMessages) ||
-          noop
-        return getCustomMessages(locale)
-      })
-      .reduce((acc, strings) => ({ ...acc, ...strings }), {})
-
-    return customMessages
   }
 
   public goBack = () => {
@@ -924,17 +898,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { children } = this.props
     const {
       culture: { locale },
-      messages,
       pages,
       page,
       query,
       production,
     } = this.state
-    const customMessages = this.getCustomMessages(locale)
-    const mergedMessages = {
-      ...messages,
-      ...customMessages,
-    }
 
     const component = children ? (
       React.cloneElement(children as ReactElement<any>, { query })
@@ -951,10 +919,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       <RenderContextProvider runtime={context}>
         <TreePathContextProvider treePath="">
           <ApolloProvider client={this.apolloClient}>
-            <IntlProvider
+            <MessagesProvider
+              components={this.state.components}
+              messages={this.state.messages}
               locale={locale}
-              messages={mergedMessages}
-              textComponent={Fragment}
             >
               <Fragment>
                 <ExtensionManager runtime={this.props.runtime} />
@@ -964,7 +932,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                   <ExtensionPoint id="store/__overlay" />
                 ) : null}
               </Fragment>
-            </IntlProvider>
+            </MessagesProvider>
           </ApolloProvider>
         </TreePathContextProvider>
       </RenderContextProvider>
