@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.55.2] - 2019-09-02
+
 ## [8.55.1] - 2019-09-02
 ### Fixed
 - Properly memo TreePathContextProvider.
