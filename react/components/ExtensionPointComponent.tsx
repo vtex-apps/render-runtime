@@ -26,8 +26,10 @@ interface State {
   lastUpdate?: number
 }
 
-const componentPromiseMap: any = {}
-const componentPromiseResolvedMap: any = {}
+type LoadingState = undefined | 'loading' | 'resolved'
+
+const componentPromiseMap: Record<string, Promise<void>> = {}
+const componentPromiseResolvedMap: Record<string, LoadingState> = {}
 
 class ExtensionPointComponent extends PureComponent<
   Props & RenderContextProps,
@@ -81,18 +83,19 @@ class ExtensionPointComponent extends PureComponent<
     if (component && !Component) {
       if (!(component in componentPromiseMap)) {
         componentPromiseMap[component] = fetchComponent(component)
-      } else if (componentPromiseResolvedMap[component]) {
+        componentPromiseResolvedMap[component] = 'loading'
+
+        componentPromiseMap[component]
+          .then(() => {
+            componentPromiseResolvedMap[component] = 'resolved'
+            this.updateComponentsWithEvent(component)
+          })
+          .catch(() => {
+            componentPromiseResolvedMap[component] = 'resolved'
+          })
+      } else if (componentPromiseResolvedMap[component] === 'resolved') {
         throw new Error(`Unable to fetch component ${component}`)
       }
-
-      componentPromiseMap[component]
-        .then(() => {
-          componentPromiseResolvedMap[component] = true
-          this.updateComponentsWithEvent(component)
-        })
-        .catch(() => {
-          componentPromiseResolvedMap[component] = true
-        })
     }
   }
 
