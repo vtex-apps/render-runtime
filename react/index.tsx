@@ -1,6 +1,8 @@
 /* global module */
 import 'core-js/es6/symbol'
 import 'core-js/fn/symbol/iterator'
+import * as Sentry from '@sentry/browser'
+import { canUseDOM } from 'exenv'
 import * as runtimeGlobals from './core/main'
 
 window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
@@ -24,4 +26,28 @@ if (module.hot) {
     window.__RENDER_8_RUNTIME__.buildCacheLocator = hotGlobals.buildCacheLocator
     runtimeGlobals.start()
   })
+}
+
+const sentryDSN = 'https://2fac72ea180d48ae9bf1dbb3104b4000@sentry.io/1292015'
+
+if (canUseDOM && window.__RUNTIME__.production) {
+  const { version = '' } = window.__RUNTIME__.runtimeMeta || {}
+  Sentry.init({
+    beforeSend: (event: Sentry.SentryEvent) =>
+      event.tags && event.tags.component ? event : null,
+    dsn: sentryDSN,
+    environment: canUseDOM ? 'browser' : 'ssr',
+    release: version,
+  })
+}
+
+if (window.__RUNTIME__.start && !window.__ERROR__) {
+  if (canUseDOM) {
+    document.addEventListener(
+      'DOMContentLoaded',
+      window.__RENDER_8_RUNTIME__.start
+    )
+  } else {
+    window.__RENDER_8_RUNTIME__.start()
+  }
 }
