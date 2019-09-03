@@ -297,9 +297,6 @@ export function navigate(
     navigationRoute.path = rootPath + navigationRoute.path
   }
 
-  // Lowercase all urls navigation
-  navigationRoute.path = navigationRoute.path.toLowerCase()
-
   if (history) {
     const nextQuery = mergePersistingQueries(history.location.search, query)
     const location = createLocationDescriptor(navigationRoute, {
