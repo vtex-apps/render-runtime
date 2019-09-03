@@ -76,10 +76,14 @@ function withOuterExtensions(
       query={props.query}
     />
   ))
+
+  const isRootTreePath = treePath.indexOf('/') === -1
+
   const wrapped = (
     <Fragment key={`wrapped-${treePath}`}>
       {beforeElements}
       {element}
+      {isRootTreePath && <div className="flex flex-grow-1" />}
       {afterElements}
     </Fragment>
   )
