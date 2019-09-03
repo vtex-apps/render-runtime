@@ -1,5 +1,5 @@
 const flags = {
-  RENDER_NAVIGATION: false,
+  RENDER_NAVIGATION: true,
 }
 
 window.flags = flags
