@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.58.0-beta] - 2019-09-04
+
 ## [8.57.2] - 2019-09-04
 ### Fixed
 - Prevent the so-called accordion effect on root ExtensionPoints.
