@@ -78,16 +78,10 @@ const parsePageQueryResponse = (
 const parseDefaultPagesQueryResponse = (
   defaultPages: DefaultPagesQueryResponse
 ): ParsedDefaultPagesQueryResponse => {
-  const { componentsJSON, extensionsJSON, messages } = defaultPages
-
-  const [components, extensions] = [componentsJSON, extensionsJSON].map(json =>
-    JSON.parse(json)
-  )
-
+  const { componentsJSON } = defaultPages
+  const components = JSON.parse(componentsJSON)
   return {
     components,
-    extensions,
-    messages: parseMessages(messages),
   }
 }
 

@@ -377,8 +377,6 @@ declare global {
 
   interface ParsedDefaultPagesQueryResponse {
     components: RenderRuntime['components']
-    extensions: RenderRuntime['extensions']
-    messages: RenderRuntime['messages']
   }
 
   type Rendered = ClientRendered | Promise<NamedServerRendered>

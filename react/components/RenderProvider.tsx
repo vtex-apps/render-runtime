@@ -1003,11 +1003,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture: { locale },
     } = this.state
 
-    const {
-      components: defaultComponents,
-      extensions: defaultExtensions,
-      messages: defaultMessages,
-    } = await fetchDefaultPages({
+    const { components: defaultComponents } = await fetchDefaultPages({
       apolloClient: this.apolloClient,
       locale,
       pages,
@@ -1024,16 +1020,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         return prefetchAssets(runtime, componentsAssetsMap)
       })
     )
-
-    this.setState(({ components, messages }) => ({
-      components: {
-        ...defaultComponents,
-        ...this.state.components,
-        ...components,
-      },
-      defaultExtensions,
-      messages: { ...defaultMessages, ...this.state.messages, ...messages },
-    }))
   }
 }
 

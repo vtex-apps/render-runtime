@@ -5,7 +5,7 @@ import ExtensionPointComponent from './ExtensionPointComponent'
 import Loading from './Loading'
 import { useRuntime } from './RenderContext'
 import { useTreePath } from '../utils/treePath'
-import { useSSR } from './NoSSR'
+import NoSSR from './NoSSR'
 import { withErrorBoundary } from './ErrorBoundary'
 
 interface Props {
@@ -146,11 +146,7 @@ const ExtensionPoint: FC<Props> = props => {
     ])
   }, [parentProps, extensionProps, blockProps, content, params, query])
 
-  const isSSR = useSSR()
-
   if (
-    /* Prevents a client-only block from being inserted into the wrong element */
-    (renderStrategy === 'client' && isSSR) ||
     /* Stops rendering if the extension is not found. Useful for optional ExtensionPoints */
     !extension
   ) {
@@ -181,7 +177,11 @@ const ExtensionPoint: FC<Props> = props => {
     </ExtensionPointComponent>
   )
 
-  return extensionPointComponent
+  return renderStrategy === 'client' ? (
+    <NoSSR>{extensionPointComponent}</NoSSR>
+  ) : (
+    extensionPointComponent
+  )
 }
 
 ExtensionPoint.defaultProps = {
