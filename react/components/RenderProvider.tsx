@@ -530,7 +530,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pagesState[maybePage] && pagesState[maybePage].allowConditions
     const declarer = pagesState[maybePage] && pagesState[maybePage].declarer
     const shouldSkipFetchNavigationData =
-      (!allowConditions && loadedPages.has(maybePage)) || !fetchPage
+      (!allowConditions && loadedPages.has(maybePage)) || fetchPage === false
     const query = queryStringToMap(location.search) as RenderRuntime['query']
     const page = maybePage || route.id
 
