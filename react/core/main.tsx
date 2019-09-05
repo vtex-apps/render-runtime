@@ -95,6 +95,24 @@ function renderToStringWithData(
   })
 }
 
+function renderToString(component: ReactElement<any>): Promise<ServerRendered> {
+  const startGetDataFromTree = window.hrtime()
+  return new Promise(res => res()).then(() => {
+    const endGetDataFromTree = window.hrtime(startGetDataFromTree)
+
+    const startRenderToString = window.hrtime()
+    const markup = require('react-dom/server').renderToString(component)
+    const endRenderToString = window.hrtime(startRenderToString)
+    return {
+      markup,
+      renderTimeMetric: {
+        getDataFromTree: endGetDataFromTree,
+        renderToString: endRenderToString,
+      },
+    }
+  })
+}
+
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = (
   name: string,
@@ -104,6 +122,7 @@ const render = (
   const {
     customRouting,
     disableSSR,
+    disableSSQ,
     page,
     pages,
     extensions,
@@ -137,7 +156,15 @@ const render = (
     ? ((disableSSR || created
         ? renderDOM<HTMLDivElement>(root, elem)
         : hydrate(root, elem)) as Element)
-    : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
+    : !disableSSQ
+    ? renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
+        markups: getMarkups(name, markup),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        maxAge: cacheControl!.maxAge,
+        page,
+        renderTimeMetric,
+      }))
+    : renderToString(root).then(({ markup, renderTimeMetric }) => ({
         markups: getMarkups(name, markup),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         maxAge: cacheControl!.maxAge,

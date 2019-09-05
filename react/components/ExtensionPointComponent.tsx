@@ -221,11 +221,7 @@ class ExtensionPointComponent extends PureComponent<
 
     return (
       <TreePathContextProvider treePath={treePath}>
-        {Component ? (
-          <Component {...props}>{children}</Component>
-        ) : (
-          children || <Loading />
-        )}
+        {Component ? <Component {...props}>{children}</Component> : <Loading />}
       </TreePathContextProvider>
     )
   }
