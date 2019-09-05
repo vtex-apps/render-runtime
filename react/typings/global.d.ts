@@ -412,6 +412,7 @@ declare global {
     emitter: EventEmitter
     workspace: string
     disableSSR: boolean
+    disableSSQ: boolean
     hints: any
     introspectionResult: IntrospectionResultData
     page: string
