@@ -13,7 +13,7 @@ import { IntrospectionResultData } from 'apollo-cache-inmemory'
 
 declare global {
   interface RenderMetric {
-    getDataFromTree: [number, number]
+    getDataFromTree?: [number, number]
     renderToString: [number, number]
   }
 
@@ -379,7 +379,7 @@ declare global {
     components: RenderRuntime['components']
   }
 
-  type Rendered = ClientRendered | Promise<NamedServerRendered>
+  type Rendered = ClientRendered | Promise<NamedServerRendered> | undefined
 
   interface ComponentTraversalResult {
     apps: string[]

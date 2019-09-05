@@ -96,17 +96,13 @@ function renderToStringWithData(
 }
 
 function renderToString(component: ReactElement<any>): Promise<ServerRendered> {
-  const startGetDataFromTree = window.hrtime()
-  return new Promise(res => res()).then(() => {
-    const endGetDataFromTree = window.hrtime(startGetDataFromTree)
-
+  return Promise.resolve().then(() => {
     const startRenderToString = window.hrtime()
     const markup = require('react-dom/server').renderToString(component)
     const endRenderToString = window.hrtime(startRenderToString)
     return {
       markup,
       renderTimeMetric: {
-        getDataFromTree: endGetDataFromTree,
         renderToString: endRenderToString,
       },
     }
@@ -152,25 +148,34 @@ const render = (
     </RenderProvider>
   )
 
-  return canUseDOM
-    ? ((disableSSR || created
-        ? renderDOM<HTMLDivElement>(root, elem)
-        : hydrate(root, elem)) as Element)
-    : !disableSSQ
-    ? renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
+  if (!canUseDOM) {
+    if (!disableSSQ) {
+      return renderToStringWithData(root).then(
+        ({ markup, renderTimeMetric }) => ({
+          markups: getMarkups(name, markup),
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          maxAge: cacheControl!.maxAge,
+          page,
+          renderTimeMetric,
+        })
+      )
+    } else {
+      return renderToString(root).then(({ markup, renderTimeMetric }) => ({
         markups: getMarkups(name, markup),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         maxAge: cacheControl!.maxAge,
         page,
         renderTimeMetric,
       }))
-    : renderToString(root).then(({ markup, renderTimeMetric }) => ({
-        markups: getMarkups(name, markup),
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        maxAge: cacheControl!.maxAge,
-        page,
-        renderTimeMetric,
-      }))
+    }
+  }
+
+  if (disableSSR || created) {
+    renderDOM<HTMLDivElement>(root, elem)
+  } else {
+    hydrate(root, elem)
+  }
+  return
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
