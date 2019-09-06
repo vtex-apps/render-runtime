@@ -236,6 +236,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       baseURI,
       runtimeContextLink,
       ensureSessionLink,
+      this.fetcher,
       cacheControl
     )
 

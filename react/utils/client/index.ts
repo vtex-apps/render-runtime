@@ -71,6 +71,7 @@ export const getClient = (
   baseURI: string,
   runtimeContextLink: ApolloLink,
   ensureSessionLink: ApolloLink,
+  fetcher: GlobalFetch['fetch'],
   cacheControl?: PageCacheControl
 ) => {
   const {
@@ -97,6 +98,7 @@ export const getClient = (
       createHttpLink({
         credentials: 'include',
         useGETForQueries: false,
+        fetch: fetcher,
       }),
     ])
 
