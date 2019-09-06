@@ -102,11 +102,13 @@ const runtimeFields = [
 ].join(',')
 
 export const fetchServerPage = async ({
+  fetcher,
   path,
   query: rawQuery,
 }: {
   path: string
   query?: Record<string, string>
+  fetcher: GlobalFetch['fetch']
 }): Promise<ParsedServerPageResponse> => {
   const query = stringify({
     ...rawQuery,
@@ -118,6 +120,7 @@ export const fetchServerPage = async ({
     headers: {
       accept: 'application/json',
     },
+    fetcher,
   }).then(({ response }) => response.json())
   const {
     blocksTree,

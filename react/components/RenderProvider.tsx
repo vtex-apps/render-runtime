@@ -178,6 +178,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
   private prefetchRoutes: Set<string>
+  private fetcher: GlobalFetch['fetch']
 
   public constructor(props: Props) {
     super(props)
@@ -201,6 +202,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = props.runtime
     const { history, baseURI, cacheControl } = props
     const ignoreCanonicalReplacement = query && query.map
+    this.fetcher = fetch
 
     if (history) {
       const renderLocation: RenderHistoryLocation = {
@@ -234,6 +236,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       baseURI,
       runtimeContextLink,
       ensureSessionLink,
+      this.fetcher,
       cacheControl
     )
 
@@ -590,6 +593,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // the results of this query will probably remain the same.
     return isEnabled('RENDER_NAVIGATION')
       ? fetchServerPage({
+          fetcher: this.fetcher,
           path: navigationRoute.path,
           query,
         }).then(
@@ -784,6 +788,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ? await fetchServerPage({
           path: route.path,
           query,
+          fetcher: this.fetcher,
         })
       : await fetchNavigationPage({
           apolloClient: this.apolloClient,
