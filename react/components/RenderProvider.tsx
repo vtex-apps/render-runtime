@@ -593,6 +593,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // the results of this query will probably remain the same.
     return isEnabled('RENDER_NAVIGATION')
       ? fetchServerPage({
+          fetcher: this.fetcher,
           path: navigationRoute.path,
           query,
         }).then(
@@ -787,6 +788,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ? await fetchServerPage({
           path: route.path,
           query,
+          fetcher: this.fetcher,
         })
       : await fetchNavigationPage({
           apolloClient: this.apolloClient,

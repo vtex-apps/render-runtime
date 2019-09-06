@@ -26,14 +26,15 @@ const ok = (status: number) => 200 <= status && status < 300
 
 export const fetchWithRetry = (
   url: string,
-  init: RequestInit,
+  init: RequestInit & { fetcher: GlobalFetch['fetch'] },
   maxRetries: number = 3
 ) => {
   let status = 500
   const callFetch = (
     attempt: number = 0
   ): Promise<{ response: Response; error: any }> =>
-    fetch(url, init)
+    init
+      .fetcher(url, init)
       .then(response => {
         status = response.status
         return ok(status)
