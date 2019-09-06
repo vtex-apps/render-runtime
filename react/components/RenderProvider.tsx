@@ -178,6 +178,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
   private prefetchRoutes: Set<string>
+  private fetcher: GlobalFetch['fetch']
 
   public constructor(props: Props) {
     super(props)
@@ -201,6 +202,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = props.runtime
     const { history, baseURI, cacheControl } = props
     const ignoreCanonicalReplacement = query && query.map
+    this.fetcher = fetch
 
     if (history) {
       const renderLocation: RenderHistoryLocation = {
