@@ -69,7 +69,7 @@
       },
       {
         "clientOnly": true,
-        "path": "npm:vtex-render-session@1.2.1/dist/index.js"
+        "path": "npm:vtex-render-session@1.5.0/dist/index.js"
       }
     ],
     "prod": [
