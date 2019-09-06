@@ -115,13 +115,16 @@ export const fetchServerPage = async ({
     __pickRuntime: runtimeFields,
   })
   const url = `${path}?${query}`
-  const page: ServerPageResponse = await fetchWithRetry(url, {
-    credentials: 'same-origin',
-    headers: {
-      accept: 'application/json',
+  const page: ServerPageResponse = await fetchWithRetry(
+    url,
+    {
+      credentials: 'same-origin',
+      headers: {
+        accept: 'application/json',
+      },
     },
-    fetcher,
-  }).then(({ response }) => response.json())
+    fetcher
+  ).then(({ response }) => response.json())
   const {
     blocksTree,
     blocks,
