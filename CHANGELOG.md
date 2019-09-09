@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Navigating back crashes if the server-side page was fetched with some querystring.
 
 ## [8.59.1] - 2019-09-06
 ### Fixed
@@ -13,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [8.59.0] - 2019-09-06
 ### Changed
-- Adds fetch to render provider 
+- Adds fetch to render provider
 
 ## [8.58.1] - 2019-09-05
 ### Fixed
