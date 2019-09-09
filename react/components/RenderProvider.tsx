@@ -215,7 +215,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           navigationRoute: {
             id: route.id,
             params: route.params,
-            path: route.path,
+            path: history.location.pathname,
           },
           renderRouting: true,
         },
