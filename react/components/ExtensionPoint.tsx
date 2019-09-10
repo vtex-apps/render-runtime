@@ -129,7 +129,7 @@ const ExtensionPoint: FC<Props> = props => {
   } = extension || {}
 
   const mergedProps = React.useMemo(() => {
-    return reduce(mergeDeepRight, {}, [
+    return reduce(mergeDeepRight, {} as any, [
       /** Extra props passed to the ExtensionPoint component
        * e.g. <ExtensionPoint foo="bar" />
        */
@@ -177,8 +177,10 @@ const ExtensionPoint: FC<Props> = props => {
     </ExtensionPointComponent>
   )
 
+  // `client` component assets are sent to server side rendering, but they should display a loading animation.
+  // `lazy` components might never be used, so they don't necessarily need a loading animation.
   return renderStrategy === 'client' ? (
-    <NoSSR>{extensionPointComponent}</NoSSR>
+    <NoSSR onSSR={<Loading />}>{extensionPointComponent}</NoSSR>
   ) : (
     extensionPointComponent
   )
