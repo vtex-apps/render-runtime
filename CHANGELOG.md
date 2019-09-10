@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Add loading animation for client blocks.
+
 ## [8.59.2] - 2019-09-09
 ### Fixed
 - Navigating back crashes if the server-side page was fetched with some querystring.
