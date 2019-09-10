@@ -275,6 +275,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     if (!production) {
       emitter.addListener('extensionsUpdated', this.updateRuntime)
+      emitter.addListener('blocksUpdated', this.updateRuntime)
     }
 
     this.sendInfoFromIframe()
@@ -302,6 +303,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     if (!production) {
       emitter.removeListener('extensionsUpdated', this.updateRuntime)
+      emitter.removeListener('blocksUpdated', this.updateRuntime)
     }
   }
 

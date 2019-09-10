@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- Hot reload for blocks.
+
 ## [8.59.3] - 2019-09-10
 
 ### Fixed
