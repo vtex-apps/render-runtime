@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.59.3] - 2019-09-10
+
 ### Fixed
 - Add loading animation for client blocks.
 
