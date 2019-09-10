@@ -24,8 +24,13 @@ const CONNECTION_CLOSED = 2
 
 const emittersByWorkspace: EmittersRegistry = {}
 
-const initSSE = (account: string, workspace: string, baseURI: string) => {
-  if (Object.keys(window.__RENDER_8_HOT__).length === 0) {
+const initSSE = (
+  account: string,
+  workspace: string,
+  baseURI: string,
+  isProductionWorkspace: boolean
+) => {
+  if (isProductionWorkspace) {
     return undefined
   }
 
@@ -128,7 +133,8 @@ export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
     emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(
       account,
       workspace,
-      baseURI
+      baseURI,
+      production
     )
 
     if (!production) {
@@ -139,7 +145,8 @@ export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
           emittersByWorkspace[`${account}/${workspace}`].eventSource = initSSE(
             account,
             workspace,
-            baseURI
+            baseURI,
+            production
           )
         }
       })
