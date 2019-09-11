@@ -1,7 +1,17 @@
 import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
-import { difference, is, isEmpty, keys, startsWith } from 'ramda'
+import {
+  contains,
+  difference,
+  is,
+  isEmpty,
+  keys,
+  map,
+  pluck,
+  startsWith,
+  zip,
+} from 'ramda'
 import RouteParser from 'route-parser'
 
 import { isEnabled } from './flags'
@@ -39,6 +49,27 @@ function isHost(hostname: string) {
 
 function trimEndingSlash(token: string) {
   return token.replace(/\/$/, '') || '/'
+}
+
+function pathToLowerCase(path: string, query: any) {
+  const queryMap = queryStringToMap(query)
+  if (queryMap && queryMap.map) {
+    const pathSegments = path.startsWith('/')
+      ? path.split('/').slice(1)
+      : path.split('/')
+    const mapValues = queryMap.map.split(',').slice(0, pathSegments.length)
+    const convertedSegments = map(
+      ([pathSegment, mapValue]: [string, string]) =>
+        contains('specificationFilter', mapValue)
+          ? pathSegment
+          : pathSegment.toLowerCase(),
+      zip(pathSegments, mapValues) as [string, string][]
+    )
+    return path.startsWith('/')
+      ? `/${convertedSegments.join('/')}`
+      : convertedSegments.join('/')
+  }
+  return path && path.toLowerCase()
 }
 
 function createLocationDescriptor(
@@ -293,9 +324,13 @@ export function navigate(
   }
 
   // Prefix any non-absolute paths (e.g. http:// or https://) with runtime.rootPath
+  console.log('Navigation route path is ' + navigationRoute.path)
   if (rootPath && !navigationRoute.path.startsWith('http')) {
-    navigationRoute.path = rootPath + navigationRoute.path
+    navigationRoute.path =
+      rootPath + pathToLowerCase(navigationRoute.path, query)
   }
+
+  navigationRoute.path = pathToLowerCase(navigationRoute.path, query)
 
   if (history) {
     const nextQuery = mergePersistingQueries(history.location.search, query)
