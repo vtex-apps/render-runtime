@@ -325,7 +325,6 @@ export function navigate(
   }
 
   // Prefix any non-absolute paths (e.g. http:// or https://) with runtime.rootPath
-  console.log('Navigation route path is ' + navigationRoute.path)
   if (rootPath && !navigationRoute.path.startsWith('http')) {
     navigationRoute.path =
       rootPath + pathToLowerCase(navigationRoute.path, query)
