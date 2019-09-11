@@ -106,7 +106,7 @@ export function queryStringToMap(query: string): Record<string, any> {
 }
 
 export function mapToQueryString(query: Record<string, any> = {}): string {
-  return queryString.stringify(query)
+  return queryString.stringify(query, { encode: false })
 }
 
 export function getPageParams(path: string, routePath: string) {
