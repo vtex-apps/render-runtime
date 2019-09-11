@@ -52,6 +52,7 @@ function trimEndingSlash(token: string) {
 }
 
 function pathToLowerCase(path: string, query: any) {
+  // Maybe consider moving this 'lowercasing' logic from this project since it is specific to stores.
   const queryMap = queryStringToMap(query)
   if (queryMap && queryMap.map) {
     const pathSegments = path.startsWith('/')
