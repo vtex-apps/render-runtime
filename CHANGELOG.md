@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.62.0] - 2019-09-12
+
 ## [8.61.0] - 2019-09-12
 ### Added
 - Lowercase URL segments if they are not related to a `specificationFilter`
