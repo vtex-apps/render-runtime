@@ -172,12 +172,9 @@ const render = (
     }
   }
 
-  if (disableSSR || created) {
-    renderDOM<HTMLDivElement>(root, elem)
-  } else {
-    hydrate(root, elem)
-  }
-  return
+  return (disableSSR || created
+    ? renderDOM<HTMLDivElement>(root, elem)
+    : hydrate(root, elem)) as Element
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
