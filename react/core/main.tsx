@@ -96,6 +96,8 @@ function renderToStringWithData(
 }
 
 function renderToString(component: ReactElement<any>): Promise<ServerRendered> {
+  // The renderToString function must be inside a 'then' of a promise, because of the concurrency when
+  // running scripts
   return Promise.resolve().then(() => {
     const startRenderToString = window.hrtime()
     const markup = require('react-dom/server').renderToString(component)
