@@ -150,31 +150,30 @@ const render = (
     </RenderProvider>
   )
 
-  if (!canUseDOM) {
-    if (!disableSSQ) {
-      return renderToStringWithData(root).then(
-        ({ markup, renderTimeMetric }) => ({
-          markups: getMarkups(name, markup),
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          maxAge: cacheControl!.maxAge,
-          page,
-          renderTimeMetric,
-        })
-      )
-    } else {
-      return renderToString(root).then(({ markup, renderTimeMetric }) => ({
+  if (canUseDOM) {
+    return (disableSSR || created
+      ? renderDOM<HTMLDivElement>(root, elem)
+      : hydrate(root, elem)) as Element
+  }
+  if (disableSSQ) {
+    return renderToString(root).then(({ markup, renderTimeMetric }) => ({
+      markups: getMarkups(name, markup),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      maxAge: cacheControl!.maxAge,
+      page,
+      renderTimeMetric,
+    }))
+  } else {
+    return renderToStringWithData(root).then(
+      ({ markup, renderTimeMetric }) => ({
         markups: getMarkups(name, markup),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         maxAge: cacheControl!.maxAge,
         page,
         renderTimeMetric,
-      }))
-    }
+      })
+    )
   }
-
-  return (disableSSR || created
-    ? renderDOM<HTMLDivElement>(root, elem)
-    : hydrate(root, elem)) as Element
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
