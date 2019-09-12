@@ -337,9 +337,6 @@ export function navigate(
 
   navigationRoute.path = pathToLowerCase(navigationRoute.path, query)
 
-  console.log('navigationRoute: ' + JSON.stringify(navigationRoute, null, 2))
-  console.log('domain: ' + window.__RUNTIME__.route.domain)
-
   if (history) {
     const nextQuery = mergePersistingQueries(history.location.search, query)
     const location = createLocationDescriptor(navigationRoute, {
