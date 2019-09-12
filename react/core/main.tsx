@@ -95,6 +95,22 @@ function renderToStringWithData(
   })
 }
 
+function renderToString(component: ReactElement<any>): Promise<ServerRendered> {
+  // The renderToString function must be inside a 'then' of a promise, because of the concurrency when
+  // running scripts
+  return Promise.resolve().then(() => {
+    const startRenderToString = window.hrtime()
+    const markup = require('react-dom/server').renderToString(component)
+    const endRenderToString = window.hrtime(startRenderToString)
+    return {
+      markup,
+      renderTimeMetric: {
+        renderToString: endRenderToString,
+      },
+    }
+  })
+}
+
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = (
   name: string,
@@ -104,6 +120,7 @@ const render = (
   const {
     customRouting,
     disableSSR,
+    disableSSQ,
     page,
     pages,
     extensions,
@@ -133,17 +150,30 @@ const render = (
     </RenderProvider>
   )
 
-  return canUseDOM
-    ? ((disableSSR || created
-        ? renderDOM<HTMLDivElement>(root, elem)
-        : hydrate(root, elem)) as Element)
-    : renderToStringWithData(root).then(({ markup, renderTimeMetric }) => ({
+  if (canUseDOM) {
+    return (disableSSR || created
+      ? renderDOM<HTMLDivElement>(root, elem)
+      : hydrate(root, elem)) as Element
+  }
+  if (disableSSQ) {
+    return renderToString(root).then(({ markup, renderTimeMetric }) => ({
+      markups: getMarkups(name, markup),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      maxAge: cacheControl!.maxAge,
+      page,
+      renderTimeMetric,
+    }))
+  } else {
+    return renderToStringWithData(root).then(
+      ({ markup, renderTimeMetric }) => ({
         markups: getMarkups(name, markup),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         maxAge: cacheControl!.maxAge,
         page,
         renderTimeMetric,
-      }))
+      })
+    )
+  }
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {

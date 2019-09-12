@@ -13,7 +13,7 @@ import { IntrospectionResultData } from 'apollo-cache-inmemory'
 
 declare global {
   interface RenderMetric {
-    getDataFromTree: [number, number]
+    getDataFromTree?: [number, number]
     renderToString: [number, number]
   }
 
@@ -412,6 +412,7 @@ declare global {
     emitter: EventEmitter
     workspace: string
     disableSSR: boolean
+    disableSSQ: boolean
     hints: any
     introspectionResult: IntrospectionResultData
     page: string
