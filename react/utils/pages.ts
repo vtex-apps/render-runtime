@@ -54,7 +54,7 @@ function trimEndingSlash(token: string) {
 
 function pathToLowerCase(path: string, query: any) {
   // Maybe consider moving this 'lowercasing' logic from this project since it is specific to stores.
-  if (ramdaPath(['__RUNTIME__', 'route', 'domain'], window) === 'store') {
+  if (ramdaPath(['__RUNTIME__', 'route', 'domain'], window) !== 'store') {
     return path
   }
 
