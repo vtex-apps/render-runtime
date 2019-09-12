@@ -186,7 +186,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     emitter.addListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {
-      emitter.addListener('localesUpdated', this.onLocalesUpdated)
       emitter.addListener('extensionsUpdated', this.updateRuntime)
     }
 
@@ -211,7 +210,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     emitter.removeListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {
-      emitter.removeListener('localesUpdated', this.onLocalesUpdated)
       emitter.removeListener('extensionsUpdated', this.updateRuntime)
     }
   }
@@ -485,51 +483,24 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     })
   }
 
-  public onLocalesUpdated = (locales: string[]) => {
-    const { runtime: { renderMajor } } = this.props
-    const { page, production, culture: { locale } } = this.state
-
-    // Current locale is one or a subset of the updated ones
-    if (locales.indexOf(locale) !== -1 || locales.indexOf(locale.split('-')[0]) !== -1) {
-      fetchMessages(this.apolloClient, page, production, locale, renderMajor, true)
-        .then(newMessages => {
-          this.setState(prevState => ({
-            ...prevState,
-            messages: { ...prevState.messages, ...newMessages },
-          }), () => {
-            this.sendInfoFromIframe(true)
-          })
-        })
-        .catch(e => {
-          console.log('Failed to fetch new locale file.')
-          console.error(e)
-        })
-    }
-  }
-
-  public onLocaleSelected = (locale: string) => {
-    const { runtime: { renderMajor } } = this.props
-    const { page, production } = this.state
-
+  public onLocaleSelected = (locale: string, domain?: string) => {
     if (locale !== this.state.culture.locale) {
-      createLocaleCookie(locale)
-      Promise.all([
-        fetchMessages(this.apolloClient, page, production, locale, renderMajor),
-        loadLocaleData(locale),
-      ])
-        .then(([newMessages]) => {
-          this.setState(prevState => ({
-            ...prevState,
-            culture: {
-              ...this.state.culture,
-              locale,
-            },
-            messages: { ...prevState.messages, ...newMessages },
-          }), () => {
-            this.sendInfoFromIframe(true)
-          })
-        })
-        .then(() => window.postMessage({ key: 'cookie.locale', body: { locale } }, '*'))
+      const sessionData = { public: {} }
+      if (domain && domain === 'admin') {
+        sessionData.public = {
+          admin_cultureInfo: {
+            value: locale,
+          },
+        }
+      } else {
+        sessionData.public = {
+          cultureInfo: {
+            value: locale,
+          },
+        }
+      }
+      Promise.all([this.patchSession(sessionData)])
+        .then(() => window.location.reload())
         .catch(e => {
           console.log('Failed to fetch new locale file.')
           console.error(e)

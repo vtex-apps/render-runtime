@@ -53,7 +53,8 @@ export const getState = (runtime: RenderRuntime) => {
 }
 
 export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContextLink: ApolloLink, ensureSessionLink: ApolloLink, cacheControl?: PageCacheControl) => {
-  const {account, workspace} = runtime
+  const {account, workspace, culture: { locale }, route } = runtime
+  const domain = route.path && route.path.split('/')[1]
 
   if (!clientsByWorkspace[`${account}/${workspace}`]) {
     const cache = new InMemoryCache({
@@ -82,7 +83,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       useGETForHashedQueries: true,
     })
 
-    const uriSwitchLink = createUriSwitchLink(baseURI, workspace)
+    const uriSwitchLink = createUriSwitchLink(baseURI, workspace, locale, domain)
 
     const cacheLink = cacheControl ? [cachingLink(cacheControl)] : []
 
