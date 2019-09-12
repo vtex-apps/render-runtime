@@ -313,6 +313,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       components,
       extensions,
       messages,
+      blocks,
+      blocksTree,
+      contentMap,
       page,
       pages,
       preview,
@@ -639,7 +642,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         }).then(
           ({
             appsEtag,
+            blocks,
+            blocksTree,
             cacheHints,
+            contentMap,
             components,
             extensions,
             matchingPage,
@@ -651,7 +657,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             this.setState(
               {
                 appsEtag,
+                blocks,
+                blocksTree,
                 cacheHints: mergeWith(merge, this.state.cacheHints, cacheHints),
+                contentMap,
                 components: { ...this.state.components, ...components },
                 extensions: { ...this.state.extensions, ...extensions },
                 loadedPages: loadedPages.add(page),
