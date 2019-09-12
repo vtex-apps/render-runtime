@@ -279,9 +279,6 @@ export function navigate(
     fetchPage = true,
   } = options
 
-  console.log('page: ' + JSON.stringify(page, null, 2))
-  console.log('params: ' + JSON.stringify(params, null, 2))
-
   if (!page && !inputTo) {
     console.error(
       `Invalid navigation options. You should use 'page' or 'to' parameters`
