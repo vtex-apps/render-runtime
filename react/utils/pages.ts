@@ -9,6 +9,7 @@ import {
   keys,
   map,
   pluck,
+  path as ramdaPath,
   startsWith,
   zip,
 } from 'ramda'
@@ -54,7 +55,11 @@ function trimEndingSlash(token: string) {
 function pathToLowerCase(path: string, query: any) {
   // Maybe consider moving this 'lowercasing' logic from this project since it is specific to stores.
   const queryMap = queryStringToMap(query)
-  if (queryMap && queryMap.map) {
+  if (
+    queryMap &&
+    queryMap.map &&
+    ramdaPath(['__RUNTIME__', 'route', 'domain'], window) === 'store'
+  ) {
     const pathSegments = path.startsWith('/')
       ? path.split('/').slice(1)
       : path.split('/')
