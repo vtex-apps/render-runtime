@@ -379,7 +379,7 @@ declare global {
     components: RenderRuntime['components']
   }
 
-  type Rendered = ClientRendered | Promise<NamedServerRendered> | undefined
+  type Rendered = ClientRendered | Promise<NamedServerRendered>
 
   interface ComponentTraversalResult {
     apps: string[]
