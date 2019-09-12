@@ -9,6 +9,7 @@ import {
   keys,
   map,
   pluck,
+  path as ramdaPath,
   startsWith,
   zip,
 } from 'ramda'
@@ -54,7 +55,11 @@ function trimEndingSlash(token: string) {
 function pathToLowerCase(path: string, query: any) {
   // Maybe consider moving this 'lowercasing' logic from this project since it is specific to stores.
   const queryMap = queryStringToMap(query)
-  if (queryMap && queryMap.map) {
+  if (
+    queryMap &&
+    queryMap.map &&
+    ramdaPath(['__RUNTIME__', 'route', 'domain'], window) === 'store'
+  ) {
     const pathSegments = path.startsWith('/')
       ? path.split('/').slice(1)
       : path.split('/')
@@ -274,6 +279,9 @@ export function navigate(
     fetchPage = true,
   } = options
 
+  console.log('page: ' + JSON.stringify(page, null, 2))
+  console.log('params: ' + JSON.stringify(params, null, 2))
+
   if (!page && !inputTo) {
     console.error(
       `Invalid navigation options. You should use 'page' or 'to' parameters`
@@ -331,6 +339,9 @@ export function navigate(
   }
 
   navigationRoute.path = pathToLowerCase(navigationRoute.path, query)
+
+  console.log('navigationRoute: ' + JSON.stringify(navigationRoute, null, 2))
+  console.log('domain: ' + window.__RUNTIME__.route.domain)
 
   if (history) {
     const nextQuery = mergePersistingQueries(history.location.search, query)

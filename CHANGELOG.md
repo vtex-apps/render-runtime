@@ -6,10 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Only lowercase URL segments for `store`.
 
 ## [8.61.0] - 2019-09-12
 ### Added
-- Lowercase URL segments if they are not related to a `specificationFilter`
+- Lowercase URL segments if they are not related to a `specificationFilter`.
 
 ## [8.60.2] - 2019-09-11
 ### Changed
