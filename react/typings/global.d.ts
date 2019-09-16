@@ -423,6 +423,7 @@ declare global {
     culture: Culture
     pages: Pages
     extensions: Extensions
+    platform: string
     preview: boolean
     production: boolean
     publicEndpoint: string
