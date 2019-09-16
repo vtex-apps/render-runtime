@@ -5910,6 +5910,13 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-amphtml@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/react-amphtml/-/react-amphtml-4.0.2.tgz#118338e60109341811ed4496ec7ad2ca60cd1309"
+  integrity sha512-CQoSahAv5biAwQ+RsZuQJTjflML6mRR/I4+mNlf4ANl4fI2O8DUZVgX8bvKCrmgrLbBe1gmGewqvG7sMAA5REQ==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-apollo@^2.5.2, react-apollo@^2.5.6:
   version "2.5.8"
   resolved "https://registry.yarnpkg.com/react-apollo/-/react-apollo-2.5.8.tgz#c7a593b027efeefdd8399885e0ac6bec3b32623c"

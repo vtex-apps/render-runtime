@@ -6,7 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "lib": ["es2017", "dom", "es2018.promise"],
-    "module": "es6",
+    "module": "esnext",
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,

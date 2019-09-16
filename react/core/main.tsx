@@ -76,14 +76,21 @@ const renderExtension = (
 }
 
 function renderToStringWithData(
-  component: ReactElement<any>
+  component: ReactElement<any>,
+  renderFn: (root: ReactElement) => string,
+  skipQuery = false
 ): Promise<ServerRendered> {
+  const getDataFn = (): Promise<string | void> => {
+    if (skipQuery) return Promise.resolve()
+    return getDataFromTree(component)
+  }
+
   const startGetDataFromTree = window.hrtime()
-  return getDataFromTree(component).then(() => {
+  return getDataFn().then(() => {
     const endGetDataFromTree = window.hrtime(startGetDataFromTree)
 
     const startRenderToString = window.hrtime()
-    const markup = require('react-dom/server').renderToString(component)
+    const markup = renderFn(component)
     const endRenderToString = window.hrtime(startRenderToString)
     return {
       markup,
@@ -95,24 +102,8 @@ function renderToStringWithData(
   })
 }
 
-function renderToString(component: ReactElement<any>): Promise<ServerRendered> {
-  // The renderToString function must be inside a 'then' of a promise, because of the concurrency when
-  // running scripts
-  return Promise.resolve().then(() => {
-    const startRenderToString = window.hrtime()
-    const markup = require('react-dom/server').renderToString(component)
-    const endRenderToString = window.hrtime(startRenderToString)
-    return {
-      markup,
-      renderTimeMetric: {
-        renderToString: endRenderToString,
-      },
-    }
-  })
-}
-
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
-const render = (
+const render = async (
   name: string,
   runtime: RenderRuntime,
   element?: HTMLElement
@@ -151,29 +142,57 @@ const render = (
   )
 
   if (canUseDOM) {
-    return (disableSSR || created
-      ? renderDOM<HTMLDivElement>(root, elem)
-      : hydrate(root, elem)) as Element
+    const renderFn = disableSSR || created ? renderDOM : hydrate
+
+    return (renderFn(root, elem) as unknown) as Element
   }
-  if (disableSSQ) {
-    return renderToString(root).then(({ markup, renderTimeMetric }) => ({
-      markups: getMarkups(name, markup),
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      maxAge: cacheControl!.maxAge,
-      page,
-      renderTimeMetric,
-    }))
-  } else {
-    return renderToStringWithData(root).then(
-      ({ markup, renderTimeMetric }) => ({
-        markups: getMarkups(name, markup),
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        maxAge: cacheControl!.maxAge,
-        page,
-        renderTimeMetric,
-      })
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { renderToStaticMarkup, renderToString } = require('react-dom/server')
+
+  const commonRenderResult = {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    maxAge: cacheControl!.maxAge,
+    page,
+  }
+
+  if (runtime.amp) {
+    const {
+      AmpScriptsManager,
+      AmpScripts,
+      headerBoilerplate,
+    } = require('react-amphtml/setup') // eslint-disable-line @typescript-eslint/no-var-requires
+    const scripts = new AmpScripts()
+
+    const ampRoot = (
+      <AmpScriptsManager ampScripts={scripts}>{root}</AmpScriptsManager>
+    )
+
+    return renderToStringWithData(ampRoot, renderToStaticMarkup).then(
+      ({ markup, renderTimeMetric }) => {
+        const scriptsMarkup = renderToStaticMarkup(scripts.getScriptElements())
+        const boilerplateMarkup = renderToStaticMarkup(
+          headerBoilerplate(runtime.route.canonicalPath)
+        )
+
+        return {
+          ...commonRenderResult,
+          markups: getMarkups(name, markup),
+          renderTimeMetric,
+          ampScripts: scriptsMarkup,
+          ampHeadBoilerplate: boilerplateMarkup,
+        }
+      }
     )
   }
+
+  return renderToStringWithData(root, renderToString, disableSSQ).then(
+    ({ markup, renderTimeMetric }) => ({
+      ...commonRenderResult,
+      markups: getMarkups(name, markup),
+      renderTimeMetric,
+    })
+  )
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
@@ -253,7 +272,7 @@ function start() {
       // Expose render promise to global context.
       window.rendered = (maybeRenderPromise as Promise<
         NamedServerRendered
-      >).then(({ markups, maxAge, page, renderTimeMetric }) => ({
+      >).then(({ markups, maxAge, page, renderTimeMetric, ...rendered }) => ({
         extensions: markups.reduce<RenderedSuccess['extensions']>(
           (acc, { name, markup }) => ((acc[name] = markup), acc),
           {}
@@ -262,6 +281,7 @@ function start() {
         maxAge,
         renderMetrics: { [page]: renderTimeMetric },
         state: getState(runtime),
+        ...rendered,
       }))
     } else {
       setLazyCookie(runtime.workspaceCookie)

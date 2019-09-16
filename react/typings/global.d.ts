@@ -32,6 +32,7 @@ declare global {
     maxAge: number
     page: string
     renderTimeMetric: RenderMetric
+    ampScripts?: string[]
   }
 
   type ClientRendered = Element
@@ -379,7 +380,7 @@ declare global {
     components: RenderRuntime['components']
   }
 
-  type Rendered = ClientRendered | Promise<NamedServerRendered>
+  type Rendered = Promise<ClientRendered | NamedServerRendered>
 
   interface ComponentTraversalResult {
     apps: string[]
@@ -402,6 +403,7 @@ declare global {
   }
 
   interface RenderRuntime {
+    amp: boolean
     account: string
     accountId: string
     appsEtag: string

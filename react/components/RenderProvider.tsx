@@ -111,6 +111,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
     addMessages: PropTypes.func,
+    amp: PropTypes.bool,
     blocks: PropTypes.object,
     blocksTree: PropTypes.object,
     contentMap: PropTypes.object,
@@ -259,7 +260,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       production,
       query,
       route,
-      settings,
+      settings: settings || {},
     }
 
     this.prefetchRoutes = new Set<string>()
@@ -324,6 +325,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = this.state
     const {
       account,
+      amp,
       emitter,
       hints,
       production,
@@ -336,6 +338,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return {
       account,
       addMessages: this.addMessages,
+      amp,
       components,
       culture,
       defaultExtensions,
