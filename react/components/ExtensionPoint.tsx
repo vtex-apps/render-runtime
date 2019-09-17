@@ -81,9 +81,15 @@ function withOuterExtensions(
 
   const isRootTreePath = treePath.indexOf('/') === -1
 
+  const padding = 90
   const width = (window && window.innerWidth) || 0
   const height = (window && window.innerHeight) || 0
-  const genericPreview = <Box height={height} width={width} />
+
+  const genericPreview = (
+    <div className={'center w-100'} style={{ padding }}>
+      <Box height={height} width={width} />
+    </div>
+  )
 
   const wrapped = (
     <Fragment key={`wrapped-${treePath}`}>
