@@ -1,5 +1,5 @@
 import { mergeDeepRight, reduce } from 'ramda'
-import React, { FC, Fragment, CSSProperties } from 'react'
+import React, { FC, Fragment } from 'react'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
 import Loading from './Loading'
