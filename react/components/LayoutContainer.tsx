@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { useTreePath } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 import { useRuntime } from './RenderContext'
+import { useTrackedExtensionsState } from '../hooks/extension'
 
 type Element = string | ElementArray
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -131,7 +132,8 @@ class Container extends Component<ContainerProps, ContainerState> {
 const LayoutContainer: React.FunctionComponent<
   LayoutContainerProps
 > = props => {
-  const { extensions, preview, hints } = useRuntime()
+  const { hints, preview } = useRuntime()
+  const extensions = useTrackedExtensionsState()
   const { treePath } = useTreePath()
 
   const extension = extensions[treePath]

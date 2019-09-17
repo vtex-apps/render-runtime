@@ -29,6 +29,10 @@ import {
   withRuntimeContext,
 } from '../components/RenderContext'
 import RenderProvider from '../components/RenderProvider'
+import {
+  ExtensionsProviderRender,
+  ExtensionsProvider,
+} from '../hooks/extension'
 import { getVTEXImgHost } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getState } from '../utils/client'
@@ -129,16 +133,26 @@ const render = async (
   const created = !element && ensureContainer(page)
   const elem = element || getContainer()
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
+
   const root = (
-    <RenderProvider
-      history={history}
-      cacheControl={cacheControl}
-      baseURI={baseURI}
-      root={name}
-      runtime={runtime}
-    >
-      {!isPage ? <ExtensionPoint id={name} /> : null}
-    </RenderProvider>
+    <ExtensionsProvider initialState={runtime.extensions}>
+      <ExtensionsProviderRender>
+        {dispatchExtensions => {
+          return (
+            <RenderProvider
+              history={history}
+              cacheControl={cacheControl}
+              baseURI={baseURI}
+              root={name}
+              runtime={runtime}
+              dispatchExtensions={dispatchExtensions}
+            >
+              {!isPage ? <ExtensionPoint id={name} /> : null}
+            </RenderProvider>
+          )
+        }}
+      </ExtensionsProviderRender>
+    </ExtensionsProvider>
   )
 
   if (canUseDOM) {
