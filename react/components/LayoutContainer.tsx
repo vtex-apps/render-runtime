@@ -114,7 +114,17 @@ class Container extends Component<ContainerProps, ContainerState> {
         )
       })
 
-    return <div className={className}>{returnValue}</div>
+    return (
+      <div
+        className={className}
+        style={{
+          // Forces scrolling if there is below-the-fold content to be rendered
+          minHeight: hasFold && !shouldRenderBelowTheFold ? '101vh' : 'auto',
+        }}
+      >
+        {returnValue}
+      </div>
+    )
   }
 }
 
