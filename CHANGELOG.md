@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.65.0-beta] - 2019-09-17
+
 ## [8.64.0] - 2019-09-17
 ### Added
 - Support for `__fold__` blocks, to be able to set what lies "below the fold".
