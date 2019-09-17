@@ -552,10 +552,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             pages,
             settings,
           }: ParsedServerPageResponse) => {
-            dispatchExtensions({
-              type: 'update',
-              extensions: { ...extensions },
-            })
             this.setState(
               {
                 appsEtag,
@@ -569,7 +565,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 route: matchingPage,
                 settings,
               },
-              () => this.sendInfoFromIframe()
+              () => {
+                dispatchExtensions({
+                  type: 'update',
+                  extensions: { ...extensions },
+                })
+                this.sendInfoFromIframe()
+              }
             )
           }
         )
@@ -595,10 +597,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             settings,
           }: ParsedPageQueryResponse) => {
             const updatedRoute = { ...transientRoute, ...matchingPage }
-            dispatchExtensions({
-              type: 'update',
-              extensions: extensions,
-            })
             this.setState(
               {
                 appsEtag,
@@ -613,7 +611,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 route: updatedRoute,
                 settings,
               },
-              () => this.sendInfoFromIframe()
+              () => {
+                dispatchExtensions({
+                  type: 'update',
+                  extensions: extensions,
+                })
+                this.sendInfoFromIframe()
+              }
             )
           }
         )
