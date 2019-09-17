@@ -192,9 +192,12 @@ const ExtensionPoint: FC<Props> = props => {
     </ExtensionPointComponent>
   )
 
-  // `client` component assets are sent to server side rendering, but they should display a loading animation.
-  // `lazy` components might never be used, so they don't necessarily need a loading animation.
-  return renderStrategy === 'client' ? (
+  // "client" component assets are sent to server side rendering,
+  // but they should display a loading animation.
+  //
+  // "lazy" components might never be used, so they don't necessarily
+  // need a loading animation.
+  return renderStrategy === 'client' && !runtime.amp ? (
     <NoSSR onSSR={<Loading />}>{extensionPointComponent}</NoSSR>
   ) : (
     extensionPointComponent
