@@ -508,13 +508,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       runtime: { renderMajor },
     } = this.props
     const {
-      blocks,
-      blocksTree,
-      contentMap,
       culture: { locale },
       pages: pagesState,
       production,
-      defaultExtensions,
       route,
       loadedPages,
     } = this.state
@@ -550,39 +546,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
     }
 
-    let updatedExtensions: Extensions = {}
-
-    if (window.__RUNTIME__.hasNewExtensions) {
-      // TODO: Remove this when new pages-graphql get released
-      updatedExtensions = generateExtensions(
-        // eslint-disable-next-line
-        blocksTree!,
-        // eslint-disable-next-line
-        blocks!,
-        // eslint-disable-next-line
-        contentMap!,
-        pagesState[page]
-      )
-    }
-
+    // Shows a generic preview page when navigating. In the future, the
+    // preview should be according to the entitiy (department, search, product),
+    // and the fallback should be the generic preview.
     this.setState(
       {
-        extensions: replaceExtensionsWithDefault(
-          { ...updatedExtensions, ...this.state.extensions },
-          page,
-          defaultExtensions
-        ),
-        page,
         preview: true,
-        query,
-        route: isEnabled('RENDER_NAVIGATION')
-          ? mergeDeepRight(route, navigationRoute)
-          : transientRoute,
       },
-      () => {
-        this.replaceRouteClass(page)
-        this.scrollTo(state.scrollOptions)
-      }
+      () => this.scrollTo(state.scrollOptions)
     )
 
     const paramsJSON = JSON.stringify(params)
