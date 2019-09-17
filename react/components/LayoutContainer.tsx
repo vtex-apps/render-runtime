@@ -92,8 +92,10 @@ class Container extends Component<ContainerProps, ContainerState> {
       )
     }
 
-    if (foldIndex > -1 && !shouldRenderBelowTheFold) {
-      elementsToRender = foldIndex
+    const hasFold = foldIndex > -1
+
+    if (hasFold && !shouldRenderBelowTheFold) {
+      elementsToRender = foldIndex + 1
     }
 
     const returnValue: JSX.Element[] = elements
