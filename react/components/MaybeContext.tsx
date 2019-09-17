@@ -16,7 +16,11 @@ const useContextComponent = ({
 }: Omit<Props, 'runtime'>) => {
   const extensions = useTrackedExtensionsState()
 
-  const { context, props: pageProps } = extensions[nestedPage]
+  const { context, props: pageProps } = extensions[nestedPage] || {
+    context: undefined,
+    props: undefined,
+  }
+
   const pageContextProps = pageProps && pageProps.context
 
   const contextProps = useMemo(() => {
