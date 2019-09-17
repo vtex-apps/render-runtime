@@ -1,5 +1,5 @@
 import { mergeDeepRight, reduce } from 'ramda'
-import React, { FC, Fragment } from 'react'
+import React, { FC, Fragment, CSSProperties } from 'react'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
 import Loading from './Loading'
@@ -7,6 +7,7 @@ import { useRuntime } from './RenderContext'
 import { useTreePath } from '../utils/treePath'
 import NoSSR from './NoSSR'
 import { withErrorBoundary } from './ErrorBoundary'
+import Box from './Preview/Box'
 
 interface Props {
   id: string
@@ -55,6 +56,7 @@ function withOuterExtensions(
   before: string[],
   treePath: string,
   props: any,
+  preview: boolean,
   element: JSX.Element
 ) {
   const beforeElements = before.map(beforeId => (
@@ -79,10 +81,14 @@ function withOuterExtensions(
 
   const isRootTreePath = treePath.indexOf('/') === -1
 
+  const width = (window && window.innerWidth) || 0
+  const height = (window && window.innerHeight) || 0
+  const genericPreview = <Box height={height} width={width} />
+
   const wrapped = (
     <Fragment key={`wrapped-${treePath}`}>
       {beforeElements}
-      {element}
+      {isRootTreePath && preview ? genericPreview : element}
       {isRootTreePath && <div className="flex flex-grow-1" />}
       {afterElements}
     </Fragment>
@@ -161,12 +167,15 @@ const ExtensionPoint: FC<Props> = props => {
       ? getChildExtensions(runtime, newTreePath)
       : children
 
+  const preview = runtime.preview
+
   const extensionPointComponent = withOuterExtensions(
     after,
     around,
     before,
     newTreePath,
     mergedProps,
+    preview,
     <ExtensionPointComponent
       component={component}
       props={mergedProps}
