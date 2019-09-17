@@ -1,6 +1,7 @@
 import React, { useMemo, Fragment, FC } from 'react'
 import ExtensionPointComponent from '../components/ExtensionPointComponent'
 import { RenderContextProps } from './RenderContext'
+import { useTrackedExtensionsState } from '../hooks/extension'
 
 interface Props extends RenderContextProps {
   nestedPage: string
@@ -12,9 +13,8 @@ const useContextComponent = ({
   nestedPage,
   query,
   params,
-  runtime,
-}: Props & RenderContextProps) => {
-  const { extensions } = runtime
+}: Omit<Props, 'runtime'>) => {
+  const extensions = useTrackedExtensionsState()
 
   const { context, props: pageProps } = extensions[nestedPage]
   const pageContextProps = pageProps && pageProps.context
@@ -46,7 +46,6 @@ const MaybeContext: FC<Props> = ({
     nestedPage,
     query,
     params,
-    runtime,
   })
 
   return contextComponent ? (

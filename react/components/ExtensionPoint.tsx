@@ -4,6 +4,7 @@ import React, { FC, Fragment } from 'react'
 import ExtensionPointComponent from './ExtensionPointComponent'
 import Loading from './Loading'
 import { useRuntime } from './RenderContext'
+import { useTrackedExtensionsState } from '../hooks/extension'
 import { useTreePath } from '../utils/treePath'
 import NoSSR from './NoSSR'
 import { withErrorBoundary } from './ErrorBoundary'
@@ -24,8 +25,11 @@ function mountTreePath(currentId: string, parentTreePath: string) {
   return [parentTreePath, currentId].filter(id => !!id).join('/')
 }
 
-function getChildExtensions(runtime: RenderContext, treePath: string) {
-  const extension = runtime.extensions && runtime.extensions[treePath]
+function getChildExtensions(
+  extensions: RenderContext['extensions'],
+  treePath: string
+) {
+  const extension = extensions && extensions[treePath]
 
   if (!extension || !extension.blocks) {
     return
@@ -34,8 +38,7 @@ function getChildExtensions(runtime: RenderContext, treePath: string) {
   return extension.blocks.map((child, i) => {
     const childTreePath = mountTreePath(child.extensionPointId, treePath)
 
-    const childExtension =
-      runtime.extensions && runtime.extensions[childTreePath]
+    const childExtension = extensions && extensions[childTreePath]
     const childProps = childExtension ? childExtension.props : {}
 
     return (
@@ -104,6 +107,7 @@ function withOuterExtensions(
 
 const ExtensionPoint: FC<Props> = props => {
   const runtime = useRuntime()
+  const extensions = useTrackedExtensionsState()
 
   const treePathFromHook = useTreePath()
 
@@ -114,9 +118,7 @@ const ExtensionPoint: FC<Props> = props => {
     [id, props.treePath, treePathFromHook.treePath]
   )
 
-  const extension = React.useMemo(() => {
-    return runtime.extensions && runtime.extensions[newTreePath]
-  }, [newTreePath, runtime.extensions])
+  const extension = extensions[newTreePath]
 
   const {
     component = null,
@@ -158,7 +160,7 @@ const ExtensionPoint: FC<Props> = props => {
 
   const componentChildren =
     isCompositionChildren && extension.blocks
-      ? getChildExtensions(runtime, newTreePath)
+      ? getChildExtensions(extensions, newTreePath)
       : children
 
   const extensionPointComponent = withOuterExtensions(

@@ -12,6 +12,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
 
+import { ExtensionsDispatchAction } from '../hooks/extension'
 import { fetchAssets, getImplementation, prefetchAssets } from '../utils/assets'
 import { generateExtensions } from '../utils/blocks'
 import PageCacheControl from '../utils/cacheControl'
@@ -52,6 +53,7 @@ interface Props {
   baseURI: string
   root: string
   runtime: RenderRuntime
+  dispatchExtensions: React.Dispatch<ExtensionsDispatchAction>
 }
 
 export interface RenderProviderState {
@@ -61,7 +63,6 @@ export interface RenderProviderState {
   culture: RenderRuntime['culture']
   defaultExtensions: RenderRuntime['defaultExtensions']
   device: ConfigurationDevice
-  extensions: RenderRuntime['extensions']
   messages: RenderRuntime['messages']
   page: RenderRuntime['page']
   pages: RenderRuntime['pages']
@@ -164,7 +165,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }
 
       return window.top.__provideRuntime(
-        this.getChildContext(),
+        {
+          ...this.getChildContext(),
+          extensions: window.__RUNTIME__.extensions || {},
+        },
         this.state.messages,
         (params && params.shouldUpdateRuntime) || false,
         // Deprecated
@@ -201,7 +205,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       route,
       settings,
     } = props.runtime
-    const { history, baseURI, cacheControl } = props
+    const { history, baseURI, cacheControl, dispatchExtensions } = props
     const ignoreCanonicalReplacement = query && query.map
     this.fetcher = fetch
 
@@ -251,7 +255,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture,
       defaultExtensions: {},
       device: 'any',
-      extensions,
       loadedPages: new Set([page]),
       messages,
       page,
@@ -262,6 +265,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       route,
       settings: settings || {},
     }
+
+    dispatchExtensions({ type: 'update', extensions })
 
     this.prefetchRoutes = new Set<string>()
   }
@@ -283,17 +288,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.prefetchPages()
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
-    // If RenderProvider is being re-rendered, the global runtime might have changed
-    // so we must update all extensions.
-    if (this.rendered) {
-      const {
-        runtime: { extensions },
-      } = nextProps
-      this.setState({ extensions })
-    }
-  }
-
   public componentWillUnmount() {
     const { runtime } = this.props
     const { production, emitter } = runtime
@@ -312,7 +306,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { history, runtime } = this.props
     const {
       components,
-      extensions,
       messages,
       page,
       pages,
@@ -345,7 +338,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       device,
       emitter,
       ensureSession: this.ensureSession,
-      extensions,
+      extensions: window.__RUNTIME__.extensions,
       fetchComponent: this.fetchComponent,
       getSettings: this.getSettings,
       goBack: this.goBack,
@@ -509,6 +502,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public onPageChanged = (location: RenderHistoryLocation) => {
     const {
       runtime: { renderMajor },
+      dispatchExtensions,
     } = this.props
     const {
       blocks,
@@ -568,13 +562,17 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
     }
 
+    this.props.dispatchExtensions({
+      type: 'update',
+      extensions: replaceExtensionsWithDefault(
+        { ...updatedExtensions },
+        page,
+        defaultExtensions
+      ),
+    })
+
     this.setState(
       {
-        extensions: replaceExtensionsWithDefault(
-          { ...updatedExtensions, ...this.state.extensions },
-          page,
-          defaultExtensions
-        ),
         page,
         preview: true,
         query,
@@ -611,11 +609,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             pages,
             settings,
           }: ParsedServerPageResponse) => {
+            dispatchExtensions({
+              type: 'update',
+              extensions: { ...extensions },
+            })
             this.setState(
               {
                 appsEtag,
                 components: { ...this.state.components, ...components },
-                extensions: { ...this.state.extensions, ...extensions },
                 loadedPages: loadedPages.add(matchingPage.routeId),
                 messages: { ...this.state.messages, ...messages },
                 page: matchingPage.routeId,
@@ -651,12 +652,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             settings,
           }: ParsedPageQueryResponse) => {
             const updatedRoute = { ...transientRoute, ...matchingPage }
+            dispatchExtensions({
+              type: 'update',
+              extensions: extensions,
+            })
             this.setState(
               {
                 appsEtag,
                 cacheHints: mergeWith(merge, this.state.cacheHints, cacheHints),
                 components: { ...this.state.components, ...components },
-                extensions: { ...this.state.extensions, ...extensions },
                 loadedPages: loadedPages.add(page),
                 messages: { ...this.state.messages, ...messages },
                 page,
@@ -673,8 +677,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public prefetchPage = (pageName: string) => {
-    const { extensions } = this.state
-    const component = extensions[pageName] && extensions[pageName].component
+    const component =
+      window.__RUNTIME__.extensions[pageName] &&
+      window.__RUNTIME__.extensions[pageName].component
     if (component) {
       const { runtime } = this.props
       const { components } = this.state
@@ -810,6 +815,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         })
 
     await new Promise<void>(resolve => {
+      this.props.dispatchExtensions({
+        type: 'update',
+        extensions,
+      })
       this.setState(
         state => ({
           appsEtag,
@@ -817,10 +826,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             ? state.cacheHints
             : cacheHints,
           components,
-          extensions: {
-            ...state.extensions,
-            ...extensions,
-          },
           messages,
           page,
           pages,
@@ -867,7 +872,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         cacheHints,
         components,
         culture,
-        extensions,
         messages,
         pages,
       } = this.state
@@ -880,7 +884,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
               cacheHints,
               components,
               culture,
-              extensions,
+              extensions: window.__RUNTIME__.extensions,
               messages,
               pages,
             },
@@ -892,18 +896,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public updateExtension = async (name: string, extension: Extension) => {
-    const { extensions } = this.state
-
-    await new Promise<void>(resolve => {
-      this.setState(
-        {
-          extensions: {
-            ...extensions,
-            [name]: extension,
-          },
-        },
-        resolve
-      )
+    this.props.dispatchExtensions({
+      type: 'update',
+      extensions: { [name]: extension },
     })
 
     if (name !== 'store/__overlay') {

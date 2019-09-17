@@ -6045,6 +6045,11 @@ react-textarea-autosize@^6.1.0:
   dependencies:
     prop-types "^15.6.0"
 
+react-tracked@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/react-tracked/-/react-tracked-0.8.0.tgz#f07097619c9c77b14d7a0063eaac7543ae336b37"
+  integrity sha512-j0IUBMUQgQdhnwkeSODsVn1rO5uk0gaelYeYZ32MvIiU0COxj0tKg6qWFpArQAdNmVqCkAi+vUMoDuxfJOOqhQ==
+
 react@^16.8.4, react@^16.8.6:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"

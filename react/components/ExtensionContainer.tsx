@@ -2,7 +2,7 @@ import React, { FC, Fragment } from 'react'
 
 import { getDirectChildren, useTreePath } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
-import { useRuntime } from './RenderContext'
+import { useTrackedExtensionsState } from '../hooks/extension'
 
 const join = (p: string | null, c: string | null): string =>
   [p, c].filter(id => !!id).join('/')
@@ -13,9 +13,10 @@ interface Props {
 
 const ExtensionContainer: FC<Props> = props => {
   const { id } = props
-  const { extensions } = useRuntime()
+  const extensions = useTrackedExtensionsState()
   const { treePath } = useTreePath()
   const containerTreePath = join(treePath, id)
+
   return (
     <Fragment>
       {getDirectChildren(extensions, containerTreePath).map(cid => {
