@@ -8,7 +8,6 @@ import {
   isEmpty,
   keys,
   map,
-  pluck,
   path as ramdaPath,
   startsWith,
   zip,
