@@ -37,7 +37,7 @@ class Container extends Component<ContainerProps, ContainerState> {
     preview: PropTypes.bool,
   }
 
-  private state = {
+  public state = {
     shouldRenderBelowTheFold: false,
   }
 
