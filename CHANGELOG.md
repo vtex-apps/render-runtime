@@ -7,7 +7,221 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [7.39.3] - 2019-07-11
+## [7.40.0] - 2019-09-18
+
+## [8.64.0] - 2019-09-17
+### Added
+- Support for `__fold__` blocks, to be able to set what lies "below the fold".
+
+## [8.63.0] - 2019-09-16
+### Added
+- Support for rendering AMP pages.
+
+## [8.62.2] - 2019-09-12
+### Fixed
+- Fix the 'only lowercase URL segments for `store`' modification.
+
+## [8.62.1] - 2019-09-12
+### Fixed
+- Only lowercase URL segments for `store`.
+
+## [8.62.0] - 2019-09-12
+
+## [8.61.0] - 2019-09-12
+### Added
+- Lowercase URL segments if they are not related to a `specificationFilter`.
+
+## [8.60.2] - 2019-09-11
+### Changed
+- Stop encoding query.
+
+## [8.60.1] - 2019-09-10
+
+### Fixed
+- Initialize SSE in dev workspaces.
+
+## [8.60.0] - 2019-09-10
+
+### Added
+- Hot reload for blocks.
+
+## [8.59.3] - 2019-09-10
+
+### Fixed
+- Add loading animation for client blocks.
+
+## [8.59.2] - 2019-09-09
+### Fixed
+- Navigating back crashes if the server-side page was fetched with some querystring.
+
+## [8.59.1] - 2019-09-06
+### Fixed
+- Navigation bug of invalid fetch use
+
+## [8.59.0] - 2019-09-06
+### Changed
+- Adds fetch to render provider
+
+## [8.58.1] - 2019-09-05
+### Fixed
+- Fix navigation skipping fetchNavigationPage
+
+## [8.58.0] - 2019-09-04
+
+## [8.58.0-beta] - 2019-09-04
+
+## [8.57.2] - 2019-09-04
+### Fixed
+- Prevent the so-called accordion effect on root ExtensionPoints.
+
+## [8.57.1] - 2019-09-03
+
+## [8.57.0] - 2019-09-03
+
+## [8.56.0] - 2019-09-03
+
+## [8.55.2] - 2019-09-02
+
+## [8.55.1] - 2019-09-02
+### Fixed
+- Properly memo TreePathContextProvider.
+
+## [8.55.0] - 2019-08-29
+### Changed
+- Adds 100% of navigation to render server
+
+## [8.54.0] - 2019-08-28
+### Changed
+- Add 50% of users to render navigation
+
+## [8.53.1] - 2019-08-28
+### Changed
+- Deprecate render navigation due to bad CDN configuration
+
+## [8.53.0] - 2019-08-28
+### Fixed
+- Fix bundled assets discovery.
+### Changed
+- Increase number of users to 50 navigating using render server
+
+## [8.52.0] - 2019-08-27
+
+## [8.51.0] - 2019-08-27
+
+## [8.50.0] - 2019-08-23
+### Added
+- Pool to prefetch pages
+- Delay to execute prefetch pages
+- Add querystring `__disablePrefetchPages`
+
+## [8.49.0] - 2019-08-22
+### Changed
+- Prepare to use comma instead of semicolon as bundle files separator
+
+## [8.48.3] - 2019-08-21
+### Fixed
+- Temporarily reverted changes made in #370 (8.46.0) because of problems rendering pages in IE11.
+
+## [8.48.2] - 2019-08-19
+### Fixed
+- Lint errors
+
+### Added
+- Husky to prevent commits with lint errors
+
+## [8.48.1] - 2019-08-19
+
+## [8.48.0] - 2019-08-13
+### Added
+- Support to assets bundle
+
+## [8.47.0] - 2019-08-12
+### Added
+- Locale as a querystring on final request URI
+
+## [8.46.0] - 2019-08-12
+### Added
+- Support for rendering AMP pages.
+
+## [8.45.3] - 2019-08-06
+
+### Fixed
+- Prevent extensions overwriting after an `updateRuntime`
+
+## [8.45.2] - 2019-08-06
+### Fixed
+- undefined@undefined in Apollo cache
+
+## [8.45.1] - 2019-08-05
+### Fixed
+- Add displayName to ErrorBoundary HOC.
+
+## [8.45.0] - 2019-08-05
+### Changed
+- Added error boundaries on the ExtensionPoint component, limiting crashes to the component instead of breaking most of the page.
+- Hide errors on production mode.
+
+## [8.44.1] - 2019-08-02
+### Fixed
+- Enhanced `NoSSR` detection.
+
+## [8.44.0] - 2019-07-31
+
+### Added
+
+- Add support for GraphQL `Unions` and `Interfaces`in ApolloClient's cache. This is done by using `IntrospectionFragmentMatcher` instead of `HeuristicFragmentMatcher` (https://www.apollographql.com/docs/react/advanced/fragments/).
+
+## [8.43.0] - 2019-07-30
+### Added
+- Separate admin language from store language
+
+## [8.42.8] - 2019-07-29
+### Changed
+- `ExtensionPoint` render is interrupted earlier if no extension is found, and refrains from rendering `ExtensionPointComponent` if so.
+
+### Fixed
+- `Loading` gets its block props from context again, thus fixing issue where it wouldn't appear if inserted on a component.
+
+## [8.42.7] - 2019-07-26
+### Changed
+- Omit `/app/` in href for links inside iframe.
+
+## [8.42.6] - 2019-07-25
+### Fixed
+- Fix issue where client-only blocks would render under the wrong parent element.
+
+## [8.42.5] - 2019-07-24
+### Added
+- Add rootPath to navigate options
+
+## [8.42.4] - 2019-07-23
+### Fixed
+- Revert behaviour introduced in 8.36.1 regarding templates from `maps`. It now gets the template from the first parameter of the `map` query string.
+
+## [8.42.3] - 2019-07-15
+
+### Fixed
+
+- Context props passed by `MaybeContext`.
+
+## [8.42.2] - 2019-07-15
+### Fixed
+- Warning of deprecated import of `createBrowserHistory` of `history` library.
+
+## [8.42.1] - 2019-07-12
+
+### Changed
+- Reduce number of `Context` created by `ExtensionPoint` to improve mount time.
+
+## [8.41.3] - 2019-07-11
+### Fixed
+- Fix canonical replacement using rootPath
+
+## [DEPRECATED] [8.42.0] - 2019-07-11
+
+## [8.41.2] - 2019-07-11
+
+## [8.41.1] - 2019-07-11
 
 ## [8.41.0] - 2019-07-10
 ### Added
