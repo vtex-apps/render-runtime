@@ -157,33 +157,24 @@ const render = async (
   }
 
   if (runtime.amp) {
-    const {
-      AmpScriptsManager,
-      AmpScripts,
-      headerBoilerplate,
-    } = require('react-amphtml/setup') // eslint-disable-line @typescript-eslint/no-var-requires
-    const scripts = new AmpScripts()
-
-    const ampRoot = (
-      <AmpScriptsManager ampScripts={scripts}>{root}</AmpScriptsManager>
-    )
-
-    return renderToStringWithData(ampRoot, renderToStaticMarkup).then(
-      ({ markup, renderTimeMetric }) => {
-        const scriptsMarkup = renderToStaticMarkup(scripts.getScriptElements())
-        const boilerplateMarkup = renderToStaticMarkup(
-          headerBoilerplate(runtime.route.canonicalPath)
-        )
-
-        return {
+    return import(
+      /* webpackMode: "weak" */
+      '../AMP'
+    ).then(({ setupAMP }) => {
+      const { ampRoot, getExtraRenderedData } = setupAMP(
+        root,
+        renderToStaticMarkup,
+        runtime
+      )
+      return renderToStringWithData(ampRoot, renderToStaticMarkup).then(
+        ({ markup, renderTimeMetric }) => ({
           ...commonRenderResult,
           markups: getMarkups(name, markup),
           renderTimeMetric,
-          ampScripts: scriptsMarkup,
-          ampHeadBoilerplate: boilerplateMarkup,
-        }
-      }
-    )
+          ...getExtraRenderedData(),
+        })
+      )
+    })
   }
 
   return renderToStringWithData(root, renderToString, disableSSQ).then(
