@@ -143,7 +143,7 @@ const observableFromOperations = (operations: Operation[], forward: NextLink) =>
   }))
 })
 
-export const versionSplitterLink = new ApolloLink((operation: Operation, forward?: NextLink) => {
+export const versionSplitterLink = new ApolloLink((operation: Operation, forward?: NextLink): Observable<unknown | any> | null => {
   if (forward) {
     const query = operation.query
     const operations = operationByRuntimeMetaDirective(operation)

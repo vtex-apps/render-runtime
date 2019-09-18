@@ -53,7 +53,7 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
   }
 }
 
-export const createUriSwitchLink = (baseURI: string, workspace: string) =>
+export const createUriSwitchLink = (baseURI: string, workspace: string, locale: string, domain?: string) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     operation.setContext((oldContext: OperationContext) => {
       const { fetchOptions = {}, runtime: {appsEtag, cacheHints} } = oldContext
@@ -65,7 +65,7 @@ export const createUriSwitchLink = (baseURI: string, workspace: string) =>
       return {
         ...oldContext,
         fetchOptions: {...fetchOptions, method},
-        uri: `${protocol}//${baseURI}/_v/${scope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}`,
+        uri: `${protocol}//${baseURI}/_v/${scope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}&locale=${locale}`,
       }
     })
     return forward ? forward(operation) : null
