@@ -1,4 +1,7 @@
 import React from 'react'
+import 'react-amphtml'
+import 'react-amphtml/helpers'
+
 import {
   AmpScriptsManager,
   AmpScripts,
