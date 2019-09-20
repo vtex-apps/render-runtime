@@ -190,14 +190,17 @@ declare global {
   interface RenderContext {
     account: RenderRuntime['account']
     addMessages: (newMessages: RenderContext['messages']) => Promise<void>
+    amp: boolean
     components: RenderRuntime['components']
     culture: RenderRuntime['culture']
+    defaultExtensions: RenderRuntime['defaultExtensions']
     device: ConfigurationDevice
     emitter: RenderRuntime['emitter']
     ensureSession: () => Promise<void>
     extensions: RenderRuntime['extensions']
     fetchComponent: (component: string) => Promise<void>
     getSettings: (app: string) => any
+    goBack: () => void
     hints: RenderHints
     history: History | null
     messages: RenderRuntime['messages']
@@ -206,19 +209,25 @@ declare global {
     page: RenderRuntime['page']
     pages: RenderRuntime['pages']
     patchSession: (data?: any) => Promise<void>
+    platform: string
+    prefetchDefaultPages: (routeIds: string[]) => Promise<void>
     prefetchPage: (name: string) => void
     preview: RenderRuntime['preview']
     production: RenderRuntime['production']
     publicEndpoint: RenderRuntime['publicEndpoint']
+    query: RenderRuntime['query']
+    renderMajor: number
+    rootPath?: string
+    route: RenderRuntime['route']
     setDevice: (device: ConfigurationDevice) => void
+    setQuery: (
+      query?: Record<string, any>,
+      options?: SetQueryOptions
+    ) => boolean
     updateComponentAssets: (availableComponents: Components) => void
     updateExtension: (name: string, extension: Extension) => Promise<void>
     updateRuntime: (options?: PageContextOptions) => Promise<void>
     workspace: RenderRuntime['workspace']
-    route: RenderRuntime['route']
-    query: RenderRuntime['query']
-    defaultExtensions: RenderRuntime['defaultExtensions']
-    rootPath?: string
   }
 
   interface PageContextOptions {

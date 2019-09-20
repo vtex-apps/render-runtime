@@ -308,7 +308,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public getChildContext() {
+  public getChildContext(): RenderContext {
     const { history, runtime } = this.props
     const {
       components,
