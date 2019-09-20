@@ -70,6 +70,10 @@
       {
         "clientOnly": true,
         "path": "npm:vtex-render-session@1.2.1/dist/index.js"
+      },
+      {
+        "path": "runtime:AMP",
+        "serverOnly": true
       }
     ],
     "prod": [
@@ -142,6 +146,10 @@
       {
         "clientOnly": true,
         "path": "npm:vtex-render-session@1.2.1/dist/index.min.js"
+      },
+      {
+        "path": "runtime:AMP",
+        "serverOnly": true
       }
     ]
   },
