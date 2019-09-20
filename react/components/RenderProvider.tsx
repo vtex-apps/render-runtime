@@ -80,32 +80,6 @@ const DISABLE_PREFETCH_PAGES = '__disablePrefetchPages'
 
 const noop = () => {}
 
-const unionKeys = (record1: any, record2: any) => [
-  ...new Set([...Object.keys(record1), ...Object.keys(record2)]),
-]
-
-const isChildOrSelf = (child: string, parent: string) =>
-  child === parent ||
-  (child.startsWith(`${parent}/`) && !child.startsWith(`${parent}/$`))
-
-const replaceExtensionsWithDefault = (
-  extensions: Extensions,
-  page: string,
-  defaultExtensions: Extensions
-) =>
-  unionKeys(extensions, defaultExtensions).reduce<Extensions>((acc, key) => {
-    const maybeExtension = isChildOrSelf(key, page)
-      ? defaultExtensions[key] || {
-          ...extensions[key],
-          component: null,
-        }
-      : extensions[key]
-    if (maybeExtension) {
-      acc[key] = maybeExtension
-    }
-    return acc
-  }, {})
-
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
@@ -132,6 +106,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     page: PropTypes.string,
     pages: PropTypes.object,
     patchSession: PropTypes.func,
+    platform: PropTypes.string,
     prefetchDefaultPages: PropTypes.func,
     prefetchPage: PropTypes.func,
     preview: PropTypes.bool,
@@ -307,7 +282,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
-  public getChildContext() {
+  public getChildContext(): RenderContext {
     const { history, runtime } = this.props
     const {
       components,
@@ -327,6 +302,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       amp,
       emitter,
       hints,
+      platform,
       production,
       publicEndpoint,
       renderMajor,
@@ -356,6 +332,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       page,
       pages,
       patchSession: this.patchSession,
+      platform,
       prefetchDefaultPages: this.prefetchDefaultPages,
       prefetchPage: this.prefetchPage,
       preview,
