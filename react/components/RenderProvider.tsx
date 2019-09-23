@@ -557,23 +557,28 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             messages,
             pages,
             settings,
+            redirectLogin,
           }: ParsedServerPageResponse) => {
-            this.setState(
-              {
-                appsEtag,
-                components: { ...this.state.components, ...components },
-                extensions: { ...this.state.extensions, ...extensions },
-                loadedPages: loadedPages.add(matchingPage.routeId),
-                messages: { ...this.state.messages, ...messages },
-                page: matchingPage.routeId,
-                pages,
-                preview: false,
-                query,
-                route: matchingPage,
-                settings,
-              },
-              () => this.sendInfoFromIframe()
-            )
+            if (redirectLogin) {
+              window.top.location.reload()
+            } else {
+              this.setState(
+                {
+                  appsEtag,
+                  components: { ...this.state.components, ...components },
+                  extensions: { ...this.state.extensions, ...extensions },
+                  loadedPages: loadedPages.add(matchingPage.routeId),
+                  messages: { ...this.state.messages, ...messages },
+                  page: matchingPage.routeId,
+                  pages,
+                  preview: false,
+                  query,
+                  route: matchingPage,
+                  settings,
+                },
+                () => this.sendInfoFromIframe()
+              )
+            }
           }
         )
       : fetchNavigationPage({
