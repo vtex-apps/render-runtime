@@ -28,6 +28,28 @@ if (module.hot) {
   })
 }
 
+if (!window.__RUNTIME__.amp) {
+  window.ReactAMPHTML = window.ReactAMPHTMLHelpers =
+    typeof Proxy !== 'undefined'
+      ? new Proxy(
+          {},
+          {
+            get: (_, key) => {
+              if (key === '__esModule' || key === 'constructor') {
+                return
+              }
+
+              const message = canUseDOM
+                ? 'You can not render AMP components on client-side'
+                : 'You must check runtime.amp to render AMP components'
+
+              throw new Error(message)
+            },
+          }
+        )
+      : {} // IE11 users will not have a clear error in this case
+}
+
 const sentryDSN = 'https://2fac72ea180d48ae9bf1dbb3104b4000@sentry.io/1292015'
 
 if (canUseDOM && window.__RUNTIME__.production) {
