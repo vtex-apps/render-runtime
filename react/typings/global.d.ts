@@ -499,33 +499,35 @@ declare global {
   }
 
   interface Window extends Window {
+    __APP_ID__: string
     __ERROR__: any
-    __RENDER_8_SESSION__: RenderSession
-    __RENDER_8_RUNTIME__: RuntimeExports
-    __RENDER_8_COMPONENTS__: ComponentsRegistry
-    __RENDER_8_HOT__: HotEmitterRegistry
-    __RUNTIME__: RenderRuntime
+    __hasPortals__: boolean
     __hostname__: string
     __pathname__: string
-    __STATE__: NormalizedCacheObject
-    __REQUEST_ID__: string
-    __APP_ID__: string
-    __hasPortals__: boolean
     __provideRuntime: (
       runtime: RenderContext | null,
       messages: Record<string, string>,
       shouldUpdateRuntime: boolean,
       setMessages: (messages: RenderRuntime['messages']) => void
     ) => Promise<void>
+    __RENDER_8_COMPONENTS__: ComponentsRegistry
+    __RENDER_8_HOT__: HotEmitterRegistry
+    __RENDER_8_RUNTIME__: RuntimeExports
+    __RENDER_8_SESSION__: RenderSession
+    __REQUEST_ID__: string
+    __RUNTIME__: RenderRuntime
+    __STATE__: NormalizedCacheObject
     browserHistory: History
-    ReactIntlLocaleData: any
-    IntlPolyfill: any
-    Intl: any
+    flags: Record<string, boolean>
     hrtime: NodeJS.Process['hrtime']
+    Intl: any
+    IntlPolyfill: any
     myvtexSSE: any
+    ReactAMPHTML: any
+    ReactAMPHTMLHelpers: any
+    ReactIntlLocaleData: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
     requestIdleCallback: (callback: (...args) => any | void) => number
-    flags: Record<string, boolean>
   }
 
   interface BlockEntry {
