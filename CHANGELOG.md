@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.66.1] - 2019-09-24
+
 ## [8.66.0] - 2019-09-20
 ### Changed
 - Stop bundling `react-amphtml` into index entrypoint.
