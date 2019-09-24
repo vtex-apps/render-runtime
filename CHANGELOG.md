@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [8.66.2] - 2019-09-24
 ### Fixed
 - Register react-amphtml global mocks that throw an explicitly error when trying to use AMP components on client-side or out of a `runtime.amp` check.
 
