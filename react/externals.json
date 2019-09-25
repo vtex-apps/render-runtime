@@ -69,7 +69,7 @@
       },
       {
         "clientOnly": true,
-        "path": "npm:vtex-render-session@1.4.1/dist/index.js"
+        "path": "npm:vtex-render-session@1.5.0/dist/index.js"
       },
       {
         "path": "runtime:AMP",
@@ -145,7 +145,7 @@
       },
       {
         "clientOnly": true,
-        "path": "npm:vtex-render-session@1.4.1/dist/index.min.js"
+        "path": "npm:vtex-render-session@1.5.0/dist/index.min.js"
       },
       {
         "path": "runtime:AMP",
