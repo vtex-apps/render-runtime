@@ -57,6 +57,7 @@ declare global {
   enum Composition {
     blocks = 'blocks',
     children = 'children',
+    list = 'list',
   }
 
   interface BlockInsertion {

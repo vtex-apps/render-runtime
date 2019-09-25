@@ -16,6 +16,7 @@ interface Props {
   query?: any
   treePath?: string
   blockProps?: object
+  listItemProps?: object
 }
 
 function mountTreePath(currentId: string, parentTreePath: string) {
@@ -39,9 +40,27 @@ function getChildExtensions(runtime: RenderContext, treePath: string) {
       runtime.extensions && runtime.extensions[childTreePath]
     const childProps = childExtension ? childExtension.props : {}
 
+    const isList = childExtension.composition === 'list'
+
+    if (isList) {
+      if (!Array.isArray(childProps.items)) {
+        return null
+      }
+      return childProps.items.map((itemProps: any, j: number) => {
+        return (
+          <ExtensionPoint
+            key={`list-item-${i}-${j}`}
+            id={child.extensionPointId}
+            treePath={treePath}
+            listItemProps={itemProps}
+          />
+        )
+      })
+    }
+
     return (
       <ExtensionPoint
-        key={`around-${treePath}-${i}`}
+        key={`child-${treePath}-${i}`}
         id={child.extensionPointId}
         blockProps={childProps}
         treePath={treePath}
@@ -119,7 +138,15 @@ const ExtensionPoint: FC<Props> = props => {
 
   const treePathFromHook = useTreePath()
 
-  const { children, params, query, id, blockProps, ...parentProps } = props
+  const {
+    children,
+    params,
+    query,
+    id,
+    blockProps,
+    listItemProps,
+    ...parentProps
+  } = props
 
   const newTreePath = React.useMemo(
     () => mountTreePath(id, props.treePath || treePathFromHook.treePath),
@@ -154,9 +181,18 @@ const ExtensionPoint: FC<Props> = props => {
        */
       blockProps || {},
       content,
+      listItemProps || {},
       { params, query },
     ])
-  }, [parentProps, extensionProps, blockProps, content, params, query])
+  }, [
+    parentProps,
+    extensionProps,
+    blockProps,
+    content,
+    listItemProps,
+    params,
+    query,
+  ])
 
   if (
     /* Stops rendering if the extension is not found. Useful for optional ExtensionPoints */
