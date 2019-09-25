@@ -12,6 +12,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
 
+import { generateExtensions } from '../utils/blocks'
 import { fetchAssets, getImplementation, prefetchAssets } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
@@ -79,6 +80,32 @@ const SEND_INFO_DEBOUNCE_MS = 100
 const DISABLE_PREFETCH_PAGES = '__disablePrefetchPages'
 
 const noop = () => {}
+
+const unionKeys = (record1: any, record2: any) => [
+  ...new Set([...Object.keys(record1), ...Object.keys(record2)]),
+]
+
+const isChildOrSelf = (child: string, parent: string) =>
+  child === parent ||
+  (child.startsWith(`${parent}/`) && !child.startsWith(`${parent}/$`))
+
+const replaceExtensionsWithDefault = (
+  extensions: Extensions,
+  page: string,
+  defaultExtensions: Extensions
+) =>
+  unionKeys(extensions, defaultExtensions).reduce<Extensions>((acc, key) => {
+    const maybeExtension = isChildOrSelf(key, page)
+      ? defaultExtensions[key] || {
+          ...extensions[key],
+          component: null,
+        }
+      : extensions[key]
+    if (maybeExtension) {
+      acc[key] = maybeExtension
+    }
+    return acc
+  }, {})
 
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
@@ -487,9 +514,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       runtime: { renderMajor },
     } = this.props
     const {
+      blocks,
+      blocksTree,
+      contentMap,
       culture: { locale },
       pages: pagesState,
       production,
+      defaultExtensions,
       route,
       loadedPages,
     } = this.state
@@ -525,15 +556,49 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
     }
 
-    // Shows a generic preview page when navigating. In the future, the
-    // preview should be according to the entitiy (department, search, product),
-    // and the fallback should be the generic preview.
-    this.setState(
-      {
-        preview: true,
-      },
-      () => this.scrollTo(state.scrollOptions)
-    )
+    if (navigationRoute.id) {
+      let updatedExtensions: Extensions = {}
+
+      if (window.__RUNTIME__.hasNewExtensions) {
+        // TODO: Remove this when new pages-graphql get released
+        updatedExtensions = generateExtensions(
+          // eslint-disable-next-line
+          blocksTree!,
+          // eslint-disable-next-line
+          blocks!,
+          // eslint-disable-next-line
+          contentMap!,
+          pagesState[page]
+        )
+      }
+      this.setState(
+        {
+          extensions: replaceExtensionsWithDefault(
+            { ...updatedExtensions, ...this.state.extensions },
+            page,
+            defaultExtensions
+          ),
+          page,
+          preview: false,
+          query,
+          route: transientRoute,
+        },
+        () => {
+          this.replaceRouteClass(page)
+          this.scrollTo(state.scrollOptions)
+        }
+      )
+    } else {
+      // Shows a generic preview page when navigating. In the future, the
+      // preview should be according to the entitiy (department, search, product),
+      // and the fallback should be the generic preview.
+      this.setState(
+        {
+          preview: true,
+        },
+        () => this.scrollTo(state.scrollOptions)
+      )
+    }
 
     const paramsJSON = JSON.stringify(params)
     const apolloClient = this.apolloClient
