@@ -188,6 +188,7 @@ declare global {
   }
 
   interface RenderContext {
+    amp: RenderRuntime['amp']
     account: RenderRuntime['account']
     addMessages: (newMessages: RenderContext['messages']) => Promise<void>
     amp: boolean

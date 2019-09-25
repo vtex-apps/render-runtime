@@ -166,14 +166,16 @@ const render = async (
         renderToStaticMarkup,
         runtime
       )
-      return renderToStringWithData(ampRoot, renderToStaticMarkup).then(
-        ({ markup, renderTimeMetric }) => ({
-          ...commonRenderResult,
-          markups: getMarkups(name, markup),
-          renderTimeMetric,
-          ...getExtraRenderedData(),
-        })
-      )
+      return renderToStringWithData(
+        ampRoot,
+        renderToStaticMarkup,
+        disableSSQ
+      ).then(({ markup, renderTimeMetric }) => ({
+        ...commonRenderResult,
+        markups: getMarkups(name, markup),
+        renderTimeMetric,
+        ...getExtraRenderedData(),
+      }))
     })
   }
 
