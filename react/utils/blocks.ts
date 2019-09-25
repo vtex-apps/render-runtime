@@ -46,6 +46,7 @@ const createExtensions = (
         component: block.component,
         composition: block.composition,
         content: contentMap[blockContentId] || contentMap[contentId] || {},
+        contentId: contentMap[blockContentId] ? blockContentId : contentId,
         context: block.context,
         hasContentSchema: block.hasContentSchema,
         preview: block.preview,
