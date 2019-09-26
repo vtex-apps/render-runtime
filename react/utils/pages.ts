@@ -131,7 +131,11 @@ export function pathFromPageName(page: string, pages: Pages, params: any) {
   if (!validTemplate) {
     return null
   }
-  return new RouteParser(validTemplate).reverse(params) || null
+  const path = new RouteParser(validTemplate).reverse(params)
+  const filters = params
+    ? params.rest || (params.terms && `/${params.terms}`) || ''
+    : ''
+  return path ? `${path}${filters}` : null
 }
 
 export function queryStringToMap(query: string): Record<string, any> {
