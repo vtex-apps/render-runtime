@@ -943,9 +943,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   private prefetchPages = () => {
     if (this.prefetchRoutes.size >= 0) {
-      window.requestIdleCallback
-        ? window.requestIdleCallback(this.execPrefetchPages)
-        : setTimeout(this.execPrefetchPages, 3000)
+      setTimeout(this.execPrefetchPages, 20 * 1000)
     }
   }
 
