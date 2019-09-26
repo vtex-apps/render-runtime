@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.66.6-beta] - 2019-09-26
+
+### Fixed
+- Do not prefetch pages if no pages were prefetched :upside_down_face: 
+
 ## [8.66.5] - 2019-09-26
 
 ## [8.66.4] - 2019-09-25
