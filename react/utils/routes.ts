@@ -1,5 +1,6 @@
 import { stringify } from 'query-string'
 import { isEmpty } from 'ramda'
+import { parse, format } from 'url'
 
 import navigationPageQuery from '../queries/navigationPage.graphql'
 import routePreviews from '../queries/routePreviews.graphql'
@@ -110,11 +111,12 @@ export const fetchServerPage = async ({
   query?: Record<string, string>
   fetcher: GlobalFetch['fetch']
 }): Promise<ParsedServerPageResponse> => {
-  const query = stringify({
+  const parsedUrl = parse(path)
+  parsedUrl.query = {
     ...rawQuery,
     __pickRuntime: runtimeFields,
-  })
-  const url = `${path}?${query}`
+  } as any
+  const url = format(parsedUrl)
   const page: ServerPageResponse = await fetchWithRetry(
     url,
     {
