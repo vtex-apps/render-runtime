@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Update react from 16.8.6 to 16.9.0.
 
 ## [8.66.7] - 2019-09-27
 
@@ -14,7 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [8.66.6-beta] - 2019-09-26
 
 ### Fixed
-- Do not prefetch pages if no pages were prefetched :upside_down_face: 
+- Do not prefetch pages if no pages were prefetched :upside_down_face:
 
 ## [8.66.5] - 2019-09-26
 
