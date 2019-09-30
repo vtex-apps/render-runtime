@@ -194,6 +194,7 @@ declare global {
     addMessages: (newMessages: RenderContext['messages']) => Promise<void>
     amp: boolean
     components: RenderRuntime['components']
+    contentMap: RenderRuntime['contentMap']
     culture: RenderRuntime['culture']
     defaultExtensions: RenderRuntime['defaultExtensions']
     device: ConfigurationDevice
