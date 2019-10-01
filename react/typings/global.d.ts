@@ -82,7 +82,7 @@ declare global {
     preview?: Preview
     composition?: Composition
     hasContentSchema?: boolean
-    contentId?: string
+    contentIds?: string[]
   }
 
   interface Extensions {

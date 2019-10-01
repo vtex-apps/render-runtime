@@ -35,17 +35,17 @@ const createExtensions = (
   const blockContentId = `${blockContentMapId}+${blockId}`
 
   let content = {}
-  let contentId = null
+  let contentIds = []
   if (contentMap[blockContentId]) {
     content = contentMap[blockContentId].content
       ? contentMap[blockContentId].content
       : contentMap[blockContentId]
-    contentId = contentMap[blockContentId].contentId
+    contentIds = contentMap[blockContentId].contentIds || []
   } else if (contentMap[blockContentMapId]) {
     content = contentMap[blockContentMapId].content
       ? contentMap[blockContentMapId].content
       : contentMap[blockContentMapId]
-    contentId = contentMap[blockContentMapId].contentId
+    contentIds = contentMap[blockContentMapId].contentIds || []
   }
 
   const self = [
@@ -60,7 +60,7 @@ const createExtensions = (
         component: block.component,
         composition: block.composition,
         content,
-        contentId,
+        contentIds,
         context: block.context,
         hasContentSchema: block.hasContentSchema,
         preview: block.preview,
