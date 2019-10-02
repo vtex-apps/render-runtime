@@ -370,6 +370,7 @@ declare global {
 
   interface ParsedServerPageResponse extends ServerPageResponse {
     matchingPage: MatchingServerPage
+    redirectLogin?: boolean
   }
 
   interface ParsedPageQueryResponse {
