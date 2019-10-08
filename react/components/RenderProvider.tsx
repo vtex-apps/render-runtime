@@ -529,14 +529,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // preview should be according to the entitiy (department, search, product),
     // and the fallback should be the generic preview.
     const { domain } = this.state.route
-    if (domain !== 'admin') {
-      this.setState(
-        {
-          preview: true,
-        },
-        () => this.scrollTo(state.scrollOptions)
-      )
-    }
+    this.setState(
+      {
+        preview: domain !== 'admin',
+      },
+      () => this.scrollTo(state.scrollOptions)
+    )
 
     const paramsJSON = JSON.stringify(params)
     const apolloClient = this.apolloClient
