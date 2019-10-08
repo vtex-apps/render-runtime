@@ -529,7 +529,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // preview should be according to the entitiy (department, search, product),
     // and the fallback should be the generic preview.
     const { domain } = this.state.route
-    if (domain === 'admin') {
+    if (domain !== 'admin') {
       this.setState(
         {
           preview: true,
