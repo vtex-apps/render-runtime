@@ -136,6 +136,9 @@ export const fetchServerPage = async ({
     route,
     route: { routeId },
   } = page
+  if (routeId === 'redirect') {
+    window.location.href = route.path
+  }
   const routePath = `${path}?${stringify(rawQuery || {})}`
 
   const extensions =
