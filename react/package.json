@@ -93,5 +93,6 @@
       "eslint --fix",
       "git add"
     ]
-  }
+  },
+  "version": "8.67.1"
 }
