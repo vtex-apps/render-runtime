@@ -34,19 +34,10 @@ const createExtensions = (
     contentIdMap[bindingPath] || contentIdMap[withStar(bindingPath)] || blockId
   const blockContentId = `${blockContentMapId}+${blockId}`
 
-  let content = {}
-  let contentIds = []
-  if (contentMap[blockContentId]) {
-    content = contentMap[blockContentId].content
-      ? contentMap[blockContentId].content
-      : contentMap[blockContentId]
-    contentIds = contentMap[blockContentId].contentIds || []
-  } else if (contentMap[blockContentMapId]) {
-    content = contentMap[blockContentMapId].content
-      ? contentMap[blockContentMapId].content
-      : contentMap[blockContentMapId]
-    contentIds = contentMap[blockContentMapId].contentIds || []
-  }
+  const maybeContent = contentMap[blockContentId] ||
+    contentMap[blockContentMapId] || { content: {}, contentIds: [] }
+  const content = maybeContent.content || maybeContent
+  const contentIds = maybeContent.contentIds || []
 
   const self = [
     {
