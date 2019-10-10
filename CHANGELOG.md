@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.68.0] - 2019-10-10
+
 ## [8.67.1] - 2019-10-10
 ### Fixed
 - Improved navigation preview
