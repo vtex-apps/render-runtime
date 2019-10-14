@@ -286,6 +286,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { history, runtime } = this.props
     const {
       components,
+      contentMap,
       extensions,
       messages,
       page,
@@ -315,6 +316,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       addMessages: this.addMessages,
       amp,
       components,
+      contentMap,
       culture,
       defaultExtensions,
       device,

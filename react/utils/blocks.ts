@@ -30,9 +30,14 @@ const createExtensions = (
     blockIdMap['*']
   const block = blocksMap[mappedBlockId]
   const { blockId, after = [], around = [], before = [], blocks = [] } = block
-  const contentId =
+  const blockContentMapId =
     contentIdMap[bindingPath] || contentIdMap[withStar(bindingPath)] || blockId
-  const blockContentId = `${contentId}+${blockId}`
+  const blockContentId = `${blockContentMapId}+${blockId}`
+
+  const maybeContent = contentMap[blockContentId] ||
+    contentMap[blockContentMapId] || { content: {}, contentIds: [] }
+  const content = maybeContent.content || maybeContent
+  const contentIds = maybeContent.contentIds || []
 
   const self = [
     {
@@ -45,7 +50,8 @@ const createExtensions = (
         blocks: blocks,
         component: block.component,
         composition: block.composition,
-        content: contentMap[blockContentId] || contentMap[contentId] || {},
+        content,
+        contentIds,
         context: block.context,
         hasContentSchema: block.hasContentSchema,
         preview: block.preview,
