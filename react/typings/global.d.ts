@@ -536,6 +536,7 @@ declare global {
     ReactAMPHTML: any
     ReactAMPHTMLHelpers: any
     ReactIntlLocaleData: any
+    ReactIntl: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
     requestIdleCallback: (callback: (...args) => any | void) => number
     ReactApollo: any

@@ -35,7 +35,7 @@
       {
         "global": "ReactIntl",
         "import": "react-intl",
-        "path": "npm:react-intl@2.7.2/dist/react-intl.js"
+        "path": "npm:react-intl@3.3.2/dist/react-intl.js"
       },
       {
         "global": "History",
@@ -111,7 +111,7 @@
       {
         "global": "ReactIntl",
         "import": "react-intl",
-        "path": "npm:react-intl@2.7.2/dist/react-intl.min.js"
+        "path": "npm:react-intl@3.3.2/dist/react-intl.min.js"
       },
       {
         "global": "History",

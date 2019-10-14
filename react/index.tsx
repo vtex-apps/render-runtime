@@ -3,6 +3,8 @@ import 'core-js/es6/symbol'
 import 'core-js/fn/symbol/iterator'
 import { canUseDOM } from 'exenv'
 import * as runtimeGlobals from './core/main'
+import PropTypes from 'prop-types'
+import { createCustomReactIntl } from './utils/reactIntl'
 
 import { createCustomReactApollo } from './utils/reactApollo'
 
@@ -33,26 +35,30 @@ if (!window.__RUNTIME__.amp) {
   window.ReactAMPHTML = window.ReactAMPHTMLHelpers =
     typeof Proxy !== 'undefined'
       ? new Proxy(
-          {},
-          {
-            get: (_, key) => {
-              if (key === '__esModule' || key === 'constructor') {
-                return
-              }
+        {},
+        {
+          get: (_, key) => {
+            if (key === '__esModule' || key === 'constructor') {
+              return
+            }
 
-              const message = canUseDOM
-                ? 'You can not render AMP components on client-side'
-                : 'You must check runtime.amp to render AMP components'
+            const message = canUseDOM
+              ? 'You can not render AMP components on client-side'
+              : 'You must check runtime.amp to render AMP components'
 
-              throw new Error(message)
-            },
-          }
-        )
+            throw new Error(message)
+          },
+        }
+      )
       : {} // IE11 users will not have a clear error in this case
 }
 
 if (window.ReactApollo) {
   window.ReactApollo = createCustomReactApollo()
+}
+
+if (window.ReactIntl) {
+  createCustomReactIntl()
 }
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
