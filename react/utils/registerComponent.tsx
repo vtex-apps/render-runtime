@@ -3,7 +3,7 @@ import { ComponentType } from 'react'
 
 import maybeWrapWithHMR from './withHMR'
 
-const calledComponents: Record<string, any> = {}
+const loadedComponents: Record<string, any> = {}
 
 export const isComponentType = (Arg: any): Arg is ComponentType => {
   const isFunction = typeof Arg === 'function'
@@ -46,6 +46,10 @@ const idToAppAtMajor = (appId: string) => {
   return `${name}@${major}.x`
 }
 
+export const getLoadedComponent = (componentLocator: string) => {
+  return loadedComponents[componentLocator]
+}
+
 export default (
   module: Module,
   InitialImplementer: any,
@@ -57,22 +61,28 @@ export default (
 
   if (module.hot || !lazy) {
     const wrappedComponent = maybeWrapWithHMR(module, InitialImplementer)
-    componentLocators.forEach(componentLocator => {
-      window.__RENDER_8_COMPONENTS__[componentLocator] = wrappedComponent
+    componentLocators.forEach(locator => {
+      window.__RENDER_8_COMPONENTS__[locator] = loadedComponents[
+        locator
+      ] = wrappedComponent
     })
 
     return wrappedComponent
   }
 
-  componentLocators.forEach(componentLocator => {
-    Object.defineProperty(window.__RENDER_8_COMPONENTS__, componentLocator, {
+  componentLocators.forEach(locator => {
+    Object.defineProperty(window.__RENDER_8_COMPONENTS__, locator, {
       get: () => {
-        const foundLocator = componentLocators.find(
-          componentLocator => calledComponents[componentLocator]
-        )
-        return foundLocator
-          ? calledComponents[foundLocator]
-          : (calledComponents[componentLocator] = InitialImplementer())
+        if (loadedComponents[locator]) {
+          return loadedComponents[locator]
+        }
+
+        const implementer = InitialImplementer()
+        componentLocators.forEach(eachLocator => {
+          loadedComponents[eachLocator] = implementer
+        })
+
+        return implementer
       },
     })
   })
