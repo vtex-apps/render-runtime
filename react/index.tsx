@@ -4,7 +4,8 @@ import 'core-js/fn/symbol/iterator'
 import * as Sentry from '@sentry/browser'
 import { canUseDOM } from 'exenv'
 import * as runtimeGlobals from './core/main'
-import { compose } from 'ramda'
+
+import { createCustomReactApollo } from './utils/reactApollo'
 
 window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
 
@@ -52,7 +53,7 @@ if (!window.__RUNTIME__.amp) {
 }
 
 if (window.ReactApollo) {
-  window.ReactApollo.compose = compose
+  window.ReactApollo = createCustomReactApollo()
 }
 
 const sentryDSN = 'https://2fac72ea180d48ae9bf1dbb3104b4000@sentry.io/1292015'
