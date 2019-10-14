@@ -3,8 +3,7 @@ import 'core-js/es6/symbol'
 import 'core-js/fn/symbol/iterator'
 import { canUseDOM } from 'exenv'
 import * as runtimeGlobals from './core/main'
-import PropTypes from 'prop-types'
-import { createCustomReactIntl } from './utils/reactIntl'
+import { appendDataToReactIntl } from './utils/reactIntl'
 
 import { createCustomReactApollo } from './utils/reactApollo'
 
@@ -58,7 +57,7 @@ if (window.ReactApollo) {
 }
 
 if (window.ReactIntl) {
-  createCustomReactIntl()
+  appendDataToReactIntl()
 }
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
