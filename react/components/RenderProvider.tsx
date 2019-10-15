@@ -14,7 +14,6 @@ import { IntlProvider } from 'react-intl'
 
 import {
   fetchAssets,
-  getImplementation,
   prefetchAssets,
   getLoadedImplementation,
 } from '../utils/assets'
