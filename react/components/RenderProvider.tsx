@@ -12,7 +12,11 @@ import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
 
-import { fetchAssets, getImplementation, prefetchAssets } from '../utils/assets'
+import {
+  fetchAssets,
+  prefetchAssets,
+  getLoadedImplementation,
+} from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { OperationContext } from '../utils/client/links/uriSwitchLink'
@@ -373,7 +377,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const componentsArray = Object.keys(components)
 
     const customMessages = componentsArray
-      .map(getImplementation)
+      .map(getLoadedImplementation)
       .filter(
         component =>
           component &&

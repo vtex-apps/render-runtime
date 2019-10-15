@@ -1,4 +1,5 @@
 import queryString from 'query-string'
+import { getLoadedComponent } from './registerComponent'
 
 function getExtension(path: string) {
   const adjPath = path.split('?')[0]
@@ -153,6 +154,10 @@ export function shouldAddScriptToPage(
   scripts: string[] = getExistingScriptSrcs()
 ) {
   return isScript(path) && !assetOnList(path, scripts)
+}
+
+export function getLoadedImplementation<P = {}, S = {}>(component: string) {
+  return getLoadedComponent(component) as RenderComponent<P, S>
 }
 
 export function getImplementation<P = {}, S = {}>(component: string) {
