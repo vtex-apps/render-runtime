@@ -139,7 +139,8 @@ export const fetchServerPage = async ({
   if (routeId === 'redirect') {
     window.location.href = route.path
   }
-  const routePath = `${path}?${stringify(rawQuery || {})}`
+  const queryString = stringify(rawQuery || {})
+  const routePath = `${path}${queryString ? '?' + queryString : queryString}`
 
   const extensions =
     !isEmpty(blocksTree) && blocksTree && blocks && contentMap

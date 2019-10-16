@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Issue when client-side navigation added a `?` to the path in `RenderProvider`'s state, making `updateRuntime` not work as expected.
+
 ## [8.71.0] - 2019-10-16
 ### Added
 - Support for special links `mailto:` and `tel:` to the `<Link />` component.
