@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.71.1] - 2019-10-16
+
 ### Fixed
 - Issue when client-side navigation added a `?` to the path in `RenderProvider`'s state, making `updateRuntime` not work as expected.
 
