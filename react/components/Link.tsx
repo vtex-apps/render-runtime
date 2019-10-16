@@ -9,8 +9,12 @@ const isModifiedEvent = (event: MouseEvent<HTMLAnchorElement>) =>
   !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey)
 
 const absoluteRegex = /^https?:\/\/|^\/\//i
+const telephoneRegex = /^tel:/i
+const mailToRegex = /^mailto:/i
 
 const isAbsoluteUrl = (url: string) => absoluteRegex.test(url)
+const isTelephoneUrl = (url: string) => telephoneRegex.test(url)
+const isMailToUrl = (url: string) => mailToRegex.test(url)
 
 interface Props extends NavigateOptions {
   onClick: (event: React.MouseEvent) => void
@@ -38,7 +42,7 @@ const Link: React.FunctionComponent<Props> = ({
       if (
         isModifiedEvent(event) ||
         !isLeftClickEvent(event) ||
-        (to && isAbsoluteUrl(to))
+        (to && (isAbsoluteUrl(to) || isTelephoneUrl(to) || isMailToUrl(to)))
       ) {
         return
       }
@@ -63,8 +67,15 @@ const Link: React.FunctionComponent<Props> = ({
 
   const getHref = () => {
     if (to) {
-      // Prefix any non-absolute paths (e.g. http:// or https://) with runtime.rootPath
-      if (rootPath && !to.startsWith('http') && !to.startsWith(rootPath)) {
+      // Prefix any non-absolute paths (e.g. http:// or https://) and non-special links (e.g. mailto: or tel:)
+      // with runtime.rootPath
+      if (
+        rootPath &&
+        !to.startsWith('http') &&
+        !to.startsWith(rootPath) &&
+        !isTelephoneUrl(to) &&
+        !isMailToUrl(to)
+      ) {
         return rootPath + to
       }
       return to
