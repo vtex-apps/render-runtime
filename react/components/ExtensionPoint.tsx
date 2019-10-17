@@ -58,6 +58,7 @@ function withOuterExtensions(
   before: string[],
   treePath: string,
   props: any,
+  preview: boolean,
   element: JSX.Element
 ) {
   const beforeElements = before.map(beforeId => (
@@ -82,10 +83,20 @@ function withOuterExtensions(
 
   const isRootTreePath = treePath.indexOf('/') === -1
 
+  const isOffline = window && window.navigator && !window.navigator.onLine
+
+  const offlineWarning = (
+    <div>
+      <h1>Youre offline</h1>
+    </div>
+  )
+
+  const fallbackContent = isOffline ? offlineWarning : <GenericPreview />
+
   const wrapped = (
     <Fragment key={`wrapped-${treePath}`}>
       {beforeElements}
-      {element}
+      {isRootTreePath && preview ? fallbackContent : element}
       {isRootTreePath && <div className="flex flex-grow-1" />}
       {afterElements}
     </Fragment>
@@ -174,7 +185,7 @@ const ExtensionPoint: FC<Props> = props => {
     before,
     newTreePath,
     mergedProps,
-
+    runtime.preview,
     <ExtensionPointComponent
       component={component}
       props={mergedProps}
