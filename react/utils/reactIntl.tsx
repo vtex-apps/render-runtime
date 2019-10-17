@@ -1,6 +1,11 @@
 import PropTypes from 'prop-types'
 import { FormattedRelativeTime, injectIntl } from 'react-intl'
 import React, { FC } from 'react'
+import hoistNonReactStatics from 'hoist-non-react-statics'
+
+function getDisplayName(Component: React.ComponentType<any>) {
+  return Component.displayName || Component.name || 'Component'
+}
 
 // We do our best to maintain compatibility with the prvious API but this is not perfect
 const getCorrectUnit = (timeDiff: number) => {
@@ -76,7 +81,7 @@ const millisecondsInDay = 24 * millisecondsInHour
 
 const isUnitValid = (value: number) => Math.abs(value) >= 1
 
-const renderFormattedRelative = (intl: any) => (value: any) => {
+const renderFormatRelative = (intl: any) => (value: any) => {
   console.warn(
     'formatRelative was removed in react-intl@3.x, please start using formatRelativeTime.'
   )
@@ -96,17 +101,48 @@ const renderFormattedRelative = (intl: any) => (value: any) => {
   return intl.formatRelativeTime(newValue, unit)
 }
 
-const renderRuntimeInjectIntl = (WrappedComponent: any) => {
-  return injectIntl(props => {
-    const intl = props.intl as any
-    intl.formatRelative = renderFormattedRelative(intl)
-    return <WrappedComponent {...props} />
-  })
+const renderRuntimeInjectIntl: FC<any> = (
+  WrappedComponent: any,
+  options?: any
+) => {
+  const intlPropName = (options && options.intlPropName) || 'intl'
+  const forwardRef = (options && options.forwardRef) || false
+  const WithRenderRuntimeIntl = injectIntl(props => {
+    const intlObj = props[intlPropName] as any
+    if (intlObj) {
+      intlObj.formatRelative = renderFormatRelative(intlObj)
+    }
+    return (
+      <WrappedComponent
+        {...props}
+        ref={forwardRef ? props.forwardedRef : null}
+      />
+    )
+  }, options)
+
+  WithRenderRuntimeIntl.displayName = `renderRuntimeInjectIntl(${getDisplayName(
+    WrappedComponent
+  )}`
+  WithRenderRuntimeIntl.WrappedComponent = WrappedComponent
+
+  if (forwardRef) {
+    return hoistNonReactStatics(
+      // eslint-disable-next-line react/display-name
+      React.forwardRef((props, ref) => (
+        <WithRenderRuntimeIntl {...(props as any)} forwardedRef={ref} />
+      )),
+      WrappedComponent
+    ) as any
+  }
+  return hoistNonReactStatics(WithRenderRuntimeIntl, WrappedComponent) as any
 }
 
 export const createReactIntl = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { injectIntl, ...rest } = window.ReactIntl
-  window.ReactIntlLocaleData = {}
+  if (!window.ReactIntlLocaleData) {
+    window.ReactIntlLocaleData = {}
+  }
 
   return {
     ...rest,
