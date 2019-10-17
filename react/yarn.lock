@@ -992,16 +992,23 @@
     minimist "^1.2.0"
 
 "@formatjs/intl-pluralrules@^1.3.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-pluralrules/-/intl-pluralrules-1.3.0.tgz#c8bbc6f4f858bbadb5bfc792fa77a27026d324a4"
-  integrity sha512-m5u9m0wjuR4B52ppb8Pm6zdKBNNVAAMJw9rIS2Ti8PYE+eB+LOUAw97WOn58URSE85FBhbXUYy/rIpWs1Jc38g==
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-pluralrules/-/intl-pluralrules-1.3.1.tgz#e3459a976a1a26e83f36f6d62d92eff948717a6e"
+  integrity sha512-Z3NlE4q6zzG3tum9r0q0fs30IW2pUDvwUjtP3sPimFIPcycHRC60hW5AR1PTE9N0OPOB6ntBx6ZWvASBcAFLrw==
   dependencies:
     "@formatjs/intl-utils" "^1.4.0"
 
-"@formatjs/intl-relativetimeformat@^4.1.1", "@formatjs/intl-relativetimeformat@^4.2.0":
+"@formatjs/intl-relativetimeformat@^4.1.1":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-4.2.0.tgz#dc403699eb5755dd19307c93a6541232b14dd721"
   integrity sha512-0NQnixfRIdwRMagVR0CmqfKaI8xCtT1oZ0tAU7zrsch0k6N2wJFUYBsOtlgSqRR4hz2gAbVc7Rv5tdzkWW5fgg==
+  dependencies:
+    "@formatjs/intl-utils" "^1.4.0"
+
+"@formatjs/intl-relativetimeformat@^4.2.0":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-4.2.1.tgz#bee6ffb2227dfde001d7214deb8ab6c2bde4077b"
+  integrity sha512-NIrK1jgDStuR9DEoJV8Iju6cj1Ffa7qr8qJ46nQGGH6c/222rZSdlEqd0qoX7AFMRpu2Br8OrSwNLX4IUo0nuw==
   dependencies:
     "@formatjs/intl-utils" "^1.4.0"
 
