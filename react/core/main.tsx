@@ -60,6 +60,13 @@ if (window.IntlPolyfill) {
     window.Intl.DateTimeFormat = window.IntlPolyfill.DateTimeFormat
   }
 }
+if (
+  window.Intl &&
+  canUseDOM &&
+  (!window.Intl.PluralRules || !window.Intl.RelativeTimeFormat)
+) {
+  import('../intl-polyfill')
+}
 
 const renderExtension = (
   extensionName: string,
@@ -123,8 +130,6 @@ const render = async (
   const baseURI = getBaseURI(runtime)
   registerEmitter(runtime, baseURI)
   emitter = runtime.emitter
-
-  await import('../intl-polyfill')
 
   const isPage =
     !!pages[name] && !!pages[name].path && !!extensions[name].component

@@ -74,6 +74,10 @@
       {
         "path": "runtime:AMP",
         "serverOnly": true
+      },
+      {
+        "path": "runtime:intl-polyfill",
+        "serverOnly": true
       }
     ],
     "prod": [
@@ -149,6 +153,10 @@
       },
       {
         "path": "runtime:AMP",
+        "serverOnly": true
+      },
+      {
+        "path": "runtime:intl-polyfill",
         "serverOnly": true
       }
     ]
