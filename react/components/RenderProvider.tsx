@@ -579,7 +579,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 route: matchingPage,
                 settings,
               },
-              () => this.sendInfoFromIframe()
+              () => {
+                this.replaceRouteClass(page)
+                this.sendInfoFromIframe()
+              }
             )
           }
         )
@@ -620,7 +623,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 route: updatedRoute,
                 settings,
               },
-              () => this.sendInfoFromIframe()
+              () => {
+                this.replaceRouteClass(page)
+                this.sendInfoFromIframe()
+              }
             )
           }
         )
