@@ -59,7 +59,7 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-react-app": "^7.0.1",
     "eslint": "^5.16.0",
-    "eslint-config-vtex-react": "^4.1.0",
+    "eslint-config-vtex-react": "^5.0.1",
     "eventsource-polyfill": "^0.9.6",
     "history": "^4.7.2",
     "husky": "^1.1.4",
