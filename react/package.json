@@ -27,7 +27,6 @@
     "ramda": "^0.26.1",
     "react-amphtml": "^4.0.2",
     "react-apollo": "^3.1.2",
-    "react-content-loader": "^4.0.1",
     "react-helmet": "^5.2.0",
     "react-json-view": "^1.19.1",
     "route-parser": "^0.0.5"
