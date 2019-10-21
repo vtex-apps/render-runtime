@@ -44,7 +44,6 @@ export default class Preview extends React.PureComponent<Props, State> {
         return <Box width={width} height={height} />
       case 'text':
         return <Text width={width} height={height} />
-      /** TODO: add support for Grid preview */
       case 'grid':
         return <Grid width={width} height={height} />
       case 'circle':
