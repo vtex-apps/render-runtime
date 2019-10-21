@@ -3,15 +3,8 @@ import styles from './LoadingBar.css'
 
 const LoadingBar = () => (
   <div
-    className={`${styles.loadingBarAnimation} bg-action-primary`}
-    style={{
-      position: 'fixed' as 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: 4,
-      zIndex: 999999,
-    }}
+    className={`${styles.loadingBarAnimation} fixed top-0 left-0 right-0 z-max bg-action-primary`}
+    style={{ height: 4 }}
   />
 )
 
