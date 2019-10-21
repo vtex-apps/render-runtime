@@ -16,6 +16,7 @@ import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
 import { isEmpty } from 'ramda'
 import Loading from '../components/Loading'
+import { LoadingContext } from '../components/LoadingContext'
 
 import { ChildBlock, useChildBlock } from '../components/ChildBlock'
 import ExtensionContainer from '../components/ExtensionContainer'
@@ -256,7 +257,9 @@ function start() {
       if (props && props.style && isStyleWritable(props)) {
         props.style = optimizeStyleForVtexImg(vtexImgHost, props.style)
       }
-
+      // This rule was introduced in a eslint-config update.
+      // Should be fixed in a future PR
+      //eslint-disable-next-line prefer-rest-params
       return ReactCreateElement.apply(React, arguments)
     }
 
@@ -320,6 +323,7 @@ export {
   useTreePath,
   withSession,
   Loading,
+  LoadingContext,
   buildCacheLocator,
   renderExtension,
   // These unstable APIs should be deprecated shortly
