@@ -534,16 +534,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
     }
 
-    // Shows a generic preview page when navigating. In the future, the
-    // preview should be according to the entitiy (department, search, product),
-    // and the fallback should be the generic preview.
-    const { domain } = this.state.route
-    this.setState(
-      {
-        preview: domain !== 'admin',
-      },
-      () => this.scrollTo(state.scrollOptions)
-    )
+    // Sets the preloading state, which currently displays
+    // a loading bar at the top of the page
+    this.setState({
+      preview: true,
+    })
 
     const paramsJSON = JSON.stringify(params)
     const apolloClient = this.apolloClient
