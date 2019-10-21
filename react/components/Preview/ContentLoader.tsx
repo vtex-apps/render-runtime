@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react'
-import styles from './ContentLoader2.css'
+import styles from './ContentLoader.css'
 
 // TODO: make these colors dynamic, probably based on
 // muted colors from the color theme

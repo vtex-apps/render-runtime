@@ -1,5 +1,5 @@
 import React from 'react'
-import { ContentLoader, Rect } from './ContentLoader2'
+import { ContentLoader, Rect } from './ContentLoader'
 
 interface Props {
   width: number
