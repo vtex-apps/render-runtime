@@ -23,7 +23,7 @@ if (!('RelativeTimeFormat' in Intl) || !canUseDOM) {
 }
 
 const locale = path<string>(['__RUNTIME__', 'culture', 'locale'], window)
-const [lang] = locale ? locale.split('-') : ''
+const [lang] = locale ? locale.split('-') : ['']
 
 if (window.Intl.PluralRules.polyfilled && canUseDOM && lang) {
   import('@formatjs/intl-pluralrules/dist/locale-data/' + lang)
