@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Changed
-- STop using `Consumer` in HOC that inject props, use hooks instead.
+- Stop using `Consumer` in HOC that inject props, use hooks instead.
 
 ## [8.71.3] - 2019-10-21
 ### Fixed
