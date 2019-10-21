@@ -439,7 +439,7 @@ declare global {
     preview: boolean
     production: boolean
     publicEndpoint: string
-    messages: Locale
+    messages: Record<string, string>
     components: Components
     renderMajor: number
     query?: Record<string, string>

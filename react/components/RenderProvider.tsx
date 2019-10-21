@@ -84,6 +84,37 @@ const DISABLE_PREFETCH_PAGES = '__disablePrefetchPages'
 
 const noop = () => {}
 
+const getComponentsCustomMessages = (
+  locale: string,
+  newComponents: RenderProviderState['components']
+) => {
+  const componentsArray = Object.keys(newComponents)
+  const customMessages = componentsArray
+    .map(getLoadedImplementation)
+    .filter(
+      component =>
+        component && (component.getCustomMessages || component.WrappedComponent)
+    )
+    .map(component => {
+      const getCustomMessages =
+        component.getCustomMessages ||
+        (component.WrappedComponent &&
+          component.WrappedComponent.getCustomMessages) ||
+        noop
+      return getCustomMessages(locale)
+    })
+    .reduce((acc, strings) => {
+      if (!strings) {
+        return acc
+      }
+      Object.keys(strings).forEach(
+        stringKey => (acc[stringKey] = strings[stringKey])
+      )
+    }, {})
+
+  return customMessages
+}
+
 class RenderProvider extends Component<Props, RenderProviderState> {
   public static childContextTypes = {
     account: PropTypes.string,
@@ -158,6 +189,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private apolloClient: ApolloClient<NormalizedCacheObject>
   private prefetchRoutes: Set<string>
   private fetcher: GlobalFetch['fetch']
+  private savedMessages: RenderRuntime['messages']
 
   public constructor(props: Props) {
     super(props)
@@ -241,6 +273,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       settings: settings || {},
     }
 
+    const customMessages = getComponentsCustomMessages(
+      culture.locale,
+      components
+    )
+    this.savedMessages = { ...messages, ...customMessages }
     this.prefetchRoutes = new Set<string>()
   }
 
@@ -370,30 +407,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return this.sessionPromise.then(() =>
       canUseDOM ? window.__RENDER_8_SESSION__.patchSession(data) : undefined
     )
-  }
-
-  public getCustomMessages = (locale: string) => {
-    const { components } = this.state
-    const componentsArray = Object.keys(components)
-
-    const customMessages = componentsArray
-      .map(getLoadedImplementation)
-      .filter(
-        component =>
-          component &&
-          (component.getCustomMessages || component.WrappedComponent)
-      )
-      .map(component => {
-        const getCustomMessages =
-          component.getCustomMessages ||
-          (component.WrappedComponent &&
-            component.WrappedComponent.getCustomMessages) ||
-          noop
-        return getCustomMessages(locale)
-      })
-      .reduce((acc, strings) => ({ ...acc, ...strings }), {})
-
-    return customMessages
   }
 
   public goBack = () => {
@@ -565,13 +578,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             pages,
             settings,
           }: ParsedServerPageResponse) => {
+            const newMessages = { ...this.state.messages, ...messages }
+            this.updateSavedMessages({ newComponents: components, newMessages })
             this.setState(
               {
                 appsEtag,
                 components: { ...this.state.components, ...components },
                 extensions: { ...this.state.extensions, ...extensions },
                 loadedPages: loadedPages.add(matchingPage.routeId),
-                messages: { ...this.state.messages, ...messages },
+                messages: newMessages,
                 page: matchingPage.routeId,
                 pages,
                 preview: false,
@@ -608,6 +623,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             settings,
           }: ParsedPageQueryResponse) => {
             const updatedRoute = { ...transientRoute, ...matchingPage }
+            const newMessages = { ...this.state.messages, ...messages }
+            this.updateSavedMessages({ newComponents: components, newMessages })
             this.setState(
               {
                 appsEtag,
@@ -615,7 +632,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 components: { ...this.state.components, ...components },
                 extensions: { ...this.state.extensions, ...extensions },
                 loadedPages: loadedPages.add(page),
-                messages: { ...this.state.messages, ...messages },
+                messages: newMessages,
                 page,
                 pages,
                 preview: false,
@@ -663,7 +680,30 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
   }
 
+  public updateSavedMessages = ({
+    newComponents,
+    newMessages,
+  }: {
+    newComponents?: RenderProviderState['components']
+    newMessages?: RenderProviderState['messages']
+  }) => {
+    const {
+      culture: { locale },
+    } = this.state
+    const newCustomMessages = newComponents
+      ? getComponentsCustomMessages(locale, newComponents)
+      : null
+    if (newCustomMessages || newMessages) {
+      this.savedMessages = {
+        ...this.savedMessages,
+        ...(newMessages || {}),
+        ...(newCustomMessages || {}),
+      }
+    }
+  }
+
   public updateComponentAssets = (availableComponents: Components) => {
+    this.updateSavedMessages({ newComponents: availableComponents })
     this.setState({
       components: {
         ...this.state.components,
@@ -770,6 +810,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         })
 
     await new Promise<void>(resolve => {
+      this.updateSavedMessages({ newComponents: components })
       this.setState(
         state => ({
           appsEtag,
@@ -877,7 +918,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public addMessages = async (newMessages: RenderRuntime['messages']) => {
     const newStateMessages = { ...this.state.messages, ...newMessages }
-
+    this.updateSavedMessages({ newMessages: newStateMessages })
     await new Promise<void>(resolve => {
       this.setState(
         {
@@ -894,17 +935,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { children } = this.props
     const {
       culture: { locale },
-      messages,
       pages,
       page,
       query,
       production,
     } = this.state
-    const customMessages = this.getCustomMessages(locale)
-    const mergedMessages = {
-      ...messages,
-      ...customMessages,
-    }
 
     const component = children ? (
       React.cloneElement(children as ReactElement<any>, { query })
@@ -923,7 +958,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           <ApolloProvider client={this.apolloClient}>
             <IntlProvider
               locale={locale}
-              messages={mergedMessages}
+              messages={this.savedMessages}
               textComponent={Fragment}
             >
               <Fragment>
@@ -943,6 +978,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   // Deprecated
   private updateMessages = (newMessages: RenderProviderState['messages']) => {
+    this.updateSavedMessages({ newMessages })
     this.setState(
       prevState => ({
         ...prevState,
@@ -978,6 +1014,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       renderMajor,
       routeIds: Array.from(this.prefetchRoutes),
     })
+
+    this.updateSavedMessages({ newComponents: defaultComponents })
 
     await Promise.all(
       Object.keys(defaultComponents).map((component: string) => {
