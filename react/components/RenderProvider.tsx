@@ -264,7 +264,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.prefetchPages()
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
+  public UNSAFE_componentWillReceiveProps(nextProps: Props) {
     // If RenderProvider is being re-rendered, the global runtime might have changed
     // so we must update all extensions.
     if (this.rendered) {
