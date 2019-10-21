@@ -75,7 +75,7 @@ export default (module: Module, InitialImplementer: any) => {
 
     public render() {
       // eslint-disable-next-line
-      const { __emitter, __clearError, __errorInstance, ...props } = this.props
+      const { __emitter, __clearError, __errorInstance, treePath, ...props } = this.props
       return (
         this.props.__errorInstance || <HMRComponent.Implementer {...props} />
       )
