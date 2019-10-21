@@ -1,5 +1,5 @@
 import React from 'react'
-import ContentLoader from './ContentLoader'
+import { ContentLoader, Rect } from './ContentLoader2'
 
 interface Props {
   width: number
@@ -24,14 +24,12 @@ const Grid = ({ width, height }: Props) => {
     <ContentLoader width={width} height={height}>
       {Array.from({ length: itemsNumX }).map((_, x) =>
         Array.from({ length: itemsNumY }).map((__, y) => (
-          <rect
+          <Rect
             key={`${x}-${y}`}
             x={x * (itemWidth + spacingX)}
             y={y * (itemHeight + spacingY)}
             width={itemWidth}
             height={itemHeight}
-            rx="5"
-            ry="5"
           />
         ))
       )}

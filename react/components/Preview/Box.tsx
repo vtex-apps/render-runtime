@@ -1,5 +1,5 @@
 import React from 'react'
-import ContentLoader from './ContentLoader'
+import { ContentLoader, Rect } from './ContentLoader2'
 
 interface Props {
   width: number
@@ -8,7 +8,7 @@ interface Props {
 
 const Box = ({ width, height }: Props) => (
   <ContentLoader width={width} height={height}>
-    <rect x="0" y="0" rx="5" ry="5" width={width} height={height} />
+    <Rect x={0} y={0} width={width} height={height} />
   </ContentLoader>
 )
 

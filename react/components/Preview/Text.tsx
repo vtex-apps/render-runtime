@@ -1,5 +1,5 @@
 import React from 'react'
-import ContentLoader from './ContentLoader'
+import { ContentLoader, Rect } from './ContentLoader2'
 
 interface Props {
   width: number
@@ -22,12 +22,10 @@ const Text = ({ width, height }: Props) => {
         const widthMultiplier = isLast ? 0.7 : 1
         const lineWidth = width * widthMultiplier - horizontalMargin * 2
         return (
-          <rect
+          <Rect
             key={i}
             x={horizontalMargin}
             y={Math.round(i * actualLineSize)}
-            rx="5"
-            ry="5"
             width={lineWidth}
             height={lineHeight}
           />
