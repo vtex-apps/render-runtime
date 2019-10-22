@@ -7,13 +7,15 @@ import { useRuntime } from './RenderContext'
 import { useTreePath } from '../utils/treePath'
 import NoSSR from './NoSSR'
 import { withErrorBoundary } from './ErrorBoundary'
-import Box from './Preview/Box'
+import GenericPreview from './Preview/GenericPreview'
+import LoadingBar from './LoadingBar'
 
 interface Props {
   id: string
   key?: string
   params?: any
   query?: any
+  preview?: boolean
   treePath?: string
   blockProps?: object
 }
@@ -56,7 +58,6 @@ function withOuterExtensions(
   before: string[],
   treePath: string,
   props: any,
-  preview: boolean,
   element: JSX.Element
 ) {
   const beforeElements = before.map(beforeId => (
@@ -81,20 +82,10 @@ function withOuterExtensions(
 
   const isRootTreePath = treePath.indexOf('/') === -1
 
-  const padding = 90
-  const width = (window && window.innerWidth) || 0
-  const height = (window && window.innerHeight) || 0
-
-  const genericPreview = (
-    <div className={'center w-100'} style={{ padding }}>
-      <Box height={height} width={width} />
-    </div>
-  )
-
   const wrapped = (
     <Fragment key={`wrapped-${treePath}`}>
       {beforeElements}
-      {isRootTreePath && preview ? genericPreview : element}
+      {element}
       {isRootTreePath && <div className="flex flex-grow-1" />}
       {afterElements}
     </Fragment>
@@ -173,7 +164,7 @@ const ExtensionPoint: FC<Props> = props => {
       ? getChildExtensions(runtime, newTreePath)
       : children
 
-  const preview = runtime.preview
+  const isRootTreePath = newTreePath.indexOf('/') === -1
 
   const extensionPointComponent = withOuterExtensions(
     after,
@@ -181,16 +172,31 @@ const ExtensionPoint: FC<Props> = props => {
     before,
     newTreePath,
     mergedProps,
-    preview,
+
     <ExtensionPointComponent
       component={component}
       props={mergedProps}
       runtime={runtime}
       treePath={newTreePath}
     >
-      {component ? componentChildren : <Loading />}
+      {component ? (
+        componentChildren
+      ) : isRootTreePath ? (
+        <GenericPreview />
+      ) : (
+        <Loading />
+      )}
     </ExtensionPointComponent>
   )
+
+  if (runtime.preview && isRootTreePath) {
+    return (
+      <Fragment>
+        <LoadingBar />
+        {extensionPointComponent}
+      </Fragment>
+    )
+  }
 
   // "client" component assets are sent to server side rendering,
   // but they should display a loading animation.
