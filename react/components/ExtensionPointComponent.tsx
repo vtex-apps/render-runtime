@@ -1,5 +1,4 @@
 import ReactDOM from 'react-dom'
-import PropTypes from 'prop-types'
 import React, { ErrorInfo, PureComponent } from 'react'
 
 import { getImplementation } from '../utils/assets'
@@ -31,14 +30,6 @@ class ExtensionPointComponent extends PureComponent<
   Props & RenderContextProps,
   State
 > {
-  public static propTypes = {
-    children: PropTypes.node,
-    component: PropTypes.string,
-    props: PropTypes.object,
-    runtime: PropTypes.object,
-    treePath: PropTypes.string,
-  }
-
   private _isMounted!: boolean
   private mountedError!: boolean
 
