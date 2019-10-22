@@ -5,15 +5,18 @@ import { getImplementation } from '../utils/assets'
 import graphQLErrorsStore from '../utils/graphQLErrorsStore'
 
 import ExtensionPointError from './ExtensionPointError'
-import Loading from './Loading'
+import GenericPreview from './Preview/GenericPreview'
+import { withLoading } from './LoadingContext'
 import { RenderContextProps } from './RenderContext'
 import { TreePathContextProvider } from '../utils/treePath'
 import { isSiteEditorIframe } from '../utils/dom'
+import { Loading } from '../core/main'
 
 interface Props {
   component: string | null
   props: any
   treePath: string
+  setLoading?: (treePath: string, value: boolean) => void
 }
 
 interface State {
@@ -71,6 +74,7 @@ class ExtensionPointComponent extends PureComponent<
       if (!(component in componentPromiseMap)) {
         componentPromiseMap[component] = fetchComponent(component)
       } else if (componentPromiseResolvedMap[component]) {
+        this.stopLoading()
         throw new Error(`Unable to fetch component ${component}`)
       }
 
@@ -78,10 +82,26 @@ class ExtensionPointComponent extends PureComponent<
         .then(() => {
           componentPromiseResolvedMap[component] = true
           this.updateComponentsWithEvent(component)
+          this.stopLoading()
         })
         .catch(() => {
           componentPromiseResolvedMap[component] = true
+          this.stopLoading()
         })
+    } else {
+      this.stopLoading()
+    }
+  }
+
+  private stopLoading = () => {
+    if (this.props.setLoading) {
+      this.props.setLoading(this.props.treePath, false)
+    }
+  }
+
+  private startLoading = () => {
+    if (this.props.setLoading) {
+      this.props.setLoading(this.props.treePath, true)
     }
   }
 
@@ -108,6 +128,7 @@ class ExtensionPointComponent extends PureComponent<
 
   public componentDidMount() {
     this._isMounted = true
+    this.startLoading()
     this.fetchAndRerender()
     this.addDataToElementIfEditable()
   }
@@ -136,6 +157,7 @@ class ExtensionPointComponent extends PureComponent<
       children,
       treePath,
       runtime: { production, page },
+      props: componentProps,
     } = this.props
     const { error, errorInfo, operationIds } = this.state
     const Component = component && getImplementation(component)
@@ -166,12 +188,24 @@ class ExtensionPointComponent extends PureComponent<
       delete props.__clearError
     }
 
+    const isRootTreePath = treePath.indexOf('/') === -1
+    const isAround = treePath.indexOf('$around') !== -1
+
     return (
       <TreePathContextProvider treePath={treePath}>
         {Component ? (
           <Component {...props}>{children}</Component>
+        ) : isRootTreePath || isAround ? (
+          /* Adds header/footer before and after the preview during loading,
+           * if the component being loaded is a root component--e.g. context
+           * wrappers, `around` wrappers */
+          <>
+            {componentProps.beforeElements}
+            <GenericPreview />
+            {componentProps.afterElements}
+          </>
         ) : (
-          children || <Loading />
+          <Loading />
         )}
       </TreePathContextProvider>
     )
@@ -213,4 +247,4 @@ class ExtensionPointComponent extends PureComponent<
   }
 }
 
-export default ExtensionPointComponent
+export default withLoading(ExtensionPointComponent)
