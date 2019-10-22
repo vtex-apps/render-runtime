@@ -98,6 +98,8 @@ function withOuterExtensions(
         id={aroundId}
         key={aroundId}
         treePath={treePath}
+        beforeElements={beforeElements}
+        afterElements={afterElements}
       >
         {acc}
       </ExtensionPoint>
