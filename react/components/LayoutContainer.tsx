@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { useTreePath } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 import { useRuntime } from './RenderContext'
+import { LoadingWrapper } from './LoadingContext'
 
 type Element = string | ElementArray
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -135,6 +136,7 @@ const LayoutContainer: React.FunctionComponent<
   const { treePath } = useTreePath()
 
   const extension = extensions[treePath]
+
   const elements =
     (extension &&
       extension.blocks &&
@@ -142,7 +144,7 @@ const LayoutContainer: React.FunctionComponent<
     []
   const containerProps = { ...props, elements }
 
-  return (
+  const container = (
     <Container
       {...containerProps}
       preview={preview}
@@ -150,6 +152,14 @@ const LayoutContainer: React.FunctionComponent<
       isMobile={hints.mobile}
     />
   )
+
+  const isRootTreePath = treePath.indexOf('/') === -1
+
+  if (extension.preview && isRootTreePath) {
+    return <LoadingWrapper>{container}</LoadingWrapper>
+  }
+
+  return container
 }
 
 export default LayoutContainer
