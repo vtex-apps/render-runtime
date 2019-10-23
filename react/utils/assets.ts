@@ -1,5 +1,10 @@
 import queryString from 'query-string'
 import { getLoadedComponent } from './registerComponent'
+import { isEnabled } from './flags'
+
+const imageHost = isEnabled('VTEX_ASSETS_URL')
+  ? 'vtexassets.com'
+  : 'vteximg.com.br'
 
 function getExtension(path: string) {
   const adjPath = path.split('?')[0]
@@ -12,7 +17,7 @@ const isRelative = (path: string) => {
 }
 
 export const getVTEXImgHost = (account: string) => {
-  return `https://${account}.vteximg.com.br`
+  return `https://${account}.${imageHost}`
 }
 
 const getAbsoluteURL = (
