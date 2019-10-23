@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react'
 import { Query, Mutation } from 'react-apollo'
 import { compose } from 'ramda'
 
+const noop = () => {}
+
 class RenderRuntimeQuery extends PureComponent<{
   children: (result: any) => JSX.Element | null
 }> {
@@ -14,6 +16,7 @@ class RenderRuntimeQuery extends PureComponent<{
         {result => {
           if (result.networkStatus === 1 && result.data === undefined) {
             result.data = {} as any
+            result.refetch = noop as any
           }
           return children(result)
         }}
