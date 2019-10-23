@@ -343,6 +343,7 @@ declare global {
     pages: RenderRuntime['pages']
     route: MatchingServerPage
     settings: RenderRuntime['settings']
+    queryData: RenderRuntime['queryData']
   }
 
   interface PageQueryResponse {
@@ -457,6 +458,11 @@ declare global {
     rootPath?: string
     workspaceCookie: string
     hasNewExtensions: boolean
+    queryData?: {
+      query: string
+      variables: any
+      data: string
+    }
   }
 
   interface CacheHints {
