@@ -97,6 +97,7 @@ const runtimeFields = [
   'page',
   'pages',
   'query',
+  'queryData',
   'route',
   'runtimeMeta',
   'settings',
@@ -135,10 +136,12 @@ export const fetchServerPage = async ({
     pages,
     route,
     route: { routeId },
+    queryData,
   } = page
   if (routeId === 'redirect') {
     window.location.href = route.path
   }
+
   const queryString = stringify(rawQuery || {})
   const routePath = `${path}${queryString ? '?' + queryString : queryString}`
 
@@ -154,6 +157,7 @@ export const fetchServerPage = async ({
       ...route,
       path: routePath,
     },
+    queryData,
   }
 }
 
