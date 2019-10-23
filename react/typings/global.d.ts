@@ -531,6 +531,7 @@ declare global {
     ReactIntlLocaleData: any
     rendered: Promise<RenderedSuccess> | RenderedFailure
     requestIdleCallback: (callback: (...args) => any | void) => number
+    ReactApollo: any
   }
 
   interface BlockEntry {
