@@ -133,7 +133,7 @@ export const getClient = (
       persistedQueryLink,
       uriSwitchLink,
       ...cacheLink,
-      fetcherLink, //this is a final link
+      fetcherLink,
     ])
 
     clientsByWorkspace[`${account}/${workspace}`] = new ApolloClient({
