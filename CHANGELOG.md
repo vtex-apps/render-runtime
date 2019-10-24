@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Add code to use vtexassets.com as image host. But it is disabled for now.
 
 ## [8.72.1] - 2019-10-23
 ### Fixed
