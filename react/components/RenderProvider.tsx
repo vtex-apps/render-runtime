@@ -107,9 +107,9 @@ const getComponentsCustomMessages = (
       if (!strings) {
         return acc
       }
-      Object.keys(strings).forEach(
-        stringKey => (acc[stringKey] = strings[stringKey])
-      )
+      for (const stringKey in strings) {
+        acc[stringKey] = strings[stringKey]
+      }
     }, {})
 
   return customMessages
