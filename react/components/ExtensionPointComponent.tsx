@@ -1,6 +1,5 @@
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import { forEachObjIndexed, pickBy } from 'ramda'
 import React, { ErrorInfo, PureComponent } from 'react'
 
 import { getImplementation } from '../utils/assets'
