@@ -27,16 +27,16 @@ export const useRuntime = () => {
 export const withRuntimeContext = <TOriginalProps extends {} = {}>(
   Component: ComponentType<TOriginalProps & RenderContextProps>
 ): ComponentType<TOriginalProps> => {
-  const ExtendedComponent = (props: TOriginalProps) => (
-    <RenderContext.Consumer>
-      {runtime => <Component {...props} runtime={runtime} />}
-    </RenderContext.Consumer>
-  )
-  ExtendedComponent.displayName = `ExtendedComponent(${Component.displayName ||
+  const WithRuntimeContext = (props: TOriginalProps) => {
+    const runtime = useRuntime()
+    return <Component {...props} runtime={runtime} />
+  }
+  WithRuntimeContext.displayName = `withRuntimeContext(${Component.displayName ||
     Component.name ||
     'Component'})`
+  WithRuntimeContext.WrappedComponent = Component
   return hoistNonReactStatics<TOriginalProps, RenderContextProps>(
-    ExtendedComponent,
+    WithRuntimeContext,
     Component
   )
 }
@@ -44,22 +44,14 @@ export const withRuntimeContext = <TOriginalProps extends {} = {}>(
 export const withEmitter = <TOriginalProps extends {} = {}>(
   Component: ComponentType<TOriginalProps & EmitterProps>
 ): ComponentType<TOriginalProps> => {
-  class WithEmitter extends React.Component<TOriginalProps> {
-    public static get displayName(): string {
-      return `WithEmitter(${Component.displayName ||
-        Component.name ||
-        'Component'})`
-    }
-
-    public render() {
-      return (
-        <RenderContext.Consumer>
-          {runtime => <Component {...this.props} __emitter={runtime.emitter} />}
-        </RenderContext.Consumer>
-      )
-    }
+  const WithEmitter = (props: TOriginalProps) => {
+    const { emitter } = useRuntime()
+    return <Component {...props} __emitter={emitter} />
   }
-
+  WithEmitter.displayName = `withEmitter(${Component.displayName ||
+    Component.name ||
+    'Component'})`
+  WithEmitter.WrappedComponent = Component
   return hoistNonReactStatics<TOriginalProps, EmitterProps>(
     WithEmitter,
     Component

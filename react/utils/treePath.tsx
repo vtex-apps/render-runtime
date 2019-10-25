@@ -70,28 +70,18 @@ export interface TreePathProps {
 export function withTreePath<TOriginalProps>(
   Component: ComponentType<TOriginalProps & TreePathProps>
 ): ComponentType<TOriginalProps> {
-  class TreePath extends React.Component<TOriginalProps, TreePathProps> {
-    public static get displayName(): string {
-      return `TreePath(${Component.displayName ||
-        Component.name ||
-        'Component'})`
-    }
-
-    public static get WrappedComponent() {
-      return Component
-    }
-
-    public render() {
-      return (
-        <TreePathContext.Consumer>
-          {({ treePath }) => <Component {...this.props} treePath={treePath} />}
-        </TreePathContext.Consumer>
-      )
-    }
+  const WithTreePath = (props: TOriginalProps) => {
+    const { treePath } = useTreePath()
+    return <Component {...props} treePath={treePath} />
   }
 
+  WithTreePath.displayName = `TreePath(${Component.displayName ||
+    Component.name ||
+    'Component'})`
+  WithTreePath.WrappedComponent = Component
+
   return hoistNonReactStatics<TOriginalProps, TreePathProps>(
-    TreePath,
+    WithTreePath,
     Component
   )
 }
