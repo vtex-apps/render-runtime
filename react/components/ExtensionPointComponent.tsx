@@ -1,7 +1,5 @@
 import ReactDOM from 'react-dom'
-import * as Sentry from '@sentry/browser'
 import PropTypes from 'prop-types'
-import { forEachObjIndexed, pickBy } from 'ramda'
 import React, { ErrorInfo, PureComponent } from 'react'
 
 import { getImplementation } from '../utils/assets'
@@ -105,52 +103,10 @@ class ExtensionPointComponent extends PureComponent<
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    const {
-      component,
-      props,
-      runtime: { production, account, workspace },
-      runtime,
-      treePath: path,
-    } = this.props
-    // eslint-disable-next-line
-    const { children, __errorInstance, __clearError, ...componentProps } = props
+    const { component, treePath: path } = this.props
 
     console.error('Failed to render extension point', path, component)
     const operationIds = graphQLErrorsStore.getOperationIds()
-    // Only log 10 percent of the errors so we dont exceed our quota
-    if (production && Math.random() < 0.1) {
-      Sentry.withScope(scope => {
-        const blacklistedRuntimeKeys = [
-          'cacheHints',
-          'components',
-          'culture',
-          'emitter',
-          'history',
-          'messages',
-        ]
-
-        const filteredRuntime = pickBy((val, key) => {
-          return (
-            typeof val !== 'function' && !blacklistedRuntimeKeys.includes(key)
-          )
-        }, runtime)
-
-        forEachObjIndexed((value, key) => {
-          scope.setExtra(`runtime.${key}`, value)
-        }, filteredRuntime)
-
-        scope.setExtra('treePath', path)
-        scope.setExtra('props', componentProps)
-        scope.setExtra('operationIds', operationIds)
-
-        scope.setTag('account', account)
-        scope.setTag('workspace', workspace)
-        scope.setTag('component', component || '')
-        scope.setTag('domain', runtime.route.domain)
-        scope.setTag('page', runtime.page)
-        Sentry.captureException(error)
-      })
-    }
 
     this.setState({
       error,

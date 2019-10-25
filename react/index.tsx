@@ -1,7 +1,6 @@
 /* global module */
 import 'core-js/es6/symbol'
 import 'core-js/fn/symbol/iterator'
-import * as Sentry from '@sentry/browser'
 import { canUseDOM } from 'exenv'
 import * as runtimeGlobals from './core/main'
 
@@ -54,19 +53,6 @@ if (!window.__RUNTIME__.amp) {
 
 if (window.ReactApollo) {
   window.ReactApollo = createCustomReactApollo()
-}
-
-const sentryDSN = 'https://2fac72ea180d48ae9bf1dbb3104b4000@sentry.io/1292015'
-
-if (canUseDOM && window.__RUNTIME__.production) {
-  const { version = '' } = window.__RUNTIME__.runtimeMeta || {}
-  Sentry.init({
-    beforeSend: (event: Sentry.SentryEvent) =>
-      event.tags && event.tags.component ? event : null,
-    dsn: sentryDSN,
-    environment: canUseDOM ? 'browser' : 'ssr',
-    release: version,
-  })
 }
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
