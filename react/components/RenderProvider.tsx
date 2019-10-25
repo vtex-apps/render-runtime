@@ -580,7 +580,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 settings,
               },
               () => {
-                this.replaceRouteClass(page)
+                this.replaceRouteClass(matchingPage.routeId)
                 this.sendInfoFromIframe()
               }
             )
