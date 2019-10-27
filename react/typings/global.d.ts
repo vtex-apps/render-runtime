@@ -83,6 +83,7 @@ declare global {
     content?: Record<string, any>
     render?: RenderStrategy
     preview?: Preview
+    static?: StaticStrategy
     composition?: Composition
     hasContentSchema?: boolean
     contentIds?: string[]
@@ -575,6 +576,7 @@ declare global {
     originalBlockId?: string
     preview?: Preview
     render: RenderStrategy
+    static?: StaticStrategy
     track?: string[]
     title?: string
   }
@@ -589,6 +591,7 @@ declare global {
   }
 
   type RenderStrategy = 'client' | 'lazy' | 'server'
+  type StaticStrategy = 'always' | 'on-interaction' | 'never'
   type BlockContentTree = Record<string, TreeEntry>
   type Blocks = Record<string, BlockEntry>
 
