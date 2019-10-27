@@ -11,12 +11,14 @@ import { RenderContextProps } from './RenderContext'
 import { TreePathContextProvider } from '../utils/treePath'
 import { isSiteEditorIframe } from '../utils/dom'
 import { Loading } from '../core/main'
+import StaticStrategyParent from './StaticStrategyParent'
 
 interface Props {
   component: string | null
   props: any
   treePath: string
   setLoading?: (treePath: string, value: boolean) => void
+  staticStrategy: StaticStrategy
 }
 
 interface State {
@@ -158,6 +160,7 @@ class ExtensionPointComponent extends PureComponent<
       treePath,
       runtime: { production, page },
       props: componentProps,
+      staticStrategy,
     } = this.props
     const { error, errorInfo, operationIds } = this.state
     const Component = component && getImplementation(component)
@@ -194,7 +197,9 @@ class ExtensionPointComponent extends PureComponent<
     return (
       <TreePathContextProvider treePath={treePath}>
         {Component ? (
-          <Component {...props}>{children}</Component>
+          <StaticStrategyParent staticStrategy={staticStrategy}>
+            <Component {...props}>{children}</Component>
+          </StaticStrategyParent>
         ) : isRootTreePath || isAround ? (
           /* Adds header/footer before and after the preview during loading,
            * if the component being loaded is a root component--e.g. context
