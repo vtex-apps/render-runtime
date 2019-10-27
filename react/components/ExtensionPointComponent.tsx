@@ -10,11 +10,13 @@ import Loading from './Loading'
 import { RenderContextProps } from './RenderContext'
 import { TreePathContextProvider } from '../utils/treePath'
 import { isSiteEditorIframe } from '../utils/dom'
+import StaticStrategyParent from './StaticStrategyParent'
 
 interface Props {
   component: string | null
   props: any
   treePath: string
+  staticStrategy: StaticStrategy
 }
 
 interface State {
@@ -145,6 +147,7 @@ class ExtensionPointComponent extends PureComponent<
       children,
       treePath,
       runtime: { production, page },
+      staticStrategy,
     } = this.props
     const { error, errorInfo, operationIds } = this.state
     const Component = component && getImplementation(component)
@@ -178,7 +181,9 @@ class ExtensionPointComponent extends PureComponent<
     return (
       <TreePathContextProvider treePath={treePath}>
         {Component ? (
-          <Component {...props}>{children}</Component>
+          <StaticStrategyParent staticStrategy={staticStrategy}>
+            <Component {...props}>{children}</Component>
+          </StaticStrategyParent>
         ) : (
           children || <Loading />
         )}
