@@ -21,6 +21,7 @@ import { createIOFetchLink } from './links/ioFetchLink'
 import { omitTypenameLink } from './links/omitVariableTypenameLink'
 import { createUriSwitchLink } from './links/uriSwitchLink'
 import { versionSplitterLink } from './links/versionSplitterLink'
+import { waitOnLoadLink } from './links/onLoadLink'
 
 interface ApolloClientsRegistry {
   [key: string]: ApolloClient<NormalizedCacheObject>
@@ -130,6 +131,7 @@ export const getClient = (
       versionSplitterLink,
       runtimeContextLink,
       ensureSessionLink,
+      waitOnLoadLink,
       persistedQueryLink,
       uriSwitchLink,
       ...cacheLink,
