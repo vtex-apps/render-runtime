@@ -228,7 +228,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             ${query}
           `,
           data: JSON.parse(data),
-          variables: { ...variables, skipCategoryTree: true },
+          variables,
         })
       } catch (error) {
         console.warn(
@@ -593,7 +593,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                     ${query}
                   `,
                   data: JSON.parse(data),
-                  variables: { ...variables, skipCategoryTree: true },
+                  variables,
                 })
               } catch (error) {
                 console.warn(
