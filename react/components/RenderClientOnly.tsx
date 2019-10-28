@@ -3,7 +3,7 @@ import { canUseDOM } from 'exenv'
 
 class RenderClientOnly extends Component {
   shouldComponentUpdate() {
-    return canUseDOM
+    return !canUseDOM
   }
 
   render() {

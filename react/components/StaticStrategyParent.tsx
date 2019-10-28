@@ -1,6 +1,6 @@
 import React, { FC, Fragment } from 'react'
 import RenderClientOnly from './RenderClientOnly'
-import RenderOnInteraction from './RenderonInteraction'
+import RenderOnInteraction from './RenderOnInteraction'
 
 const StaticStrategyParent: FC<{ staticStrategy: StaticStrategy }> = ({
   staticStrategy,
