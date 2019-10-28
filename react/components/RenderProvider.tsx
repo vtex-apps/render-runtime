@@ -221,21 +221,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       cacheControl
     )
     if (queryData) {
-      const { data, query, variables } = queryData
-      try {
-        this.apolloClient.writeQuery({
-          query: gql`
-            ${query}
-          `,
-          data: JSON.parse(data),
-          variables,
-        })
-      } catch (error) {
-        console.warn(
-          `Error writing query from render-server in Apollo's cache`,
-          error
-        )
-      }
+      this.hydrateApolloCache(queryData)
     }
 
     this.state = {
@@ -586,21 +572,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             queryData,
           }: ParsedServerPageResponse) => {
             if (queryData) {
-              const { data, query, variables } = queryData
-              try {
-                this.apolloClient.writeQuery({
-                  query: gql`
-                    ${query}
-                  `,
-                  data: JSON.parse(data),
-                  variables,
-                })
-              } catch (error) {
-                console.warn(
-                  `Error writing query from render-server in Apollo's cache`,
-                  error
-                )
-              }
+              this.hydrateApolloCache(queryData)
             }
             this.setState(
               {
@@ -976,6 +948,31 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         </TreePathContextProvider>
       </RenderContextProvider>
     )
+  }
+
+  private hydrateApolloCache = ({
+    data,
+    query,
+    variables,
+  }: {
+    data: string
+    query: string
+    variables: Record<string, any>
+  }) => {
+    try {
+      this.apolloClient.writeQuery({
+        query: gql`
+          ${query}
+        `,
+        data: JSON.parse(data),
+        variables,
+      })
+    } catch (error) {
+      console.warn(
+        `Error writing query from render-server in Apollo's cache`,
+        error
+      )
+    }
   }
 
   // Deprecated
