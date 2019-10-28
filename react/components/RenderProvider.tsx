@@ -11,6 +11,7 @@ import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
+import gql from 'graphql-tag'
 
 import {
   fetchAssets,
@@ -178,6 +179,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       rootPath = '',
       route,
       settings,
+      queryData,
     } = props.runtime
     const { history, baseURI, cacheControl } = props
     const ignoreCanonicalReplacement = query && query.map
@@ -218,6 +220,23 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       this.fetcher,
       cacheControl
     )
+    if (queryData) {
+      const { data, query, variables } = queryData
+      try {
+        this.apolloClient.writeQuery({
+          query: gql`
+            ${query}
+          `,
+          data: JSON.parse(data),
+          variables: { ...variables, skipCategoryTree: true },
+        })
+      } catch (error) {
+        console.warn(
+          `Error writing query from render-server in Apollo's cache`,
+          error
+        )
+      }
+    }
 
     this.state = {
       appsEtag,
@@ -564,7 +583,25 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             messages,
             pages,
             settings,
+            queryData,
           }: ParsedServerPageResponse) => {
+            if (queryData) {
+              const { data, query, variables } = queryData
+              try {
+                this.apolloClient.writeQuery({
+                  query: gql`
+                    ${query}
+                  `,
+                  data: JSON.parse(data),
+                  variables: { ...variables, skipCategoryTree: true },
+                })
+              } catch (error) {
+                console.warn(
+                  `Error writing query from render-server in Apollo's cache`,
+                  error
+                )
+              }
+            }
             this.setState(
               {
                 appsEtag,
