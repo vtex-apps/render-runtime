@@ -55,6 +55,7 @@ const MaybeContext: FC<Props> = ({
       props={contextProps}
       runtime={runtime}
       treePath={nestedPage}
+      staticStrategy={'never'}
     >
       {children}
     </ExtensionPointComponent>

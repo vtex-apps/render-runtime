@@ -4,22 +4,37 @@ import { canUseDOM } from 'exenv'
 class RenderOnInteraction extends Component {
   state = {
     canRender: false,
+    count: 0,
   }
 
   shouldComponentUpdate() {
-    return canUseDOM || this.state.canRender
+    const shouldUpdate = !canUseDOM || this.state.canRender
+    if (!shouldUpdate) {
+      console.log('teste BLOCKING UPDATE!')
+    }
+    console.log('teste returning: ', shouldUpdate)
+    return shouldUpdate
   }
 
   changeCanRender() {
-    this.setState({ canRender: true })
+    console.log('teste change can render!')
+    this.setState({ canRender: true, count: this.state.count + 1 })
   }
 
   render() {
+    console.log('teste state:', this.state)
     if (!this.state.canRender) {
+      console.log('teste RENDER STATIC:', this.state)
       return (
-        <div onMouseEnter={this.changeCanRender}>{this.props.children}</div>
+        <div
+          className={`teste-static-${this.state.count}`}
+          onMouseEnter={this.changeCanRender}
+        >
+          {this.props.children}
+        </div>
       )
     }
+    console.log('teste count:', this.state.count)
     return this.props.children
   }
 }
