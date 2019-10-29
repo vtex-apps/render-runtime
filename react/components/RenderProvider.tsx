@@ -1,7 +1,6 @@
 import { NormalizedCacheObject } from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
-import { Subscription } from 'apollo-client/util/Observable'
-import { ApolloLink, NextLink, Observable, Operation } from 'apollo-link'
+import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
@@ -14,8 +13,8 @@ import { IntlProvider } from 'react-intl'
 
 import {
   fetchAssets,
-  prefetchAssets,
   getLoadedImplementation,
+  prefetchAssets,
 } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
@@ -209,12 +208,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ? window.__RENDER_8_SESSION__.sessionPromise
       : Promise.resolve()
     const runtimeContextLink = this.createRuntimeContextLink()
-    const ensureSessionLink = this.createEnsureSessionLink()
     this.apolloClient = getClient(
       props.runtime,
       baseURI,
       runtimeContextLink,
-      ensureSessionLink,
+      this.sessionPromise,
       this.fetcher,
       cacheControl
     )
@@ -792,32 +790,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     })
 
     await this.sendInfoFromIframe()
-  }
-
-  public createEnsureSessionLink() {
-    return new ApolloLink(
-      (operation: Operation, forward?: NextLink) =>
-        new Observable(observer => {
-          let handle: Subscription | undefined
-          this.sessionPromise
-            .then(() => {
-              handle =
-                forward &&
-                forward(operation).subscribe({
-                  complete: observer.complete.bind(observer),
-                  error: observer.error.bind(observer),
-                  next: observer.next.bind(observer),
-                })
-            })
-            .catch(observer.error.bind(observer))
-
-          return () => {
-            if (handle) {
-              handle.unsubscribe()
-            }
-          }
-        })
-    )
   }
 
   public createRuntimeContextLink() {

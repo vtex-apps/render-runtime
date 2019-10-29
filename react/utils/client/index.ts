@@ -17,6 +17,7 @@ import graphQLErrorsStore from '../graphQLErrorsStore'
 import { generateHash } from './generateHash'
 import { toBase64Link } from './links/base64Link'
 import { cachingLink } from './links/cachingLink'
+import { ensureSessionLink } from './links/ensureSessionLink'
 import { createIOFetchLink } from './links/ioFetchLink'
 import { omitTypenameLink } from './links/omitVariableTypenameLink'
 import { createUriSwitchLink } from './links/uriSwitchLink'
@@ -70,7 +71,7 @@ export const getClient = (
   runtime: RenderRuntime,
   baseURI: string,
   runtimeContextLink: ApolloLink,
-  ensureSessionLink: ApolloLink,
+  sessionPromise: Promise<any>,
   fetcher: GlobalFetch['fetch'],
   cacheControl?: PageCacheControl
 ) => {
@@ -129,9 +130,9 @@ export const getClient = (
       omitTypenameLink,
       versionSplitterLink,
       runtimeContextLink,
-      ensureSessionLink,
       persistedQueryLink,
       uriSwitchLink,
+      ensureSessionLink(sessionPromise),
       ...cacheLink,
       fetcherLink, //this is a final link
     ])
