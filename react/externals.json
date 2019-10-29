@@ -2,10 +2,6 @@
   "commons": {
     "dev": [
       {
-        "clientOnly": true,
-        "path": "npm:vtex-render-session@1.6.0/dist/index.js"
-      },
-      {
         "path": "npm:bluebird@3.5.1/js/browser/bluebird.js",
         "serverOnly": true
       },
@@ -72,15 +68,15 @@
         "path": "npm:vtex-tachyons@3.1.0/tachyons.css"
       },
       {
+        "clientOnly": true,
+        "path": "npm:vtex-render-session@1.6.0/dist/index.js"
+      },
+      {
         "path": "runtime:AMP",
         "serverOnly": true
       }
     ],
     "prod": [
-      {
-        "clientOnly": true,
-        "path": "npm:vtex-render-session@1.6.0/dist/index.min.js"
-      },
       {
         "path": "npm:bluebird@3.5.1/js/browser/bluebird.min.js",
         "serverOnly": true
@@ -146,6 +142,10 @@
       },
       {
         "path": "npm:vtex-tachyons@3.1.0/tachyons.min.css"
+      },
+      {
+        "clientOnly": true,
+        "path": "npm:vtex-render-session@1.6.0/dist/index.min.js"
       },
       {
         "path": "runtime:AMP",
