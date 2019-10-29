@@ -150,7 +150,11 @@ const mergeRecursively = (accumulator: any, value: any) => {
 const createOperationForQuery = (operation: Operation) => (
   query: DocumentNode
 ) => {
-  const graphQLRequest: GraphQLRequest = { ...operation, query }
+  const graphQLRequest: GraphQLRequest = {
+    ...operation,
+    query,
+    extensions: { ...operation.extensions },
+  }
   const op = validateOperation(transformOperation(graphQLRequest))
   return createOperation(operation.getContext(), op)
 }
