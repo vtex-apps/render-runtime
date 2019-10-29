@@ -10,6 +10,7 @@ import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
+import gql from 'graphql-tag'
 
 import {
   fetchAssets,
@@ -177,6 +178,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       rootPath = '',
       route,
       settings,
+      queryData,
     } = props.runtime
     const { history, baseURI, cacheControl } = props
     const ignoreCanonicalReplacement = query && query.map
@@ -216,6 +218,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       this.fetcher,
       cacheControl
     )
+    if (queryData) {
+      this.hydrateApolloCache(queryData)
+    }
 
     this.state = {
       appsEtag,
@@ -562,7 +567,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             messages,
             pages,
             settings,
+            queryData,
           }: ParsedServerPageResponse) => {
+            if (queryData) {
+              this.hydrateApolloCache(queryData)
+            }
             this.setState(
               {
                 appsEtag,
@@ -911,6 +920,31 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         </TreePathContextProvider>
       </RenderContextProvider>
     )
+  }
+
+  private hydrateApolloCache = ({
+    data,
+    query,
+    variables,
+  }: {
+    data: string
+    query: string
+    variables: Record<string, any>
+  }) => {
+    try {
+      this.apolloClient.writeQuery({
+        query: gql`
+          ${query}
+        `,
+        data: JSON.parse(data),
+        variables,
+      })
+    } catch (error) {
+      console.warn(
+        `Error writing query from render-server in Apollo's cache`,
+        error
+      )
+    }
   }
 
   // Deprecated
