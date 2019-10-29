@@ -127,7 +127,6 @@ export const createUriSwitchLink = (
       }
       return {
         ...oldContext,
-        scope,
         fetchOptions: { ...fetchOptions, method },
         uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}&locale=${locale}`,
       }
