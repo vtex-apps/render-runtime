@@ -14,14 +14,8 @@ export const ensureSessionLink = (sessionPromise: Promise<any>) => {
           ? sessionPromise
           : Promise.resolve()
 
-        const rand = Math.random().toFixed(3)
-        const timer = `[${rand}]: ${operation.operationName}: ${scope}`
-        console.time(timer)
-
         promise
           .then(() => {
-            console.timeEnd(`[${rand}]: ${operation.operationName}: ${scope}`)
-
             handle =
               forward &&
               forward(operation).subscribe({
