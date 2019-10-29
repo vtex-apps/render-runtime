@@ -1,9 +1,9 @@
 import { ApolloLink, NextLink, Observable, Operation } from 'apollo-link'
 import { Subscription } from 'apollo-client/util/Observable'
 
-export const ensureSessionLink = (sessionPromise: Promise<any>) => {
-  const sessionRequiredForScope = new Set(['segment', 'private'])
+const sessionRequiredForScope = new Set(['segment', 'private'])
 
+export const ensureSessionLink = (sessionPromise: Promise<any>) => {
   return new ApolloLink(
     (operation: Operation, forward?: NextLink) =>
       new Observable(observer => {
