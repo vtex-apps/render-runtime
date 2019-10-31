@@ -14,12 +14,15 @@ interface LoadingContext {
   setLoading: (treePath: string, isLoading: boolean) => void
   isParentLoading?: boolean
 }
-export const LoadingContext = React.createContext<LoadingContext>({
+
+const LoadingContext = React.createContext<LoadingContext>({
   setLoading: () => {},
   isParentLoading: false,
 })
 
 LoadingContext.displayName = 'LoadingContext'
+
+const LoadingContextProvider = LoadingContext.Provider
 
 interface LoadingState {
   components: { [key: string]: boolean }
@@ -55,7 +58,7 @@ const displayLoader = (
 
 /** TODO: LoadingWrapper is in the end a makeshift Suspense.
  * Should probably be replaced in the future. */
-export const LoadingWrapper: FunctionComponent = ({ children }) => {
+const LoadingWrapper: FunctionComponent = ({ children }) => {
   /* Uses Ref instead of state to prevent rerenders */
   const state = useRef<LoadingState>({ components: {} })
 
@@ -132,6 +135,7 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
        * to cause some bugs. */
       <LoadingContext.Provider value={value}>
         <div
+          // Content container
           ref={contentContainer}
           style={{
             opacity: isSSR ? 1 : 0,
@@ -142,10 +146,12 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
           {children}
         </div>
         <div
+          // Loader container
           ref={loaderContainer}
           suppressHydrationWarning
           style={{ display: isSSR ? 'none' : 'unset' }}
         >
+          {/** TODO: Use a better preview in the future */}
           <GenericPreview />
         </div>
       </LoadingContext.Provider>
@@ -156,19 +162,20 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
   return returnValue
 }
 
-export const withLoading = <T extends {}>(Component: ComponentType<T>) => {
+const useLoadingContext = () => {
+  return useContext(LoadingContext)
+}
+
+const withLoading = <T extends {}>(Component: ComponentType<T>) => {
   const EnhancedComponent: FunctionComponent<T> = props => {
     const isSSR = !window.navigator
+    const { setLoading } = useLoadingContext()
 
     if (isSSR) {
       return <Component {...props} setLoading={() => {}} />
     }
 
-    return (
-      <LoadingContext.Consumer>
-        {({ setLoading }) => <Component {...props} setLoading={setLoading} />}
-      </LoadingContext.Consumer>
-    )
+    return <Component {...props} setLoading={setLoading} />
   }
 
   EnhancedComponent.displayName = `WithLoading(${Component.displayName ||
@@ -176,4 +183,11 @@ export const withLoading = <T extends {}>(Component: ComponentType<T>) => {
     'Component'})`
 
   return EnhancedComponent
+}
+
+export {
+  LoadingWrapper,
+  useLoadingContext,
+  withLoading,
+  LoadingContextProvider,
 }
