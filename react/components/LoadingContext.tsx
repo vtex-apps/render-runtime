@@ -42,16 +42,31 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
 
     const isLoading = isParentLoading || areComponentsLoaded
 
+    const displayContent = () => {
+      if (childrenContainer.current) {
+        childrenContainer.current.style.position = ''
+        childrenContainer.current.style.width = ''
+        childrenContainer.current.style.opacity = ''
+      }
+      if (loadingContainer.current) {
+        loadingContainer.current.style.display = 'none'
+      }
+    }
+
+    const displayLoader = () => {
+      if (childrenContainer.current) {
+        childrenContainer.current.style.position = 'absolute'
+        childrenContainer.current.style.width = '100%'
+        childrenContainer.current.style.opacity = '0'
+      }
+      if (loadingContainer.current) {
+        loadingContainer.current.style.display = ''
+      }
+    }
+
     if (!isLoading) {
       loadingTimeout.current = setTimeout(() => {
-        if (childrenContainer.current) {
-          childrenContainer.current.style.position = ''
-          childrenContainer.current.style.width = ''
-          childrenContainer.current.style.opacity = ''
-        }
-        if (loadingContainer.current) {
-          loadingContainer.current.style.display = 'none'
-        }
+        displayContent()
 
         loadingComplete.current = true
       }, 500)
@@ -63,14 +78,7 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
 
       if (isParentLoading && loadingComplete.current) {
         loadingComplete.current = false
-        if (childrenContainer.current) {
-          childrenContainer.current.style.position = 'absolute'
-          childrenContainer.current.style.width = '100%'
-          childrenContainer.current.style.opacity = '0'
-        }
-        if (loadingContainer.current) {
-          loadingContainer.current.style.display = ''
-        }
+        displayLoader()
       }
     }
   }, [isParentLoading])
