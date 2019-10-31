@@ -70,11 +70,11 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
   const loadingComplete = useRef(false)
 
   const updateLoading = useCallback(() => {
-    const areComponentsLoaded = Object.values(state.current.components).some(
+    const areComponentsLoading = Object.values(state.current.components).some(
       Boolean
     )
 
-    const isLoading = isParentLoading || areComponentsLoaded
+    const isLoading = isParentLoading || areComponentsLoading
 
     if (!isLoading) {
       loadingTimeout.current = setTimeout(() => {
