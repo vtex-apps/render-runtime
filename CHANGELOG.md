@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Changed
-- `ExtensionPoint` render is interrupted earlier if no extension is found, and refrains from rendering `ExtensionPointComponent` if so.
+### Added
+- Export LoadingContext component, to allow data fetchers display a loading status while the data is being loaded.
+- LoadingWrapper to LayoutContainer, which displays a loading status while the components are being loaded.
 
-### Fixed
-- `Loading` gets its block props from context again, thus fixing issue where it wouldn't appear if inserted on a component.
+### Changed
+- ExtensionPointComponent content is not rendered while the component is being loaded.
+- Uses a loading bar at the top of the page in lieu of an entire-page loader while the layout info is being loaded
 
 ## [8.76.0] - 2019-10-30
 ### Changed
