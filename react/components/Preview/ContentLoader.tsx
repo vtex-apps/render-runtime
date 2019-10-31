@@ -55,6 +55,10 @@ const ContentLoader: FunctionComponent<ContentLoaderProps> = ({
   width,
   height,
   children,
-}) => <div style={{ width, height, position: 'relative' }}>{children}</div>
+}) => (
+  <div style={{ width, height, position: 'relative' }} suppressHydrationWarning>
+    {children}
+  </div>
+)
 
 export { ContentLoader, Rect }
