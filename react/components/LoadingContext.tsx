@@ -24,13 +24,42 @@ LoadingContext.displayName = 'LoadingContext'
 interface LoadingState {
   components: { [key: string]: boolean }
 }
+
+const displayContent = (
+  contentRef: React.RefObject<HTMLElement>,
+  loaderRef: React.RefObject<HTMLElement>
+) => {
+  if (contentRef.current) {
+    contentRef.current.style.position = ''
+    contentRef.current.style.width = ''
+    contentRef.current.style.opacity = ''
+  }
+  if (loaderRef.current) {
+    loaderRef.current.style.display = 'none'
+  }
+}
+
+const displayLoader = (
+  contentRef: React.RefObject<HTMLElement>,
+  loaderRef: React.RefObject<HTMLElement>
+) => {
+  if (contentRef.current) {
+    contentRef.current.style.position = 'absolute'
+    contentRef.current.style.width = '100%'
+    contentRef.current.style.opacity = '0'
+  }
+  if (loaderRef.current) {
+    loaderRef.current.style.display = ''
+  }
+}
+
 export const LoadingWrapper: FunctionComponent = ({ children }) => {
   const state = useRef<LoadingState>({ components: {} })
 
   const { isParentLoading } = useContext(LoadingContext)
 
-  const childrenContainer = useRef<HTMLDivElement>(null)
-  const loadingContainer = useRef<HTMLDivElement>(null)
+  const contentContainer = useRef<HTMLDivElement>(null)
+  const loaderContainer = useRef<HTMLDivElement>(null)
 
   const loadingTimeout = useRef<NodeJS.Timer | null>(null)
   const loadingComplete = useRef(false)
@@ -42,31 +71,9 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
 
     const isLoading = isParentLoading || areComponentsLoaded
 
-    const displayContent = () => {
-      if (childrenContainer.current) {
-        childrenContainer.current.style.position = ''
-        childrenContainer.current.style.width = ''
-        childrenContainer.current.style.opacity = ''
-      }
-      if (loadingContainer.current) {
-        loadingContainer.current.style.display = 'none'
-      }
-    }
-
-    const displayLoader = () => {
-      if (childrenContainer.current) {
-        childrenContainer.current.style.position = 'absolute'
-        childrenContainer.current.style.width = '100%'
-        childrenContainer.current.style.opacity = '0'
-      }
-      if (loadingContainer.current) {
-        loadingContainer.current.style.display = ''
-      }
-    }
-
     if (!isLoading) {
       loadingTimeout.current = setTimeout(() => {
-        displayContent()
+        displayContent(contentContainer, loaderContainer)
 
         loadingComplete.current = true
       }, 500)
@@ -78,7 +85,7 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
 
       if (isParentLoading && loadingComplete.current) {
         loadingComplete.current = false
-        displayLoader()
+        displayLoader(contentContainer, loaderContainer)
       }
     }
   }, [isParentLoading])
@@ -113,7 +120,7 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
     () => (
       <LoadingContext.Provider value={value}>
         <div
-          ref={childrenContainer}
+          ref={contentContainer}
           style={{
             opacity: isSSR ? 1 : 0,
             position: isSSR ? 'unset' : 'absolute',
@@ -123,7 +130,7 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
           {children}
         </div>
         <div
-          ref={loadingContainer}
+          ref={loaderContainer}
           suppressHydrationWarning
           style={{ display: isSSR ? 'none' : 'unset' }}
         >
