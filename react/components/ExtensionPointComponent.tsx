@@ -247,4 +247,6 @@ class ExtensionPointComponent extends PureComponent<
   }
 }
 
+/** TODO: withLoading is in the end a makeshift Suspense
+ * wrapper. Should probably be replaced in the future. */
 export default withLoading(ExtensionPointComponent)

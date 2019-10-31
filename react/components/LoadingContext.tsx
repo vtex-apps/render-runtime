@@ -53,9 +53,14 @@ const displayLoader = (
   }
 }
 
+/** TODO: LoadingWrapper is in the end a makeshift Suspense.
+ * Should probably be replaced in the future. */
 export const LoadingWrapper: FunctionComponent = ({ children }) => {
+  /* Uses Ref instead of state to prevent rerenders */
   const state = useRef<LoadingState>({ components: {} })
 
+  /* A parent component can include a LoadingContext to tell its
+   * children that it is loading data. */
   const { isParentLoading } = useContext(LoadingContext)
 
   const contentContainer = useRef<HTMLDivElement>(null)
@@ -118,6 +123,13 @@ export const LoadingWrapper: FunctionComponent = ({ children }) => {
 
   const returnValue = useMemo(
     () => (
+      /** Renders both the content and the loader, and hides them via changing the
+       * style via their refs. This is done for two reasons:
+       * 1: to make the content execute its code while it is loading, because the
+       * content can in turn require more components to be loaded, thus keeping
+       * the loading state for longer.
+       * 2: To prevent re-rendering when the loading state changes, which seemed
+       * to cause some bugs. */
       <LoadingContext.Provider value={value}>
         <div
           ref={contentContainer}
