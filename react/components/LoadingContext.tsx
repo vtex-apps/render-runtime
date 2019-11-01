@@ -70,7 +70,7 @@ const LoadingWrapper: FunctionComponent = ({ children }) => {
   const contentContainer = useRef<HTMLDivElement>(null)
   const loaderContainer = useRef<HTMLDivElement>(null)
 
-  const loadingTimeout = useRef<NodeJS.Timer | null>(null)
+  const loadingTimeout = useRef<number | null>(null)
   const loadingComplete = useRef(false)
 
   const updateLoading = useCallback(() => {
@@ -81,14 +81,14 @@ const LoadingWrapper: FunctionComponent = ({ children }) => {
     const isLoading = isParentLoading || areComponentsLoading
 
     if (!isLoading) {
-      loadingTimeout.current = setTimeout(() => {
+      loadingTimeout.current = window.setTimeout(() => {
         displayContent(contentContainer, loaderContainer)
 
         loadingComplete.current = true
       }, 500)
     } else {
       if (!loadingComplete.current && loadingTimeout.current !== null) {
-        clearTimeout(loadingTimeout.current)
+        window.clearTimeout(loadingTimeout.current)
         loadingTimeout.current = null
       }
 
