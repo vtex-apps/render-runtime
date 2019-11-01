@@ -7,6 +7,7 @@ import React, {
   FunctionComponent,
   useEffect,
 } from 'react'
+import { canUseDOM } from 'exenv'
 
 import GenericPreview from './Preview/GenericPreview'
 
@@ -122,7 +123,7 @@ const LoadingWrapper: FunctionComponent = ({ children }) => {
     [setLoading]
   )
 
-  const isSSR = !window.navigator
+  const isSSR = !canUseDOM
 
   const returnValue = useMemo(
     () => (
@@ -133,10 +134,11 @@ const LoadingWrapper: FunctionComponent = ({ children }) => {
        * the loading state for longer.
        * 2: To prevent re-rendering when the loading state changes, which seemed
        * to cause some bugs. */
-      <LoadingContext.Provider value={value}>
+      <LoadingContextProvider value={value}>
         <div
           // Content container
           ref={contentContainer}
+          suppressHydrationWarning
           style={{
             opacity: isSSR ? 1 : 0,
             position: isSSR ? 'unset' : 'absolute',
@@ -154,7 +156,7 @@ const LoadingWrapper: FunctionComponent = ({ children }) => {
           {/** TODO: Use a better preview in the future */}
           <GenericPreview />
         </div>
-      </LoadingContext.Provider>
+      </LoadingContextProvider>
     ),
     [children, isSSR, value]
   )
