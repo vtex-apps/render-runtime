@@ -584,6 +584,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
               () => {
                 this.replaceRouteClass(matchingPage.routeId)
                 this.sendInfoFromIframe()
+                this.scrollTo(state.scrollOptions)
               }
             )
           }
