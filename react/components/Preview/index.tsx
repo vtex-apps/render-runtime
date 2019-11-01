@@ -28,8 +28,8 @@ export default class Preview extends React.PureComponent<Props, State> {
   }
 
   private renderPreviewGraphic = (
-    width: number,
-    height: number,
+    width: number | string,
+    height: number | string,
     type: string
   ): ReactElement<any> | null => {
     if (!type || type === 'none') {
@@ -159,7 +159,7 @@ export default class Preview extends React.PureComponent<Props, State> {
         data-testid={TEST_ID}
         style={{ padding }}
       >
-        {this.renderPreviewGraphic(width, height, type)}
+        {this.renderPreviewGraphic(width || '100%', height, type)}
       </div>
     )
   }
