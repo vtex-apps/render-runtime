@@ -170,7 +170,7 @@ const useLoadingContext = () => {
 
 const withLoading = <T extends {}>(Component: ComponentType<T>) => {
   const EnhancedComponent: FunctionComponent<T> = props => {
-    const isSSR = !window.navigator
+    const isSSR = !canUseDOM
     const { setLoading } = useLoadingContext()
 
     if (isSSR) {
