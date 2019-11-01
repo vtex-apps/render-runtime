@@ -1,12 +1,20 @@
 import React from 'react'
 import { ContentLoader, Rect } from './ContentLoader'
+import Box from './Box'
+import { useSSR } from '../../core/main'
 
 interface Props {
-  width: number
-  height: number
+  width: number | string
+  height: number | string
 }
 
 const Grid = ({ width, height }: Props) => {
+  const isSSR = useSSR()
+
+  if (isSSR || typeof width === 'string' || typeof height === 'string') {
+    return <Box width={width} height={height} />
+  }
+
   // TODO: make these values configurable
   const itemWidth = 250
   const itemHeight = 400

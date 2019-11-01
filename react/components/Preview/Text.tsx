@@ -1,12 +1,20 @@
 import React from 'react'
 import { ContentLoader, Rect } from './ContentLoader'
+import Box from './Box'
+import { useSSR } from '../NoSSR'
 
 interface Props {
-  width: number
-  height: number
+  width: number | string
+  height: number | string
 }
 
 const Text = ({ width, height }: Props) => {
+  const isSSR = useSSR()
+
+  if (isSSR || typeof width === 'string' || typeof height === 'string') {
+    return <Box width={width} height={height} />
+  }
+
   // TODO: make the line height configurable
   const lineHeight = 16
   const lineSize = lineHeight * 1.5
