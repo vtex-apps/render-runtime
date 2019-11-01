@@ -40,7 +40,7 @@
     "@types/intl": "^1.2.0",
     "@types/jest": "^24.0.0",
     "@types/js-base64": "^2.3.1",
-    "@types/node": "^9.4.7",
+    "@types/node": "^12.12.3",
     "@types/prop-types": "^15.5.2",
     "@types/qs": "^6.5.1",
     "@types/query-string": "^5.1.0",
