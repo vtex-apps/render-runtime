@@ -9,8 +9,8 @@ const SECONDARY_COLOR = '#e0e0e0'
 interface RectProps {
   x?: number
   y?: number
-  width: number
-  height: number
+  width: number | string
+  height: number | string
   preserveAspectRatio?: string
   borderRadius?: number | string
 }
@@ -47,8 +47,8 @@ const Rect: FunctionComponent<RectProps> = ({
 )
 
 interface ContentLoaderProps {
-  width: number
-  height: number
+  width: number | string
+  height: number | string
 }
 
 const ContentLoader: FunctionComponent<ContentLoaderProps> = ({
