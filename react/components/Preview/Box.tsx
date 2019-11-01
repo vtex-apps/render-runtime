@@ -2,8 +2,8 @@ import React from 'react'
 import { ContentLoader, Rect } from './ContentLoader'
 
 interface Props {
-  width: number
-  height: number
+  width: number | string
+  height: number | string
 }
 
 const Box = ({ width, height }: Props) => (
