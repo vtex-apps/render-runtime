@@ -6,9 +6,18 @@ import { useSSR } from '../NoSSR'
 interface Props {
   width: number | string
   height: number | string
+  lineHeight?: number
+  fontSize?: number
+  paragraph?: boolean
 }
 
-const Text = ({ width, height }: Props) => {
+const Text = ({
+  width,
+  height,
+  fontSize = 16,
+  lineHeight = 1.5,
+  paragraph = true,
+}: Props) => {
   const isSSR = useSSR()
 
   if (isSSR || typeof width === 'string' || typeof height === 'string') {
@@ -16,26 +25,22 @@ const Text = ({ width, height }: Props) => {
   }
 
   // TODO: make the line height configurable
-  const lineHeight = 16
-  const lineSize = lineHeight * 1.5
+  const lineSize = fontSize * lineHeight
   const lines = Math.round(height / lineSize)
-  const lineSpacing = height / lines - lineHeight
-  const actualLineSize = lineHeight + lineSpacing
-  const horizontalMargin = 16
 
   return (
     <ContentLoader width={width} height={height}>
       {Array.from({ length: lines }).map((_, i) => {
         const isLast = i === lines - 1
-        const widthMultiplier = isLast ? 0.7 : 1
-        const lineWidth = width * widthMultiplier - horizontalMargin * 2
+        const widthMultiplier = isLast && paragraph ? 0.7 : 1
+        const lineWidth = width * widthMultiplier
         return (
           <Rect
             key={i}
-            x={horizontalMargin}
-            y={Math.round(i * actualLineSize)}
+            x={0}
+            y={Math.round(i * lineSize)}
             width={lineWidth}
-            height={lineHeight}
+            height={fontSize}
           />
         )
       })}
