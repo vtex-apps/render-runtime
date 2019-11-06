@@ -140,7 +140,7 @@ export default class Preview extends React.PureComponent<Props, State> {
     const maxWidth =
       containerWidth || (window && window.innerWidth) || initialWidth || 0
 
-    const padding = options.padding || 20
+    const padding = options.padding == null ? 20 : options.padding
     const width = Math.max(
       (typeof initialWidth === 'number'
         ? Math.min(maxWidth, initialWidth)
