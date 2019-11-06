@@ -30,7 +30,10 @@ export default class Preview extends React.PureComponent<Props, State> {
   private renderPreviewGraphic = (
     width: number,
     height: number,
-    type: string
+    type: string,
+    horizontalMargin: number,
+    lineHeight: number,
+    shortLastLine: boolean
   ): ReactElement<any> | null => {
     if (!type || type === 'none') {
       return null
@@ -43,7 +46,15 @@ export default class Preview extends React.PureComponent<Props, State> {
       case 'block':
         return <Box width={width} height={height} />
       case 'text':
-        return <Text width={width} height={height} />
+        return (
+          <Text
+            width={width}
+            height={height}
+            horizontalMargin={horizontalMargin}
+            lineHeight={lineHeight}
+            shortLastLine={shortLastLine}
+          />
+        )
       /** TODO: add support for Grid preview */
       case 'grid':
         return <Grid width={width} height={height} />
@@ -123,7 +134,13 @@ export default class Preview extends React.PureComponent<Props, State> {
       return null
     }
 
-    const { type, fullWidth } = extension.preview
+    const {
+      type,
+      fullWidth,
+      horizontalMargin,
+      lineHeight,
+      shortLastLine,
+    } = extension.preview
 
     const { width: initialWidth, height: initialHeight } = this.getDimensions()
 
@@ -132,7 +149,7 @@ export default class Preview extends React.PureComponent<Props, State> {
     const maxWidth =
       containerWidth || (window && window.innerWidth) || initialWidth || 0
 
-    const padding = 20
+    const padding = 0
     const width = Math.max(
       (typeof initialWidth === 'number'
         ? Math.min(maxWidth, initialWidth)
@@ -160,7 +177,14 @@ export default class Preview extends React.PureComponent<Props, State> {
         data-testid={TEST_ID}
         style={{ padding }}
       >
-        {this.renderPreviewGraphic(width, height, type)}
+        {this.renderPreviewGraphic(
+          width,
+          height,
+          type,
+          horizontalMargin,
+          lineHeight,
+          shortLastLine
+        )}
       </div>
     )
   }

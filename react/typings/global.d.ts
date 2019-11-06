@@ -42,6 +42,9 @@ declare global {
     width: PreviewDimension
     height: PreviewDimension
     fullWidth?: boolean
+    horizontalMargin: number
+    lineHeight: number
+    shortLastLine: boolean
   }
 
   interface PreviewDimension {
