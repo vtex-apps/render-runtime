@@ -564,6 +564,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             settings,
             queryData,
           }: ParsedServerPageResponse) => {
+            this.scrollTo({ top: 0, left: 0 })
             if (queryData) {
               this.hydrateApolloCache(queryData)
             }
