@@ -40,7 +40,8 @@ const Rect: FunctionComponent<RectProps> = ({
         height: '100%',
         position: 'relative',
         left: -x,
-        background: `linear-gradient(90deg, ${PRIMARY_COLOR}, ${SECONDARY_COLOR}, ${PRIMARY_COLOR}, ${SECONDARY_COLOR}, ${PRIMARY_COLOR})`,
+        backgroundColor: '#fff',
+        backgroundImage: `linear-gradient(90deg, ${PRIMARY_COLOR}, ${SECONDARY_COLOR}, ${PRIMARY_COLOR}, ${SECONDARY_COLOR}, ${PRIMARY_COLOR})`,
       }}
     />
   </div>
