@@ -1,18 +1,14 @@
 import React from 'react'
-import ContentLoader from './ContentLoader'
+import { ContentLoader, Rect } from './ContentLoader'
 
 interface Props {
-  width: number
-  height: number
+  width: number | string
+  height: number | string
 }
 
 const Circle = ({ width, height }: Props) => (
-  <ContentLoader
-    width={width}
-    height={height}
-    preserveAspectRatio="xMidYMid meet"
-  >
-    <rect x="0" y="0" rx={width} ry={height} width={width} height={height} />
+  <ContentLoader width={width} height={height}>
+    <Rect width={width} height={height} borderRadius="100%" />
   </ContentLoader>
 )
 

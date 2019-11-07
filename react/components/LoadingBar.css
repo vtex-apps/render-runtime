@@ -1,0 +1,20 @@
+@keyframes loading-bar-animation {
+  0% {
+    transform: scale(0, 1);
+  }
+  10% {
+    transform: scale(0.5, 1);
+  }
+  20% {
+    transform: scale(0.75, 1);
+  }
+  100% {
+    transform: scale(0.95, 1);
+  }
+}
+
+.loadingBarAnimation {
+  transform-origin: 0 0;
+  animation: loading-bar-animation 6s ease-out;
+  transform: scale(0.95, 1);
+}

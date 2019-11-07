@@ -1,36 +1,65 @@
 import React, { FunctionComponent } from 'react'
+import styles from './ContentLoader.css'
 
-import ReactContentLoader, { IContentLoaderProps } from 'react-content-loader'
+// TODO: make these colors dynamic, probably based on
+// muted colors from the color theme
+const PRIMARY_COLOR = '#fafafa'
+const SECONDARY_COLOR = '#e0e0e0'
 
-interface Props {
-  width: number
-  height: number
+interface RectProps {
+  x?: number
+  y?: number
+  width: number | string
+  height: number | string
   preserveAspectRatio?: string
+  borderRadius?: number | string
 }
 
-const ContentLoader: FunctionComponent<Props> = ({
-  children,
+const Rect: FunctionComponent<RectProps> = ({
+  x = 0,
+  y = 0,
   width,
   height,
-  preserveAspectRatio = 'none',
+  borderRadius = 5,
 }) => (
-  <ReactContentLoader
-    width={width}
-    height={height}
-    /** TODO: get these colors from the store theme */
-    primaryColor="#fafafa"
-    secondaryColor="#efefef"
-    preserveAspectRatio={
-      preserveAspectRatio as IContentLoaderProps['preserveAspectRatio']
-    }
+  <div
     style={{
+      width,
       height,
-      maxWidth: width,
-      width: '100%',
+      overflow: 'hidden',
+      position: 'absolute',
+      top: y,
+      left: x,
+      borderRadius,
     }}
   >
-    {children}
-  </ReactContentLoader>
+    <div
+      className={styles.slide}
+      style={{
+        width: '300vw',
+        height: '100%',
+        position: 'relative',
+        left: -x,
+        backgroundColor: '#fff',
+        backgroundImage: `linear-gradient(90deg, ${PRIMARY_COLOR}, ${SECONDARY_COLOR}, ${PRIMARY_COLOR}, ${SECONDARY_COLOR}, ${PRIMARY_COLOR})`,
+      }}
+    />
+  </div>
 )
 
-export default ContentLoader
+interface ContentLoaderProps {
+  width: number | string
+  height: number | string
+}
+
+const ContentLoader: FunctionComponent<ContentLoaderProps> = ({
+  width,
+  height,
+  children,
+}) => (
+  <div style={{ width, height, position: 'relative' }} suppressHydrationWarning>
+    {children}
+  </div>
+)
+
+export { ContentLoader, Rect }

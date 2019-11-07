@@ -264,7 +264,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.prefetchPages()
   }
 
-  public componentWillReceiveProps(nextProps: Props) {
+  public UNSAFE_componentWillReceiveProps(nextProps: Props) {
     // If RenderProvider is being re-rendered, the global runtime might have changed
     // so we must update all extensions.
     if (this.rendered) {
@@ -534,16 +534,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
     }
 
-    // Shows a generic preview page when navigating. In the future, the
-    // preview should be according to the entitiy (department, search, product),
-    // and the fallback should be the generic preview.
-    const { domain } = this.state.route
-    this.setState(
-      {
-        preview: domain !== 'admin',
-      },
-      () => this.scrollTo(state.scrollOptions)
-    )
+    // Sets the preloading state, which currently displays
+    // a loading bar at the top of the page
+    this.setState({
+      preview: true,
+    })
 
     const paramsJSON = JSON.stringify(params)
     const apolloClient = this.apolloClient
@@ -569,6 +564,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             settings,
             queryData,
           }: ParsedServerPageResponse) => {
+            this.scrollTo({ top: 0, left: 0 })
             if (queryData) {
               this.hydrateApolloCache(queryData)
             }
@@ -589,6 +585,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
               () => {
                 this.replaceRouteClass(matchingPage.routeId)
                 this.sendInfoFromIframe()
+                this.scrollTo(state.scrollOptions)
               }
             )
           }
@@ -633,6 +630,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
               () => {
                 this.replaceRouteClass(page)
                 this.sendInfoFromIframe()
+                this.scrollTo(state.scrollOptions)
               }
             )
           }
@@ -962,7 +960,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   private prefetchPages = () => {
     if (this.prefetchRoutes.size > 0) {
-      setTimeout(this.execPrefetchPages, 20 * 1000)
+      setTimeout(this.execPrefetchPages, 6 * 1000)
     }
   }
 

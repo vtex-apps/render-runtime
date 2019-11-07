@@ -28,9 +28,10 @@ export default class Preview extends React.PureComponent<Props, State> {
   }
 
   private renderPreviewGraphic = (
-    width: number,
-    height: number,
-    type: string
+    width: number | string,
+    height: number | string,
+    type: string,
+    options: any = {}
   ): ReactElement<any> | null => {
     if (!type || type === 'none') {
       return null
@@ -43,8 +44,15 @@ export default class Preview extends React.PureComponent<Props, State> {
       case 'block':
         return <Box width={width} height={height} />
       case 'text':
-        return <Text width={width} height={height} />
-      /** TODO: add support for Grid preview */
+        return (
+          <Text
+            width={width}
+            height={height}
+            fontSize={options.fontSize}
+            lineHeight={options.lineHeight}
+            paragraph={options.paragraph}
+          />
+        )
       case 'grid':
         return <Grid width={width} height={height} />
       case 'circle':
@@ -123,7 +131,7 @@ export default class Preview extends React.PureComponent<Props, State> {
       return null
     }
 
-    const { type, fullWidth } = extension.preview
+    const { type, options = {}, fullWidth } = extension.preview
 
     const { width: initialWidth, height: initialHeight } = this.getDimensions()
 
@@ -132,7 +140,7 @@ export default class Preview extends React.PureComponent<Props, State> {
     const maxWidth =
       containerWidth || (window && window.innerWidth) || initialWidth || 0
 
-    const padding = 20
+    const padding = options.padding == null ? 20 : options.padding
     const width = Math.max(
       (typeof initialWidth === 'number'
         ? Math.min(maxWidth, initialWidth)
@@ -160,7 +168,7 @@ export default class Preview extends React.PureComponent<Props, State> {
         data-testid={TEST_ID}
         style={{ padding }}
       >
-        {this.renderPreviewGraphic(width, height, type)}
+        {this.renderPreviewGraphic(width || '100%', height, type, options)}
       </div>
     )
   }

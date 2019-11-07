@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Export LoadingContext component, to allow data fetchers display a loading status while the data is being loaded.
+- LoadingWrapper to LayoutContainer, which displays a loading status while the components are being loaded.
+
+### Changed
+- ExtensionPointComponent content is not rendered while the component is being loaded.
+- Uses a loading bar at the top of the page in lieu of an entire-page loader while the layout info is being loaded
+- Preview now uses a CSS-based implementation.
 
 ## [8.76.0] - 2019-10-30
 ### Changed

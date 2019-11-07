@@ -1,6 +1,7 @@
 import React, { useMemo, Fragment, FC } from 'react'
 import ExtensionPointComponent from '../components/ExtensionPointComponent'
 import { RenderContextProps } from './RenderContext'
+import { ExtensionPoint } from '../core/main'
 
 interface Props extends RenderContextProps {
   nestedPage: string
@@ -16,8 +17,24 @@ const useContextComponent = ({
 }: Props & RenderContextProps) => {
   const { extensions } = runtime
 
-  const { context, props: pageProps } = extensions[nestedPage]
+  const { context, before, after, props: pageProps } = extensions[nestedPage]
   const pageContextProps = pageProps && pageProps.context
+
+  /** Allows rendering header/footer if the Context component is loading,
+   * by exposing them to ExtensionPointComponent via props.
+   * TODO:This is a bit of a hack. The header/footer should probably be decoupled
+   * from the context, but doing so introduces bugs on some stores. */
+  const beforeElements =
+    before &&
+    before.map(beforeId => (
+      <ExtensionPoint id={beforeId} key={beforeId} treePath={nestedPage} />
+    ))
+
+  const afterElements =
+    after &&
+    after.map(afterId => (
+      <ExtensionPoint id={afterId} key={afterId} treePath={nestedPage} />
+    ))
 
   const contextProps = useMemo(() => {
     if (!context) {
@@ -25,12 +42,22 @@ const useContextComponent = ({
     }
     return {
       ...pageContextProps,
+      beforeElements,
+      afterElements,
       nextTreePath: nestedPage,
       params,
       query,
       ...context.props,
     }
-  }, [context, nestedPage, params, query, pageContextProps])
+  }, [
+    context,
+    pageContextProps,
+    beforeElements,
+    afterElements,
+    nestedPage,
+    params,
+    query,
+  ])
   const contextComponent = context ? context.component : undefined
   return [contextProps, contextComponent]
 }
