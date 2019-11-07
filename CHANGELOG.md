@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [8.77.0] - 2019-11-07
 ### Added
 - Export LoadingContext component, to allow data fetchers display a loading status while the data is being loaded.
 - LoadingWrapper to LayoutContainer, which displays a loading status while the components are being loaded.
