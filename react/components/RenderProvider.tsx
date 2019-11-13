@@ -929,14 +929,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }>
   ) => {
     forEach(({ data, query, variables }) => {
-      const b = JSON.parse(data)
-      // b.productSearch.products[0].productName = 'HELLO WELT'
       try {
         this.apolloClient.writeQuery({
           query: gql`
             ${query}
           `,
-          data: b,
+          data: JSON.parse(data),
           variables,
         })
       } catch (error) {
