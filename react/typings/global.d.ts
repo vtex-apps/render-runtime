@@ -459,11 +459,11 @@ declare global {
     rootPath?: string
     workspaceCookie: string
     hasNewExtensions: boolean
-    queryData?: {
+    queryData?: Array<{
       query: string
       variables: any
       data: string
-    }
+    }>
   }
 
   interface CacheHints {

@@ -5,7 +5,7 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { merge, mergeWith } from 'ramda'
+import { forEach, merge, mergeWith } from 'ramda'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -218,6 +218,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       this.fetcher,
       cacheControl
     )
+
     if (queryData) {
       this.hydrateApolloCache(queryData)
     }
@@ -920,29 +921,31 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     )
   }
 
-  private hydrateApolloCache = ({
-    data,
-    query,
-    variables,
-  }: {
-    data: string
-    query: string
-    variables: Record<string, any>
-  }) => {
-    try {
-      this.apolloClient.writeQuery({
-        query: gql`
-          ${query}
-        `,
-        data: JSON.parse(data),
-        variables,
-      })
-    } catch (error) {
-      console.warn(
-        `Error writing query from render-server in Apollo's cache`,
-        error
-      )
-    }
+  private hydrateApolloCache = (
+    queryData: Array<{
+      data: string
+      query: string
+      variables: Record<string, any>
+    }>
+  ) => {
+    forEach(({ data, query, variables }) => {
+      const b = JSON.parse(data)
+      // b.productSearch.products[0].productName = 'HELLO WELT'
+      try {
+        this.apolloClient.writeQuery({
+          query: gql`
+            ${query}
+          `,
+          data: b,
+          variables,
+        })
+      } catch (error) {
+        console.warn(
+          `Error writing query from render-server in Apollo's cache`,
+          error
+        )
+      }
+    }, queryData)
   }
 
   // Deprecated
