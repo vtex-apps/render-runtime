@@ -22,7 +22,6 @@ const Text = ({ width, height, fontSize = 16, lineHeight = 1.5 }: Props) => {
   return (
     <ContentLoader width={width} height={height}>
       {Array.from({ length: lines }).map((_, i) => {
-        const isLast = i === lines - 1
         /** TODO: Add support for changing the width of each line
          * when width is a string (e.g. turning "100%" into "70%")
          */
