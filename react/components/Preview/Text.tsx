@@ -8,19 +8,10 @@ interface Props {
   height: number | string
   lineHeight?: number
   fontSize?: number
-  paragraph?: boolean
 }
 
-const Text = ({
-  width,
-  height,
-  fontSize = 16,
-  lineHeight = 1.5,
-  paragraph = true,
-}: Props) => {
-  const isSSR = useSSR()
-
-  if (isSSR || typeof width === 'string' || typeof height === 'string') {
+const Text = ({ width, height, fontSize = 16, lineHeight = 1.5 }: Props) => {
+  if (typeof height === 'string') {
     return <Box width={width} height={height} />
   }
 
@@ -32,8 +23,10 @@ const Text = ({
     <ContentLoader width={width} height={height}>
       {Array.from({ length: lines }).map((_, i) => {
         const isLast = i === lines - 1
-        const widthMultiplier = isLast && paragraph ? 0.7 : 1
-        const lineWidth = width * widthMultiplier
+        /** TODO: Add support for changing the width of each line
+         * when width is a string (e.g. turning "100%" into "70%")
+         */
+        const lineWidth = width
         return (
           <Rect
             key={i}

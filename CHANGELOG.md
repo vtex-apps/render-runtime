@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- `Box` preview is not being showed before `Text` preview appears anymore.
+
+### Removed
+- Remove `paragraph` preview option, since it became obsolete.
 
 ## [8.77.0] - 2019-11-07
 ### Added
