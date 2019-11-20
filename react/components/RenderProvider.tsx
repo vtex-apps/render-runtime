@@ -534,6 +534,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
     }
 
+    if (!navigator.onLine) {
+      navigationRoute.path = '/_v/offline'
+    }
+
     // Sets the preloading state, which currently displays
     // a loading bar at the top of the page
     this.setState({

@@ -1,0 +1,5 @@
+{
+  "offline-warning.title": "This page cannot be loaded",
+  "offline-warning.message": "Unable to load this page. Check your network connection",
+  "offline-warning.button": "Refresh"
+}

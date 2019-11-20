@@ -1,5 +1,12 @@
 import { mergeDeepRight, reduce } from 'ramda'
 import React, { FC, Fragment } from 'react'
+import {
+  defineMessages,
+  injectIntl,
+  InjectedIntl,
+  InjectedIntlProps,
+} from 'react-intl'
+import { EmptyState, Button } from 'vtex.styleguide'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
 import Loading from './Loading'
@@ -20,6 +27,20 @@ interface Props {
   blockProps?: object
 }
 
+const messages = defineMessages({
+  offlineTitle: {
+    id: 'offline-warning.title',
+    defaultMessage: '',
+  },
+  offlineMessage: {
+    id: 'offline-warning.message',
+    defaultMessage: '',
+  },
+  offlineButton: {
+    id: 'offline-warning.button',
+  },
+})
+
 function mountTreePath(currentId: string, parentTreePath: string) {
   if (parentTreePath === currentId) {
     return parentTreePath
@@ -27,7 +48,11 @@ function mountTreePath(currentId: string, parentTreePath: string) {
   return [parentTreePath, currentId].filter(id => !!id).join('/')
 }
 
-function getChildExtensions(runtime: RenderContext, treePath: string) {
+function getChildExtensions(
+  runtime: RenderContext,
+  treePath: string,
+  intl: InjectedIntl
+) {
   const extension = runtime.extensions && runtime.extensions[treePath]
 
   if (!extension || !extension.blocks) {
@@ -47,6 +72,7 @@ function getChildExtensions(runtime: RenderContext, treePath: string) {
         id={child.extensionPointId}
         blockProps={childProps}
         treePath={treePath}
+        intl={intl}
       />
     )
   })
@@ -59,6 +85,7 @@ function withOuterExtensions(
   treePath: string,
   props: any,
   preview: boolean,
+  intl: InjectedIntl,
   element: JSX.Element
 ) {
   const beforeElements = before.map(beforeId => (
@@ -68,6 +95,7 @@ function withOuterExtensions(
       treePath={treePath}
       params={props.params}
       query={props.query}
+      intl={intl}
     />
   ))
 
@@ -78,6 +106,7 @@ function withOuterExtensions(
       treePath={treePath}
       params={props.params}
       query={props.query}
+      intl={intl}
     />
   ))
 
@@ -85,10 +114,21 @@ function withOuterExtensions(
 
   const isOffline = window && window.navigator && !window.navigator.onLine
 
+  const handleReload = () => {
+    window.location.reload()
+  }
+
   const offlineWarning = (
-    <div>
-      <h1>Youre offline</h1>
-    </div>
+    <EmptyState title={intl.formatMessage(messages.offlineTitle)}>
+      <p>{intl.formatMessage(messages.offlineMessage)}</p>
+      <div className="pt5">
+        <Button variation="secondary" size="small" onClick={handleReload}>
+          <span className="flex align-baseline">
+            {intl.formatMessage(messages.offlineButton)}
+          </span>
+        </Button>
+      </div>
+    </EmptyState>
   )
 
   const fallbackContent = isOffline ? offlineWarning : <GenericPreview />
@@ -118,12 +158,20 @@ function withOuterExtensions(
   }, wrapped)
 }
 
-const ExtensionPoint: FC<Props> = props => {
+const ExtensionPoint: FC<Props & InjectedIntlProps> = props => {
   const runtime = useRuntime()
 
   const treePathFromHook = useTreePath()
 
-  const { children, params, query, id, blockProps, ...parentProps } = props
+  const {
+    children,
+    params,
+    query,
+    id,
+    blockProps,
+    intl,
+    ...parentProps
+  } = props
 
   const newTreePath = React.useMemo(
     () => mountTreePath(id, props.treePath || treePathFromHook.treePath),
@@ -174,7 +222,7 @@ const ExtensionPoint: FC<Props> = props => {
 
   const componentChildren =
     isCompositionChildren && extension.blocks
-      ? getChildExtensions(runtime, newTreePath)
+      ? getChildExtensions(runtime, newTreePath, intl)
       : children
 
   const isRootTreePath = newTreePath.indexOf('/') === -1
@@ -186,6 +234,7 @@ const ExtensionPoint: FC<Props> = props => {
     newTreePath,
     mergedProps,
     runtime.preview,
+    intl,
     <ExtensionPointComponent
       component={component}
       props={mergedProps}
@@ -228,4 +277,4 @@ ExtensionPoint.defaultProps = {
   treePath: '',
 }
 
-export default withErrorBoundary(ExtensionPoint)
+export default withErrorBoundary(injectIntl(ExtensionPoint))

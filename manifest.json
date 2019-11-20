@@ -5,10 +5,12 @@
   "title": "VTEX Render runtime",
   "description": "The VTEX Render framework runtime",
   "builders": {
-    "react": "3.x"
+    "react": "3.x",
+    "messages": "1.x"
   },
   "dependencies": {
-    "vtex.pages-graphql": "2.x"
+    "vtex.pages-graphql": "2.x",
+    "vtex.styleguide": "9.x"
   },
   "mustUpdateAt": "2018-09-05",
   "settingsSchema": {},
