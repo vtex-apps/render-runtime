@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Fixed
-- `Box` preview is not being showed before `Text` preview appears anymore.
+- Prevents `preview` of type `text` from falling back to `box` if `width` is not defined.
 
 ### Removed
 - Remove `paragraph` preview option, since it became obsolete.
