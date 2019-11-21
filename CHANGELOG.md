@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.79.0] - 2019-11-21
+
 ## [8.78.0] - 2019-11-21
 ### Fixed
 - Prevents `preview` of type `text` from falling back to `box` if `width` is not defined.
