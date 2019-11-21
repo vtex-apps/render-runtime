@@ -50,7 +50,6 @@ export default class Preview extends React.PureComponent<Props, State> {
             height={height}
             fontSize={options.fontSize}
             lineHeight={options.lineHeight}
-            paragraph={options.paragraph}
           />
         )
       case 'grid':
