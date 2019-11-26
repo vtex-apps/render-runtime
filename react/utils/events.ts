@@ -37,7 +37,7 @@ const initSSE = (
   require('eventsource-polyfill')
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const myvtexSSE = require('myvtex-sse')
-  const path = `vtex.builder-hub:*:react2,pages0,build.status,pages1?workspace=${workspace}`
+  const path = `vtex.builder-hub:*:react2,pages0,build.status,pages1,styles?workspace=${workspace}`
   const linkInterruptedPath = `colossus:*:link_interrupted?workspace=${workspace}`
   const source: EventSource = myvtexSSE(account, workspace, path, {
     verbose: false,
@@ -123,6 +123,12 @@ const initSSE = (
         console.log('[pages1] Blocks changed.')
         emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
           e.emit('blocksUpdated')
+        )
+        break
+      case 'styleOverrides':
+        console.log('[styles] Style overrides changed.')
+        emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+          e.emit('styleOverrides')
         )
         break
     }

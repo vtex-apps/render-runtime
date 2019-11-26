@@ -79,6 +79,19 @@ function addStyleToPage(href: string) {
   }
 }
 
+export function hotReloadOverrides() {
+  const overrideLink = document.getElementById('override_link_0')
+  const href = overrideLink && overrideLink.getAttribute('href')
+
+  if (overrideLink && href) {
+    const modifiedHref = href.replace(
+      /build(\d)+/,
+      `build${Math.round(Date.now() / 1000)}`
+    )
+    overrideLink.setAttribute('href', modifiedHref)
+  }
+}
+
 function prefetchStyle(href: string) {
   if (!document || !document.head) {
     throw new ServerSideAssetLoadingError()
