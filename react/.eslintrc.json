@@ -4,5 +4,15 @@
     "browser": true,
     "es6": true,
     "jest": true
+  },
+  "rules": {
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-console": "off"
+  },
+  "globals": {
+    "global": "writable"
   }
 }
