@@ -75,7 +75,9 @@
     "react-testing-library": "^5.6.0",
     "regenerator-runtime": "^0.13.1",
     "ts-jest": "^24.0.1",
-    "typescript": "3.5.2"
+    "typescript": "3.5.2",
+    "vtex.render-runtime": "http://vtex.vteximg.com.br/_v/public/typings/v1/vtex.render-runtime@8.79.0/public/@types/vtex.render-runtime",
+    "vtex.pages-graphql": "http://vtex.vteximg.com.br/_v/public/typings/v1/vtex.pages-graphql@2.77.0/public/@types/vtex.pages-graphql"
   },
   "husky": {
     "hooks": {

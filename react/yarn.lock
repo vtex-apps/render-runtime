@@ -7232,6 +7232,14 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+"vtex.pages-graphql@http://vtex.vteximg.com.br/_v/public/typings/v1/vtex.pages-graphql@2.77.0/public/@types/vtex.pages-graphql":
+  version "2.77.0"
+  resolved "http://vtex.vteximg.com.br/_v/public/typings/v1/vtex.pages-graphql@2.77.0/public/@types/vtex.pages-graphql#a0769e904c16277b3e0212363a2eb38999f6ec85"
+
+"vtex.render-runtime@http://vtex.vteximg.com.br/_v/public/typings/v1/vtex.render-runtime@8.79.0/public/@types/vtex.render-runtime":
+  version "8.79.0"
+  resolved "http://vtex.vteximg.com.br/_v/public/typings/v1/vtex.render-runtime@8.79.0/public/@types/vtex.render-runtime#720e67e81ed9ff32da987c5b1d3f5c77603bde70"
+
 w3c-hr-time@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/w3c-hr-time/-/w3c-hr-time-1.0.1.tgz#82ac2bff63d950ea9e3189a58a65625fedf19045"
