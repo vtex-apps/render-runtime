@@ -150,7 +150,7 @@ const ExtensionPoint: FC<Props> = props => {
     before = [],
     content = {},
     render: renderStrategy = null,
-    static: staticStrategy = 'never',
+    hydration = 'always',
     props: extensionProps = {},
   } = extension || {}
 
@@ -201,7 +201,7 @@ const ExtensionPoint: FC<Props> = props => {
       props={mergedProps}
       runtime={runtime}
       treePath={newTreePath}
-      staticStrategy={staticStrategy}
+      hydration={hydration}
     >
       {component ? (
         componentChildren
