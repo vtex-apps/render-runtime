@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
-import React, { ErrorInfo, PureComponent } from 'react'
+import React, { ErrorInfo, PureComponent, FunctionComponent } from 'react'
 
 import { getImplementation } from '../utils/assets'
 import graphQLErrorsStore from '../utils/graphQLErrorsStore'
@@ -11,14 +11,15 @@ import { RenderContextProps } from './RenderContext'
 import { TreePathContextProvider } from '../utils/treePath'
 import { isSiteEditorIframe } from '../utils/dom'
 import { Loading } from '../core/main'
-import StaticStrategyParent from './StaticStrategyParent'
+import PreventHydration from './PreventHydration'
+import HydrateOnView from './HydrateOnView'
 
 interface Props {
   component: string | null
   props: any
   treePath: string
+  hydration: string
   setLoading?: (treePath: string, value: boolean) => void
-  staticStrategy: StaticStrategy
 }
 
 interface State {
@@ -160,7 +161,7 @@ class ExtensionPointComponent extends PureComponent<
       treePath,
       runtime: { production, page },
       props: componentProps,
-      staticStrategy,
+      hydration,
     } = this.props
     const { error, errorInfo, operationIds } = this.state
     const Component = component && getImplementation(component)
@@ -194,12 +195,24 @@ class ExtensionPointComponent extends PureComponent<
     const isRootTreePath = treePath.indexOf('/') === -1
     const isAround = treePath.indexOf('$around') !== -1
 
+    const preventsHydration =
+      hydration === 'on-view' ||
+      hydration === 'on-interaction' ||
+      hydration === 'never'
+
     return (
       <TreePathContextProvider treePath={treePath}>
-        {Component ? (
-          <StaticStrategyParent staticStrategy={staticStrategy}>
-            <Component {...props}>{children}</Component>
-          </StaticStrategyParent>
+        {preventsHydration ? (
+          <Hydration
+            id={treePath}
+            hydration={hydration}
+            loading={!Component}
+            component={component}
+          >
+            {Component ? <Component {...props}>{children}</Component> : null}
+          </Hydration>
+        ) : Component ? (
+          <Component {...props}>{children}</Component>
         ) : isRootTreePath || isAround ? (
           /* Adds header/footer before and after the preview during loading,
            * if the component being loaded is a root component--e.g. context
@@ -250,6 +263,33 @@ class ExtensionPointComponent extends PureComponent<
       element.removeAttribute('data-extension-point')
     }
   }
+}
+
+interface HydrationProps {
+  id: string
+  loading?: boolean
+  hydration: Hydration
+}
+
+const Hydration: FunctionComponent<HydrationProps> = ({
+  hydration,
+  id,
+  loading,
+  children,
+}) => {
+  if (hydration === 'on-view') {
+    return (
+      <HydrateOnView id={id} loading={loading}>
+        {children}
+      </HydrateOnView>
+    )
+  }
+
+  if (hydration === 'never' || hydration === 'on-view') {
+    return <PreventHydration id={id}>{children}</PreventHydration>
+  }
+
+  return <>{children}</>
 }
 
 /** TODO: withLoading is in the end a makeshift Suspense
