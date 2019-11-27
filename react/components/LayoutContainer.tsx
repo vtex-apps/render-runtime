@@ -4,7 +4,6 @@ import { useTreePath } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 import { useRuntime } from './RenderContext'
 import { LoadingWrapper } from './LoadingContext'
-import HydrateOnIntersection from './HydrateOnIntersection'
 
 type Element = string | ElementArray
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -104,16 +103,15 @@ class Container extends Component<ContainerProps, ContainerState> {
       .slice(0, elementsToRender)
       .map((element: Element) => {
         return (
-          <HydrateOnIntersection key={element.toString()}>
-            <Container
-              elements={element}
-              isMobile={isMobile}
-              isRow={!isRow}
-              {...props}
-            >
-              {children}
-            </Container>
-          </HydrateOnIntersection>
+          <Container
+            key={element.toString()}
+            elements={element}
+            isMobile={isMobile}
+            isRow={!isRow}
+            {...props}
+          >
+            {children}
+          </Container>
         )
       })
 
