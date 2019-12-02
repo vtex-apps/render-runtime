@@ -37,6 +37,7 @@ import {
   NavigateOptions,
   queryStringToMap,
   scrollTo as pageScrollTo,
+  NavigationRouteModifier,
 } from '../utils/pages'
 import {
   fetchDefaultPages,
@@ -114,6 +115,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     patchSession: PropTypes.func,
     platform: PropTypes.string,
     prefetchDefaultPages: PropTypes.func,
+    addNavigationRouteModifier: PropTypes.func,
     prefetchPage: PropTypes.func,
     preview: PropTypes.bool,
     production: PropTypes.bool,
@@ -159,6 +161,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClient<NormalizedCacheObject>
   private prefetchRoutes: Set<string>
+  private navigationRouteModifiers: Set<NavigationRouteModifier>
   private fetcher: GlobalFetch['fetch']
 
   public constructor(props: Props) {
@@ -248,6 +251,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
 
     this.prefetchRoutes = new Set<string>()
+    this.navigationRouteModifiers = new Set()
   }
 
   public componentDidMount() {
@@ -350,6 +354,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       patchSession: this.patchSession,
       platform,
       prefetchDefaultPages: this.prefetchDefaultPages,
+      addNavigationRouteModifier: this.addNavigationRouteModifier,
       prefetchPage: this.prefetchPage,
       preview,
       production,
@@ -444,6 +449,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       replace,
       scrollOptions,
       rootPath,
+      modifiers: this.navigationRouteModifiers,
     })
   }
 
@@ -454,7 +460,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = this.props
     const { pages } = this.state
     options.rootPath = rootPath
+    options.modifiers = this.navigationRouteModifiers
     return pageNavigate(history, pages, options)
+  }
+
+  public addNavigationRouteModifier = (modifier: NavigationRouteModifier) => {
+    this.navigationRouteModifiers.add(modifier)
   }
 
   public replaceRouteClass = (route: string) => {

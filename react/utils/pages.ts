@@ -1,17 +1,7 @@
 import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
-import {
-  contains,
-  difference,
-  is,
-  isEmpty,
-  keys,
-  map,
-  path as ramdaPath,
-  startsWith,
-  zip,
-} from 'ramda'
+import { difference, is, isEmpty, keys, startsWith } from 'ramda'
 import RouteParser from 'route-parser'
 
 import { isEnabled } from './flags'
@@ -49,32 +39,6 @@ function isHost(hostname: string) {
 
 function trimEndingSlash(token: string) {
   return token.replace(/\/$/, '') || '/'
-}
-
-function pathToLowerCase(path: string, query: any) {
-  // Maybe consider moving this 'lowercasing' logic from this project since it is specific to stores.
-  if (ramdaPath(['__RUNTIME__', 'route', 'domain'], window) !== 'store') {
-    return path
-  }
-
-  const queryMap = queryStringToMap(query)
-  if (queryMap && queryMap.map) {
-    const pathSegments = path.startsWith('/')
-      ? path.split('/').slice(1)
-      : path.split('/')
-    const mapValues = queryMap.map.split(',').slice(0, pathSegments.length)
-    const convertedSegments = map(
-      ([pathSegment, mapValue]: [string, string]) =>
-        contains('specificationFilter', mapValue)
-          ? pathSegment
-          : pathSegment.toLowerCase(),
-      zip(pathSegments, mapValues) as [string, string][]
-    )
-    return path.startsWith('/')
-      ? `/${convertedSegments.join('/')}`
-      : convertedSegments.join('/')
-  }
-  return path && path.toLowerCase()
 }
 
 function createLocationDescriptor(
@@ -280,6 +244,7 @@ export function navigate(
     rootPath,
     replace,
     fetchPage = true,
+    modifiers,
   } = options
 
   if (!page && !inputTo) {
@@ -308,7 +273,7 @@ export function navigate(
     : ''
   ).split('#')
   const realHash = is(String, hash) ? `#${hash}` : ''
-  const query = inputQuery || realQuery
+  let query = inputQuery || realQuery
 
   let navigationRoute: any = {}
 
@@ -332,13 +297,15 @@ export function navigate(
     return false
   }
 
-  // Prefix any non-absolute paths (e.g. http:// or https://) with runtime.rootPath
-  if (rootPath && !navigationRoute.path.startsWith('http')) {
-    navigationRoute.path =
-      rootPath + pathToLowerCase(navigationRoute.path, query)
+  navigationRoute.path = navigationRootPath(navigationRoute.path, rootPath)
+  for (const modifier of modifiers) {
+    const { path, query: fixedQuery } = modifier({
+      path: navigationRoute.path,
+      query,
+    })
+    navigationRoute.path = path || navigationRoute.path
+    query = fixedQuery || query
   }
-
-  navigationRoute.path = pathToLowerCase(navigationRoute.path, query)
 
   if (history) {
     const nextQuery = mergePersistingQueries(history.location.search, query)
@@ -359,6 +326,15 @@ export function navigate(
   }
 
   return false
+}
+
+function navigationRootPath(path: string, rootPath?: string) {
+  // Prefix any non-absolute paths (e.g. http:// or https://) with runtime.rootPath
+  if (rootPath && !path.startsWith('http')) {
+    return rootPath + path
+  }
+
+  return path
 }
 
 export function goBack(history: History | null) {
@@ -512,4 +488,14 @@ export interface NavigateOptions {
   replace?: boolean
   fetchPage?: boolean
   rootPath?: string
+  modifiers: Set<NavigationRouteModifier>
 }
+
+export interface NavigationRouteChange {
+  path: string
+  query: string
+}
+
+export type NavigationRouteModifier = (
+  navigationRoute: NavigationRouteChange
+) => NavigationRouteChange
