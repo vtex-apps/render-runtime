@@ -79,18 +79,22 @@ function addStyleToPage(href: string) {
   }
 }
 
-export function hotReloadOverrides() {
-  const overrideLink = document.getElementById('override_link_0')
-  const href = overrideLink && overrideLink.getAttribute('href')
+const hotReloadCss = (id: string) => () => {
+  const linkElement = document.getElementById(id)
+  const href = linkElement && linkElement.getAttribute('href')
 
-  if (overrideLink && href) {
+  if (linkElement && href) {
     const modifiedHref = href.replace(
       /build(\d)+/,
       `build${Math.round(Date.now() / 1000)}`
     )
-    overrideLink.setAttribute('href', modifiedHref)
+    linkElement.setAttribute('href', modifiedHref)
   }
 }
+
+export const hotReloadOverrides = hotReloadCss('override_link_0')
+
+export const hotReloadTachyons = hotReloadCss('style_link')
 
 function prefetchStyle(href: string) {
   if (!document || !document.head) {

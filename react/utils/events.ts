@@ -9,6 +9,7 @@ interface IOEvent {
     hash: string
     locales: any
     subject: string
+    updated: string[]
   }
 }
 
@@ -57,7 +58,7 @@ const initSSE = (
     const event = JSON.parse(data) as IOEvent
     const {
       key,
-      body: { code, type, hash, locales, subject },
+      body: { code, type, hash, locales, subject, updated },
     } = event
 
     if (key === 'build.status') {
@@ -131,6 +132,12 @@ const initSSE = (
           e.emit('styleOverrides')
         )
         break
+    }
+
+    if (key === 'styles' && updated.indexOf('style.json') > -1) {
+      emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+        e.emit('styleTachyonsUpdate')
+      )
     }
   }
 
