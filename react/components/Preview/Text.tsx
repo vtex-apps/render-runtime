@@ -1,7 +1,6 @@
 import React from 'react'
 import { ContentLoader, Rect } from './ContentLoader'
 import Box from './Box'
-import { useSSR } from '../NoSSR'
 
 interface Props {
   width: number | string

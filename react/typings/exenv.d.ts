@@ -1,3 +1,3 @@
 declare module 'exenv' {
-  var canUseDOM: boolean
+  const canUseDOM: boolean
 }

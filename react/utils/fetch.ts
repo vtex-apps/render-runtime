@@ -28,11 +28,11 @@ export const fetchWithRetry = (
   url: string,
   init: RequestInit,
   fetcher: GlobalFetch['fetch'],
-  maxRetries: number = 3
+  maxRetries = 3
 ) => {
   let status = 500
   const callFetch = (
-    attempt: number = 0
+    attempt = 0
   ): Promise<{ response: Response; error: any }> =>
     fetcher(url, init)
       .then(response => {

@@ -2,7 +2,7 @@ interface Module {
   hot: any
 }
 
-declare var module: Module
+declare const module: Module
 
 declare module '*.graphql' {
   import { DocumentNode } from 'graphql'
@@ -12,7 +12,7 @@ declare module '*.graphql' {
 }
 
 declare module '*.png' {
-  var url: string
+  let url: string
   export = url
 }
 
@@ -21,4 +21,4 @@ declare module '*.css' {
   export default content
 }
 
-declare var vtex: any
+declare const vtex: any
