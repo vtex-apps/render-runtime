@@ -9,6 +9,7 @@ import * as EventEmitter from 'eventemitter3'
 import { canUseDOM } from 'exenv'
 import 'graphql'
 import { createBrowserHistory as createHistory } from 'history'
+import queryString from 'query-string'
 import React, { ReactElement } from 'react'
 import { getDataFromTree } from 'react-apollo'
 import { hydrate, render as renderDOM } from 'react-dom'
@@ -220,6 +221,14 @@ function start() {
         window.__RUNTIME__.contentMap!,
         window.__RUNTIME__.pages[window.__RUNTIME__.page]
       )
+    }
+
+    if (canUseDOM && window.location.search) {
+      const browserQuery = queryString.parse(window.location.search)
+      window.__RUNTIME__.query = {
+        ...browserQuery,
+        ...(window.__RUNTIME__.query || {}),
+      }
     }
 
     const runtime = window.__RUNTIME__
