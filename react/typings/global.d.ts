@@ -10,6 +10,7 @@ import { HelmetData } from 'react-helmet'
 import { TreePathProps } from '../utils/treePath'
 import { LayoutContainer } from '../core/main'
 import { IntrospectionResultData } from 'apollo-cache-inmemory'
+import { NavigationRouteModifier } from '../utils/pages'
 
 declare global {
   interface RenderMetric {
@@ -194,6 +195,7 @@ declare global {
     account: RenderRuntime['account']
     addMessages: (newMessages: RenderContext['messages']) => Promise<void>
     amp: boolean
+    addNavigationRouteModifier: (modifier: NavigationRouteModifier) => void
     components: RenderRuntime['components']
     contentMap: RenderRuntime['contentMap']
     culture: RenderRuntime['culture']
