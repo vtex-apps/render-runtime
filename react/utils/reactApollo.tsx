@@ -11,9 +11,8 @@ class RenderRuntimeQuery extends PureComponent<{
     const { children, ...rest } = this.props
 
     return (
-      // @ts-ignore
-      <Query {...rest}>
-        {result => {
+      <Query {...(rest as any)}>
+        {(result: any) => {
           if (result.networkStatus === 1 && result.data === undefined) {
             result.data = {} as any
             result.refetch = noop as any
@@ -32,8 +31,7 @@ class RenderRuntimeMutation extends PureComponent<{
     const { children, ...rest } = this.props
 
     return (
-      // @ts-ignore
-      <Mutation {...rest}>
+      <Mutation {...(rest as any)}>
         {(mutateFunction: any, result: any) => {
           return children(mutateFunction, result)
         }}

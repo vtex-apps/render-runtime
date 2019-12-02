@@ -58,7 +58,7 @@ export default (
   InitialImplementer: any,
   app: string,
   name: string,
-  lazy: boolean = false
+  lazy = false
 ) => {
   const componentLocators = [`${app}/${name}`, `${idToAppAtMajor(app)}/${name}`]
 

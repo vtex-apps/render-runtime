@@ -1,4 +1,4 @@
 declare module 'vtex.render-runtime' {
-  var runtimeExports: RuntimeExports
+  let runtimeExports: RuntimeExports
   export = runtimeExports
 }
