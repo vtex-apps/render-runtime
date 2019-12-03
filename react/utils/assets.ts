@@ -79,11 +79,9 @@ function addStyleToPage(href: string) {
   }
 }
 
-const hotReloadCss = (id: string) => () => {
-  const linkElement = document.getElementById(id)
+const updateHref = (linkElement: Element) => {
   const href = linkElement && linkElement.getAttribute('href')
-
-  if (linkElement && href) {
+  if (href) {
     const modifiedHref = href.replace(
       /build(\d)+/,
       `build${Math.round(Date.now() / 1000)}`
@@ -92,9 +90,17 @@ const hotReloadCss = (id: string) => () => {
   }
 }
 
-export const hotReloadOverrides = hotReloadCss('override_link_0')
+export const hotReloadOverrides = () => {
+  const linkElements = Array.from(document.querySelectorAll('.override_link'))
+  linkElements.forEach(updateHref)
+}
 
-export const hotReloadTachyons = hotReloadCss('style_link')
+export const hotReloadTachyons = () => {
+  const linkElement = document.getElementById('style_link')
+  if (linkElement) {
+    updateHref(linkElement)
+  }
+}
 
 function prefetchStyle(href: string) {
   if (!document || !document.head) {

@@ -126,18 +126,20 @@ const initSSE = (
           e.emit('blocksUpdated')
         )
         break
-      case 'styleOverrides':
-        console.log('[styles] Style overrides changed.')
-        emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
-          e.emit('styleOverrides')
-        )
-        break
-    }
+      case 'styles':
+        console.log('[styles] Styles changed.')
+        if (updated.indexOf('style.json') > -1) {
+          emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+            e.emit('styleTachyonsUpdate')
+          )
+        }
+        if (updated.indexOf('overrides.css') > -1) {
+          emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+            e.emit('styleOverrides')
+          )
+        }
 
-    if (key === 'styles' && updated.indexOf('style.json') > -1) {
-      emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
-        e.emit('styleTachyonsUpdate')
-      )
+        break
     }
   }
 
