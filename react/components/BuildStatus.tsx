@@ -158,16 +158,13 @@ class BuildStatus extends Component<RenderContextProps, State> {
       animateOut ? 'fadeOut' : 'fadeIn'
     }`
 
-    const fail = (
-      <p className="ma2">
-        {' '}
-        Oops! Build failed. Check your terminal for more information
-      </p>
-    )
-
-    const reload = <p className="ma2">Performing full reload</p>
-
-    const linkInterrupted = <p className="ma2">Link interrupted</p>
+    const message = interrupted
+      ? 'Link interrupted'
+      : status === 'fail'
+      ? 'Oops! Build failed. Check your terminal for more information'
+      : status === 'reload'
+      ? 'Performing full reload'
+      : null
 
     return (
       // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
@@ -182,13 +179,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
         }}
         onMouseOver={this.handleMouseOver}
       >
-        {interrupted
-          ? linkInterrupted
-          : status === 'fail'
-          ? fail
-          : status === 'reload'
-          ? reload
-          : this.renderLoading()}
+        {message ? <p className="ma2">{message}</p> : this.renderLoading()}
       </div>
     )
   }
