@@ -5,6 +5,7 @@ interface State {
   animateOut: boolean
   status: string | null
   anchor: 'left' | 'right'
+  interrupted: boolean | null
 }
 
 class BuildStatus extends Component<RenderContextProps, State> {
@@ -17,6 +18,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
     this.state = {
       animateOut: false,
       status: null,
+      interrupted: null,
       anchor: 'left',
     }
   }
@@ -32,7 +34,8 @@ class BuildStatus extends Component<RenderContextProps, State> {
       delayMillis
     )
     this.hideHandle = window.setTimeout(
-      () => this.setState({ status: null, animateOut: false }),
+      () =>
+        this.setState({ status: null, interrupted: null, animateOut: false }),
       delayMillis + 300
     )
   }
@@ -58,6 +61,13 @@ class BuildStatus extends Component<RenderContextProps, State> {
     }
   }
 
+  public updateInterrupted = () => {
+    this.clearTimeouts()
+    this.setState({ interrupted: true, animateOut: false })
+    const delay = 2000
+    this.hideWithDelay(delay)
+  }
+
   public subscribeToStatus = () => {
     const { emitter } = this.props.runtime
     emitter.addListener('build.status', this.updateStatus)
@@ -68,12 +78,24 @@ class BuildStatus extends Component<RenderContextProps, State> {
     emitter.removeListener('build.status', this.updateStatus)
   }
 
+  public subscribeToLinkInterrupted = () => {
+    const { emitter } = this.props.runtime
+    emitter.addListener('link_interrupted', this.updateInterrupted)
+  }
+
+  public unsubscribeToLinkInterrupted = () => {
+    const { emitter } = this.props.runtime
+    emitter.removeListener('link_interrupted', this.updateInterrupted)
+  }
+
   public componentDidMount() {
     this.subscribeToStatus()
+    this.subscribeToLinkInterrupted()
   }
 
   public componentWillUnmount() {
     this.unsubscribeToStatus()
+    this.unsubscribeToLinkInterrupted()
     this.clearTimeouts()
   }
 
@@ -126,9 +148,9 @@ class BuildStatus extends Component<RenderContextProps, State> {
   )
 
   public render() {
-    const { status, animateOut, anchor } = this.state
+    const { status, animateOut, anchor, interrupted } = this.state
 
-    if (status === null) {
+    if (status === null && interrupted === null) {
       return null
     }
 
@@ -138,11 +160,14 @@ class BuildStatus extends Component<RenderContextProps, State> {
 
     const fail = (
       <p className="ma2">
+        {' '}
         Oops! Build failed. Check your terminal for more information
       </p>
     )
 
     const reload = <p className="ma2">Performing full reload</p>
+
+    const linkInterrupted = <p className="ma2">Link interrupted</p>
 
     return (
       // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
@@ -157,7 +182,9 @@ class BuildStatus extends Component<RenderContextProps, State> {
         }}
         onMouseOver={this.handleMouseOver}
       >
-        {status === 'fail'
+        {interrupted
+          ? linkInterrupted
+          : status === 'fail'
           ? fail
           : status === 'reload'
           ? reload
