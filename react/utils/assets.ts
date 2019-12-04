@@ -81,12 +81,35 @@ function addStyleToPage(href: string) {
 
 const updateHref = (linkElement: Element) => {
   const href = linkElement && linkElement.getAttribute('href')
+
   if (href) {
+    const now = Date.now()
+    const idPrefix = 'hot_reload_css'
     const modifiedHref = href.replace(
       /build(\d)+/,
-      `build${Math.round(Date.now() / 1000)}`
+      `build${Math.round(now / 1000)}`
     )
-    linkElement.setAttribute('href', modifiedHref)
+    const newCssElement = document.createElement('link')
+    const nextElementSibling = linkElement.nextElementSibling
+    newCssElement.rel = 'stylesheet'
+    newCssElement.type = 'text/css'
+    newCssElement.href = modifiedHref
+    newCssElement.id = idPrefix + now
+    newCssElement.onload = function onLoadCb() {
+      requestAnimationFrame(() => {
+        if (
+          nextElementSibling &&
+          linkElement.parentNode &&
+          nextElementSibling.id.indexOf(idPrefix) > -1
+        ) {
+          linkElement.parentNode.removeChild(nextElementSibling)
+        }
+      })
+    }
+
+    if (linkElement.parentNode) {
+      linkElement.parentNode.insertBefore(newCssElement, nextElementSibling)
+    }
   }
 }
 
