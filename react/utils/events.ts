@@ -9,6 +9,7 @@ interface IOEvent {
     hash: string
     locales: any
     subject: string
+    updated: string[]
   }
 }
 
@@ -37,7 +38,7 @@ const initSSE = (
   require('eventsource-polyfill')
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const myvtexSSE = require('myvtex-sse')
-  const path = `vtex.builder-hub:*:react2,pages0,build.status,pages1?workspace=${workspace}`
+  const path = `vtex.builder-hub:*:react2,pages0,build.status,pages1,styles?workspace=${workspace}`
   const linkInterruptedPath = `colossus:*:link_interrupted?workspace=${workspace}`
   const source: EventSource = myvtexSSE(account, workspace, path, {
     verbose: false,
@@ -57,7 +58,7 @@ const initSSE = (
     const event = JSON.parse(data) as IOEvent
     const {
       key,
-      body: { code, type, hash, locales, subject },
+      body: { code, type, hash, locales, subject, updated },
     } = event
 
     if (key === 'build.status') {
@@ -124,6 +125,20 @@ const initSSE = (
         emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
           e.emit('blocksUpdated')
         )
+        break
+      case 'styles':
+        console.log('[styles] Styles changed.')
+        if (updated.indexOf('style.json') > -1) {
+          emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+            e.emit('styleTachyonsUpdate')
+          )
+        }
+        if (updated.indexOf('overrides.css') > -1) {
+          emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+            e.emit('styleOverrides')
+          )
+        }
+
         break
     }
   }

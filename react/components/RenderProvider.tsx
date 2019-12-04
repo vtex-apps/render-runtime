@@ -15,6 +15,8 @@ import gql from 'graphql-tag'
 import {
   fetchAssets,
   getLoadedImplementation,
+  hotReloadOverrides,
+  hotReloadTachyons,
   prefetchAssets,
 } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
@@ -259,6 +261,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     if (!production) {
       emitter.addListener('extensionsUpdated', this.updateRuntime)
       emitter.addListener('blocksUpdated', this.updateRuntime)
+      emitter.addListener('styleOverrides', hotReloadOverrides)
+      emitter.addListener('styleTachyonsUpdate', hotReloadTachyons)
     }
 
     this.sendInfoFromIframe()
@@ -287,6 +291,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     if (!production) {
       emitter.removeListener('extensionsUpdated', this.updateRuntime)
       emitter.removeListener('blocksUpdated', this.updateRuntime)
+      emitter.removeListener('styleOverrides', hotReloadOverrides)
+      emitter.removeListener('styleTachyonsUpdate', hotReloadTachyons)
     }
   }
 
