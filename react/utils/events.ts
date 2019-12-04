@@ -38,10 +38,20 @@ const initSSE = (
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const myvtexSSE = require('myvtex-sse')
   const path = `vtex.builder-hub:*:react2,pages0,build.status,pages1?workspace=${workspace}`
+  const linkInterruptedPath = `colossus:*:link_interrupted?workspace=${workspace}`
   const source: EventSource = myvtexSSE(account, workspace, path, {
     verbose: false,
     host: baseURI,
   })
+  const linkInterruptedSource: EventSource = myvtexSSE(
+    account,
+    workspace,
+    linkInterruptedPath,
+    {
+      verbose: false,
+      host: baseURI,
+    }
+  )
 
   const handler = ({ data }: MessageEvent) => {
     const event = JSON.parse(data) as IOEvent
@@ -72,6 +82,13 @@ const initSSE = (
           break
       }
       return
+    }
+
+    if (key === 'link_interrupted') {
+      console.log(`[colossus] Link interrupted.`)
+      emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+        e.emit('link_interrupted', code)
+      )
     }
 
     switch (type) {
@@ -112,10 +129,15 @@ const initSSE = (
   }
 
   source.onmessage = handler
+  linkInterruptedSource.onmessage = handler
   source.onopen = () =>
     console.log('[render] Connected to event server successfully')
   source.onerror = () =>
     console.log('[render] Connection to event server failed')
+  linkInterruptedSource.onopen = () =>
+    console.log('[colossus] Connected to event server successfully')
+  linkInterruptedSource.onerror = () =>
+    console.log('[colossus] Connection to event server failed')
 
   return source
 }
