@@ -266,7 +266,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public componentDidMount() {
     this.rendered = true
     const { history, runtime } = this.props
-    const { production, emitter } = runtime
+    const { production, emitter, publicEndpoint } = runtime
 
     this.unlisten = history && history.listen(this.onPageChanged)
     emitter.addListener('localesChanged', this.onLocaleSelected)
@@ -281,7 +281,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.sendInfoFromIframe()
     this.prefetchPages()
 
-    if ('__inspect' in (this.state.query || {})) {
+    if (
+      publicEndpoint === 'myvtex.com' &&
+      '__inspect' in (this.state.query || {})
+    ) {
       this.setState({ inspect: true })
     }
   }
