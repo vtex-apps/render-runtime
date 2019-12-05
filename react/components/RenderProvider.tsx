@@ -6,7 +6,7 @@ import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
 import { forEach, merge, mergeWith, equals } from 'ramda'
-import React, { Component, Fragment, ReactElement } from 'react'
+import React, { Component, Fragment, ReactElement, Suspense } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
@@ -57,6 +57,16 @@ import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
 import { appendLocationSearch } from '../utils/location'
 import { setCookie } from '../utils/cookie'
+
+// TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
+const InspectorPopover = React.lazy(
+  () =>
+    new Promise<{ default: any }>(resolve => {
+      import('@vtex/blocks-inspector').then(BlocksInspector => {
+        resolve({ default: BlocksInspector.default.InspectorPopover })
+      })
+    })
+)
 
 interface Props {
   children: ReactElement<any> | null
@@ -1057,6 +1067,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 {isSiteEditorIframe ? (
                   <ExtensionPoint id="store/__overlay" />
                 ) : null}
+                {inspect && (
+                  <Suspense fallback={null}>
+                    <InspectorPopover />
+                  </Suspense>
+                )}
               </Fragment>
             </IntlProvider>
           </ApolloProvider>
