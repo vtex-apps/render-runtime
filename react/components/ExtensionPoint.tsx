@@ -1,5 +1,5 @@
 import { mergeDeepRight, reduce } from 'ramda'
-import React, { FC, Fragment } from 'react'
+import React, { FC, Fragment, Suspense } from 'react'
 
 import ExtensionPointComponent from './ExtensionPointComponent'
 import Loading from './Loading'
@@ -9,6 +9,16 @@ import NoSSR from './NoSSR'
 import { withErrorBoundary } from './ErrorBoundary'
 import GenericPreview from './Preview/GenericPreview'
 import LoadingBar from './LoadingBar'
+
+// TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
+const BlockWrapper = React.lazy(
+  () =>
+    new Promise<{ default: any }>(resolve => {
+      import('@vtex/blocks-inspector').then(BlocksInspector => {
+        resolve({ default: BlocksInspector.default.ExtensionPointWrapper })
+      })
+    })
+)
 
 interface Props {
   id: string
@@ -110,6 +120,8 @@ function withOuterExtensions(
 const ExtensionPoint: FC<Props> = props => {
   const runtime = useRuntime()
 
+  const { inspect } = runtime
+
   const treePathFromHook = useTreePath()
 
   const { children, params, query, id, blockProps, ...parentProps } = props
@@ -205,11 +217,24 @@ const ExtensionPoint: FC<Props> = props => {
   //
   // "lazy" components might never be used, so they don't necessarily
   // need a loading animation.
-  return renderStrategy === 'client' && !runtime.amp ? (
-    <NoSSR onSSR={<Loading />}>{extensionPointComponent}</NoSSR>
-  ) : (
-    extensionPointComponent
-  )
+  const maybeClientExtension =
+    renderStrategy === 'client' && !runtime.amp ? (
+      <NoSSR onSSR={<Loading />}>{extensionPointComponent}</NoSSR>
+    ) : (
+      extensionPointComponent
+    )
+
+  if (inspect) {
+    return (
+      <Suspense fallback={maybeClientExtension}>
+        <BlockWrapper extension={extension} treePath={newTreePath}>
+          {maybeClientExtension}
+        </BlockWrapper>
+      </Suspense>
+    )
+  }
+
+  return maybeClientExtension
 }
 
 ExtensionPoint.defaultProps = {
