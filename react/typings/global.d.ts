@@ -207,6 +207,7 @@ declare global {
     goBack: () => void
     hints: RenderHints
     history: History | null
+    inspect: RenderRuntime['inspect']
     messages: RenderRuntime['messages']
     navigate: (options: NavigateOptions) => boolean
     onPageChanged: (location: RenderHistoryLocation) => void
@@ -431,6 +432,7 @@ declare global {
     disableSSQ: boolean
     hints: any
     introspectionResult: IntrospectionResultData
+    inspect: boolean
     page: string
     route: Route
     version: string
