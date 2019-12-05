@@ -283,6 +283,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     if (
       publicEndpoint === 'myvtex.com' &&
+      !production &&
       '__inspect' in (this.state.query || {})
     ) {
       this.setState({ inspect: true })
