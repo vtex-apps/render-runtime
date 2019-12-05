@@ -75,6 +75,7 @@ export interface RenderProviderState {
   defaultExtensions: RenderRuntime['defaultExtensions']
   device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
+  inspect: RenderRuntime['inspect']
   messages: RenderRuntime['messages']
   page: RenderRuntime['page']
   pages: RenderRuntime['pages']
@@ -132,6 +133,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     goBack: PropTypes.func,
     hints: PropTypes.object,
     history: PropTypes.object,
+    inspect: PropTypes.bool,
     messages: PropTypes.object,
     navigate: PropTypes.func,
     onPageChanged: PropTypes.func,
@@ -289,6 +291,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query,
       route,
       settings: settings || {},
+      inspect: false,
     }
 
     this.prefetchRoutes = new Set<string>()
@@ -313,6 +316,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     this.sendInfoFromIframe()
     this.prefetchPages()
+
+    if ('__inspect' in (this.state.query || {})) {
+      this.setState({ inspect: true })
+    }
   }
 
   public UNSAFE_componentWillReceiveProps(nextProps: Props) {
@@ -348,6 +355,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       components,
       contentMap,
       extensions,
+      inspect,
       messages,
       page,
       pages,
@@ -358,6 +366,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query,
       defaultExtensions,
     } = this.state
+
     const {
       account,
       amp,
@@ -391,6 +400,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       goBack: this.goBack,
       hints,
       history,
+      inspect,
       messages,
       navigate: this.navigate,
       onPageChanged: this.onPageChanged,
@@ -1012,6 +1022,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       page,
       query,
       production,
+      inspect,
     } = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
