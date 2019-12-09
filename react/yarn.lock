@@ -2293,10 +2293,10 @@
     lodash.unescape "4.0.1"
     semver "^6.3.0"
 
-"@vtex/blocks-inspector@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@vtex/blocks-inspector/-/blocks-inspector-0.0.7.tgz#f9dbd2f517fba43b5282a4c08d99fde52b2fc5a1"
-  integrity sha512-Ak2LsVJKR2hMonuMxcJrWHTcmgSBslem1ibnXUV9IWdCuRASLLJLFZ8wS62n+Xjuo6f7PigJvtBDD5fQECSbyA==
+"@vtex/blocks-inspector@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@vtex/blocks-inspector/-/blocks-inspector-0.0.8.tgz#905d47364948880322b1b22ac75cfe727a7d45ae"
+  integrity sha512-afW1Hom2DoH5XQz4XA2zrHCrrLCDHYGXhumcR2DAe6m+QwZVHmxmORe4QyOZQVA9zpPPSfpEVYAqTpNjQIafJQ==
   dependencies:
     throttle-debounce "^2.1.0"
 
