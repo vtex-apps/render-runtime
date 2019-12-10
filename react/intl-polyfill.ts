@@ -1,8 +1,11 @@
 import { path } from 'ramda'
 import { canUseDOM } from 'exenv'
 
+// @ts-ignore
 import { PluralRules } from '@formatjs/intl-pluralrules'
 import RelativeTimeFormat from '@formatjs/intl-relativetimeformat'
+
+console.log('teste PluralRules!!!:', PluralRules)
 
 if (typeof window.Intl.PluralRules === 'undefined' || !canUseDOM) {
   Object.defineProperty(Intl, 'PluralRules', {
