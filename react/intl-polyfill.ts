@@ -28,31 +28,33 @@ const locale = path<string>(['__RUNTIME__', 'culture', 'locale'], window)
 const [lang] = locale ? locale.split('-') : ['']
 
 myPromise = new Promise(resolve => {
-  let hasImportedPlural =
-    !window.Intl.PluralRules.polyfilled || !canUseDOM || !lang
-  let hasImportedRelative =
-    !window.Intl.RelativeTimeFormat.polyfilled || !canUseDOM || !lang
+  const hasPolyfilledPlural =
+    window.Intl.PluralRules.polyfilled && canUseDOM && lang
+  const hasPolyfilledRelative =
+    window.Intl.RelativeTimeFormat.polyfilled && canUseDOM && lang
+  let isPluralLocaleImported = false
+  let iRelativeLocaleImported = false
 
-  if (!hasImportedPlural) {
+  if (hasPolyfilledPlural) {
     import('@formatjs/intl-pluralrules/dist/locale-data/' + lang).then(() => {
-      hasImportedPlural = true
-      if (hasImportedPlural && hasImportedRelative) {
+      isPluralLocaleImported = true
+      if (isPluralLocaleImported && iRelativeLocaleImported) {
         resolve()
       }
     })
   }
 
-  if (!hasImportedRelative) {
+  if (hasPolyfilledRelative) {
     import('@formatjs/intl-relativetimeformat/dist/locale-data/' + lang).then(
       () => {
-        hasImportedRelative = true
-        if (hasImportedPlural && hasImportedRelative) {
+        iRelativeLocaleImported = true
+        if (isPluralLocaleImported && iRelativeLocaleImported) {
           resolve()
         }
       }
     )
   }
-  if (hasImportedPlural && hasImportedRelative) {
+  if (!hasPolyfilledPlural && !hasPolyfilledRelative) {
     resolve()
   }
 })
