@@ -49,6 +49,7 @@ export function addScriptToPage(src: string): Promise<void> {
       throw new ServerSideAssetLoadingError()
     }
     const script = document.createElement('script')
+    script.type = 'text/javascript'
     script.onload = () => resolve()
     script.onerror = () => reject()
     script.async = false
@@ -56,7 +57,7 @@ export function addScriptToPage(src: string): Promise<void> {
     if (isAbsolute(src)) {
       script.crossOrigin = 'anonymous'
     }
-    document.head.appendChild(script)
+    document.body.appendChild(script)
   })
 }
 
@@ -232,18 +233,25 @@ export function getExtensionImplementation<P = {}, S = {}>(
 
 export function fetchAssets(
   runtime: RenderRuntime,
-  componentsAssetsMap: ComponentTraversalResult
+  componentsAssetsMap: ComponentTraversalResult,
+  options: any
 ) {
+  const { scriptsOnly } = options || {}
   const { assets } = componentsAssetsMap
 
-  const existingScripts = getExistingScriptSrcs()
-  const existingStyles = getExistingStyleHrefs()
+  if (!scriptsOnly) {
+    const existingStyles = getExistingStyleHrefs()
+    const styles = getAssetsToAdd(runtime, assets, '.css', existingStyles)
+    styles.forEach(addStyleToPage)
+  } else {
+    console.log('prevent styles from reloading')
+  }
 
+  const existingScripts = getExistingScriptSrcs()
   const scripts = getAssetsToAdd(runtime, assets, '.js', existingScripts)
-  const styles = getAssetsToAdd(runtime, assets, '.css', existingStyles)
-  styles.forEach(addStyleToPage)
+
   return Promise.all(scripts.map(addScriptToPage)).then(() => {
-    return
+    return {}
   })
 }
 
