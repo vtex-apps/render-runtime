@@ -1,7 +1,11 @@
 import React, { useEffect, useState, FC, useRef } from 'react'
 import PreventHydration from './PreventHydration'
 
-const HydrateOnInteraction: FC = ({ children, id }) => {
+interface Props {
+  id: string
+}
+
+const HydrateOnInteraction: FC<Props> = ({ children, id }) => {
   const [shouldHydrate, setHydrate] = useState(false)
   const ref = useRef<HTMLDivElement | null>(null)
 
@@ -11,7 +15,9 @@ const HydrateOnInteraction: FC = ({ children, id }) => {
     }
     const handleMouseOver = () => {
       setHydrate(true)
-      ref.current.removeEventListener('mouseover', handleMouseOver)
+      if (ref.current) {
+        ref.current.removeEventListener('mouseover', handleMouseOver)
+      }
     }
     ref.current.addEventListener('mouseover', handleMouseOver)
   }, [])
