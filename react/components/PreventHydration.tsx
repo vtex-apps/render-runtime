@@ -6,6 +6,7 @@ import React, {
   useContext,
   createContext,
   useLayoutEffect,
+  ForwardRefExoticComponent,
 } from 'react'
 
 interface HydrationContext {
@@ -15,11 +16,16 @@ interface HydrationContext {
 const HydrationContext = createContext<HydrationContext>({
   dehydratedContent: {},
 })
+
 interface Props {
   shouldHydrate?: boolean
   children: ReactNode
   id: string
 }
+
+type Ref = ForwardRefExoticComponent<
+  Props & React.RefAttributes<HTMLElement> | null
+>
 
 const getDehydratedElement = (id: string) => {
   const ssrRenderedElement =
@@ -148,12 +154,12 @@ const PreventHydration = React.forwardRef<HTMLElement, Props>(
           }}
         >
           {shouldHydrate ? (
-            <div ref={ref} data-hydration-id={id}>
+            <div ref={ref as Ref} data-hydration-id={id}>
               {children}
             </div>
           ) : (
             <div
-              ref={(ref as unknown) as HTMLElement}
+              ref={ref as Ref}
               data-hydration-id={id}
               suppressHydrationWarning
               dangerouslySetInnerHTML={{
