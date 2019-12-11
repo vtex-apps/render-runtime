@@ -29,9 +29,6 @@ interface State {
   lastUpdate?: number
 }
 
-const componentPromiseMap: any = {}
-const componentPromiseResolvedMap: any = {}
-
 class ExtensionPointComponent extends PureComponent<
   Props & RenderContextProps,
   State
@@ -70,30 +67,22 @@ class ExtensionPointComponent extends PureComponent<
       component,
       runtime: { fetchComponent },
     } = this.props
-    const Component = component && getImplementation(component)
 
-    // Let's fetch the assets and re-render.
-    if (component && !Component) {
-      if (!(component in componentPromiseMap)) {
-        componentPromiseMap[component] = fetchComponent(component)
-      } else if (componentPromiseResolvedMap[component]) {
-        this.stopLoading()
-        throw new Error(`Unable to fetch component ${component}`)
-      }
-
-      componentPromiseMap[component]
-        .then(() => {
-          componentPromiseResolvedMap[component] = true
-          this.updateComponentsWithEvent(component)
-          this.stopLoading()
-        })
-        .catch(() => {
-          componentPromiseResolvedMap[component] = true
-          this.stopLoading()
-        })
-    } else {
-      this.stopLoading()
+    if (!component) {
+      return
     }
+
+    fetchComponent(component, { preventRefetch: true })
+      .then(({ wasAlreadyLoaded }) => {
+        if (!wasAlreadyLoaded) {
+          this.updateComponentsWithEvent(component)
+        }
+        this.stopLoading()
+      })
+      .catch(({ error }) => {
+        this.stopLoading()
+        throw new Error(error)
+      })
   }
 
   private stopLoading = () => {
@@ -132,7 +121,9 @@ class ExtensionPointComponent extends PureComponent<
   public componentDidMount() {
     this._isMounted = true
     this.startLoading()
-    this.fetchAndRerender()
+    setTimeout(() => {
+      this.fetchAndRerender()
+    }, 1)
     this.addDataToElementIfEditable()
   }
 
