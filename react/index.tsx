@@ -57,10 +57,11 @@ if (window.ReactApollo) {
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
   if (canUseDOM) {
-    document.addEventListener(
-      'DOMContentLoaded',
-      window.__RENDER_8_RUNTIME__.start
-    )
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        window.__RENDER_8_RUNTIME__.start()
+      }, 1)
+    })
   } else {
     window.__RENDER_8_RUNTIME__.start()
   }
