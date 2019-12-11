@@ -196,9 +196,8 @@ class ExtensionPointComponent extends PureComponent<
         {preventsHydration ? (
           <Hydration
             id={treePath}
-            hydration={hydration}
+            hydration={hydration as Hydration}
             loading={!Component}
-            component={component}
           >
             {Component ? <Component {...props}>{children}</Component> : null}
           </Hydration>
@@ -276,7 +275,7 @@ const Hydration: FunctionComponent<HydrationProps> = ({
     )
   }
 
-  if (hydration === 'never' || hydration === 'on-view') {
+  if (hydration === 'never') {
     return <PreventHydration id={id}>{children}</PreventHydration>
   }
 
