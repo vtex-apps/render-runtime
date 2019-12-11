@@ -1,11 +1,10 @@
 import { path } from 'ramda'
 import { canUseDOM } from 'exenv'
 
-// @ts-ignore
 import { PluralRules } from '@formatjs/intl-pluralrules'
 import RelativeTimeFormat from '@formatjs/intl-relativetimeformat'
 
-console.log('teste PluralRules!!!:', PluralRules)
+let myPromise = null
 
 if (typeof window.Intl.PluralRules === 'undefined' || !canUseDOM) {
   Object.defineProperty(Intl, 'PluralRules', {
@@ -28,10 +27,34 @@ if (!('RelativeTimeFormat' in Intl) || !canUseDOM) {
 const locale = path<string>(['__RUNTIME__', 'culture', 'locale'], window)
 const [lang] = locale ? locale.split('-') : ['']
 
-if (window.Intl.PluralRules.polyfilled && canUseDOM && lang) {
-  import('@formatjs/intl-pluralrules/dist/locale-data/' + lang)
-}
+myPromise = new Promise(resolve => {
+  let hasImportedPlural =
+    !window.Intl.PluralRules.polyfilled || !canUseDOM || !lang
+  let hasImportedRelative =
+    !window.Intl.RelativeTimeFormat.polyfilled || !canUseDOM || !lang
 
-if (window.Intl.RelativeTimeFormat.polyfilled && canUseDOM && lang) {
-  import('@formatjs/intl-relativetimeformat/dist/locale-data/' + lang)
-}
+  if (!hasImportedPlural) {
+    import('@formatjs/intl-pluralrules/dist/locale-data/' + lang).then(() => {
+      hasImportedPlural = true
+      if (hasImportedPlural && hasImportedRelative) {
+        resolve()
+      }
+    })
+  }
+
+  if (!hasImportedRelative) {
+    import('@formatjs/intl-relativetimeformat/dist/locale-data/' + lang).then(
+      () => {
+        hasImportedRelative = true
+        if (hasImportedPlural && hasImportedRelative) {
+          resolve()
+        }
+      }
+    )
+  }
+  if (hasImportedPlural && hasImportedRelative) {
+    resolve()
+  }
+})
+
+export default myPromise

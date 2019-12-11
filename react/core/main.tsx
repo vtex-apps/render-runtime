@@ -15,7 +15,7 @@ import { getDataFromTree } from 'react-apollo'
 import { hydrate, render as renderDOM } from 'react-dom'
 import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
-import { isEmpty } from 'ramda'
+import { isEmpty, prop } from 'ramda'
 import Loading from '../components/Loading'
 import { LoadingContextProvider } from '../components/LoadingContext'
 
@@ -48,8 +48,11 @@ import {
 } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
 import { generateExtensions } from '../utils/blocks'
+import WaitIntlPolyfill from '../components/WaitIntlPolyfill'
 
 let emitter: EventEmitter | null = null
+
+let intlPolyfillPromise: Promise<void> | any = null
 
 if (window.IntlPolyfill) {
   window.IntlPolyfill.__disableRegExpRestore()
@@ -65,7 +68,7 @@ if (
   canUseDOM &&
   (!window.Intl.PluralRules || !window.Intl.RelativeTimeFormat)
 ) {
-  import('../intl-polyfill')
+  intlPolyfillPromise = import('../intl-polyfill').then(prop('default'))
 }
 
 const renderExtension = (
@@ -136,16 +139,19 @@ const render = async (
   const created = !element && ensureContainer(page)
   const elem = element || getContainer()
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
+
   const root = (
-    <RenderProvider
-      history={history}
-      cacheControl={cacheControl}
-      baseURI={baseURI}
-      root={name}
-      runtime={runtime}
-    >
-      {!isPage ? <ExtensionPoint id={name} /> : null}
-    </RenderProvider>
+    <WaitIntlPolyfill intlPolyfillPromise={intlPolyfillPromise}>
+      <RenderProvider
+        history={history}
+        cacheControl={cacheControl}
+        baseURI={baseURI}
+        root={name}
+        runtime={runtime}
+      >
+        {!isPage ? <ExtensionPoint id={name} /> : null}
+      </RenderProvider>
+    </WaitIntlPolyfill>
   )
 
   if (canUseDOM) {
