@@ -7,9 +7,17 @@ interface Props {
 const WaitIntlPolyfill: FC<Props> = ({ children, intlPolyfillPromise }) => {
   const locale = window?.__RUNTIME__?.culture?.locale
   const [lang] = locale ? locale.split('-') : ['']
-  const hasPolyfilledPluralRules = lang && window?.Intl?.PluralRules?.polyfilled && window?.Intl?.PluralRules?.localeData?.[lang]
-  const hasPolyfilledRelativeTmeRules = lang && window?.Intl?.RelativeTimeFormat?.polyfilled && window?.Intl?.RelativeTimeFormat?.localeData?.[lang]
-  const arePolyfillsDone = Boolean(hasPolyfilledPluralRules && hasPolyfilledRelativeTmeRules)
+  const hasPolyfilledPluralRules =
+    lang &&
+    window?.Intl?.PluralRules?.polyfilled &&
+    window?.Intl?.PluralRules?.localeData?.[lang]
+  const hasPolyfilledRelativeTmeRules =
+    lang &&
+    window?.Intl?.RelativeTimeFormat?.polyfilled &&
+    window?.Intl?.RelativeTimeFormat?.localeData?.[lang]
+  const arePolyfillsDone = Boolean(
+    hasPolyfilledPluralRules && hasPolyfilledRelativeTmeRules
+  )
   const [canRender, setCanRender] = useState(arePolyfillsDone)
 
   useEffect(() => {
@@ -20,14 +28,8 @@ const WaitIntlPolyfill: FC<Props> = ({ children, intlPolyfillPromise }) => {
     }
   }, [canRender, intlPolyfillPromise])
 
-  console.log('teste RENDERING:', !intlPolyfillPromise || canRender)
-
   if (!intlPolyfillPromise || canRender) {
-    return (
-      <Fragment>
-        {children}
-      </Fragment>
-    )
+    return <Fragment>{children}</Fragment>
   }
 
   return null

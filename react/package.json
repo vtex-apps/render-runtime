@@ -67,7 +67,7 @@
     "jest-dom": "^3.1.1",
     "jest-transform-graphql": "^2.1.0",
     "lint-staged": "^8.0.4",
-    "prettier": "^1.17.1",
+    "prettier": "^1.19.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.3.12",
