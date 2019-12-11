@@ -57,7 +57,7 @@ const createExtensions = (
         preview: block.preview,
         props: block.props,
         render: block.render,
-        static: block.static,
+        hydration: block.hydration,
         title: block.title,
         track: block.track,
       },
