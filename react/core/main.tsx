@@ -48,28 +48,8 @@ import {
 } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
 import { generateExtensions } from '../utils/blocks'
-import WaitIntlPolyfill from '../components/WaitIntlPolyfill'
 
 let emitter: EventEmitter | null = null
-
-let intlPolyfillPromise: Promise<void> | any = null
-
-if (window.IntlPolyfill) {
-  window.IntlPolyfill.__disableRegExpRestore()
-  if (!window.Intl) {
-    window.Intl = window.IntlPolyfill
-  } else if (!canUseDOM) {
-    window.Intl.NumberFormat = window.IntlPolyfill.NumberFormat
-    window.Intl.DateTimeFormat = window.IntlPolyfill.DateTimeFormat
-  }
-}
-if (
-  window.Intl &&
-  canUseDOM &&
-  (!window.Intl.PluralRules || !window.Intl.RelativeTimeFormat)
-) {
-  intlPolyfillPromise = import('../intl-polyfill').then(prop('default'))
-}
 
 const renderExtension = (
   extensionName: string,
@@ -141,17 +121,15 @@ const render = async (
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
 
   const root = (
-    <WaitIntlPolyfill intlPolyfillPromise={intlPolyfillPromise}>
-      <RenderProvider
-        history={history}
-        cacheControl={cacheControl}
-        baseURI={baseURI}
-        root={name}
-        runtime={runtime}
-      >
-        {!isPage ? <ExtensionPoint id={name} /> : null}
-      </RenderProvider>
-    </WaitIntlPolyfill>
+    <RenderProvider
+      history={history}
+      cacheControl={cacheControl}
+      baseURI={baseURI}
+      root={name}
+      runtime={runtime}
+    >
+      {!isPage ? <ExtensionPoint id={name} /> : null}
+    </RenderProvider>
   )
 
   if (canUseDOM) {
