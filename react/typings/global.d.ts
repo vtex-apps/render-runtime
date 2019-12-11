@@ -581,7 +581,13 @@ declare global {
   }
 
   type RenderStrategy = 'client' | 'lazy' | 'server'
-  type Hydration = 'always' | 'on-interaction' | 'on-view' | 'defer' | 'never'
+  type Hydration =
+    | 'always'
+    | 'on-interaction'
+    | 'on-view'
+    | 'on-idle'
+    | 'inherit'
+    | 'never'
   type BlockContentTree = Record<string, TreeEntry>
   type Blocks = Record<string, BlockEntry>
 
