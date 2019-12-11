@@ -208,7 +208,10 @@ declare global {
     emitter: RenderRuntime['emitter']
     ensureSession: () => Promise<void>
     extensions: RenderRuntime['extensions']
-    fetchComponent: (component: string) => Promise<void>
+    fetchComponent: (
+      component: string,
+      options: { preventRefetch?: boolean; scriptsOnly?: boolean }
+    ) => Promise<{ wasAlreadyLoaded?: boolean }>
     fetchComponents: (
       components: RenderRuntime['components'],
       extensions?: RenderRuntime['extensions']
@@ -522,6 +525,8 @@ declare global {
     sessionPromise: Promise<void>
   }
 
+  type DeferredScripts = string[] | undefined
+
   interface Window extends Window {
     __APP_ID__: string
     __ERROR__: any
@@ -540,6 +545,7 @@ declare global {
     __RENDER_8_SESSION__: RenderSession
     __REQUEST_ID__: string
     __RUNTIME__: RenderRuntime
+    __DEFERRED_SCRIPTS__: DeferredScripts
     __STATE__: NormalizedCacheObject
     browserHistory: History
     flags: Record<string, boolean>

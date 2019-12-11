@@ -120,6 +120,12 @@ interface NavigationState {
   lastOptions?: NavigateOptions
 }
 
+interface ComponentPromises {
+  [component: string]: Promise<any>
+}
+
+const componentsPromises: ComponentPromises = {}
+
 class RenderProvider extends Component<Props, RenderProviderState> {
   navigationState: NavigationState = { isNavigating: false }
   public static childContextTypes = {
@@ -323,6 +329,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       emitter.addListener('styleOverrides', hotReloadOverrides)
       emitter.addListener('styleTachyonsUpdate', hotReloadTachyons)
     }
+
+    setTimeout(() => {
+      const deferredScripts = window.__DEFERRED_SCRIPTS__
+
+      deferredScripts &&
+        deferredScripts.forEach(component => {
+          this.fetchComponent(component, {
+            preventRefetch: true,
+            scriptsOnly: true,
+          })
+        })
+    }, 100)
 
     this.sendInfoFromIframe()
     this.prefetchPages()
@@ -839,19 +857,54 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.sendInfoFromIframe({ shouldUpdateRuntime: true })
   }
 
-  public fetchComponent = (component: string) => {
+  public fetchComponent: RenderContext['fetchComponent'] = (
+    component,
+    options = {}
+  ) => {
     if (!canUseDOM) {
       throw new Error('Cannot fetch components during server side rendering.')
     }
 
     const { runtime } = this.props
     const { components } = this.state
+    const { preventRefetch = false } = options
+
+    if (preventRefetch) {
+      const hasImplementation = !!hasComponentImplementation(component)
+
+      if (hasImplementation) {
+        return Promise.resolve({ wasAlreadyLoaded: true })
+      }
+    }
+
+    const componentPromise = componentsPromises[component]
+
+    if (preventRefetch && componentPromise) {
+      return componentPromise
+    }
+
     const componentsAssetsMap = traverseComponent(components, component)
 
-    const assetsPromise = fetchAssets(runtime, componentsAssetsMap)
-    assetsPromise.then(() => {
-      this.sendInfoFromIframe({ shouldUpdateRuntime: true })
-    })
+    const { apps } = componentsAssetsMap
+
+    const unfetchedApps = apps.filter(
+      app =>
+        !Object.keys(window.__RENDER_8_COMPONENTS__).some(c =>
+          c.startsWith(app)
+        )
+    )
+
+    const assetsPromise = fetchAssets(runtime, componentsAssetsMap, options)
+
+    if (unfetchedApps.length !== 0) {
+      assetsPromise.then(() => {
+        this.sendInfoFromIframe({ shouldUpdateRuntime: true })
+      })
+    }
+
+    if (preventRefetch && !componentPromise) {
+      componentsPromises[component] = assetsPromise
+    }
 
     return assetsPromise
   }
