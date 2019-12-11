@@ -85,9 +85,11 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
     const contentLoadedPromise = new Promise(resolve =>
       document.addEventListener('DOMContentLoaded', resolve)
     )
-    Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(
-      window.__RENDER_8_RUNTIME__.start
-    )
+    Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
+      setTimeout(() => {
+        window.__RENDER_8_RUNTIME__.start()
+      }, 1)
+    })
   } else {
     window.__RENDER_8_RUNTIME__.start()
   }
