@@ -340,7 +340,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             scriptsOnly: true,
           })
         })
-    }, 5000)
+    }, 30000)
 
     this.sendInfoFromIframe()
     this.prefetchPages()
