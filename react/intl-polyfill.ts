@@ -32,31 +32,14 @@ myPromise = new Promise(resolve => {
     window.Intl.PluralRules.polyfilled && canUseDOM && lang
   const hasPolyfilledRelative =
     window.Intl.RelativeTimeFormat.polyfilled && canUseDOM && lang
-  let isPluralLocaleImported = false
-  let iRelativeLocaleImported = false
 
-  if (hasPolyfilledPlural) {
-    import('@formatjs/intl-pluralrules/dist/locale-data/' + lang).then(() => {
-      isPluralLocaleImported = true
-      if (isPluralLocaleImported && iRelativeLocaleImported) {
-        resolve()
-      }
-    })
-  }
-
-  if (hasPolyfilledRelative) {
-    import('@formatjs/intl-relativetimeformat/dist/locale-data/' + lang).then(
-      () => {
-        iRelativeLocaleImported = true
-        if (isPluralLocaleImported && iRelativeLocaleImported) {
-          resolve()
-        }
-      }
-    )
-  }
-  if (!hasPolyfilledPlural && !hasPolyfilledRelative) {
-    resolve()
-  }
+  const pluralPromise = hasPolyfilledPlural
+    ? import('@formatjs/intl-pluralrules/dist/locale-data/' + lang)
+    : Promise.resolve()
+  const relativeTimePromise = hasPolyfilledRelative
+    ? import('@formatjs/intl-relativetimeformat/dist/locale-data/' + lang)
+    : Promise.resolve()
+  Promise.all([pluralPromise, relativeTimePromise]).then(resolve)
 })
 
 export default myPromise
