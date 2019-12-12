@@ -28,6 +28,7 @@ const Link: React.FunctionComponent<Props> = ({
   scrollOptions,
   query,
   children,
+  modifiers,
   ...linkProps
 }) => {
   const {
@@ -57,12 +58,23 @@ const Link: React.FunctionComponent<Props> = ({
         rootPath,
         scrollOptions,
         to,
+        modifiers,
       }
       if (navigate(options)) {
         event.preventDefault()
       }
     },
-    [to, onClick, page, params, query, rootPath, scrollOptions, navigate]
+    [
+      to,
+      onClick,
+      page,
+      params,
+      query,
+      rootPath,
+      scrollOptions,
+      modifiers,
+      navigate,
+    ]
   )
 
   const getHref = () => {
