@@ -226,6 +226,14 @@ const mergePersistingQueries = (currentQuery: string, query: string) => {
   return mapToQueryString({ ...persisting, ...next })
 }
 
+const fixQuery = (query: string) => {
+  return query && query.startsWith('?')
+    ? query
+    : query.length > 0
+    ? `?${query}`
+    : ''
+}
+
 export function navigate(
   history: History | null,
   pages: Pages,
@@ -308,7 +316,12 @@ export function navigate(
   }
 
   if (forceWindowLocation) {
-    window.location.href = `${navigationRoute.path}${query}`
+    const nextQuery = mergePersistingQueries(
+      history?.location?.search ?? '',
+      query
+    )
+    const fixedQuery = fixQuery(nextQuery)
+    window.location.href = `${navigationRoute.path}${fixedQuery}`
     return true
   }
 
@@ -326,7 +339,8 @@ export function navigate(
   }
 
   if (fallbackToWindowLocation) {
-    window.location.href = `${navigationRoute.path}${query}`
+    const fixedQuery = fixQuery(query)
+    window.location.href = `${navigationRoute.path}${fixedQuery}`
     return true
   }
 
