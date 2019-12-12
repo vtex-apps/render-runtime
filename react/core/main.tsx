@@ -15,7 +15,7 @@ import { getDataFromTree } from 'react-apollo'
 import { hydrate, render as renderDOM } from 'react-dom'
 import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
-import { isEmpty } from 'ramda'
+import { isEmpty, prop } from 'ramda'
 import Loading from '../components/Loading'
 import { LoadingContextProvider } from '../components/LoadingContext'
 
@@ -38,7 +38,6 @@ import { buildCacheLocator } from '../utils/client'
 import { ensureContainer, getContainer, getMarkups } from '../utils/dom'
 import { registerEmitter } from '../utils/events'
 import { getBaseURI } from '../utils/host'
-import { addLocaleData } from '../utils/locales'
 import registerComponent from '../utils/registerComponent'
 import { withSession } from '../utils/session'
 import { TreePathContext, useTreePath } from '../utils/treePath'
@@ -51,15 +50,6 @@ import withHMR from '../utils/withHMR'
 import { generateExtensions } from '../utils/blocks'
 
 let emitter: EventEmitter | null = null
-
-if (window.IntlPolyfill) {
-  if (!window.Intl) {
-    window.Intl = window.IntlPolyfill
-  } else if (!canUseDOM) {
-    window.Intl.NumberFormat = window.IntlPolyfill.NumberFormat
-    window.Intl.DateTimeFormat = window.IntlPolyfill.DateTimeFormat
-  }
-}
 
 const renderExtension = (
   extensionName: string,
@@ -117,20 +107,19 @@ const render = async (
     page,
     pages,
     extensions,
-    culture: { locale },
   } = runtime
 
   const cacheControl = canUseDOM ? undefined : new PageCacheControl()
   const baseURI = getBaseURI(runtime)
   registerEmitter(runtime, baseURI)
   emitter = runtime.emitter
-  addLocaleData(locale)
 
   const isPage =
     !!pages[name] && !!pages[name].path && !!extensions[name].component
   const created = !element && ensureContainer(page)
   const elem = element || getContainer()
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
+
   const root = (
     <RenderProvider
       history={history}

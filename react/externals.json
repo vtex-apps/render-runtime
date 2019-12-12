@@ -35,7 +35,7 @@
       {
         "global": "ReactIntl",
         "import": "react-intl",
-        "path": "npm:react-intl@2.7.2/dist/react-intl.js"
+        "path": "npm:react-intl@3.9.1/dist/react-intl.js"
       },
       {
         "global": "History",
@@ -74,6 +74,10 @@
       {
         "path": "runtime:AMP",
         "serverOnly": true
+      },
+      {
+        "path": "runtime:intl-polyfill",
+        "serverOnly": true
       }
     ],
     "prod": [
@@ -111,7 +115,7 @@
       {
         "global": "ReactIntl",
         "import": "react-intl",
-        "path": "npm:react-intl@2.7.2/dist/react-intl.min.js"
+        "path": "npm:react-intl@3.9.1/dist/react-intl.min.js"
       },
       {
         "global": "History",
@@ -149,6 +153,10 @@
       },
       {
         "path": "runtime:AMP",
+        "serverOnly": true
+      },
+      {
+        "path": "runtime:intl-polyfill",
         "serverOnly": true
       }
     ]
