@@ -490,7 +490,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public navigate = (options: NavigateOptions) => {
     const {
       history,
-      runtime: { rootPath },
+      runtime: { rootPath, hints },
     } = this.props
     const { pages } = this.state
     options.rootPath = rootPath
@@ -507,6 +507,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       lastOptions: options,
     }
 
+    options.forceWindowLocation = hints.mobile
     return pageNavigate(history, pages, options)
   }
 
@@ -558,7 +559,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onPageChanged = (location: RenderHistoryLocation) => {
     const {
-      runtime: { renderMajor },
+      runtime: { renderMajor, hints },
     } = this.props
     const {
       culture: { locale },

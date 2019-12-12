@@ -242,6 +242,7 @@ export function navigate(
     replace,
     fetchPage = true,
     modifiers,
+    forceWindowLocation = false,
   } = options
 
   if (!page && !inputTo) {
@@ -304,6 +305,11 @@ export function navigate(
       navigationRoute.path = path || navigationRoute.path
       query = fixedQuery || query
     }
+  }
+
+  if (forceWindowLocation) {
+    window.location.href = `${navigationRoute.path}${query}`
+    return true
   }
 
   if (history) {
@@ -488,6 +494,7 @@ export interface NavigateOptions {
   fetchPage?: boolean
   rootPath?: string
   modifiers?: Set<NavigationRouteModifier>
+  forceWindowLocation?: boolean
 }
 
 export interface NavigationRouteChange {

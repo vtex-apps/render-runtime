@@ -418,6 +418,13 @@ declare global {
     id: string
     canonicalBaseAddress: string
   }
+  
+  interface DeviceHints {
+    mobile: boolean
+    phone: boolean
+    tablet: boolean
+    desktop: boolean
+  }
 
   interface RenderRuntime {
     amp: boolean
@@ -434,7 +441,7 @@ declare global {
     workspace: string
     disableSSR: boolean
     disableSSQ: boolean
-    hints: any
+    hints: DeviceHints
     introspectionResult: IntrospectionResultData
     page: string
     route: Route
