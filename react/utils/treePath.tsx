@@ -43,14 +43,16 @@ export const getDirectChildren = (extensions: Extensions, treePath: string) => {
 
 export const TreePathContext = React.createContext<TreePathProps>({
   treePath: '',
+  itemKey: null,
 })
 TreePathContext.displayName = 'TreePathContext'
 
 export const TreePathContextProvider: FC<TreePathProps> = ({
   treePath,
+  itemKey,
   children,
 }) => {
-  const value = useMemo(() => ({ treePath }), [treePath])
+  const value = useMemo(() => ({ treePath, itemKey }), [treePath, itemKey])
   return (
     <TreePathContext.Provider value={value}>
       {children}
@@ -65,14 +67,15 @@ export const useTreePath = () => {
 
 export interface TreePathProps {
   treePath: string
+  itemKey?: string | null
 }
 
 export function withTreePath<TOriginalProps>(
   Component: ComponentType<TOriginalProps & TreePathProps>
 ): ComponentType<TOriginalProps> {
   const WithTreePath = (props: TOriginalProps) => {
-    const { treePath } = useTreePath()
-    return <Component {...props} treePath={treePath} />
+    const { treePath, itemKey } = useTreePath()
+    return <Component {...props} treePath={treePath} itemKey={itemKey} />
   }
 
   WithTreePath.displayName = `TreePath(${Component.displayName ||
