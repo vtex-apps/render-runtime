@@ -5,6 +5,7 @@ import ExtensionPoint from './ExtensionPoint'
 import { useRuntime } from './RenderContext'
 import { LoadingWrapper } from './LoadingContext'
 import { LazyImages } from './LazyImages'
+import HydrateOnView from './HydrateOnView'
 
 type Element = string | ElementArray
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -110,15 +111,17 @@ class Container extends Component<ContainerProps, ContainerState> {
       .slice(0, elementsToRender)
       .map((element: Element, i: number) => {
         const container = (
-          <Container
-            key={element.toString()}
-            elements={element}
-            isMobile={isMobile}
-            isRow={!isRow}
-            {...props}
-          >
-            {children}
-          </Container>
+          <HydrateOnView id={element.toString()} key={element.toString()}>
+            <Container
+              key={element.toString()}
+              elements={element}
+              isMobile={isMobile}
+              isRow={!isRow}
+              {...props}
+            >
+              {children}
+            </Container>
+          </HydrateOnView>
         )
 
         if (!hasLazyImagesFold || i < lazyImagesFoldPosition) {
