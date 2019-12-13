@@ -226,7 +226,7 @@ const mergePersistingQueries = (currentQuery: string, query: string) => {
   return mapToQueryString({ ...persisting, ...next })
 }
 
-const fixQuery = (query: string) => {
+const ensureQuestionAtQueryStart = (query: string) => {
   return query && query.startsWith('?')
     ? query
     : query.length > 0
@@ -320,7 +320,7 @@ export function navigate(
       history?.location?.search ?? '',
       query
     )
-    const fixedQuery = fixQuery(nextQuery)
+    const fixedQuery = ensureQuestionAtQueryStart(nextQuery)
     window.location.href = `${navigationRoute.path}${fixedQuery}`
     return true
   }
@@ -339,7 +339,7 @@ export function navigate(
   }
 
   if (fallbackToWindowLocation) {
-    const fixedQuery = fixQuery(query)
+    const fixedQuery = ensureQuestionAtQueryStart(query)
     window.location.href = `${navigationRoute.path}${fixedQuery}`
     return true
   }
