@@ -24,7 +24,7 @@ interface Props {
 }
 
 type Ref = ForwardRefExoticComponent<
-  Props & React.RefAttributes<HTMLElement> | null
+  (Props & React.RefAttributes<HTMLElement>) | null
 >
 
 const getDehydratedElement = (id: string) => {
@@ -53,17 +53,14 @@ const usePreserveDehydratedElements = (id: string) => {
           value: item.innerHTML,
         }
       })
-      .reduce(
-        (acc, cur) => {
-          if (!cur.key) {
-            return acc
-          }
-
-          acc[cur.key] = cur.value
+      .reduce((acc, cur) => {
+        if (!cur.key) {
           return acc
-        },
-        {} as any
-      )
+        }
+
+        acc[cur.key] = cur.value
+        return acc
+      }, {} as any)
 
     setDehydratedContent(dehydratedContent)
   }, [id])
@@ -140,7 +137,11 @@ const PreventHydration = React.forwardRef<HTMLElement, Props>(
     useTransplantImages(id, shouldTransplantImages)
 
     if (shouldRenderImmediately) {
-      return <div data-hydration-id={id}>{children}</div>
+      return (
+        <div data-hydration-id={id} style={{ display: 'contents' }}>
+          {children}
+        </div>
+      )
     }
 
     return (
@@ -154,7 +155,11 @@ const PreventHydration = React.forwardRef<HTMLElement, Props>(
           }}
         >
           {shouldHydrate ? (
-            <div ref={ref as Ref} data-hydration-id={id}>
+            <div
+              ref={ref as Ref}
+              data-hydration-id={id}
+              style={{ display: 'contents' }}
+            >
               {children}
             </div>
           ) : (
@@ -162,6 +167,7 @@ const PreventHydration = React.forwardRef<HTMLElement, Props>(
               ref={ref as Ref}
               data-hydration-id={id}
               suppressHydrationWarning
+              style={{ display: 'contents' }}
               dangerouslySetInnerHTML={{
                 __html: hydrationContext.dehydratedContent[id] || '',
               }}
