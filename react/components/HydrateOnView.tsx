@@ -12,7 +12,7 @@ const useViewDetection = ({
   ref,
   bailOut,
 }: {
-  ref: MutableRefObject<HTMLElement | null | undefined>
+  ref: MutableRefObject<HTMLElement | null>
   bailOut?: boolean
 }) => {
   const hasInitializedObserver = useRef(false)
@@ -77,9 +77,11 @@ const HydrateOnView: FC<Props> = ({ children, id, loading }) => {
   })
 
   return (
-    <PreventHydration ref={containerRef} shouldHydrate={hasBeenViewed} id={id}>
-      {children}
-    </PreventHydration>
+    <div ref={containerRef as MutableRefObject<HTMLDivElement>}>
+      <PreventHydration shouldHydrate={hasBeenViewed} id={id}>
+        {children}
+      </PreventHydration>
+    </div>
   )
 }
 
