@@ -9,6 +9,7 @@ import NoSSR from '../NoSSR'
 import { withErrorBoundary } from '../ErrorBoundary'
 import GenericPreview from '../Preview/GenericPreview'
 import LoadingBar from '../LoadingBar'
+import HydrateOnView from '../HydrateOnView'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectBlockWrapper = React.lazy(
@@ -28,6 +29,7 @@ interface Props {
   preview?: boolean
   treePath?: string
   blockProps?: object
+  itemKey?: string
 }
 
 function mountTreePath(currentId: string, parentTreePath: string) {
@@ -90,15 +92,19 @@ function withOuterExtensions(
     />
   ))
 
-  const afterElements = after.map(afterId => (
-    <ExtensionPoint
-      id={afterId}
-      key={afterId}
-      treePath={treePath}
-      params={props.params}
-      query={props.query}
-    />
-  ))
+  const afterElements = (
+    <HydrateOnView id={`$after-${treePath}`}>
+      {after.map(afterId => (
+        <ExtensionPoint
+          id={afterId}
+          key={afterId}
+          treePath={treePath}
+          params={props.params}
+          query={props.query}
+        />
+      ))}
+    </HydrateOnView>
+  )
 
   const isRootTreePath = treePath.indexOf('/') === -1
 
@@ -134,12 +140,32 @@ const ExtensionPoint: FC<Props> = props => {
 
   const treePathFromHook = useTreePath()
 
-  const { children, params, query, id, blockProps, ...parentProps } = props
+  const {
+    children,
+    params,
+    query,
+    id,
+    blockProps,
+    itemKey,
+    ...parentProps
+  } = props
 
   const newTreePath = React.useMemo(
     () => mountTreePath(id, props.treePath || treePathFromHook.treePath),
     [id, props.treePath, treePathFromHook.treePath]
   )
+
+  const newItemKey = React.useMemo(() => {
+    const prevItemKey = treePathFromHook.itemKey
+    if (!prevItemKey) {
+      return itemKey
+    }
+
+    if (itemKey) {
+      return `${prevItemKey}/${itemKey}`
+    }
+    return prevItemKey
+  }, [itemKey, treePathFromHook.itemKey])
 
   const extension = runtime.extensions && runtime.extensions[newTreePath]
 
@@ -202,6 +228,7 @@ const ExtensionPoint: FC<Props> = props => {
       runtime={runtime}
       treePath={newTreePath}
       hydration={hydration}
+      itemKey={newItemKey}
     >
       {component ? (
         componentChildren
