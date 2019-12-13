@@ -83,7 +83,7 @@ if (window.ReactIntl) {
 if (window.__RUNTIME__.start && !window.__ERROR__) {
   if (canUseDOM) {
     const contentLoadedPromise = new Promise(resolve =>
-      document.addEventListener('DOMContentLoaded', resolve)
+      window.addEventListener('load', resolve)
     )
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
       setTimeout(() => {
