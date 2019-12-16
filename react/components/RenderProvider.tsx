@@ -168,6 +168,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     super(props)
     const {
       appsEtag,
+      binding,
       blocks,
       blocksTree,
       cacheHints,
@@ -175,6 +176,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture,
       messages,
       components,
+      exposeBindingAddress,
       extensions,
       pages,
       page,
@@ -187,11 +189,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = props.runtime
     const { history, baseURI, cacheControl } = props
     const ignoreCanonicalReplacement = query && query.map
+    const hasBindingAddress = query && query.__bindingAddress
     this.fetcher = fetch
 
     if (history) {
       const renderLocation: RenderHistoryLocation = {
         ...history.location,
+        search:
+          !hasBindingAddress && exposeBindingAddress
+            ? history.location.search +
+              '__bindingAddress=' +
+              binding?.canonicalBaseAddress
+            : history.location.search,
         pathname:
           ignoreCanonicalReplacement || !route.canonicalPath
             ? history.location.pathname

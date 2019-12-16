@@ -97,6 +97,7 @@ export const createUriSwitchLink = (
       } = oldContext
       const { extensions } = operation
       const {
+        binding,
         workspace,
         route: { domain },
       } = initialRuntime
@@ -125,11 +126,12 @@ export const createUriSwitchLink = (
         sender,
         provider,
       }
+      const bindingIdQuery = (binding && `&__bindingId=${binding.id}`) || ''
       return {
         ...oldContext,
         scope: customScope,
         fetchOptions: { ...fetchOptions, method },
-        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}&locale=${locale}`,
+        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}&locale=${locale}${bindingIdQuery}`,
       }
     })
     return forward ? forward(operation) : null
