@@ -50,6 +50,7 @@ import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
+import { appendLocationSearch } from '../utils/location'
 
 interface Props {
   children: ReactElement<any> | null
@@ -189,17 +190,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = props.runtime
     const { history, baseURI, cacheControl } = props
     const ignoreCanonicalReplacement = query && query.map
-    const hasBindingAddress = query && query.__bindingAddress
     this.fetcher = fetch
 
     if (history) {
       const renderLocation: RenderHistoryLocation = {
         ...history.location,
         search:
-          !hasBindingAddress && exposeBindingAddress
-            ? history.location.search +
-              '__bindingAddress=' +
-              binding?.canonicalBaseAddress
+          exposeBindingAddress && binding
+            ? appendLocationSearch(history.location.search, {
+                __bindingAddress: binding.canonicalBaseAddress,
+              })
             : history.location.search,
         pathname:
           ignoreCanonicalReplacement || !route.canonicalPath

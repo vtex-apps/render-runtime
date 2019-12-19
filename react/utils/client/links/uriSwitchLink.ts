@@ -10,6 +10,7 @@ import {
 } from 'graphql'
 
 import { generateHash } from '../generateHash'
+import { createLocationSearch } from '../../location'
 
 interface Assets {
   operationType: string
@@ -126,12 +127,21 @@ export const createUriSwitchLink = (
         sender,
         provider,
       }
-      const bindingIdQuery = (binding && `&__bindingId=${binding.id}`) || ''
+
+      const query = createLocationSearch({
+        workspace,
+        maxAge,
+        appsEtag,
+        domain,
+        locale,
+        ...(binding && { __bindingId: binding.id }),
+      })
+
       return {
         ...oldContext,
         scope: customScope,
         fetchOptions: { ...fetchOptions, method },
-        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}&locale=${locale}${bindingIdQuery}`,
+        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}${query}`,
       }
     })
     return forward ? forward(operation) : null
