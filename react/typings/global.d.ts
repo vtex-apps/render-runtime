@@ -196,6 +196,7 @@ declare global {
     addMessages: (newMessages: RenderContext['messages']) => Promise<void>
     amp: boolean
     addNavigationRouteModifier: (modifier: NavigationRouteModifier) => void
+    binding: RenderRuntime['binding']
     components: RenderRuntime['components']
     contentMap: RenderRuntime['contentMap']
     culture: RenderRuntime['culture']

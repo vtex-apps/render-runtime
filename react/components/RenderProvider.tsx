@@ -93,6 +93,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     account: PropTypes.string,
     addMessages: PropTypes.func,
     amp: PropTypes.bool,
+    binding: PropTypes.object,
     blocks: PropTypes.object,
     blocksTree: PropTypes.object,
     contentMap: PropTypes.object,
@@ -328,6 +329,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {
       account,
       amp,
+      binding,
       emitter,
       hints,
       platform,
@@ -342,6 +344,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       account,
       addMessages: this.addMessages,
       amp,
+      binding,
       components,
       contentMap,
       culture,
