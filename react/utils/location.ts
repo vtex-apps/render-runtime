@@ -1,10 +1,6 @@
 import queryString from 'query-string'
 import { pickBy } from 'ramda'
 
-export const createLocationSearch = (params: Record<string, string>) => {
-  return appendLocationSearch('', params)
-}
-
 export const appendLocationSearch = (
   search: string,
   params: Record<string, string>

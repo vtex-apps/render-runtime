@@ -10,7 +10,7 @@ import {
 } from 'graphql'
 
 import { generateHash } from '../generateHash'
-import { createLocationSearch } from '../../location'
+import { appendLocationSearch } from '../../location'
 
 interface Assets {
   operationType: string
@@ -128,14 +128,10 @@ export const createUriSwitchLink = (
         provider,
       }
 
-      const query = createLocationSearch({
-        workspace,
-        maxAge,
-        appsEtag,
-        domain,
-        locale,
-        ...(binding && { __bindingId: binding.id }),
-      })
+      let query = `?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}&locale=${locale}`
+      if (binding && binding.id) {
+        query = appendLocationSearch(query, { __bindingId: binding.id })
+      }
 
       return {
         ...oldContext,
