@@ -295,13 +295,15 @@ export function navigate(
   }
 
   navigationRoute.path = navigationRootPath(navigationRoute.path, rootPath)
-  for (const modifier of modifiers) {
-    const { path, query: fixedQuery } = modifier({
-      path: navigationRoute.path,
-      query,
-    })
-    navigationRoute.path = path || navigationRoute.path
-    query = fixedQuery || query
+  if (modifiers) {
+    for (const modifier of modifiers) {
+      const { path, query: fixedQuery } = modifier({
+        path: navigationRoute.path,
+        query,
+      })
+      navigationRoute.path = path || navigationRoute.path
+      query = fixedQuery || query
+    }
   }
 
   if (history) {
@@ -485,7 +487,7 @@ export interface NavigateOptions {
   replace?: boolean
   fetchPage?: boolean
   rootPath?: string
-  modifiers: Set<NavigationRouteModifier>
+  modifiers?: Set<NavigationRouteModifier>
 }
 
 export interface NavigationRouteChange {
