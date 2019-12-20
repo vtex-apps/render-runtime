@@ -2,7 +2,14 @@ import React, { FunctionComponent, Fragment, useEffect, useState } from 'react'
 import Loading from './Loading'
 import { useRuntime } from './RenderContext'
 
-const Session: FunctionComponent = ({ children }) => {
+interface Props {
+  renderWhileLoading?: boolean
+}
+
+const Session: FunctionComponent<Props> = ({
+  renderWhileLoading,
+  children,
+}) => {
   const [ensured, setEnsured] = useState(false)
   const [error, setError] = useState(null)
   const { ensureSession } = useRuntime()
@@ -30,7 +37,7 @@ const Session: FunctionComponent = ({ children }) => {
     }
   }, [ensureSession, ensured, error])
 
-  if (ensured) {
+  if (ensured || renderWhileLoading) {
     return <Fragment>{children}</Fragment>
   }
 

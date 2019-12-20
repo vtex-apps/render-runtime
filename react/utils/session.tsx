@@ -3,7 +3,11 @@ import React, { ComponentType } from 'react'
 
 import Session from '../components/Session'
 
-export const withSession = () => {
+interface Options {
+  renderWhileLoading?: boolean
+}
+
+export const withSession = ({ renderWhileLoading }: Options = {}) => {
   return function<TOriginalProps>(
     Component: ComponentType<TOriginalProps>
   ): ComponentType<TOriginalProps> {
@@ -20,7 +24,7 @@ export const withSession = () => {
 
       public render() {
         return (
-          <Session>
+          <Session renderWhileLoading={renderWhileLoading}>
             <Component {...this.props} />
           </Session>
         )
