@@ -3,9 +3,7 @@ import { uniqWith } from 'ramda'
 const FILE_PATH_REX = /([^/]+?)(?:$|\?)/ // https://regex101.com/r/joJ2p7/1
 const FILE_EXT_REX = /(\.min)?(\.js|\.css)/ // https://regex101.com/r/8vmjes/1
 
-const uniqAsset = uniqWith<AssetEntry, AssetEntry>((a, b) => {
-  return a.app === b.app && a.name === b.name && a.path === b.path
-})
+const uniqAsset = uniqWith<AssetEntry, AssetEntry>((a, b) => a.path === b.path)
 
 export const traverseListOfComponents = (
   componentsData: Components | Record<string, string[]>,
