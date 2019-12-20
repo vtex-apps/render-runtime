@@ -720,32 +720,24 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     extensions: RenderRuntime['extensions']
   ) => {
     const { runtime } = this.props
-    const componentsNames = Object.keys(components)
-
-    const componentsNotDownloaded = componentsNames.filter(
-      component => !hasComponentImplementation(component)
-    )
-    if (componentsNotDownloaded.length === 0) {
-      return
-    }
-
-    const lazyComponents = Object.values(extensions).reduce(
+    const componentsToDownload = Object.values(extensions).reduce<string[]>(
       (acc, extension) => {
-        acc[extension.component] = extension.render === 'lazy'
+        if (
+          extension.render !== 'lazy' &&
+          !hasComponentImplementation(extension.component)
+        ) {
+          acc.push(extension.component)
+        }
         return acc
       },
-      {} as Record<string, boolean>
+      []
     )
 
-    const componentsToFetch = componentsNotDownloaded.filter(
-      component => !lazyComponents[component]
-    )
-    if (componentsToFetch.length === 0) {
+    if (componentsToDownload.length === 0) {
       return
     }
 
-    const allAssets = traverseListOfComponents(components, componentsToFetch)
-
+    const allAssets = traverseListOfComponents(components, componentsToDownload)
     await fetchAssets(runtime, allAssets)
     this.sendInfoFromIframe({ shouldUpdateRuntime: true })
   }
