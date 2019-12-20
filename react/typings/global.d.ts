@@ -399,11 +399,6 @@ declare global {
 
   type Rendered = Promise<ClientRendered | NamedServerRendered>
 
-  interface ComponentTraversalResult {
-    apps: string[]
-    assets: AssetEntry[]
-  }
-
   interface AssetEntry {
     name: string
     path: string
