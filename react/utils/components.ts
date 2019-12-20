@@ -33,7 +33,7 @@ export const traverseComponent = (
   const assetsForDeps = dependencies.reduce(
     (acc, dependency) => {
       const depAssets = traverseComponent(components, dependency, false)
-      return acc.concat(depAssets)
+      return depAssets.concat(acc)
     },
     assets.map(asset => {
       return { path: asset, app, name: assetName(asset) }
