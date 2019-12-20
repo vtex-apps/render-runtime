@@ -196,6 +196,7 @@ declare global {
     addMessages: (newMessages: RenderContext['messages']) => Promise<void>
     amp: boolean
     addNavigationRouteModifier: (modifier: NavigationRouteModifier) => void
+    binding: RenderRuntime['binding']
     components: RenderRuntime['components']
     contentMap: RenderRuntime['contentMap']
     culture: RenderRuntime['culture']
@@ -418,16 +419,23 @@ declare global {
     [entrypoint: string]: ComponentEntry
   }
 
+  interface BindingInfo {
+    id: string
+    canonicalBaseAddress: string
+  }
+
   interface RenderRuntime {
     amp: boolean
     account: string
     accountId: string
     appsEtag: string
+    binding?: BindingInfo
     blocks?: Blocks
     blocksTree?: BlockContentTree
     contentMap?: ContentMap
     customRouting?: boolean
     emitter: EventEmitter
+    exposeBindingAddress?: boolean
     workspace: string
     disableSSR: boolean
     disableSSQ: boolean

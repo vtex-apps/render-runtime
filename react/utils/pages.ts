@@ -14,20 +14,17 @@ const removeTrailingParenthesis = (path: string) =>
 export function getComparablePrecedence(path: string): string {
   return path
     .split('/')
-    .reduce(
-      (acc, pathSegment) => {
-        if (pathSegment.startsWith('*')) {
-          acc.push(3)
-        } else if (pathSegment.startsWith(':')) {
-          acc.push(2)
-        } else if (pathSegment) {
-          acc.push(1)
-        }
+    .reduce((acc, pathSegment) => {
+      if (pathSegment.startsWith('*')) {
+        acc.push(3)
+      } else if (pathSegment.startsWith(':')) {
+        acc.push(2)
+      } else if (pathSegment) {
+        acc.push(1)
+      }
 
-        return acc
-      },
-      [] as number[]
-    )
+      return acc
+    }, [] as number[])
     .join()
 }
 
@@ -216,7 +213,7 @@ export function getRouteFromPathOld(
 }
 
 const mergePersistingQueries = (currentQuery: string, query: string) => {
-  const KEYS = ['disableUserLand']
+  const KEYS = ['disableUserLand', '__bindingAddress']
   const current = queryStringToMap(currentQuery)
   const next = queryStringToMap(query)
   const has = (value?: string) => !!value || value === null

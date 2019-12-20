@@ -50,6 +50,7 @@ import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
+import { appendLocationSearch } from '../utils/location'
 
 interface Props {
   children: ReactElement<any> | null
@@ -92,6 +93,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     account: PropTypes.string,
     addMessages: PropTypes.func,
     amp: PropTypes.bool,
+    binding: PropTypes.object,
     blocks: PropTypes.object,
     blocksTree: PropTypes.object,
     contentMap: PropTypes.object,
@@ -168,6 +170,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     super(props)
     const {
       appsEtag,
+      binding,
       blocks,
       blocksTree,
       cacheHints,
@@ -175,6 +178,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture,
       messages,
       components,
+      exposeBindingAddress,
       extensions,
       pages,
       page,
@@ -192,6 +196,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     if (history) {
       const renderLocation: RenderHistoryLocation = {
         ...history.location,
+        search:
+          exposeBindingAddress && binding
+            ? appendLocationSearch(history.location.search, {
+                __bindingAddress: binding.canonicalBaseAddress,
+              })
+            : history.location.search,
         pathname:
           ignoreCanonicalReplacement || !route.canonicalPath
             ? history.location.pathname
@@ -319,6 +329,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {
       account,
       amp,
+      binding,
       emitter,
       hints,
       platform,
@@ -333,6 +344,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       account,
       addMessages: this.addMessages,
       amp,
+      binding,
       components,
       contentMap,
       culture,
