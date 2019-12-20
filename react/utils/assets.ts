@@ -220,6 +220,10 @@ export function getImplementation<P = {}, S = {}>(component: string) {
   return window.__RENDER_8_COMPONENTS__[component] as RenderComponent<P, S>
 }
 
+export function hasComponentImplementation(component: string) {
+  return window.__RENDER_8_COMPONENTS__.hasOwnProperty(component)
+}
+
 export function getExtensionImplementation<P = {}, S = {}>(
   extensions: Extensions,
   name: string
@@ -230,12 +234,7 @@ export function getExtensionImplementation<P = {}, S = {}>(
     : null
 }
 
-export function fetchAssets(
-  runtime: RenderRuntime,
-  componentsAssetsMap: ComponentTraversalResult
-) {
-  const { assets } = componentsAssetsMap
-
+export function fetchAssets(runtime: RenderRuntime, assets: AssetEntry[]) {
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
 
@@ -247,12 +246,7 @@ export function fetchAssets(
   })
 }
 
-export function prefetchAssets(
-  runtime: RenderRuntime,
-  componentsAssetsMap: ComponentTraversalResult
-) {
-  const { assets } = componentsAssetsMap
-
+export function prefetchAssets(runtime: RenderRuntime, assets: AssetEntry[]) {
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
   const existingScriptsPrefetches = getExistingPrefetchScriptLinks()

@@ -18,11 +18,15 @@ import {
   hotReloadOverrides,
   hotReloadTachyons,
   prefetchAssets,
+  hasComponentImplementation,
 } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
 import { OperationContext } from '../utils/client/links/uriSwitchLink'
-import { traverseComponent } from '../utils/components'
+import {
+  traverseComponent,
+  traverseListOfComponents,
+} from '../utils/components'
 import {
   isSiteEditorIframe,
   RENDER_CONTAINER_CLASS,
@@ -584,7 +588,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           path: navigationRoute.path,
           query,
         }).then(
-          ({
+          async ({
             appsEtag,
             components,
             extensions,
@@ -594,10 +598,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             settings,
             queryData,
           }: ParsedServerPageResponse) => {
-            this.scrollTo({ top: 0, left: 0 })
             if (queryData) {
               this.hydrateApolloCache(queryData)
             }
+
+            await this.fetchComponents(components, extensions)
+
             this.setState(
               {
                 appsEtag,
@@ -631,7 +637,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           routeId,
           skipCache: false,
         }).then(
-          ({
+          async ({
             appsEtag,
             cacheHints,
             components,
@@ -642,6 +648,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             settings,
           }: ParsedPageQueryResponse) => {
             const updatedRoute = { ...transientRoute, ...matchingPage }
+            await this.fetchComponents(components, extensions)
+
             this.setState(
               {
                 appsEtag,
@@ -707,6 +715,41 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     })
   }
 
+  public fetchComponents = async (
+    components: RenderRuntime['components'],
+    extensions: RenderRuntime['extensions']
+  ) => {
+    const { runtime } = this.props
+    const componentsNames = Object.keys(components)
+
+    const componentsNotDownloaded = componentsNames.filter(
+      component => !hasComponentImplementation(component)
+    )
+    if (componentsNotDownloaded.length === 0) {
+      return
+    }
+
+    const lazyComponents = Object.values(extensions).reduce(
+      (acc, extension) => {
+        acc[extension.component] = extension.render === 'lazy'
+        return acc
+      },
+      {} as Record<string, boolean>
+    )
+
+    const componentsToFetch = componentsNotDownloaded.filter(
+      component => !lazyComponents[component]
+    )
+    if (componentsToFetch.length === 0) {
+      return
+    }
+
+    const allAssets = traverseListOfComponents(components, componentsToFetch)
+
+    await fetchAssets(runtime, allAssets)
+    this.sendInfoFromIframe({ shouldUpdateRuntime: true })
+  }
+
   public fetchComponent = (component: string) => {
     if (!canUseDOM) {
       throw new Error('Cannot fetch components during server side rendering.')
@@ -715,17 +758,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { runtime } = this.props
     const { components } = this.state
     const componentsAssetsMap = traverseComponent(components, component)
-    const { apps } = componentsAssetsMap
-
-    const unfetchedApps = apps.filter(
-      app =>
-        !Object.keys(window.__RENDER_8_COMPONENTS__).some(c =>
-          c.startsWith(app)
-        )
-    )
-    if (unfetchedApps.length === 0) {
-      return fetchAssets(runtime, componentsAssetsMap)
-    }
 
     const assetsPromise = fetchAssets(runtime, componentsAssetsMap)
     assetsPromise.then(() => {
@@ -751,7 +783,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           },
         }
       }
-      Promise.all([this.patchSession(sessionData)])
+      this.patchSession(sessionData)
         .then(() => window.location.reload())
         .catch(e => {
           console.log('Failed to fetch new locale file.')
@@ -803,6 +835,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           skipCache: true,
           ...options,
         })
+
+    await this.fetchComponents(components, extensions)
 
     await new Promise<void>(resolve => {
       this.setState(
@@ -1013,15 +1047,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       routeIds: Array.from(this.prefetchRoutes),
     })
 
-    await Promise.all(
-      Object.keys(defaultComponents).map((component: string) => {
-        const componentsAssetsMap = traverseComponent(
-          defaultComponents,
-          component
-        )
-        return prefetchAssets(runtime, componentsAssetsMap)
-      })
+    const allAssets = traverseListOfComponents(
+      defaultComponents,
+      Object.keys(defaultComponents)
     )
+
+    await prefetchAssets(runtime, allAssets)
   }
 }
 

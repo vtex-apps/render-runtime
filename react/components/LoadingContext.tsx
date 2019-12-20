@@ -81,11 +81,8 @@ const LoadingWrapper: FunctionComponent = ({ children }) => {
     const isLoading = isParentLoading || areComponentsLoading
 
     if (!isLoading) {
-      loadingTimeout.current = window.setTimeout(() => {
-        displayContent(contentContainer, loaderContainer)
-
-        loadingComplete.current = true
-      }, 100)
+      displayContent(contentContainer, loaderContainer)
+      loadingComplete.current = true
     } else {
       if (!loadingComplete.current && loadingTimeout.current !== null) {
         window.clearTimeout(loadingTimeout.current)
