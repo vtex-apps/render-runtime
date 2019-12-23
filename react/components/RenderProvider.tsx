@@ -722,11 +722,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { runtime } = this.props
     const componentsToDownload = Object.values(extensions).reduce<string[]>(
       (acc, extension) => {
-        if (
-          extension.render !== 'lazy' &&
-          !hasComponentImplementation(extension.component)
-        ) {
+        if (extension.render === 'lazy') {
+          return acc
+        }
+        if (!hasComponentImplementation(extension.component)) {
           acc.push(extension.component)
+        }
+        const context = extension?.context?.component
+        if (context && !hasComponentImplementation(context)) {
+          acc.push(context)
         }
         return acc
       },
