@@ -11,7 +11,8 @@ export const traverseListOfComponents = (
 ) => {
   const allAssets = componentsToTraverse.reduce((acc, component) => {
     const assets = traverseComponent(componentsData, component, false)
-    return acc.concat(assets)
+    acc.push(...assets)
+    return acc
   }, [] as AssetEntry[])
 
   return uniqAsset(allAssets)
