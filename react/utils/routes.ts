@@ -113,6 +113,7 @@ export const fetchServerPage = async ({
   fetcher: GlobalFetch['fetch']
 }): Promise<ParsedServerPageResponse> => {
   const parsedUrl = parse(path)
+  parsedUrl.search = undefined
   parsedUrl.query = {
     ...rawQuery,
     __pickRuntime: runtimeFields,
