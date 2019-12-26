@@ -93,6 +93,7 @@ const DISABLE_PREFETCH_PAGES = '__disablePrefetchPages'
 const noop = () => {}
 
 class RenderProvider extends Component<Props, RenderProviderState> {
+  isNavigating = false
   public static childContextTypes = {
     account: PropTypes.string,
     addMessages: PropTypes.func,
@@ -455,8 +456,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {
       location: { search },
     } = history
+    if (this.isNavigating) {
+      return false
+    }
     const current = queryStringToMap(search)
     const nextQuery = mapToQueryString(merge ? { ...current, ...query } : query)
+    this.isNavigating = true
     return pageNavigate(history, pages, {
       fetchPage: false,
       page,
@@ -477,6 +482,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { pages } = this.state
     options.rootPath = rootPath
     options.modifiers = this.navigationRouteModifiers
+    if (this.isNavigating) {
+      return false
+    }
+    this.isNavigating = true
     return pageNavigate(history, pages, options)
   }
 
@@ -520,6 +529,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     route: string,
     scrollOptions?: RenderScrollOptions
   ) => {
+    this.isNavigating = false
     this.replaceRouteClass(route)
     this.scrollTo(scrollOptions)
     this.sendInfoFromIframe()
@@ -619,6 +629,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 settings,
               },
               () => {
+                this.isNavigating = false
                 this.replaceRouteClass(matchingPage.routeId)
                 this.sendInfoFromIframe()
                 this.scrollTo(state.scrollOptions)
@@ -666,6 +677,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 settings,
               },
               () => {
+                this.isNavigating = false
                 this.replaceRouteClass(page)
                 this.sendInfoFromIframe()
                 this.scrollTo(state.scrollOptions)
