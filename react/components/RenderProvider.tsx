@@ -92,13 +92,13 @@ const DISABLE_PREFETCH_PAGES = '__disablePrefetchPages'
 
 const noop = () => {}
 
-const areOptionsEqual = (a: NavigateOptions, b: NavigateOptions) => {
+const areOptionsDifferent = (a: NavigateOptions, b: NavigateOptions) => {
   return (
-    a.page === b.page &&
-    a.query === b.query &&
-    a.to === b.to &&
-    a.rootPath === b.rootPath &&
-    equals(a.params, b.params)
+    a.page !== b.page ||
+    a.query !== b.query ||
+    a.to !== b.to ||
+    a.rootPath !== b.rootPath ||
+    !equals(a.params, b.params)
   )
 }
 
@@ -497,7 +497,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     options.modifiers = this.navigationRouteModifiers
     if (this.navigationState.isNavigating) {
       const lastOptions = this.navigationState.lastOptions!
-      if (areOptionsEqual(lastOptions, options)) {
+      if (!areOptionsDifferent(lastOptions, options)) {
         return false
       }
     }
