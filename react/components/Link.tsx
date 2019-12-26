@@ -17,7 +17,8 @@ const isTelephoneUrl = (url: string) => telephoneRegex.test(url)
 const isMailToUrl = (url: string) => mailToRegex.test(url)
 
 interface Props extends NavigateOptions {
-  onClick: (event: React.MouseEvent) => void
+  onClick?: (event: React.MouseEvent) => void
+  className?: string
 }
 
 const Link: React.FunctionComponent<Props> = ({
