@@ -885,7 +885,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             ...state.extensions,
             ...extensions,
           },
-          messages,
+          messages: {
+            ...state.messages,
+            ...messages,
+          },
           page,
           pages,
           route,
