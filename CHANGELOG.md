@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+- Accumulate messages on RenderProvider state.
+
 ## [8.87.3] - 2020-01-02
 ### Fixed
 - Prevent current page remount when performing a navigation
