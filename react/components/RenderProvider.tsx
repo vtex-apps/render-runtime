@@ -636,19 +636,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             await this.fetchComponents(components, extensions)
 
             this.setState(
-              {
+              state => ({
+                ...state,
                 appsEtag,
-                components: { ...this.state.components, ...components },
-                extensions: { ...this.state.extensions, ...extensions },
+                components: { ...state.components, ...components },
+                extensions: { ...state.extensions, ...extensions },
                 loadedPages: loadedPages.add(matchingPage.routeId),
-                messages: { ...this.state.messages, ...messages },
+                messages: { ...state.messages, ...messages },
                 page: matchingPage.routeId,
                 pages,
                 preview: false,
                 query,
                 route: matchingPage,
                 settings,
-              },
+              }),
               () => {
                 this.navigationState = { isNavigating: false }
                 this.replaceRouteClass(matchingPage.routeId)
@@ -957,13 +958,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public addMessages = async (newMessages: RenderRuntime['messages']) => {
-    const newStateMessages = { ...this.state.messages, ...newMessages }
-
     await new Promise<void>(resolve => {
       this.setState(
-        {
-          messages: newStateMessages,
-        },
+        state => ({
+          ...state,
+          messages: {
+            ...state.messages,
+            ...newMessages,
+          },
+        }),
         resolve
       )
     })
