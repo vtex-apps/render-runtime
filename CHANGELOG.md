@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.87.1] - 2019-12-26
+
 ### Changed
 - Types for `Link` props
 
