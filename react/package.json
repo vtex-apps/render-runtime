@@ -34,6 +34,7 @@
     "route-parser": "^0.0.5"
   },
   "devDependencies": {
+    "@apollo/react-testing": "3.1.2",
     "@types/apollo-upload-client": "^8.1.0",
     "@types/debounce": "^1.0.0",
     "@types/eventemitter3": "^2.0.2",
@@ -53,7 +54,7 @@
     "@types/react-helmet": "^5.0.5",
     "@types/react-hot-loader": "^4.1.0",
     "@types/route-parser": "^0.1.1",
-    "@vtex/test-tools": "^1.0.0",
+    "@vtex/test-tools": "^3.0.0",
     "babel-core": "^6.26.3",
     "babel-jest": "^24.1.0",
     "babel-preset-env": "^1.7.0",
@@ -73,7 +74,6 @@
     "react-hot-loader": "^4.3.12",
     "react-intl": "^3.9.1",
     "react-no-ssr": "^1.1.0",
-    "react-testing-library": "^5.6.0",
     "regenerator-runtime": "^0.13.1",
     "ts-jest": "^24.0.1",
     "typescript": "3.7.3"
