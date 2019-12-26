@@ -5,7 +5,7 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { forEach, merge, mergeWith } from 'ramda'
+import { forEach, merge, mergeWith, equals } from 'ramda'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -92,8 +92,23 @@ const DISABLE_PREFETCH_PAGES = '__disablePrefetchPages'
 
 const noop = () => {}
 
+const areOptionsEqual = (a: NavigateOptions, b: NavigateOptions) => {
+  return (
+    a.page === b.page &&
+    a.query === b.query &&
+    a.to === b.to &&
+    a.rootPath === b.rootPath &&
+    equals(a.params, b.params)
+  )
+}
+
+interface NavigationState {
+  isNavigating: boolean
+  lastOptions?: NavigateOptions
+}
+
 class RenderProvider extends Component<Props, RenderProviderState> {
-  isNavigating = false
+  navigationState: NavigationState = { isNavigating: false }
   public static childContextTypes = {
     account: PropTypes.string,
     addMessages: PropTypes.func,
@@ -456,12 +471,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {
       location: { search },
     } = history
-    if (this.isNavigating) {
-      return false
-    }
+
     const current = queryStringToMap(search)
     const nextQuery = mapToQueryString(merge ? { ...current, ...query } : query)
-    this.isNavigating = true
+
     return pageNavigate(history, pages, {
       fetchPage: false,
       page,
@@ -482,10 +495,18 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { pages } = this.state
     options.rootPath = rootPath
     options.modifiers = this.navigationRouteModifiers
-    if (this.isNavigating) {
-      return false
+    if (this.navigationState.isNavigating) {
+      const lastOptions = this.navigationState.lastOptions!
+      if (areOptionsEqual(lastOptions, options)) {
+        return false
+      }
     }
-    this.isNavigating = true
+
+    this.navigationState = {
+      isNavigating: true,
+      lastOptions: options,
+    }
+
     return pageNavigate(history, pages, options)
   }
 
@@ -529,7 +550,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     route: string,
     scrollOptions?: RenderScrollOptions
   ) => {
-    this.isNavigating = false
+    this.navigationState = { isNavigating: false }
     this.replaceRouteClass(route)
     this.scrollTo(scrollOptions)
     this.sendInfoFromIframe()
@@ -592,7 +613,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // well as the fields that need to be retrieved, but the logic
     // that the new state (extensions and assets) will be derived from
     // the results of this query will probably remain the same.
-    return isEnabled('RENDER_NAVIGATION')
+    const navigationPromise = isEnabled('RENDER_NAVIGATION')
       ? fetchServerPage({
           fetcher: this.fetcher,
           path: navigationRoute.path,
@@ -629,7 +650,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 settings,
               },
               () => {
-                this.isNavigating = false
+                this.navigationState = { isNavigating: false }
                 this.replaceRouteClass(matchingPage.routeId)
                 this.sendInfoFromIframe()
                 this.scrollTo(state.scrollOptions)
@@ -677,7 +698,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 settings,
               },
               () => {
-                this.isNavigating = false
+                this.navigationState = { isNavigating: false }
                 this.replaceRouteClass(page)
                 this.sendInfoFromIframe()
                 this.scrollTo(state.scrollOptions)
@@ -685,6 +706,12 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             )
           }
         )
+    navigationPromise.finally(() => {
+      if (this.navigationState.isNavigating) {
+        this.navigationState = { isNavigating: false }
+      }
+    })
+    return navigationPromise
   }
 
   public prefetchPage = (pageName: string) => {
