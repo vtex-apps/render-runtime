@@ -198,7 +198,7 @@ const ExtensionPoint: FC<Props> = props => {
   // need a loading animation.
   return renderStrategy === 'client' && !runtime.amp ? (
     <NoSSR onSSR={<Loading />}>
-      {runtime.preview && !runtime.amp && <LoadingBar />}
+      {runtime.preview && isRootTreePath && <LoadingBar />}
       {extensionPointComponent}
     </NoSSR>
   ) : (
