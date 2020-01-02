@@ -200,10 +200,7 @@ const ExtensionPoint: FC<Props> = props => {
     <Fragment>
       {runtime.preview && isRootTreePath && <LoadingBar />}
       {renderStrategy === 'client' && !runtime.amp ? (
-        <NoSSR onSSR={<Loading />}>
-          {runtime.preview && <LoadingBar />}
-          {extensionPointComponent}
-        </NoSSR>
+        <NoSSR onSSR={<Loading />}>{extensionPointComponent}</NoSSR>
       ) : (
         extensionPointComponent
       )}
