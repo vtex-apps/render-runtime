@@ -196,13 +196,18 @@ const ExtensionPoint: FC<Props> = props => {
   //
   // "lazy" components might never be used, so they don't necessarily
   // need a loading animation.
-  return renderStrategy === 'client' && !runtime.amp ? (
-    <NoSSR onSSR={<Loading />}>
+  return (
+    <Fragment>
       {runtime.preview && isRootTreePath && <LoadingBar />}
-      {extensionPointComponent}
-    </NoSSR>
-  ) : (
-    extensionPointComponent
+      {renderStrategy === 'client' && !runtime.amp ? (
+        <NoSSR onSSR={<Loading />}>
+          {runtime.preview && <LoadingBar />}
+          {extensionPointComponent}
+        </NoSSR>
+      ) : (
+        extensionPointComponent
+      )}
+    </Fragment>
   )
 }
 
