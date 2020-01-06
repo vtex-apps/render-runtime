@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.87.4] - 2020-01-06
+
 ### Changed
 - Accumulate messages on RenderProvider state.
 
