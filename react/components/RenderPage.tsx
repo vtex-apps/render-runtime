@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect } from 'react'
 import ExtensionPoint from './ExtensionPoint'
 import MaybeContext from './MaybeContext'
 import { useRuntime } from './RenderContext'
@@ -22,7 +22,13 @@ const RenderPage: FC<Props> = props => {
       params={params}
       runtime={runtime}
     >
-      <ExtensionPoint id={page} query={query} params={params} {...props} />
+      <ExtensionPoint
+        key={`${page}/${JSON.stringify(params)}`}
+        id={page}
+        query={query}
+        params={params}
+        {...props}
+      />
     </MaybeContext>
   )
 }
