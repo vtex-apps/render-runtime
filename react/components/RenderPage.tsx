@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react'
+import React, { FC } from 'react'
 import ExtensionPoint from './ExtensionPoint'
 import MaybeContext from './MaybeContext'
 import { useRuntime } from './RenderContext'
