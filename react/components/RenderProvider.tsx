@@ -42,6 +42,7 @@ import {
   queryStringToMap,
   scrollTo as pageScrollTo,
   NavigationRouteModifier,
+  NavigationRouteChange,
 } from '../utils/pages'
 import {
   fetchDefaultPages,
@@ -185,6 +186,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private apolloClient: ApolloClient<NormalizedCacheObject>
   private prefetchRoutes: Set<string>
   private navigationRouteModifiers: Set<NavigationRouteModifier>
+  private navigationIgnores: Record<string, NavigationRouteChange>
   private fetcher: GlobalFetch['fetch']
 
   public constructor(props: Props) {
@@ -287,6 +289,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     this.prefetchRoutes = new Set<string>()
     this.navigationRouteModifiers = new Set()
+    this.navigationIgnores = {}
   }
 
   public componentDidMount() {
@@ -500,6 +503,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { pages } = this.state
     options.rootPath = rootPath
     options.modifiers = this.navigationRouteModifiers
+
+    this.navigationIgnores = {
+      ...this.navigationIgnores,
+      ...options.modifiersIgnore,
+    }
+    options.modifiersIgnore = this.navigationIgnores
+
     if (this.navigationState.isNavigating) {
       const lastOptions = this.navigationState.lastOptions!
       if (!areOptionsDifferent(lastOptions, options)) {

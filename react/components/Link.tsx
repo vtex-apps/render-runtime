@@ -30,6 +30,7 @@ const Link: React.FunctionComponent<Props> = ({
   query,
   children,
   modifiers,
+  modifiersIgnore,
   ...linkProps
 }) => {
   const {
@@ -60,6 +61,7 @@ const Link: React.FunctionComponent<Props> = ({
         scrollOptions,
         to,
         modifiers,
+        modifiersIgnore,
       }
       if (navigate(options)) {
         event.preventDefault()
@@ -75,6 +77,7 @@ const Link: React.FunctionComponent<Props> = ({
       scrollOptions,
       modifiers,
       navigate,
+      modifiersIgnore,
     ]
   )
 
