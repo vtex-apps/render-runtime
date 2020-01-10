@@ -226,6 +226,14 @@ const mergePersistingQueries = (currentQuery: string, query: string) => {
   return mapToQueryString({ ...persisting, ...next })
 }
 
+const ensureQuestionAtQueryStart = (query: string) => {
+  return query && query.startsWith('?')
+    ? query
+    : query.length > 0
+    ? `?${query}`
+    : ''
+}
+
 export function navigate(
   history: History | null,
   pages: Pages,
@@ -242,6 +250,7 @@ export function navigate(
     replace,
     fetchPage = true,
     modifiers,
+    forceWindowLocation = false,
   } = options
 
   if (!page && !inputTo) {
@@ -306,6 +315,16 @@ export function navigate(
     }
   }
 
+  if (forceWindowLocation) {
+    const nextQuery = mergePersistingQueries(
+      history?.location?.search ?? '',
+      query
+    )
+    const fixedQuery = ensureQuestionAtQueryStart(nextQuery)
+    window.location.href = `${navigationRoute.path}${fixedQuery}`
+    return true
+  }
+
   if (history) {
     const nextQuery = mergePersistingQueries(history.location.search, query)
     const location = createLocationDescriptor(navigationRoute, {
@@ -320,7 +339,8 @@ export function navigate(
   }
 
   if (fallbackToWindowLocation) {
-    window.location.href = `${navigationRoute.path}${query}`
+    const fixedQuery = ensureQuestionAtQueryStart(query)
+    window.location.href = `${navigationRoute.path}${fixedQuery}`
     return true
   }
 
@@ -488,6 +508,7 @@ export interface NavigateOptions {
   fetchPage?: boolean
   rootPath?: string
   modifiers?: Set<NavigationRouteModifier>
+  forceWindowLocation?: boolean
 }
 
 export interface NavigationRouteChange {
