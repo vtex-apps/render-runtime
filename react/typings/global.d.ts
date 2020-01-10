@@ -64,6 +64,7 @@ declare global {
   interface BlockInsertion {
     extensionPointId: string
     blockId: string
+    children?: boolean
   }
 
   interface Extension {
