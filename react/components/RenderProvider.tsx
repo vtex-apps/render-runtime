@@ -55,6 +55,7 @@ import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
 import { appendLocationSearch } from '../utils/location'
+import { setCookie } from '../utils/cookie'
 
 interface Props {
   children: ReactElement<any> | null
@@ -212,6 +213,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const { history, baseURI, cacheControl } = props
     const ignoreCanonicalReplacement = query && query.map
     this.fetcher = fetch
+
+    if (exposeBindingAddress && binding && canUseDOM) {
+      setCookie('vtex_binding_address', binding.canonicalBaseAddress)
+    }
 
     if (history) {
       const renderLocation: RenderHistoryLocation = {
