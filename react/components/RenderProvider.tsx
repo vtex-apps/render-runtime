@@ -56,6 +56,7 @@ import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
 import { appendLocationSearch } from '../utils/location'
 import { setCookie } from '../utils/cookie'
+import isEmpty from 'ramda/es/isEmpty'
 
 interface Props {
   children: ReactElement<any> | null
@@ -86,6 +87,7 @@ export interface RenderProviderState {
   blocksTree?: RenderRuntime['blocksTree']
   blocks?: RenderRuntime['blocks']
   contentMap?: RenderRuntime['contentMap']
+  registerCallback?: RenderRuntime['registerCallback']
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
@@ -153,6 +155,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     updateExtension: PropTypes.func,
     updateRuntime: PropTypes.func,
     workspace: PropTypes.string,
+    registerCallback: PropTypes.func,
   }
 
   public static propTypes = {
@@ -186,6 +189,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private prefetchRoutes: Set<string>
   private navigationRouteModifiers: Set<NavigationRouteModifier>
   private fetcher: GlobalFetch['fetch']
+  private callbacks: any = []
 
   public constructor(props: Props) {
     super(props)
@@ -289,13 +293,38 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.navigationRouteModifiers = new Set()
   }
 
+  public hasGoBack = false
+
   public componentDidMount() {
     this.rendered = true
     const { history, runtime } = this.props
     const { production, emitter } = runtime
 
-    this.unlisten = history && history.listen(this.onPageChanged)
-    emitter.addListener('localesChanged', this.onLocaleSelected)
+    this.unlisten =
+      history &&
+      history.listen(location => {
+        const hasCallbacks = !isEmpty(this.callbacks)
+
+        if (!hasCallbacks || this.hasGoBack) {
+          this.hasGoBack = false
+          return this.onPageChanged(location)
+        }
+
+        const hasUnsaveData = this.callbacks
+          .map((callback: () => boolean) => callback())
+          .some(Boolean)
+
+        if (
+          hasUnsaveData &&
+          window.confirm('Are you sure you want to leave?')
+        ) {
+          this.hasGoBack = false
+          this.onPageChanged(location)
+        } else {
+          history.goBack()
+          this.hasGoBack = true
+        }
+      })
 
     if (!production) {
       emitter.addListener('extensionsUpdated', this.updateRuntime)
@@ -406,6 +435,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
       workspace,
+      registerCallback: this.registerCallback,
     }
   }
 
@@ -490,6 +520,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       rootPath,
       modifiers: this.navigationRouteModifiers,
     })
+  }
+
+  public registerCallback = (callback: () => boolean) => {
+    const index = this.callbacks.length
+    this.callbacks.push(callback)
+    return () => {
+      this.callbacks.splice(index, 1)
+    }
   }
 
   public navigate = (options: NavigateOptions) => {

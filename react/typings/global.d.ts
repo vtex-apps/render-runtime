@@ -235,6 +235,7 @@ declare global {
     updateExtension: (name: string, extension: Extension) => Promise<void>
     updateRuntime: (options?: PageContextOptions) => Promise<void>
     workspace: RenderRuntime['workspace']
+    registerCallback: RenderRuntime['registerCallback']
   }
 
   interface PageContextOptions {
@@ -469,6 +470,8 @@ declare global {
       variables: any
       data: string
     }>
+
+    registerCallback?: (callback: () => boolean) => any
   }
 
   interface CacheHints {
