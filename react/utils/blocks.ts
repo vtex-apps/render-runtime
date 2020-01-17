@@ -68,46 +68,40 @@ const createExtensions = (
     around,
     before,
   ].map(outer => {
-    return outer.reduce(
-      (acc, { extensionPointId }) => {
-        const outerExtensionPath = `${extensionPath}/${extensionPointId}`
-        const outerResults = createExtensions(
-          extensionPointId,
-          outerExtensionPath,
-          bindingPath,
-          true,
-          blocksTree,
-          blocksMap,
-          contentMap
-        )
-        acc.push(...outerResults)
-        return acc
-      },
-      [] as ExtensionResult[]
-    )
-  })
-
-  const innerExtensions = blocks.reduce(
-    (acc, { extensionPointId }) => {
-      const innerBlockTreePath = `${blockTreePath}/${extensionPointId}`
-      const innerExtensionPath = `${extensionPath}/${extensionPointId}`
-      const innerBindingPath = outerNested
-        ? bindingPath
-        : `${bindingPath}/${extensionPointId}`
-      const innerResults = createExtensions(
-        innerBlockTreePath,
-        innerExtensionPath,
-        innerBindingPath,
-        outerNested,
+    return outer.reduce((acc, { extensionPointId }) => {
+      const outerExtensionPath = `${extensionPath}/${extensionPointId}`
+      const outerResults = createExtensions(
+        extensionPointId,
+        outerExtensionPath,
+        bindingPath,
+        true,
         blocksTree,
         blocksMap,
         contentMap
       )
-      acc.push(...innerResults)
+      acc.push(...outerResults)
       return acc
-    },
-    [] as ExtensionResult[]
-  )
+    }, [] as ExtensionResult[])
+  })
+
+  const innerExtensions = blocks.reduce((acc, { extensionPointId }) => {
+    const innerBlockTreePath = `${blockTreePath}/${extensionPointId}`
+    const innerExtensionPath = `${extensionPath}/${extensionPointId}`
+    const innerBindingPath = outerNested
+      ? bindingPath
+      : `${bindingPath}/${extensionPointId}`
+    const innerResults = createExtensions(
+      innerBlockTreePath,
+      innerExtensionPath,
+      innerBindingPath,
+      outerNested,
+      blocksTree,
+      blocksMap,
+      contentMap
+    )
+    acc.push(...innerResults)
+    return acc
+  }, [] as ExtensionResult[])
 
   return result.concat(
     self,

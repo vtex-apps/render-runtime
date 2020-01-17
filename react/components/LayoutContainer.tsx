@@ -129,9 +129,7 @@ class Container extends Component<ContainerProps, ContainerState> {
   }
 }
 
-const LayoutContainer: React.FunctionComponent<
-  LayoutContainerProps
-> = props => {
+const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = props => {
   const { extensions, preview, hints } = useRuntime()
   const { treePath } = useTreePath()
 
