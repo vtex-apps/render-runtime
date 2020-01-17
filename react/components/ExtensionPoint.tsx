@@ -164,18 +164,12 @@ const ExtensionPoint: FC<Props> = props => {
   const isCompositionChildren =
     extension && extension.composition === 'children'
 
-  let componentChildren = null
+  let componentChildren = children
 
-  if (isCompositionChildren) {
-    componentChildren =
-      extension.blocks && extension.blocks.length > 0
-        ? getChildExtensions(runtime, newTreePath)
-        : children
-  } else {
-    componentChildren =
-      extension.blocks && extension.blocks.length > 0
-        ? [...getChildExtensions(runtime, newTreePath), children]
-        : children
+  if (extension.blocks && extension.blocks.length > 0) {
+    componentChildren = isCompositionChildren
+      ? getChildExtensions(runtime, newTreePath)
+      : [...getChildExtensions(runtime, newTreePath), children]
   }
 
   const isRootTreePath = newTreePath.indexOf('/') === -1
