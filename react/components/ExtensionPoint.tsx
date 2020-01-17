@@ -31,25 +31,28 @@ function getChildExtensions(runtime: RenderContext, treePath: string) {
   const extension = runtime.extensions && runtime.extensions[treePath]
 
   if (!extension || !extension.blocks) {
-    return
+    return []
   }
 
-  return extension.blocks.map((child, i) => {
-    const childTreePath = mountTreePath(child.extensionPointId, treePath)
+  // This filter condition is for backwards compatibility
+  return extension.blocks
+    .filter(block => block.children !== false)
+    .map((child, i) => {
+      const childTreePath = mountTreePath(child.extensionPointId, treePath)
 
-    const childExtension =
-      runtime.extensions && runtime.extensions[childTreePath]
-    const childProps = childExtension ? childExtension.props : {}
+      const childExtension =
+        runtime.extensions && runtime.extensions[childTreePath]
+      const childProps = childExtension ? childExtension.props : {}
 
-    return (
-      <ExtensionPoint
-        key={`around-${treePath}-${i}`}
-        id={child.extensionPointId}
-        blockProps={childProps}
-        treePath={treePath}
-      />
-    )
-  })
+      return (
+        <ExtensionPoint
+          key={`around-${treePath}-${i}`}
+          id={child.extensionPointId}
+          blockProps={childProps}
+          treePath={treePath}
+        />
+      )
+    })
 }
 
 function withOuterExtensions(
@@ -161,10 +164,19 @@ const ExtensionPoint: FC<Props> = props => {
   const isCompositionChildren =
     extension && extension.composition === 'children'
 
-  const componentChildren =
-    isCompositionChildren && extension.blocks
-      ? getChildExtensions(runtime, newTreePath)
-      : children
+  let componentChildren = null
+
+  if (isCompositionChildren) {
+    componentChildren =
+      extension.blocks && extension.blocks.length > 0
+        ? getChildExtensions(runtime, newTreePath)
+        : children
+  } else {
+    componentChildren =
+      extension.blocks && extension.blocks.length > 0
+        ? [...getChildExtensions(runtime, newTreePath), children]
+        : children
+  }
 
   const isRootTreePath = newTreePath.indexOf('/') === -1
 
