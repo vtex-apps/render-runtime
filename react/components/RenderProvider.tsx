@@ -310,21 +310,20 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           return this.onPageChanged(location)
         }
 
-        const hasUnsaveData = this.callbacks
-          .map((callback: () => boolean) => callback())
-          .some(Boolean)
-
-        if (
-          hasUnsaveData &&
-          window.confirm('Are you sure you want to leave?')
-        ) {
-          this.hasGoBack = false
-          this.onPageChanged(location)
-        } else {
-          history.goBack()
-          this.hasGoBack = true
+        if (!isEmpty(this.callbacks)) {
+          this.callbacks.forEach((fn: any) => {
+            if (fn()) {
+              history.goBack()
+              this.hasGoBack = true
+            } else {
+              this.hasGoBack = false
+              this.onPageChanged(location)
+            }
+          })
         }
       })
+
+    emitter.addListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {
       emitter.addListener('extensionsUpdated', this.updateRuntime)
