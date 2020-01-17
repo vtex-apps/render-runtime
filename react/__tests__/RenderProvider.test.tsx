@@ -4,7 +4,7 @@ import { useRuntime } from '../core/main'
 import { render, wait } from '@vtex/test-tools/react'
 
 const renderFakeProvider = ({ children }: { children: JSX.Element }) => {
-  window.fetch = () => Promise.resolve(null)
+  window.fetch = () => Promise.resolve({} as Response)
   window.__RENDER_8_SESSION__ = {
     sessionPromise: Promise.resolve(),
     patchSession: () => Promise.resolve(),
@@ -94,7 +94,7 @@ it('Calling navigates one after another with different payload, will make second
   expect(navigateResultSecond).toBe(true)
 })
 
-it.each([
+const input: [any, any, any][] = [
   [
     { to: 'product', params: { id: 'a' } },
     { to: 'product', params: { id: 'a' } },
@@ -120,7 +120,9 @@ it.each([
     { page: 'page', params: { id: 'b' } },
     true,
   ],
-])(
+]
+
+it.each(input)(
   'test if navigation is properly exiting early based on different repeated input',
   async (arg1: any, arg2: any, expected: boolean) => {
     let navigateResultFirst = undefined
