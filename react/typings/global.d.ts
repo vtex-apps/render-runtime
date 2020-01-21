@@ -471,7 +471,7 @@ declare global {
       data: string
     }>
 
-    registerCallback?: (callback: () => boolean) => any
+    registerCallback?: (id: string, callback: () => boolean) => any
   }
 
   interface CacheHints {

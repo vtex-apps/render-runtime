@@ -5,7 +5,7 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { forEach, merge, mergeWith, equals } from 'ramda'
+import { forEach, merge, mergeWith, equals, isEmpty, keys } from 'ramda'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -56,7 +56,6 @@ import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
 import { appendLocationSearch } from '../utils/location'
 import { setCookie } from '../utils/cookie'
-import isEmpty from 'ramda/es/isEmpty'
 
 interface Props {
   children: ReactElement<any> | null
@@ -189,7 +188,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private prefetchRoutes: Set<string>
   private navigationRouteModifiers: Set<NavigationRouteModifier>
   private fetcher: GlobalFetch['fetch']
-  private callbacks: any = []
+  private callbacks: any = {}
 
   public constructor(props: Props) {
     super(props)
@@ -310,16 +309,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           return this.onPageChanged(location)
         }
 
-        if (!isEmpty(this.callbacks)) {
-          this.callbacks.forEach((fn: any) => {
-            if (fn()) {
-              history.goBack()
-              this.hasGoBack = true
-            } else {
-              this.hasGoBack = false
-              this.onPageChanged(location)
-            }
-          })
+        const goBack = keys(this.callbacks)
+          .filter((key: any) => this.callbacks[key]())
+          .some(Boolean)
+
+        if (goBack) {
+          this.hasGoBack = true
+          history.goBack()
+        } else {
+          this.hasGoBack = false
+          this.onPageChanged(location)
         }
       })
 
@@ -521,11 +520,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     })
   }
 
-  public registerCallback = (callback: () => boolean) => {
-    const index = this.callbacks.length
-    this.callbacks.push(callback)
+  public registerCallback = (id: string, callback: () => boolean) => {
+    this.callbacks[id] = callback
     return () => {
-      this.callbacks.splice(index, 1)
+      delete this.callbacks[id]
     }
   }
 
