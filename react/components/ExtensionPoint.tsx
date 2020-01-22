@@ -167,7 +167,13 @@ const ExtensionPoint: FC<Props> = props => {
   let componentChildren = children
 
   if (extension.blocks && extension.blocks.length > 0) {
-    componentChildren = isCompositionChildren
+    // This is for backwards compatibility with apps that were built before
+    // https://github.com/vtex/builder-hub/pull/856
+    const hasOldChildrenBlocks =
+      isCompositionChildren &&
+      !extension.blocks.some(block => 'children' in block)
+
+    componentChildren = hasOldChildrenBlocks
       ? getChildExtensions(runtime, newTreePath)
       : [...getChildExtensions(runtime, newTreePath), children]
   }
