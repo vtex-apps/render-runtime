@@ -174,7 +174,7 @@ const ExtensionPoint: FC<Props> = props => {
     if (hasBeenRebuilt) {
       componentChildren = [
         ...getChildExtensions(runtime, newTreePath),
-        children,
+        children || [],
       ]
     } else if (isCompositionChildren) {
       componentChildren = getChildExtensions(runtime, newTreePath)
