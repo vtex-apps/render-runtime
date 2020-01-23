@@ -5,7 +5,7 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { forEach, merge, mergeWith, equals } from 'ramda'
+import { forEach, merge, mergeWith, equals, isEmpty, keys } from 'ramda'
 import React, { Component, Fragment, ReactElement } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -86,6 +86,7 @@ export interface RenderProviderState {
   blocksTree?: RenderRuntime['blocksTree']
   blocks?: RenderRuntime['blocks']
   contentMap?: RenderRuntime['contentMap']
+  registerCallback?: RenderRuntime['registerCallback']
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
@@ -153,6 +154,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     updateExtension: PropTypes.func,
     updateRuntime: PropTypes.func,
     workspace: PropTypes.string,
+    registerCallback: PropTypes.func,
   }
 
   public static propTypes = {
@@ -186,6 +188,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private prefetchRoutes: Set<string>
   private navigationRouteModifiers: Set<NavigationRouteModifier>
   private fetcher: GlobalFetch['fetch']
+  private callbacks: any = {}
 
   public constructor(props: Props) {
     super(props)
@@ -289,12 +292,36 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.navigationRouteModifiers = new Set()
   }
 
+  public hasGoBack = false
+
   public componentDidMount() {
     this.rendered = true
     const { history, runtime } = this.props
     const { production, emitter } = runtime
 
-    this.unlisten = history && history.listen(this.onPageChanged)
+    this.unlisten =
+      history &&
+      history.listen(location => {
+        const hasCallbacks = !isEmpty(this.callbacks)
+
+        if (!hasCallbacks || this.hasGoBack) {
+          this.hasGoBack = false
+          return this.onPageChanged(location)
+        }
+
+        const goBack = keys(this.callbacks)
+          .filter((key: any) => this.callbacks[key]())
+          .some(Boolean)
+
+        if (goBack) {
+          this.hasGoBack = true
+          history.goBack()
+        } else {
+          this.hasGoBack = false
+          this.onPageChanged(location)
+        }
+      })
+
     emitter.addListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {
@@ -406,6 +433,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
       workspace,
+      registerCallback: this.registerCallback,
     }
   }
 
@@ -490,6 +518,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       rootPath,
       modifiers: this.navigationRouteModifiers,
     })
+  }
+
+  public registerCallback = (id: string, callback: () => boolean) => {
+    this.callbacks[id] = callback
+    return () => {
+      delete this.callbacks[id]
+    }
   }
 
   public navigate = (options: NavigateOptions) => {
