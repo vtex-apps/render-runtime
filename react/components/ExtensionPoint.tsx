@@ -164,7 +164,7 @@ const ExtensionPoint: FC<Props> = props => {
   const isCompositionChildren =
     extension && extension.composition === 'children'
 
-  let componentChildren = children
+  let componentChildren: any = children
 
   if (extension.blocks && extension.blocks.length > 0) {
     // This is for backwards compatibility with apps that were built before
@@ -174,8 +174,11 @@ const ExtensionPoint: FC<Props> = props => {
     if (hasBeenRebuilt) {
       componentChildren = [
         ...getChildExtensions(runtime, newTreePath),
-        children || [],
+        ...(children ? [children] : []),
       ]
+      if (componentChildren.length === 0 && children === undefined) {
+        componentChildren = undefined
+      }
     } else if (isCompositionChildren) {
       componentChildren = getChildExtensions(runtime, newTreePath)
     }
