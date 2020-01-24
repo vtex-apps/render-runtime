@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [8.90.1] - 2020-01-24
 ### Fixed
 - Returning an array with `undefined` to be rendered with apps that were rebuilt.
 
