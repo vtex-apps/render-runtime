@@ -31,12 +31,12 @@ function getChildExtensions(runtime: RenderContext, treePath: string) {
   const extension = runtime.extensions && runtime.extensions[treePath]
 
   if (!extension || !extension.blocks) {
-    return []
+    return
   }
 
   // This filter condition is for backwards compatibility
   return extension.blocks
-    .filter(block => block.children !== false)
+    .filter(block => block.children === undefined || block.children === true)
     .map((child, i) => {
       const childTreePath = mountTreePath(child.extensionPointId, treePath)
 
@@ -164,22 +164,10 @@ const ExtensionPoint: FC<Props> = props => {
   const isCompositionChildren =
     extension && extension.composition === 'children'
 
-  let componentChildren = children
-
-  if (extension.blocks && extension.blocks.length > 0) {
-    // This is for backwards compatibility with apps that were built before
-    // https://github.com/vtex/builder-hub/pull/856
-    const hasBeenRebuilt = extension.blocks.some(block => 'children' in block)
-
-    if (hasBeenRebuilt) {
-      componentChildren = [
-        ...getChildExtensions(runtime, newTreePath),
-        children,
-      ]
-    } else if (isCompositionChildren) {
-      componentChildren = getChildExtensions(runtime, newTreePath)
-    }
-  }
+  const componentChildren =
+    isCompositionChildren && extension.blocks
+      ? getChildExtensions(runtime, newTreePath)
+      : children
 
   const isRootTreePath = newTreePath.indexOf('/') === -1
 
