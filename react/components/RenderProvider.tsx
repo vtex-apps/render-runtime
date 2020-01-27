@@ -126,6 +126,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     ensureSession: PropTypes.func,
     extensions: PropTypes.object,
     fetchComponent: PropTypes.func,
+    fetchComponents: PropTypes.func,
     getSettings: PropTypes.func,
     goBack: PropTypes.func,
     hints: PropTypes.object,
@@ -379,6 +380,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       ensureSession: this.ensureSession,
       extensions,
       fetchComponent: this.fetchComponent,
+      fetchComponents: this.fetchComponents,
       getSettings: this.getSettings,
       goBack: this.goBack,
       hints,
@@ -762,9 +764,16 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public fetchComponents = async (
     components: RenderRuntime['components'],
-    extensions: RenderRuntime['extensions']
+    extensions?: RenderRuntime['extensions']
   ) => {
     const { runtime } = this.props
+    if (!extensions) {
+      const componentsNames = Object.keys(components)
+      extensions = componentsNames.reduce(
+        (acc, component) => ({ ...acc, [component]: { component } }),
+        {}
+      ) as RenderRuntime['extensions']
+    }
     const componentsToDownload = Object.values(extensions).reduce<string[]>(
       (acc, extension) => {
         if (extension.render === 'lazy') {

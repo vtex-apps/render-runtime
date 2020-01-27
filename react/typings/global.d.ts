@@ -207,6 +207,10 @@ declare global {
     ensureSession: () => Promise<void>
     extensions: RenderRuntime['extensions']
     fetchComponent: (component: string) => Promise<void>
+    fetchComponents: (
+      components: RenderRuntime['components'],
+      extensions?: RenderRuntime['extensions']
+    ) => Promise<void>
     getSettings: (app: string) => any
     goBack: () => void
     hints: RenderHints
