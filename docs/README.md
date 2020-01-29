@@ -85,6 +85,7 @@ You can pass a handful of configuration props to navigate:
 | params | `object`      |   `{}`  | Map of _parameters_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}`
 | query | `string`  | `''`   | String representation of the query params that will be appended to the path. Example: `skuId=231`.
 | scrollOptions | `RenderScrollOptions` | -- | After the navigation, if the page should be scrolled to a specific position, or should stay still (use `false`)
+| replace | `boolean` | `undefined` | If it should call the replace function to navigate or not
 #### Example
 ```javascript
 navigate({
@@ -107,6 +108,7 @@ Link is a custom React component that renders an `a` HTML element that, when cli
 | params | `object`      |   `{}`  | Map of _param_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}`
 | query | `string`  | `''`   | String representation of the query params that will be appended to the path. Example: `skuId=231`.
 | onClick | `function` | -- | Callback that will be fired when the user click on the Component. Example: `() => alert('Salut')`
+| replace | `boolean` | `undefined` | If it should call the replace function to navigate or not
 
 Other props you pass will be forwarded to the `a` component and can be used for customisation.
 
