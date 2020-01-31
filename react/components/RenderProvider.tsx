@@ -767,12 +767,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     extensions?: RenderRuntime['extensions']
   ) => {
     const { runtime } = this.props
+    // In order for only fetching `components`, we create corresponding extensions
+    // for them if they weren't passed
     if (!extensions) {
       const componentsNames = Object.keys(components)
-      extensions = componentsNames.reduce(
-        (acc, component) => ({ ...acc, [component]: { component } }),
-        {}
-      ) as RenderRuntime['extensions']
+      extensions = componentsNames.reduce((acc, component) => {
+        acc[component] = { component }
+        return acc
+      }, {} as RenderRuntime['extensions'])
     }
     const componentsToDownload = Object.values(extensions).reduce<string[]>(
       (acc, extension) => {
