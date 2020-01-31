@@ -56,7 +56,6 @@ import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
 import { appendLocationSearch } from '../utils/location'
 import { setCookie } from '../utils/cookie'
-import { isEqual } from 'apollo-utilities'
 
 interface Props {
   children: ReactElement<any> | null
@@ -242,7 +241,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           renderRouting: true,
         },
       }
-      if (!isEqual(history.location, renderLocation)) {
+      if (!equals(history.location, renderLocation)) {
         history.replace(renderLocation)
       }
       // backwards compatibility
