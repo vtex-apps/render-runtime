@@ -241,7 +241,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           renderRouting: true,
         },
       }
-      if (!equals(history.location, renderLocation)) {
+      if (!equals(history.location as RenderHistoryLocation, renderLocation)) {
         history.replace(renderLocation)
       }
       // backwards compatibility
