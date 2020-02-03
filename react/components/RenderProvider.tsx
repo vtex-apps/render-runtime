@@ -241,6 +241,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           renderRouting: true,
         },
       }
+      // TODO: use something with better performance than equals
       if (!equals(history.location as RenderHistoryLocation, renderLocation)) {
         history.replace(renderLocation)
       }
