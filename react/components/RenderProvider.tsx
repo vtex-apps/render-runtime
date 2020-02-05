@@ -215,7 +215,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const ignoreCanonicalReplacement = query && query.map
     this.fetcher = fetch
 
-    if (exposeBindingAddress && binding && canUseDOM) {
+    if (binding && canUseDOM) {
       setCookie('vtex_binding_address', binding.canonicalBaseAddress)
     }
 
