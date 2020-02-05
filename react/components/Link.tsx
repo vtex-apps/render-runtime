@@ -31,7 +31,7 @@ const Link: React.FunctionComponent<Props> = ({
   children,
   modifiers,
   replace,
-  modifiersIgnore,
+  modifiersOptions,
   ...linkProps
 }) => {
   const {
@@ -63,7 +63,7 @@ const Link: React.FunctionComponent<Props> = ({
         to,
         modifiers,
         replace,
-        modifiersIgnore,
+        modifiersOptions,
       }
       if (navigate(options)) {
         event.preventDefault()
@@ -80,7 +80,7 @@ const Link: React.FunctionComponent<Props> = ({
       modifiers,
       navigate,
       replace,
-      modifiersIgnore,
+      modifiersOptions,
     ]
   )
 

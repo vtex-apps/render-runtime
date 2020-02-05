@@ -187,7 +187,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private apolloClient: ApolloClient<NormalizedCacheObject>
   private prefetchRoutes: Set<string>
   private navigationRouteModifiers: Set<NavigationRouteModifier>
-  private navigationIgnores: Record<string, NavigationRouteChange>
+  private navigationModifierOptions: Record<string, NavigationRouteChange>
   private fetcher: GlobalFetch['fetch']
 
   public constructor(props: Props) {
@@ -293,7 +293,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     this.prefetchRoutes = new Set<string>()
     this.navigationRouteModifiers = new Set()
-    this.navigationIgnores = {}
+    this.navigationModifierOptions = {}
   }
 
   public componentDidMount() {
@@ -509,11 +509,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     options.rootPath = rootPath
     options.modifiers = this.navigationRouteModifiers
 
-    this.navigationIgnores = {
-      ...this.navigationIgnores,
-      ...options.modifiersIgnore,
+    this.navigationModifierOptions = {
+      ...this.navigationModifierOptions,
+      ...options.modifiersOptions,
     }
-    options.modifiersIgnore = this.navigationIgnores
+    options.modifiersOptions = this.navigationModifierOptions
 
     if (this.navigationState.isNavigating) {
       const lastOptions = this.navigationState.lastOptions!

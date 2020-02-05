@@ -242,7 +242,7 @@ export function navigate(
     replace,
     fetchPage = true,
     modifiers,
-    modifiersIgnore,
+    modifiersOptions,
   } = options
 
   if (!page && !inputTo) {
@@ -301,7 +301,7 @@ export function navigate(
       const { path, query: fixedQuery } = modifier({
         path: navigationRoute.path,
         query,
-        ignore: modifiersIgnore,
+        options: modifiersOptions,
       })
       navigationRoute.path = path || navigationRoute.path
       query = fixedQuery || query
@@ -490,13 +490,13 @@ export interface NavigateOptions {
   fetchPage?: boolean
   rootPath?: string
   modifiers?: Set<NavigationRouteModifier>
-  modifiersIgnore?: Record<string, NavigationRouteChange>
+  modifiersOptions?: Record<string, any>
 }
 
 export interface NavigationRouteChange {
   path: string
   query?: string
-  ignore?: Record<string, NavigationRouteChange>
+  options?: Record<string, NavigationRouteChange>
 }
 
 export type NavigationRouteModifier = (
