@@ -48,6 +48,10 @@
       },
       {
         "clientOnly": true,
+        "path": "npm:lazysizes@5.1.0/lazysizes.min.js"
+      },
+      {
+        "clientOnly": true,
         "path": "npm:fg-loadcss@2.1.0/dist/cssrelpreload.min.js"
       },
       {
@@ -111,6 +115,10 @@
       {
         "path": "npm:intl@1.2.5/dist/Intl.min.js",
         "serverOnly": true
+      },
+      {
+        "clientOnly": true,
+        "path": "npm:lazysizes@5.1.0/lazysizes.min.js"
       },
       {
         "clientOnly": true,
