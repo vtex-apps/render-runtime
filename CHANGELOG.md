@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.91.0] - 2020-02-06
+
 ## [8.90.5] - 2020-02-05
 ### Fixed
 - Always set `vtex_binding_address` cookie. This should fix some binding switching issues.
