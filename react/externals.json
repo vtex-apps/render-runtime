@@ -28,11 +28,6 @@
         "path": "npm:react-dom@16.9.0/umd/react-dom.development.js"
       },
       {
-        "global": "ReactDOMServer",
-        "import": "react-dom/server",
-        "path": "npm:react-dom@16.9.0/umd/react-dom-server.browser.development.js"
-      },
-      {
         "global": "ReactIntl",
         "import": "react-intl",
         "path": "npm:react-intl@3.9.1/dist/react-intl.js"
@@ -43,11 +38,6 @@
         "path": "npm:history@4.7.2/umd/history.js"
       },
       {
-        "global": "Sentry",
-        "import": "@sentry/browser",
-        "path": "npm:@sentry/browser@4.4.1/build/bundle.js"
-      },
-      {
         "global": "R",
         "import": "ramda",
         "path": "npm:ramda@0.26.1/dist/ramda.js"
@@ -55,10 +45,6 @@
       {
         "path": "npm:intl@1.2.5/dist/Intl.js",
         "serverOnly": true
-      },
-      {
-        "clientOnly": true,
-        "path": "npm:lazysizes@5.1.0/lazysizes.min.js"
       },
       {
         "clientOnly": true,
@@ -108,11 +94,6 @@
         "path": "npm:react-dom@16.9.0/umd/react-dom.production.min.js"
       },
       {
-        "global": "ReactDOMServer",
-        "import": "react-dom/server",
-        "path": "npm:react-dom@16.9.0/umd/react-dom-server.browser.production.min.js"
-      },
-      {
         "global": "ReactIntl",
         "import": "react-intl",
         "path": "npm:react-intl@3.9.1/dist/react-intl.min.js"
@@ -123,11 +104,6 @@
         "path": "npm:history@4.7.2/umd/history.min.js"
       },
       {
-        "global": "Sentry",
-        "import": "@sentry/browser",
-        "path": "npm:@sentry/browser@4.4.1/build/bundle.min.js"
-      },
-      {
         "global": "R",
         "import": "ramda",
         "path": "npm:ramda@0.26.1/dist/ramda.min.js"
@@ -135,10 +111,6 @@
       {
         "path": "npm:intl@1.2.5/dist/Intl.min.js",
         "serverOnly": true
-      },
-      {
-        "clientOnly": true,
-        "path": "npm:lazysizes@5.1.0/lazysizes.min.js"
       },
       {
         "clientOnly": true,
