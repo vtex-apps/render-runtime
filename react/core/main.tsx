@@ -138,8 +138,9 @@ const render = async (
     return (renderFn(root, elem) as unknown) as Element
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { renderToStaticMarkup, renderToString } = require('react-dom/server')
+  const ReactDOMServer = await import('react-dom/server')
+
+  const { renderToStaticMarkup, renderToString } = ReactDOMServer.default
 
   const commonRenderResult = {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
