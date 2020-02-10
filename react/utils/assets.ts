@@ -16,6 +16,10 @@ const isRelative = (path: string) => {
   return path && path[0] === '/' && path[1] !== '/'
 }
 
+const hasQuery = (url: string) => {
+  return url.includes('?')
+}
+
 export const getVTEXImgHost = (account: string) => {
   return `https://${account}.${imageHost}`
 }
@@ -24,13 +28,17 @@ const getAbsoluteURL = (
   account: string,
   url: string,
   production: boolean,
-  rootPath: string
+  rootPath: string,
+  workspace: string
 ) => {
   if (!isRelative(url)) {
     return url
   }
 
-  return production ? `${getVTEXImgHost(account)}${url}` : rootPath + url
+  const workspaceQs = `${hasQuery(url) ? '?' : '&'}workspace=${workspace}`
+  return production
+    ? `${getVTEXImgHost(account)}${url}`
+    : rootPath + url + workspaceQs
 }
 
 class ServerSideAssetLoadingError extends Error {
@@ -225,7 +233,7 @@ function getAssetsToAdd(
   assetExtension: string,
   existingAssets: string[]
 ) {
-  const { account, production, rootPath = '' } = runtime
+  const { account, production, rootPath = '', workspace } = runtime
 
   const existingBundledAssetsByApp = groupAssetsByApp(existingAssets)
 
@@ -243,7 +251,8 @@ function getAssetsToAdd(
           account,
           asset.path,
           production,
-          rootPath
+          rootPath,
+          workspace
         )
         acc.add(absoluteAsset)
       }
