@@ -11,7 +11,7 @@ import GenericPreview from './Preview/GenericPreview'
 import LoadingBar from './LoadingBar'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
-const BlockWrapper = React.lazy(
+const InspectBlockWrapper = React.lazy(
   () =>
     new Promise<{ default: any }>(resolve => {
       import('@vtex/blocks-inspector').then(BlocksInspector => {
@@ -222,12 +222,14 @@ const ExtensionPoint: FC<Props> = props => {
     </Fragment>
   )
 
+  /** If it's on inspect mode (?__inspect on querystring) wraps the block
+   * on a block-inspector wrapper */
   if (inspect) {
     return (
       <Suspense fallback={maybeClientExtension}>
-        <BlockWrapper extension={extension} treePath={newTreePath}>
+        <InspectBlockWrapper extension={extension} treePath={newTreePath}>
           {maybeClientExtension}
-        </BlockWrapper>
+        </InspectBlockWrapper>
       </Suspense>
     )
   }
