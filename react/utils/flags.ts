@@ -1,6 +1,6 @@
 const flags = {
   RENDER_NAVIGATION: true,
-  VTEX_ASSETS_URL: false,
+  VTEX_ASSETS_URL: true,
 }
 
 window.flags = flags
