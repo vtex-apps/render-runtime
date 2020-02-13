@@ -1,13 +1,22 @@
+import { isEnabled } from './flags'
+
 const SECURE_PROTOCOL = 'https://'
 const PROTOCOL_RELATIVE_PREFIX = '//'
 const ARQUIVOS_RELATIVE_PREFIX = '/arquivos'
 const ASSETS_RELATIVE_PREFIX = '/assets'
 const FILE_MANAGER_PATH_REGEX = /url\("?(.*\/)assets\/vtex\.file-manager-graphql/
 
+const toVtexAssets = (url: string) =>
+  isEnabled('VTEX_ASSETS_URL')
+    ? url.replace('vteximg.com.br', 'vtexassets.com')
+    : url
+
 export function optimizeSrcForVtexImg(vtexImgHost: string, src?: any) {
   try {
     if (src && src.indexOf(PROTOCOL_RELATIVE_PREFIX) === 0) {
-      return src.replace(PROTOCOL_RELATIVE_PREFIX, SECURE_PROTOCOL)
+      return toVtexAssets(
+        src.replace(PROTOCOL_RELATIVE_PREFIX, SECURE_PROTOCOL)
+      )
     }
 
     if (
@@ -18,7 +27,7 @@ export function optimizeSrcForVtexImg(vtexImgHost: string, src?: any) {
       return vtexImgHost + src
     }
 
-    return src
+    return toVtexAssets(src)
   } catch (e) {
     console.warn('Failed to optimize image source.')
     return src
