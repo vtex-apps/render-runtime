@@ -4,6 +4,7 @@ import { useTreePath } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 import { useRuntime } from './RenderContext'
 import { LoadingWrapper } from './LoadingContext'
+import { LazyImages } from './LazyImages'
 
 type Element = string | ElementArray
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -96,13 +97,17 @@ class Container extends Component<ContainerProps, ContainerState> {
     const hasFold = foldIndex > -1
 
     if (hasFold && !shouldRenderBelowTheFold) {
-      elementsToRender = foldIndex + 1
+      elementsToRender = foldIndex
     }
+
+    const lazyImagesFoldPosition = elements.indexOf(
+      '__fold__.experimentalLazyImages'
+    )
 
     const returnValue: JSX.Element[] = elements
       .slice(0, elementsToRender)
-      .map((element: Element) => {
-        return (
+      .map((element: Element, i: number) => {
+        const container = (
           <Container
             key={element.toString()}
             elements={element}
@@ -113,6 +118,12 @@ class Container extends Component<ContainerProps, ContainerState> {
             {children}
           </Container>
         )
+
+        if (i < lazyImagesFoldPosition) {
+          return container
+        }
+
+        return <LazyImages key={element.toString()}>{container}</LazyImages>
       })
 
     return (
