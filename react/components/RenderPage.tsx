@@ -15,6 +15,17 @@ const RenderPage: FC<Props> = props => {
     route: { params },
   } = runtime
 
+  let paramsString = ''
+
+  try {
+    paramsString = JSON.stringify(params)
+  } catch (e) {
+    console.warn(
+      "Unable to stringify params for page. This shouldn't be much of a problem, but might prevent components from being reset on page change. The params object is as follows:",
+      params
+    )
+  }
+
   return (
     <MaybeContext
       nestedPage={page}
@@ -23,7 +34,7 @@ const RenderPage: FC<Props> = props => {
       runtime={runtime}
     >
       <ExtensionPoint
-        key={`${page}/${JSON.stringify(params)}`}
+        key={`${page}/${paramsString}`}
         id={page}
         query={query}
         params={params}
