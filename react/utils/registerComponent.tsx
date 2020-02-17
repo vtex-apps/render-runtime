@@ -60,35 +60,44 @@ export default (
   name: string,
   lazy = false
 ) => {
-  const componentLocators = [`${app}/${name}`, `${idToAppAtMajor(app)}/${name}`]
+  const locators = [`${app}/${name}`, `${idToAppAtMajor(app)}/${name}`]
+  const eager = module.hot || !lazy
+  let implementer = InitialImplementer
 
-  if (module.hot || !lazy) {
-    const implementer = lazy ? InitialImplementer() : InitialImplementer
-    const wrappedComponent = maybeWrapWithHMR(module, implementer)
-    componentLocators.forEach(locator => {
-      window.__RENDER_8_COMPONENTS__[locator] = wrappedComponent
-      loadedComponents[locator] = { implementer: wrappedComponent }
-    })
-
-    return wrappedComponent
+  if (eager) {
+    const evaluatedImplementer = lazy
+      ? InitialImplementer()
+      : InitialImplementer
+    implementer = maybeWrapWithHMR(module, evaluatedImplementer)
   }
 
-  componentLocators.forEach(locator => {
-    Object.defineProperty(window.__RENDER_8_COMPONENTS__, locator, {
-      get: () => {
-        if (loadedComponents[locator]) {
-          return loadedComponents[locator].implementer
-        }
+  locators.forEach(locator => {
+    if (window.__RENDER_8_COMPONENTS__[locator]) {
+      return
+    }
 
-        const implementer = InitialImplementer()
-        componentLocators.forEach(eachLocator => {
-          loadedComponents[eachLocator] = { implementer }
-        })
+    if (eager) {
+      window.__RENDER_8_COMPONENTS__[locator] = implementer
+      loadedComponents[locator] = { implementer }
+    } else {
+      Object.defineProperty(window.__RENDER_8_COMPONENTS__, locator, {
+        get: () => {
+          if (loadedComponents[locator]) {
+            return loadedComponents[locator].implementer
+          }
 
-        return implementer
-      },
-    })
+          const evaluatedImplementer = implementer()
+          locators.forEach(eachLocator => {
+            loadedComponents[eachLocator] = {
+              implementer: evaluatedImplementer,
+            }
+          })
+
+          return evaluatedImplementer
+        },
+      })
+    }
   })
 
-  return InitialImplementer
+  return implementer
 }

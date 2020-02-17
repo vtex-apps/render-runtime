@@ -9,6 +9,7 @@ import { createReactIntl } from './utils/reactIntl'
 import { createCustomReactApollo } from './utils/reactApollo'
 import { fetchUncriticalStyles, UncriticalStyle } from './utils/assets'
 
+window.__RENDER_LAZY__ = true
 window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
 
 // compatibility
