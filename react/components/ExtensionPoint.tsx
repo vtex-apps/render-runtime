@@ -1,7 +1,7 @@
 import { mergeDeepRight, reduce } from 'ramda'
 import React, { FC, Fragment, Suspense } from 'react'
 
-import ExtensionPointComponent from './ExtensionPointComponent'
+import ExtensionPointComponent from './ExtensionPointFunctionComponent'
 import Loading from './Loading'
 import { useRuntime } from './RenderContext'
 import { useTreePath } from '../utils/treePath'
