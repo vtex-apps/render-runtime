@@ -24,7 +24,10 @@ function mountTreePath(currentId: string, parentTreePath: string) {
   if (parentTreePath === currentId) {
     return parentTreePath
   }
-  return [parentTreePath, currentId].filter(id => !!id).join('/')
+  if (parentTreePath && currentId) {
+    return `${parentTreePath}/${currentId}`
+  }
+  return parentTreePath || currentId
 }
 
 function getChildExtensions(runtime: RenderContext, treePath: string) {
@@ -63,6 +66,10 @@ function withOuterExtensions(
   props: any,
   element: JSX.Element
 ) {
+  if (before.length === 0 && after.length === 0 && around.length === 0) {
+    return element
+  }
+
   const beforeElements = before.map(beforeId => (
     <ExtensionPoint
       id={beforeId}
@@ -122,9 +129,7 @@ const ExtensionPoint: FC<Props> = props => {
     [id, props.treePath, treePathFromHook.treePath]
   )
 
-  const extension = React.useMemo(() => {
-    return runtime.extensions && runtime.extensions[newTreePath]
-  }, [newTreePath, runtime.extensions])
+  const extension = runtime.extensions && runtime.extensions[newTreePath]
 
   const {
     component = null,
