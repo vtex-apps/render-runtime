@@ -153,7 +153,7 @@ const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = props => 
 
   const isRootTreePath = treePath.indexOf('/') === -1
 
-  if (extension.preview && isRootTreePath) {
+  if (extension && extension.preview && isRootTreePath) {
     /** TODO: LoadingWrapper is in the end a makeshift Suspense.
      * Should probably be replaced in the future. */
     return <LoadingWrapper>{container}</LoadingWrapper>
