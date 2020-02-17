@@ -1,5 +1,5 @@
 import React, { useMemo, Fragment, FC } from 'react'
-import ExtensionPointComponent from '../components/ExtensionPointComponent'
+import ExtensionPointComponent from '../components/ExtensionPointClassComponent'
 import { RenderContextProps } from './RenderContext'
 import { ExtensionPoint } from '../core/main'
 
