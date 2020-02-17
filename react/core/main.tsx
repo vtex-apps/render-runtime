@@ -244,9 +244,11 @@ function start() {
       }
 
       if (type === 'img') {
-        const { src } = props
-        props.src = optimizeSrcForVtexImg(vtexImgHost, src)
-        if (typeof src === 'string' && src.startsWith(vtexImgHost)) {
+        props.src = optimizeSrcForVtexImg(vtexImgHost, props.src)
+        if (
+          typeof props.src === 'string' &&
+          props.src.startsWith(vtexImgHost)
+        ) {
           props.crossOrigin = props.crossOrigin || 'anonymous'
         }
         return ReactCreateElement.apply(React, [
