@@ -66,10 +66,12 @@ const LazyLoadedExtensionPointComponent = (props: any) => {
   )
 
   useEffect(() => {
+    // Does nothing if Component is loaded...
     if (Component) {
       return
     }
 
+    // ...otherwise, fetches it and stores the result in the Component state
     fetchComponent(component, runtime.fetchComponent).then(result => {
       if (Component) {
         return
