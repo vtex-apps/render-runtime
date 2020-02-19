@@ -77,6 +77,7 @@ class Container extends Component<ContainerProps, ContainerState> {
       return (
         <div className={isRow ? '' : className}>
           <ExtensionPoint id={elements} {...props} />
+          {/* {ExtensionPoint({ ...props, id: elements })} */}
         </div>
       )
     }

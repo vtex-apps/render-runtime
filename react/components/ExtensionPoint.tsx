@@ -92,14 +92,12 @@ function withOuterExtensions(
 
   const isRootTreePath = treePath.indexOf('/') === -1
 
-  const wrapped = (
-    <Fragment key={`wrapped-${treePath}`}>
-      {beforeElements}
-      {element}
-      {isRootTreePath && <div className="flex flex-grow-1" />}
-      {afterElements}
-    </Fragment>
-  )
+  const wrapped = [
+    beforeElements,
+    element,
+    isRootTreePath && <div className="flex flex-grow-1" />,
+    afterElements,
+  ]
   // return around.reduce((acc, aroundId) => {
   //   return (
   //     <ExtensionPoint
