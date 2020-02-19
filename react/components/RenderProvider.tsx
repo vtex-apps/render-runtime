@@ -6,7 +6,7 @@ import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
 import { forEach, merge, mergeWith, equals } from 'ramda'
-import React, { Component, Fragment, ReactElement } from 'react'
+import React, { Component, Fragment, ReactElement, Suspense } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
@@ -58,6 +58,16 @@ import RenderPage from './RenderPage'
 import { appendLocationSearch } from '../utils/location'
 import { setCookie } from '../utils/cookie'
 
+// TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
+const InspectorPopover = React.lazy(
+  () =>
+    new Promise<{ default: any }>(resolve => {
+      import('@vtex/blocks-inspector').then(BlocksInspector => {
+        resolve({ default: BlocksInspector.default.InspectorPopover })
+      })
+    })
+)
+
 interface Props {
   children: ReactElement<any> | null
   history: History | null
@@ -75,6 +85,7 @@ export interface RenderProviderState {
   defaultExtensions: RenderRuntime['defaultExtensions']
   device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
+  inspect: RenderRuntime['inspect']
   messages: RenderRuntime['messages']
   page: RenderRuntime['page']
   pages: RenderRuntime['pages']
@@ -132,6 +143,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     goBack: PropTypes.func,
     hints: PropTypes.object,
     history: PropTypes.object,
+    inspect: PropTypes.bool,
     messages: PropTypes.object,
     navigate: PropTypes.func,
     onPageChanged: PropTypes.func,
@@ -289,6 +301,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query,
       route,
       settings: settings || {},
+      inspect: false,
     }
 
     this.prefetchRoutes = new Set<string>()
@@ -299,7 +312,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public componentDidMount() {
     this.rendered = true
     const { history, runtime } = this.props
-    const { production, emitter } = runtime
+    const { production, emitter, publicEndpoint } = runtime
 
     this.unlisten = history && history.listen(this.onPageChanged)
     emitter.addListener('localesChanged', this.onLocaleSelected)
@@ -313,6 +326,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     this.sendInfoFromIframe()
     this.prefetchPages()
+
+    if (
+      publicEndpoint === 'myvtex.com' &&
+      !production &&
+      '__inspect' in (this.state.query || {})
+    ) {
+      this.setState({ inspect: true })
+    }
   }
 
   public UNSAFE_componentWillReceiveProps(nextProps: Props) {
@@ -348,6 +369,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       components,
       contentMap,
       extensions,
+      inspect,
       messages,
       page,
       pages,
@@ -358,6 +380,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query,
       defaultExtensions,
     } = this.state
+
     const {
       account,
       amp,
@@ -391,6 +414,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       goBack: this.goBack,
       hints,
       history,
+      inspect,
       messages,
       navigate: this.navigate,
       onPageChanged: this.onPageChanged,
@@ -1012,6 +1036,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       page,
       query,
       production,
+      inspect,
     } = this.state
     const customMessages = this.getCustomMessages(locale)
     const mergedMessages = {
@@ -1046,6 +1071,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 {isSiteEditorIframe ? (
                   <ExtensionPoint id="store/__overlay" />
                 ) : null}
+                {inspect && (
+                  <Suspense fallback={null}>
+                    <InspectorPopover />
+                  </Suspense>
+                )}
               </Fragment>
             </IntlProvider>
           </ApolloProvider>

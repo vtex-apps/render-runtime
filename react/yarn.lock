@@ -2293,6 +2293,13 @@
     lodash.unescape "4.0.1"
     semver "^6.3.0"
 
+"@vtex/blocks-inspector@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@vtex/blocks-inspector/-/blocks-inspector-0.0.8.tgz#905d47364948880322b1b22ac75cfe727a7d45ae"
+  integrity sha512-afW1Hom2DoH5XQz4XA2zrHCrrLCDHYGXhumcR2DAe6m+QwZVHmxmORe4QyOZQVA9zpPPSfpEVYAqTpNjQIafJQ==
+  dependencies:
+    throttle-debounce "^2.1.0"
+
 "@vtex/test-tools@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@vtex/test-tools/-/test-tools-3.0.0.tgz#fbe0d5fa60a750d2098e707535924d1b9e86a35c"
@@ -7858,6 +7865,11 @@ throat@^4.0.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/throat/-/throat-4.1.0.tgz#89037cbc92c56ab18926e6ba4cbb200e15672a6a"
   integrity sha1-iQN8vJLFarGJJua6TLsgDhVnKmo=
+
+throttle-debounce@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/throttle-debounce/-/throttle-debounce-2.1.0.tgz#257e648f0a56bd9e54fe0f132c4ab8611df4e1d5"
+  integrity sha512-AOvyNahXQuU7NN+VVvOOX+uW6FPaWdAOdRP5HfwYxAfCzXTFKRMoIMk+n+po318+ktcChx+F1Dd91G3YHeMKyg==
 
 through@^2.3.6:
   version "2.3.8"
