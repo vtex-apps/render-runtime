@@ -82,10 +82,8 @@ const LazyLoadedExtensionPointComponent = (props: any) => {
 
   return Component ? (
     <Component {...componentProps}>{children}</Component>
-  ) : isRootTreePath || isAround ? (
-    /* Adds header/footer before and after the preview during loading,
-     * if the component being loaded is a root component--e.g. context
-     * wrappers, `around` wrappers */
+  ) : // If component is not loaded yet, renders a "loading" state.
+  isRootTreePath || isAround ? (
     <>
       {componentProps.beforeElements}
       <GenericPreview />
