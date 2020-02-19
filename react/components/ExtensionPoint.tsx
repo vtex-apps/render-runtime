@@ -152,21 +152,25 @@ const ExtensionPoint: FC<Props> = props => {
     props: extensionProps = {},
   } = extension || {}
 
-  const mergedProps = reduce(mergeDeepRight, {} as any, [
-    /** Extra props passed to the ExtensionPoint component
-     * e.g. <ExtensionPoint foo="bar" />
-     */
-    parentProps,
-    /** Props that are read from runtime.extensions, that come from the blocks files
-     */
-    extensionProps,
-    /** Props from the blockProps prop, used when the user wants to prevent overriding
-     * the native ExtensionPoint props (such as `id`)
-     */
-    blockProps || {},
-    content,
-    { params, query },
-  ])
+  const mergedProps = React.useMemo(
+    () =>
+      reduce(mergeDeepRight, {} as any, [
+        /** Extra props passed to the ExtensionPoint component
+         * e.g. <ExtensionPoint foo="bar" />
+         */
+        parentProps,
+        /** Props that are read from runtime.extensions, that come from the blocks files
+         */
+        extensionProps,
+        /** Props from the blockProps prop, used when the user wants to prevent overriding
+         * the native ExtensionPoint props (such as `id`)
+         */
+        blockProps || {},
+        content,
+        { params, query },
+      ]),
+    [parentProps, extensionProps, blockProps, content, params, query]
+  )
 
   if (
     /* Stops rendering if the extension is not found. Useful for optional ExtensionPoints */
