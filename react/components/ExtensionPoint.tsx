@@ -70,25 +70,25 @@ function withOuterExtensions(
     return element
   }
 
-  const beforeElements = before.map(beforeId => (
-    <ExtensionPoint
-      id={beforeId}
-      key={beforeId}
-      treePath={treePath}
-      params={props.params}
-      query={props.query}
-    />
-  ))
+  const beforeElements = before.map(beforeId =>
+    ExtensionPoint({
+      id: beforeId,
+      key: beforeId,
+      treePath: treePath,
+      params: props.params,
+      query: props.query,
+    })
+  )
 
-  const afterElements = after.map(afterId => (
-    <ExtensionPoint
-      id={afterId}
-      key={afterId}
-      treePath={treePath}
-      params={props.params}
-      query={props.query}
-    />
-  ))
+  const afterElements = after.map(afterId =>
+    ExtensionPoint({
+      id: afterId,
+      key: afterId,
+      treePath: treePath,
+      params: props.params,
+      query: props.query,
+    })
+  )
 
   const isRootTreePath = treePath.indexOf('/') === -1
 
@@ -100,20 +100,31 @@ function withOuterExtensions(
       {afterElements}
     </Fragment>
   )
+  // return around.reduce((acc, aroundId) => {
+  //   return (
+  //     <ExtensionPoint
+  //       {...props}
+  //       id={aroundId}
+  //       key={aroundId}
+  //       treePath={treePath}
+  //       beforeElements={beforeElements}
+  //       afterElements={afterElements}
+  //     >
+  //       {acc}
+  //     </ExtensionPoint>
+  //   )
+  // }, wrapped)
 
   return around.reduce((acc, aroundId) => {
-    return (
-      <ExtensionPoint
-        {...props}
-        id={aroundId}
-        key={aroundId}
-        treePath={treePath}
-        beforeElements={beforeElements}
-        afterElements={afterElements}
-      >
-        {acc}
-      </ExtensionPoint>
-    )
+    return ExtensionPoint({
+      ...props,
+      id: aroundId,
+      key: aroundId,
+      treePath: treePath,
+      beforeElements: beforeElements,
+      afterElements: afterElements,
+      children: acc,
+    })
   }, wrapped)
 }
 
@@ -141,23 +152,21 @@ const ExtensionPoint: FC<Props> = props => {
     props: extensionProps = {},
   } = extension || {}
 
-  const mergedProps = React.useMemo(() => {
-    return reduce(mergeDeepRight, {} as any, [
-      /** Extra props passed to the ExtensionPoint component
-       * e.g. <ExtensionPoint foo="bar" />
-       */
-      parentProps,
-      /** Props that are read from runtime.extensions, that come from the blocks files
-       */
-      extensionProps,
-      /** Props from the blockProps prop, used when the user wants to prevent overriding
-       * the native ExtensionPoint props (such as `id`)
-       */
-      blockProps || {},
-      content,
-      { params, query },
-    ])
-  }, [parentProps, extensionProps, blockProps, content, params, query])
+  const mergedProps = reduce(mergeDeepRight, {} as any, [
+    /** Extra props passed to the ExtensionPoint component
+     * e.g. <ExtensionPoint foo="bar" />
+     */
+    parentProps,
+    /** Props that are read from runtime.extensions, that come from the blocks files
+     */
+    extensionProps,
+    /** Props from the blockProps prop, used when the user wants to prevent overriding
+     * the native ExtensionPoint props (such as `id`)
+     */
+    blockProps || {},
+    content,
+    { params, query },
+  ])
 
   if (
     /* Stops rendering if the extension is not found. Useful for optional ExtensionPoints */
@@ -182,21 +191,34 @@ const ExtensionPoint: FC<Props> = props => {
     before,
     newTreePath,
     mergedProps,
-
-    <ExtensionPointComponent
-      component={component}
-      props={mergedProps}
-      runtime={runtime}
-      treePath={newTreePath}
-    >
-      {component ? (
+    ExtensionPointComponent({
+      component,
+      props: mergedProps,
+      runtime,
+      treePath: newTreePath,
+      children: component ? (
         componentChildren
       ) : isRootTreePath ? (
         <GenericPreview />
       ) : (
         <Loading />
-      )}
-    </ExtensionPointComponent>
+      ),
+    })
+
+    // <ExtensionPointComponent
+    //   component={component}
+    //   props={mergedProps}
+    //   runtime={runtime}
+    //   treePath={newTreePath}
+    // >
+    //   {component ? (
+    //     componentChildren
+    //   ) : isRootTreePath ? (
+    //     <GenericPreview />
+    //   ) : (
+    //     <Loading />
+    //   )}
+    // </ExtensionPointComponent>
   )
 
   // "client" component assets are sent to server side rendering,
@@ -204,7 +226,14 @@ const ExtensionPoint: FC<Props> = props => {
   //
   // "lazy" components might never be used, so they don't necessarily
   // need a loading animation.
-  return (
+  const hasMultipleChildren = runtime.preview && isRootTreePath
+  const child =
+    renderStrategy === 'client' && !runtime.amp ? (
+      <NoSSR onSSR={<Loading />}>{extensionPointComponent}</NoSSR>
+    ) : (
+      extensionPointComponent
+    )
+  return hasMultipleChildren ? (
     <Fragment>
       {runtime.preview && isRootTreePath && <LoadingBar />}
       {renderStrategy === 'client' && !runtime.amp ? (
@@ -213,6 +242,8 @@ const ExtensionPoint: FC<Props> = props => {
         extensionPointComponent
       )}
     </Fragment>
+  ) : (
+    child
   )
 }
 
@@ -221,4 +252,4 @@ ExtensionPoint.defaultProps = {
   treePath: '',
 }
 
-export default withErrorBoundary(ExtensionPoint)
+export default ExtensionPoint

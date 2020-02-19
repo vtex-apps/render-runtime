@@ -23,6 +23,7 @@ const RenderPage: FC<Props> = props => {
       runtime={runtime}
     >
       <ExtensionPoint id={page} query={query} params={params} {...props} />
+      {/* {ExtensionPoint({ ...props, key: page, id: page, query, params })} */}
     </MaybeContext>
   )
 }
