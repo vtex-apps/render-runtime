@@ -61,9 +61,9 @@ const LazyLoadedExtensionPointComponent = (props: any) => {
   const isRootTreePath = treePath.indexOf('/') === -1
   const isAround = treePath.indexOf('$around') !== -1
 
-  const initialComponent = (component && getImplementation(component)) || null
-
-  const [Component, setComponent] = useState(initialComponent)
+  const [Component, setComponent] = useState(
+    () => (component && getImplementation(component)) || null
+  )
 
   useEffect(() => {
     if (Component) {
