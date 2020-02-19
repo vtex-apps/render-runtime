@@ -19,6 +19,7 @@ const isMailToUrl = (url: string) => mailToRegex.test(url)
 interface Props extends NavigateOptions {
   onClick?: (event: React.MouseEvent) => void
   className?: string
+  target?: string
 }
 
 const Link: React.FunctionComponent<Props> = ({
@@ -32,6 +33,7 @@ const Link: React.FunctionComponent<Props> = ({
   modifiers,
   replace,
   modifiersOptions,
+  target,
   ...linkProps
 }) => {
   const {
@@ -65,7 +67,10 @@ const Link: React.FunctionComponent<Props> = ({
         replace,
         modifiersOptions,
       }
-      if (navigate(options)) {
+
+      // If you pass a target different from "_self" the component
+      // will behave just like a normal anchor element
+      if ((target === '_self' || !target) && navigate(options)) {
         event.preventDefault()
       }
     },
@@ -81,6 +86,7 @@ const Link: React.FunctionComponent<Props> = ({
       navigate,
       replace,
       modifiersOptions,
+      target,
     ]
   )
 
@@ -117,7 +123,12 @@ const Link: React.FunctionComponent<Props> = ({
       : href
 
   return (
-    <a href={hrefWithoutIframePrefix} {...linkProps} onClick={handleClick}>
+    <a
+      target={target}
+      href={hrefWithoutIframePrefix}
+      {...linkProps}
+      onClick={handleClick}
+    >
       {children}
     </a>
   )
