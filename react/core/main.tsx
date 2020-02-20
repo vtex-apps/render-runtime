@@ -15,8 +15,9 @@ import { getDataFromTree } from 'react-apollo'
 import { hydrate, render as renderDOM } from 'react-dom'
 import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
-import { isEmpty, prop } from 'ramda'
+import { isEmpty } from 'ramda'
 import Loading from '../components/Loading'
+import { MaybeLazyImage, LazyImages } from '../components/LazyImages'
 import { LoadingContextProvider } from '../components/LoadingContext'
 
 import { ChildBlock, useChildBlock } from '../components/ChildBlock'
@@ -250,6 +251,13 @@ function start() {
         ) {
           props.crossOrigin = props.crossOrigin || 'anonymous'
         }
+        return ReactCreateElement.apply(React, [
+          MaybeLazyImage,
+          {
+            createElement: ReactCreateElement,
+            imageProps: props,
+          },
+        ])
       }
 
       if (props && props.style && isStyleWritable(props)) {
@@ -309,6 +317,7 @@ export {
   useSSR,
   RenderContextConsumer,
   TreePathContextConsumer,
+  LazyImages as ExperimentalLazyImages,
   canUseDOM,
   render,
   start,
