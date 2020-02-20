@@ -12,7 +12,7 @@ interface State {
   errorDetails?: boolean
 }
 
-class ExtensionPointError extends PureComponent<Props, State> {
+class ErrorDisplay extends PureComponent<Props, State> {
   public static propTypes = {
     error: PropTypes.object,
     errorInfo: PropTypes.object,
@@ -74,4 +74,4 @@ class ExtensionPointError extends PureComponent<Props, State> {
   }
 }
 
-export default ExtensionPointError
+export default ErrorDisplay

@@ -1,14 +1,14 @@
 import { mergeDeepRight, reduce } from 'ramda'
 import React, { FC, Fragment, Suspense } from 'react'
 
-import ExtensionPointComponent from './ExtensionPointFunctionComponent'
-import Loading from './Loading'
-import { useRuntime } from './RenderContext'
-import { useTreePath } from '../utils/treePath'
-import NoSSR from './NoSSR'
-import { withErrorBoundary } from './ErrorBoundary'
-import GenericPreview from './Preview/GenericPreview'
-import LoadingBar from './LoadingBar'
+import ComponentLoader from './ComponentLoader'
+import Loading from '../Loading'
+import { useRuntime } from '../RenderContext'
+import { useTreePath } from '../../utils/treePath'
+import NoSSR from '../NoSSR'
+import { withErrorBoundary } from '../ErrorBoundary'
+import GenericPreview from '../Preview/GenericPreview'
+import LoadingBar from '../LoadingBar'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectBlockWrapper = React.lazy(
@@ -195,7 +195,7 @@ const ExtensionPoint: FC<Props> = props => {
     newTreePath,
     mergedProps,
 
-    <ExtensionPointComponent
+    <ComponentLoader
       component={component}
       props={mergedProps}
       runtime={runtime}
@@ -208,7 +208,7 @@ const ExtensionPoint: FC<Props> = props => {
       ) : (
         <Loading />
       )}
-    </ExtensionPointComponent>
+    </ComponentLoader>
   )
 
   // "client" component assets are sent to server side rendering,
