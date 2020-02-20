@@ -51,7 +51,7 @@ import {
 } from '../utils/routes'
 import { TreePathContextProvider } from '../utils/treePath'
 import BuildStatus from './BuildStatus'
-import ExtensionManager from './ExtensionManager'
+import ExtensionManager from './ExtensionPoint/ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'

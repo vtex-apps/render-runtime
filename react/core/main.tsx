@@ -15,15 +15,15 @@ import { getDataFromTree } from 'react-apollo'
 import { hydrate, render as renderDOM } from 'react-dom'
 import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
-import { isEmpty, prop } from 'ramda'
+import { isEmpty } from 'ramda'
 import Loading from '../components/Loading'
 import { LoadingContextProvider } from '../components/LoadingContext'
 
 import { ChildBlock, useChildBlock } from '../components/ChildBlock'
-import ExtensionContainer from '../components/ExtensionContainer'
+import ExtensionContainer from '../components/ExtensionPoint/ExtensionContainer'
 import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
-import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
+import LegacyExtensionContainer from '../components/ExtensionPoint/LegacyExtensionContainer'
 import Link from '../components/Link'
 import {
   RenderContext,
