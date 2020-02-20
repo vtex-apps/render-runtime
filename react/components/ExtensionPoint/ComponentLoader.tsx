@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { getImplementation } from '../utils/assets'
-import GenericPreview from './Preview/GenericPreview'
-import Loading from './Loading'
-import { TreePathContextProvider } from '../utils/treePath'
+import React, { useEffect, useState, FunctionComponent } from 'react'
+import { getImplementation } from '../../utils/assets'
+import GenericPreview from '../Preview/GenericPreview'
+import Loading from '../Loading'
+import { TreePathContextProvider } from '../../utils/treePath'
+import { isSiteEditorIframe } from '../../utils/dom'
+import SiteEditorWrapper from './SiteEditorWrapper'
 
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
@@ -32,24 +34,35 @@ async function fetchComponent(
   return getImplementation(component)
 }
 
-const ExtensionPointFunctionComponent = (props: any) => {
+interface Props {
+  component: string | null
+  props: any
+  treePath: string
+  runtime: RenderContext
+}
+
+const ComponentLoader: FunctionComponent<Props> = props => {
   const { component, children, treePath, props: componentProps } = props
   const Component = component && getImplementation(component)
 
-  return (
+  const content = (
     <TreePathContextProvider treePath={treePath}>
       {Component ? (
         <Component {...componentProps}>{children}</Component>
       ) : (
-        <LazyLoadedExtensionPointComponent {...props}>
-          {children}
-        </LazyLoadedExtensionPointComponent>
+        <AsyncComponent {...props}>{children}</AsyncComponent>
       )}
     </TreePathContextProvider>
   )
+
+  if (isSiteEditorIframe) {
+    return <SiteEditorWrapper {...props}>{content}</SiteEditorWrapper>
+  }
+
+  return content
 }
 
-const LazyLoadedExtensionPointComponent = (props: any) => {
+const AsyncComponent: FunctionComponent<Props> = props => {
   const {
     component,
     children,
@@ -67,7 +80,8 @@ const LazyLoadedExtensionPointComponent = (props: any) => {
 
   useEffect(() => {
     // Does nothing if Component is loaded...
-    if (Component) {
+    // (or component is nil)
+    if (Component || !component) {
       return
     }
 
@@ -94,4 +108,4 @@ const LazyLoadedExtensionPointComponent = (props: any) => {
   )
 }
 
-export default ExtensionPointFunctionComponent
+export default ComponentLoader
