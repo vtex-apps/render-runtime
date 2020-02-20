@@ -104,6 +104,8 @@ class Container extends Component<ContainerProps, ContainerState> {
       '__fold__.experimentalLazyImages'
     )
 
+    const hasLazyImagesFold = lazyImagesFoldPosition > -1
+
     const returnValue: JSX.Element[] = elements
       .slice(0, elementsToRender)
       .map((element: Element, i: number) => {
@@ -119,7 +121,7 @@ class Container extends Component<ContainerProps, ContainerState> {
           </Container>
         )
 
-        if (i < lazyImagesFoldPosition) {
+        if (!hasLazyImagesFold || i < lazyImagesFoldPosition) {
           return container
         }
 
