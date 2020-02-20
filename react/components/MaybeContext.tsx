@@ -1,5 +1,5 @@
 import React, { useMemo, Fragment, FC } from 'react'
-import ExtensionPointComponent from '../components/ExtensionPointClassComponent'
+import ComponentLoader from '../components/ExtensionPoint/ComponentLoader'
 import { RenderContextProps } from './RenderContext'
 import { ExtensionPoint } from '../core/main'
 
@@ -77,14 +77,14 @@ const MaybeContext: FC<Props> = ({
   })
 
   return contextComponent ? (
-    <ExtensionPointComponent
+    <ComponentLoader
       component={contextComponent}
       props={contextProps}
       runtime={runtime}
       treePath={nestedPage}
     >
       {children}
-    </ExtensionPointComponent>
+    </ComponentLoader>
   ) : (
     <Fragment>{children}</Fragment>
   )
