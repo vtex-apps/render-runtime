@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.93.2] - 2020-03-02
+
 ## [8.93.1] - 2020-02-28
 ### Changed
 - Revert page remounting temporarily (introduced in versions 8.91.3 and 8.91.5) due to bugs in edge cases.
