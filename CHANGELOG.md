@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ## [8.93.2] - 2020-03-02
+### Changed
+- Update `prop-types` to `^16.7.2`.
 
 ## [8.93.1] - 2020-02-28
 ### Changed
