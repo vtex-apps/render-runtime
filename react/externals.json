@@ -15,7 +15,7 @@
       {
         "global": "PropTypes",
         "import": "prop-types",
-        "path": "npm:prop-types@15.6.2/prop-types.js"
+        "path": "npm:prop-types@15.7.2/prop-types.js"
       },
       {
         "global": "React",
@@ -95,7 +95,7 @@
       {
         "global": "PropTypes",
         "import": "prop-types",
-        "path": "npm:prop-types@15.6.2/prop-types.min.js"
+        "path": "npm:prop-types@15.7.2/prop-types.min.js"
       },
       {
         "global": "React",
