@@ -613,8 +613,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     } = this.state
     const { state } = location
 
-    // Make sure this is our navigation
-    if (!state || !state.renderRouting) {
+    // In case of other router's navigation, or when preventRemount is true, do nothing
+    if (!state || !state.renderRouting || state.preventRemount) {
       return
     }
 
