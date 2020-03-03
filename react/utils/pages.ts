@@ -45,13 +45,15 @@ function createLocationDescriptor(
     query,
     scrollOptions,
     fetchPage,
-  }: Pick<NavigateOptions, 'hash' | 'query' | 'scrollOptions' | 'fetchPage'>
+    preventRemount,
+  }: Partial<NavigateOptions>
 ): LocationDescriptorObject {
   return {
     pathname: navigationRoute.path,
     state: {
       fetchPage,
       navigationRoute,
+      preventRemount,
       renderRouting: true,
       scrollOptions,
     },
@@ -241,6 +243,7 @@ export function navigate(
     rootPath,
     replace,
     fetchPage = true,
+    preventRemount,
     modifiers,
     modifiersOptions,
   } = options
@@ -312,6 +315,7 @@ export function navigate(
     const nextQuery = mergePersistingQueries(history.location.search, query)
     const location = createLocationDescriptor(navigationRoute, {
       fetchPage,
+      preventRemount,
       query: nextQuery,
       scrollOptions,
       hash: realHash,
@@ -488,6 +492,7 @@ export interface NavigateOptions {
   fallbackToWindowLocation?: boolean
   replace?: boolean
   fetchPage?: boolean
+  preventRemount?: boolean
   rootPath?: string
   modifiers?: Set<NavigationRouteModifier>
   modifiersOptions?: Record<string, any>

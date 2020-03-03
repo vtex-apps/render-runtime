@@ -2,19 +2,6 @@
 
 This app handles runtime execution of React apps in the VTEX IO Platform.
 
-## Table of Contents
-
-- [Exported Components](#exported-components)
-	- [Link](#link-1)
-	- [NoSSR](#nossr)
-- [Navigation](#navigation)
-  - [navigate](#navigate)
-    - [Navigate options](#navigate-options)
-    - [Example](#example)
-  - [Link](#link-1)
-  - [Other methods](#other-methods)
-     - [goBack](#goback)
-     - [setQuery](#setQuery)
 ## Exported Components
 
 ### Link
@@ -74,7 +61,7 @@ export withRuntimeContext(MyOtherComponent)
 
 You can pass a handful of configuration props to navigate:
 
-#### Navigate options
+#### Navigate Options
 
 | Name      | Type          | Default  | Description |
 | :------------- |:-------------| :-----|:-----|
@@ -86,6 +73,9 @@ You can pass a handful of configuration props to navigate:
 | query | `string`  | `''`   | String representation of the query params that will be appended to the path. Example: `skuId=231`.
 | scrollOptions | `RenderScrollOptions` | -- | After the navigation, if the page should be scrolled to a specific position, or should stay still (use `false`)
 | replace | `boolean` | `undefined` | If it should call the replace function to navigate or not
+| preventRemount | `boolean` | `false` | If `true`, only the URL will change, but not the components :exclamation: **Use with caution!**
+
+
 #### Example
 ```javascript
 navigate({

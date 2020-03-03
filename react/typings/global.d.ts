@@ -159,6 +159,7 @@ declare global {
       renderRouting?: true
       scrollOptions?: RenderScrollOptions
       fetchPage?: boolean
+      preventRemount?: boolean
     }
   }
 
