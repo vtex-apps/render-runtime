@@ -3,22 +3,22 @@ import ApolloClient from 'apollo-client'
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
+import { parse } from 'graphql'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { forEach, merge, mergeWith, equals } from 'ramda'
+import { equals, forEach, merge, mergeWith } from 'ramda'
 import React, { Component, Fragment, ReactElement, Suspense } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
-import gql from 'graphql-tag'
 
 import {
   fetchAssets,
   getLoadedImplementation,
+  hasComponentImplementation,
   hotReloadOverrides,
   hotReloadTachyons,
   prefetchAssets,
-  hasComponentImplementation,
 } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
 import { getClient } from '../utils/client'
@@ -27,6 +27,7 @@ import {
   traverseComponent,
   traverseListOfComponents,
 } from '../utils/components'
+import { setCookie } from '../utils/cookie'
 import {
   isSiteEditorIframe,
   RENDER_CONTAINER_CLASS,
@@ -34,15 +35,16 @@ import {
   routeClass,
 } from '../utils/dom'
 import { isEnabled } from '../utils/flags'
+import { appendLocationSearch } from '../utils/location'
 import {
   goBack as pageGoBack,
   mapToQueryString,
   navigate as pageNavigate,
   NavigateOptions,
+  NavigationRouteChange,
+  NavigationRouteModifier,
   queryStringToMap,
   scrollTo as pageScrollTo,
-  NavigationRouteModifier,
-  NavigationRouteChange,
 } from '../utils/pages'
 import {
   fetchDefaultPages,
@@ -55,8 +57,6 @@ import ExtensionManager from './ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
-import { appendLocationSearch } from '../utils/location'
-import { setCookie } from '../utils/cookie'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -1094,9 +1094,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     forEach(({ data, query, variables }) => {
       try {
         this.apolloClient.writeQuery({
-          query: gql`
-            ${query}
-          `,
+          query: parse(query),
           data: JSON.parse(data),
           variables,
         })
