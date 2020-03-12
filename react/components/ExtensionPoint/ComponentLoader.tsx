@@ -12,8 +12,9 @@ const componentPromiseResolvedMap: any = {}
 
 async function fetchComponent(
   component: string,
-  fetchComponent: RenderContext['fetchComponent']
-) {
+  runtimeFetchComponent: RenderContext['fetchComponent'],
+  retries = 3
+): Promise<any> {
   const Component = component && getImplementation(component)
 
   if (Component) {
@@ -21,8 +22,14 @@ async function fetchComponent(
   }
 
   if (!(component in componentPromiseMap)) {
-    componentPromiseMap[component] = fetchComponent(component)
+    componentPromiseMap[component] = runtimeFetchComponent(component)
   } else if (componentPromiseResolvedMap[component]) {
+    /** These retries perhaps are not needed anymore, but keeping just to be safe */
+    if (retries > 0) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return fetchComponent(component, runtimeFetchComponent, retries - 1)
+    }
+
     /* Loading was completed but the component was not registered.
      * This means something wrong happened */
     throw new Error(`Unable to fetch component ${component}`)
