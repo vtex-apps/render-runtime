@@ -330,18 +330,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       emitter.addListener('styleTachyonsUpdate', hotReloadTachyons)
     }
 
-    setTimeout(() => {
-      const deferredScripts = window.__DEFERRED_SCRIPTS__
-
-      deferredScripts &&
-        deferredScripts.forEach(component => {
-          this.fetchComponent(component, {
-            preventRefetch: true,
-            scriptsOnly: true,
-          })
-        })
-    }, 30000)
-
     this.sendInfoFromIframe()
     this.prefetchPages()
 
