@@ -245,7 +245,6 @@ function start() {
 
       if (type === 'img') {
         props.src = optimizeSrcForVtexImg(vtexImgHost, props.src)
-        // props.loading = 'lazy'
         if (
           typeof props.src === 'string' &&
           props.src.startsWith(vtexImgHost)
