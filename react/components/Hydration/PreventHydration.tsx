@@ -113,8 +113,6 @@ const useTransplantImages = (id: string, shouldTransplant?: boolean) => {
     return
   }
 
-  // const dehydratedElement = getDehydratedElement(id)
-
   if (dehydratedElement && transplantedImages.current === null) {
     const images = Array.from(dehydratedElement.querySelectorAll('img'))
     transplantedImages.current = images
