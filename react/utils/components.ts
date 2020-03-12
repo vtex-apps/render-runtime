@@ -47,6 +47,35 @@ export const traverseComponent = (
   return assetsForDeps
 }
 
+export const traverseExtension = (
+  extensions: Extensions,
+  components: Components,
+  extensionId: string,
+  isRoot: boolean
+): AssetEntry[] => {
+  const extension = extensions[extensionId]
+  const children: string[] =
+    extension.blocks?.map(
+      (block: BlockInsertion) => `${extensionId}/${block.extensionPointId}`
+    ) ?? []
+
+  const component = extension.component
+
+  const componentAssets = traverseComponent(components, component, isRoot)
+  const childrenAssets = children
+    .map((child: string) =>
+      traverseExtension(extensions, components, child, false)
+    )
+    .reduce((acc, cur) => {
+      cur.forEach(item => {
+        acc.push(item)
+      })
+      return acc
+    }, [])
+
+  return [...componentAssets, ...childrenAssets]
+}
+
 const assetName = (asset: string) => {
   const baseNameMatch = FILE_PATH_REX.exec(asset)
   const baseName =
