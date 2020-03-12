@@ -873,26 +873,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     const componentsAssetsMap = traverseComponent(components, component)
 
-    const { apps } = componentsAssetsMap
-
-    const unfetchedApps = apps.filter(
-      app =>
-        !Object.keys(window.__RENDER_8_COMPONENTS__).some(c =>
-          c.startsWith(app)
-        )
-    )
-
-    const assetsPromise = fetchAssets(runtime, componentsAssetsMap, options)
-
-    if (unfetchedApps.length !== 0) {
-      assetsPromise.then(() => {
-        this.sendInfoFromIframe({ shouldUpdateRuntime: true })
-      })
-    }
+    const assetsPromise = fetchAssets(runtime, componentsAssetsMap)
 
     if (preventRefetch && !componentPromise) {
       componentsPromises[component] = assetsPromise
     }
+
+    assetsPromise.then(() => {
+      this.sendInfoFromIframe({ shouldUpdateRuntime: true })
+    })
 
     return assetsPromise
   }
