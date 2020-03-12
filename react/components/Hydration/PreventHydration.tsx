@@ -7,7 +7,7 @@ import React, {
   ForwardRefExoticComponent,
 } from 'react'
 import { traverseExtension } from '../../utils/components'
-import { fetchAssets } from '../../utils/assets'
+import { fetchAssets, getImplementation } from '../../utils/assets'
 import { useDehydratedContent } from '../../hooks/hydration'
 import { canUseDOM } from 'exenv'
 import { useRuntime } from '../../core/main'
@@ -22,8 +22,39 @@ type Ref = ForwardRefExoticComponent<
   (Partial<Props> & React.RefAttributes<HTMLElement>) | null
 >
 
+/** TODO: sometimes, the assets seem to load successfuly, but the component
+ * implementation is not ready yet. This function works as a guarantee, but
+ * need to understand it fully how it works so this verification can be avoided
+ */
+async function verifyComponentImplementation(
+  runtime: RenderRuntime,
+  treePath: string,
+  retries = 10
+): Promise<boolean> {
+  const component = runtime?.extensions?.[treePath]?.component
+
+  const componentImplementation = component && getImplementation(component)
+
+  if (componentImplementation) {
+    return true
+  }
+
+  if (retries > 0) {
+    const timeout = 1100 - retries * 100
+    await new Promise(resolve => setTimeout(resolve, timeout))
+    const result = await verifyComponentImplementation(
+      runtime,
+      treePath,
+      retries - 1
+    )
+
+    return result
+  }
+  throw new Error(`Unable to fetch component ${component}`)
+}
+
 function loadAssets(runtime: RenderRuntime, treePath: string) {
-  if (window.document) {
+  if (canUseDOM) {
     const extensionAssets = traverseExtension(
       runtime.extensions,
       runtime.components,
@@ -33,7 +64,7 @@ function loadAssets(runtime: RenderRuntime, treePath: string) {
 
     return new Promise(resolve => {
       fetchAssets(runtime, extensionAssets).then(() => {
-        resolve()
+        verifyComponentImplementation(runtime, treePath).then(resolve)
       })
     })
   }
