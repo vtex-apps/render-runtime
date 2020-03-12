@@ -5,7 +5,6 @@ import ExtensionPoint from './ExtensionPoint'
 import { useRuntime } from './RenderContext'
 import { LoadingWrapper } from './LoadingContext'
 import { LazyImages } from './LazyImages'
-import HydrateOnView from './HydrateOnView'
 
 type Element = string | ElementArray
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -95,7 +94,7 @@ class Container extends Component<ContainerProps, ContainerState> {
       )
     }
 
-    const hasFold = foldIndex > -1
+    const hasFold = false //foldIndex > -1
 
     if (hasFold && !shouldRenderBelowTheFold) {
       elementsToRender = foldIndex
@@ -110,25 +109,25 @@ class Container extends Component<ContainerProps, ContainerState> {
     const returnValue: JSX.Element[] = elements
       .slice(0, elementsToRender)
       .map((element: Element, i: number) => {
-        const container = (
-          <HydrateOnView id={element.toString()} key={element.toString()}>
-            <Container
-              key={element.toString()}
-              elements={element}
-              isMobile={isMobile}
-              isRow={!isRow}
-              {...props}
-            >
-              {children}
-            </Container>
-          </HydrateOnView>
+        let container = (
+          <Container
+            key={element.toString()}
+            elements={element}
+            isMobile={isMobile}
+            isRow={!isRow}
+            {...props}
+          >
+            {children}
+          </Container>
         )
 
-        if (!hasLazyImagesFold || i < lazyImagesFoldPosition) {
-          return container
+        if (hasLazyImagesFold && i > lazyImagesFoldPosition) {
+          container = (
+            <LazyImages key={element.toString()}>{container}</LazyImages>
+          )
         }
 
-        return <LazyImages key={element.toString()}>{container}</LazyImages>
+        return container
       })
 
     return (
@@ -152,10 +151,7 @@ const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = props => 
   const extension = extensions[treePath]
 
   const elements =
-    (extension &&
-      extension.blocks &&
-      extension.blocks.map(insertion => insertion.extensionPointId)) ||
-    []
+    extension?.blocks?.map?.(insertion => insertion.extensionPointId) ?? []
   const containerProps = { ...props, elements }
 
   const container = (
@@ -167,13 +163,13 @@ const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = props => 
     />
   )
 
-  // const isRootTreePath = treePath.indexOf('/') === -1
+  const isRootTreePath = treePath.indexOf('/') === -1
 
-  // if (extension && extension.preview && isRootTreePath) {
-  //   /** TODO: LoadingWrapper is in the end a makeshift Suspense.
-  //    * Should probably be replaced in the future. */
-  //   return <LoadingWrapper>{container}</LoadingWrapper>
-  // }
+  if (extension?.preview && isRootTreePath) {
+    /** TODO: LoadingWrapper is in the end a makeshift Suspense.
+     * Should probably be replaced in the future. */
+    return <LoadingWrapper>{container}</LoadingWrapper>
+  }
 
   return container
 }

@@ -5,6 +5,7 @@ import Loading from '../Loading'
 import { TreePathContextProvider } from '../../utils/treePath'
 import { isSiteEditorIframe } from '../../utils/dom'
 import SiteEditorWrapper from './SiteEditorWrapper'
+import Hydration from '../Hydration'
 
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
@@ -39,19 +40,33 @@ interface Props {
   props: any
   treePath: string
   runtime: RenderContext
+  hydration: Hydration
 }
 
 const ComponentLoader: FunctionComponent<Props> = props => {
-  const { component, children, treePath, props: componentProps } = props
+  const {
+    component,
+    children,
+    treePath,
+    props: componentProps,
+    hydration,
+  } = props
+
+  if (component?.includes('Fold')) {
+    return null
+  }
+
   const Component = component && getImplementation(component)
 
   const content = (
     <TreePathContextProvider treePath={treePath}>
-      {Component ? (
-        <Component {...componentProps}>{children}</Component>
-      ) : (
-        <AsyncComponent {...props}>{children}</AsyncComponent>
-      )}
+      <Hydration treePath={treePath} hydration={hydration}>
+        {Component ? (
+          <Component {...componentProps}>{children}</Component>
+        ) : (
+          <AsyncComponent {...props}>{children}</AsyncComponent>
+        )}
+      </Hydration>
     </TreePathContextProvider>
   )
 
@@ -80,7 +95,7 @@ const AsyncComponent: FunctionComponent<Props> = props => {
 
   useEffect(() => {
     // Does nothing if Component is loaded...
-    // (or component is nil)
+    // (or if component is nil)
     if (Component || !component) {
       return
     }
@@ -96,7 +111,9 @@ const AsyncComponent: FunctionComponent<Props> = props => {
 
   return Component ? (
     <Component {...componentProps}>{children}</Component>
-  ) : // If component is not loaded yet, renders a "loading" state.
+  ) : /** If the component is not loaded yet, renders a "loading"
+   * state. This currently only applies to root components
+   * (e.g. "store.home") */
   isRootTreePath || isAround ? (
     <>
       {componentProps.beforeElements}
