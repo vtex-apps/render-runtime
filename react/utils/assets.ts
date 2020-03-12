@@ -235,25 +235,23 @@ export function getExtensionImplementation<P = {}, S = {}>(
     : null
 }
 
-export function fetchAssets(
-  runtime: RenderRuntime,
-  assets: AssetEntry[],
-  options: any
-) {
+export function fetchAssets(runtime: RenderRuntime, assets: AssetEntry[]) {
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
 
-  const { scriptsOnly } = options || {}
-
-  if (!scriptsOnly) {
-    const styles = getAssetsToAdd(runtime, assets, '.css', existingStyles)
-    styles.forEach(addStyleToPage)
-  }
+  const styles = getAssetsToAdd(runtime, assets, '.css', existingStyles)
+  styles.forEach(addStyleToPage)
 
   const scripts = getAssetsToAdd(runtime, assets, '.js', existingScripts)
 
-  return Promise.all(scripts.map(addScriptToPage)).then(() => {
-    return {}
+  return new Promise(resolve => {
+    if (scripts.length === 0) {
+      resolve()
+    } else {
+      Promise.all(scripts.map(addScriptToPage)).then(() => {
+        resolve()
+      })
+    }
   })
 }
 

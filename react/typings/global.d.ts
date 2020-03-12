@@ -208,10 +208,7 @@ declare global {
     emitter: RenderRuntime['emitter']
     ensureSession: () => Promise<void>
     extensions: RenderRuntime['extensions']
-    fetchComponent: (
-      component: string,
-      options: { preventRefetch?: boolean; scriptsOnly?: boolean }
-    ) => Promise<{ wasAlreadyLoaded?: boolean }>
+    fetchComponent: (component: string) => Promise
     fetchComponents: (
       components: RenderRuntime['components'],
       extensions?: RenderRuntime['extensions']
@@ -525,8 +522,6 @@ declare global {
     sessionPromise: Promise<void>
   }
 
-  type DeferredScripts = string[] | undefined
-
   interface Window extends Window {
     __APP_ID__: string
     __ERROR__: any
@@ -545,7 +540,6 @@ declare global {
     __RENDER_8_SESSION__: RenderSession
     __REQUEST_ID__: string
     __RUNTIME__: RenderRuntime
-    __DEFERRED_SCRIPTS__: DeferredScripts
     __STATE__: NormalizedCacheObject
     browserHistory: History
     flags: Record<string, boolean>
@@ -597,13 +591,7 @@ declare global {
   }
 
   type RenderStrategy = 'client' | 'lazy' | 'server'
-  type Hydration =
-    | 'always'
-    | 'on-interaction'
-    | 'on-view'
-    | 'on-idle'
-    | 'inherit'
-    | 'never'
+  type Hydration = 'always' | 'on-view'
   type BlockContentTree = Record<string, TreeEntry>
   type Blocks = Record<string, BlockEntry>
 

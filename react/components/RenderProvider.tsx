@@ -845,39 +845,23 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.sendInfoFromIframe({ shouldUpdateRuntime: true })
   }
 
-  public fetchComponent: RenderContext['fetchComponent'] = (
-    component,
-    options = {}
-  ) => {
+  public fetchComponent: RenderContext['fetchComponent'] = component => {
     if (!canUseDOM) {
       throw new Error('Cannot fetch components during server side rendering.')
     }
 
     const { runtime } = this.props
     const { components } = this.state
-    const { preventRefetch = false } = options
 
-    if (preventRefetch) {
-      const hasImplementation = !!hasComponentImplementation(component)
+    const hasImplementation = !!hasComponentImplementation(component)
 
-      if (hasImplementation) {
-        return Promise.resolve({ wasAlreadyLoaded: true })
-      }
-    }
-
-    const componentPromise = componentsPromises[component]
-
-    if (preventRefetch && componentPromise) {
-      return componentPromise
+    if (hasImplementation) {
+      return Promise.resolve()
     }
 
     const componentsAssetsMap = traverseComponent(components, component)
 
     const assetsPromise = fetchAssets(runtime, componentsAssetsMap)
-
-    if (preventRefetch && !componentPromise) {
-      componentsPromises[component] = assetsPromise
-    }
 
     assetsPromise.then(() => {
       this.sendInfoFromIframe({ shouldUpdateRuntime: true })
