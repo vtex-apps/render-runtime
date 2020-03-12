@@ -58,20 +58,37 @@ const ComponentLoader: FunctionComponent<Props> = props => {
 
   const Component = component && getImplementation(component)
 
-  const content = (
-    <TreePathContextProvider treePath={treePath}>
+  let content = Component ? (
+    <Component {...componentProps}>{children}</Component>
+  ) : (
+    <AsyncComponent {...props}>{children}</AsyncComponent>
+  )
+
+  const shouldHydrate =
+    !hydration ||
+    hydration === 'always' ||
+    /** TODO: Currently it only applies partial hydration on top level components
+     * Nested partial hydration should be supported in the future */
+    /** (using indexOf instead of regex for performance
+     * https://jsperf.com/js-regex-match-vs-substring) */
+    treePath?.substring(treePath?.indexOf('/') + 1).indexOf('/') > -1
+
+  if (!shouldHydrate) {
+    content = (
       <Hydration treePath={treePath} hydration={hydration}>
-        {Component ? (
-          <Component {...componentProps}>{children}</Component>
-        ) : (
-          <AsyncComponent {...props}>{children}</AsyncComponent>
-        )}
+        {content}
       </Hydration>
+    )
+  }
+
+  content = (
+    <TreePathContextProvider treePath={treePath}>
+      {content}
     </TreePathContextProvider>
   )
 
   if (isSiteEditorIframe) {
-    return <SiteEditorWrapper {...props}>{content}</SiteEditorWrapper>
+    content = <SiteEditorWrapper {...props}>{content}</SiteEditorWrapper>
   }
 
   return content
