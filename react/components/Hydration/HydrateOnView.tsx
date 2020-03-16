@@ -58,7 +58,7 @@ const useViewDetection = ({
 
     return () => {
       window?.document?.removeEventListener('scroll', handleScroll)
-      element.addEventListener('mouseover', handleMouseOver)
+      element.removeEventListener('mouseover', handleMouseOver)
     }
   }, [bailOut, hasBeenViewed, ref])
 
