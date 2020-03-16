@@ -78,7 +78,7 @@ const useTransplantImages = (id: string, shouldTransplant?: boolean) => {
   const transplantedImages = useRef<null | HTMLImageElement[]>(null)
   const { dehydratedElement } = useDehydratedContent(id)
   const didTransplantImages = useRef(false)
-  const isSSR = !window.navigator
+  const isSSR = !canUseDOM
 
   useLayoutEffect(() => {
     if (
