@@ -4,7 +4,6 @@ import React, {
   useState,
   ReactNode,
   useLayoutEffect,
-  ForwardRefExoticComponent,
 } from 'react'
 import { traverseExtension } from '../../utils/components'
 import { fetchAssets, getImplementation } from '../../utils/assets'
@@ -17,10 +16,6 @@ interface Props {
   children: ReactNode
   treePath: string
 }
-
-type Ref = ForwardRefExoticComponent<
-  (Partial<Props> & React.RefAttributes<HTMLElement>) | null
->
 
 /** TODO: sometimes, the assets seem to load successfuly, but the component
  * implementation is not ready yet. This function works as a guarantee, but
@@ -140,7 +135,7 @@ const useAssetLoading = (extensionPointId?: string, shouldLoad?: boolean) => {
   return { isLoaded }
 }
 
-const PreventHydration = React.forwardRef<HTMLElement, Props>(
+const PreventHydration = React.forwardRef<HTMLDivElement, Props>(
   ({ children, shouldHydrate, treePath }, ref) => {
     const initialShouldHydrate = useRef(shouldHydrate)
 
@@ -159,34 +154,28 @@ const PreventHydration = React.forwardRef<HTMLElement, Props>(
 
     useTransplantImages(treePath, shouldTransplantImages)
 
+    const containerProps = {
+      ref,
+      'data-hydration-id': treePath,
+      style: {
+        display: 'contents',
+      },
+    }
+
     if (!isLoaded && !hasRenderedOnServer) {
-      return (
-        <div data-hydration-id={treePath} style={{ display: 'contents' }} />
-      )
+      return <div {...containerProps} />
     }
 
     if (shouldRenderImmediately) {
-      return (
-        <div data-hydration-id={treePath} style={{ display: 'contents' }}>
-          {children}
-        </div>
-      )
+      return <div {...containerProps}>{children}</div>
     }
 
     return shouldHydrate && isLoaded ? (
-      <div
-        ref={ref as Ref}
-        data-hydration-id={treePath}
-        style={{ display: 'contents' }}
-      >
-        {children}
-      </div>
+      <div {...containerProps}>{children}</div>
     ) : (
       <div
-        ref={ref as Ref}
-        data-hydration-id={treePath}
+        {...containerProps}
         suppressHydrationWarning
-        style={{ display: 'contents' }}
         dangerouslySetInnerHTML={{
           __html: '',
         }}
