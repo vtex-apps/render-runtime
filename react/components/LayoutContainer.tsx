@@ -94,7 +94,7 @@ class Container extends Component<ContainerProps, ContainerState> {
       )
     }
 
-    const hasFold = false //foldIndex > -1
+    const hasFold = foldIndex > -1
 
     if (hasFold && !shouldRenderBelowTheFold) {
       elementsToRender = foldIndex
