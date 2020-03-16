@@ -120,10 +120,8 @@ export const hotReloadOverrides = () => {
 }
 
 export const hotReloadTachyons = () => {
-  const linkElement = document.getElementById('style_link')
-  if (linkElement) {
-    updateHref(linkElement)
-  }
+  const linkElements = Array.from(document.querySelectorAll('.style_link'))
+  linkElements.forEach(updateHref)
 }
 
 function prefetchStyle(href: string) {
