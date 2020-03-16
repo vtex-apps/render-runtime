@@ -67,13 +67,11 @@ export const traverseExtension = (
       traverseExtension(extensions, components, child, false)
     )
     .reduce((acc, cur) => {
-      cur.forEach(item => {
-        acc.push(item)
-      })
+      acc.push(...cur)
       return acc
     }, [])
 
-  return [...componentAssets, ...childrenAssets]
+  return componentAssets.concat(childrenAssets)
 }
 
 const assetName = (asset: string) => {
