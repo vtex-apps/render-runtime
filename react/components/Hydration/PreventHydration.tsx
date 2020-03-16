@@ -4,6 +4,7 @@ import React, {
   useState,
   ReactNode,
   useLayoutEffect,
+  FunctionComponent,
 } from 'react'
 import { traverseExtension } from '../../utils/components'
 import { fetchAssets, getImplementation } from '../../utils/assets'
@@ -135,54 +136,55 @@ const useAssetLoading = (extensionPointId?: string, shouldLoad?: boolean) => {
   return { isLoaded }
 }
 
-const PreventHydration = React.forwardRef<HTMLDivElement, Props>(
-  ({ children, shouldHydrate, treePath }, ref) => {
-    const initialShouldHydrate = useRef(shouldHydrate)
+const PreventHydration: FunctionComponent<Props> = ({
+  children,
+  shouldHydrate,
+  treePath,
+}) => {
+  const initialShouldHydrate = useRef(shouldHydrate)
 
-    const { hasRenderedOnServer } = useDehydratedContent(treePath)
+  const { hasRenderedOnServer } = useDehydratedContent(treePath)
 
-    const shouldRenderImmediately =
-      !hasRenderedOnServer ||
-      (shouldHydrate && shouldHydrate === initialShouldHydrate.current)
+  const shouldRenderImmediately =
+    !hasRenderedOnServer ||
+    (shouldHydrate && shouldHydrate === initialShouldHydrate.current)
 
-    const { isLoaded } = useAssetLoading(
-      treePath,
-      shouldRenderImmediately || shouldHydrate
-    )
-    const shouldTransplantImages =
-      shouldHydrate && !shouldRenderImmediately && isLoaded
+  const { isLoaded } = useAssetLoading(
+    treePath,
+    shouldRenderImmediately || shouldHydrate
+  )
+  const shouldTransplantImages =
+    shouldHydrate && !shouldRenderImmediately && isLoaded
 
-    useTransplantImages(treePath, shouldTransplantImages)
+  useTransplantImages(treePath, shouldTransplantImages)
 
-    const containerProps = {
-      ref,
-      'data-hydration-id': treePath,
-      style: {
-        display: 'contents',
-      },
-    }
-
-    if (!isLoaded && !hasRenderedOnServer) {
-      return <div {...containerProps} />
-    }
-
-    if (shouldRenderImmediately) {
-      return <div {...containerProps}>{children}</div>
-    }
-
-    return shouldHydrate && isLoaded ? (
-      <div {...containerProps}>{children}</div>
-    ) : (
-      <div
-        {...containerProps}
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: '',
-        }}
-      />
-    )
+  const containerProps = {
+    'data-hydration-id': treePath,
+    style: {
+      display: 'contents',
+    },
   }
-)
+
+  if (!isLoaded && !hasRenderedOnServer) {
+    return <div {...containerProps} />
+  }
+
+  if (shouldRenderImmediately) {
+    return <div {...containerProps}>{children}</div>
+  }
+
+  return shouldHydrate && isLoaded ? (
+    <div {...containerProps}>{children}</div>
+  ) : (
+    <div
+      {...containerProps}
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{
+        __html: '',
+      }}
+    />
+  )
+}
 
 PreventHydration.displayName = 'PreventHydration'
 
