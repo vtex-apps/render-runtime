@@ -1,10 +1,12 @@
 import { stringify } from 'query-string'
 import { isEmpty } from 'ramda'
-import { parse, format } from 'url'
+import { format, parse } from 'url'
 
 import navigationPageQuery from '../queries/navigationPage.graphql'
 import routePreviews from '../queries/routePreviews.graphql'
+import { fetchAssets } from './assets'
 import { generateExtensions } from './blocks'
+import { traverseListOfComponents } from './components'
 import { fetchWithRetry } from './fetch'
 import { parseMessages } from './messages'
 
@@ -130,12 +132,12 @@ export const getOrFetchServerPage = async ({
   const url = format(parsedUrl)
 
   if (prefetchCache.has(url)) {
-    console.log('cache HIT')
+    // console.log('cache HIT')
 
     return prefetchCache.get(url)
   }
 
-  console.log('cache MISS', url, prefetchCache.keys())
+  // console.log('cache MISS', url, prefetchCache.keys())
 
   const pagePromise = fetchWithRetry(
     url,
@@ -146,7 +148,16 @@ export const getOrFetchServerPage = async ({
       },
     },
     fetcher
-  ).then(({ response }) => response.json())
+  )
+    .then(({ response }) => response.json())
+    .then(runtime => {
+      const assets = traverseListOfComponents(
+        runtime.components,
+        Object.keys(runtime.components)
+      )
+      fetchAssets(runtime, assets)
+      return runtime
+    })
 
   prefetchCache.set(url, pagePromise)
 
