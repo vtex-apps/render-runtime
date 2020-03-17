@@ -4,7 +4,7 @@ import { format, parse } from 'url'
 
 import navigationPageQuery from '../queries/navigationPage.graphql'
 import routePreviews from '../queries/routePreviews.graphql'
-import { fetchAssets } from './assets'
+import { fetchAssets, prefetchAssets } from './assets'
 import { generateExtensions } from './blocks'
 import { traverseListOfComponents } from './components'
 import { fetchWithRetry } from './fetch'
@@ -155,7 +155,8 @@ export const getOrFetchServerPage = async ({
         runtime.components,
         Object.keys(runtime.components)
       )
-      fetchAssets(runtime, assets)
+      // fetchAssets(runtime, assets)
+      prefetchAssets(runtime, assets)
       return runtime
     })
 
