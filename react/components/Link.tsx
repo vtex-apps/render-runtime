@@ -126,7 +126,7 @@ const Link: React.FunctionComponent<Props> = ({
       : href
 
   if (canUseDOM) {
-    const fullURL = `${href}?${runtimeFields}`
+    const fullURL = `${href}?__pickRuntime=${runtimeFields}`
     fetch(fullURL).then(_ => console.log(`${fullURL} loaded`))
   }
 
