@@ -86,7 +86,7 @@ const parseDefaultPagesQueryResponse = (
   }
 }
 
-const runtimeFields = [
+export const runtimeFields = [
   'appsEtag',
   'blocks',
   'blocksTree',

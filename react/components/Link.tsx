@@ -1,6 +1,9 @@
 import React, { MouseEvent, useCallback } from 'react'
+
 import { NavigateOptions, pathFromPageName } from '../utils/pages'
+import { runtimeFields } from '../utils/routes'
 import { useRuntime } from './RenderContext'
+import { canUseDOM } from 'exenv'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) =>
   event.button === 0
@@ -121,6 +124,11 @@ const Link: React.FunctionComponent<Props> = ({
     domain && domain === 'admin' && href.startsWith('/admin/app/')
       ? href.replace('/admin/app/', '/admin/')
       : href
+
+  if (canUseDOM) {
+    const fullURL = `${href}?${runtimeFields}`
+    fetch(fullURL).then(_ => console.log(`${fullURL} loaded`))
+  }
 
   return (
     <a
