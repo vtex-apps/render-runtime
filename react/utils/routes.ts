@@ -105,7 +105,7 @@ export const runtimeFields = [
   'settings',
 ].join(',')
 
-export const prefetchCache = new Map<string, Promise<ServerPageResponse>>()
+// const prefetchCache = new Map<string, Promise<ServerPageResponse>>()
 
 export const getOrFetchServerPage = async ({
   fetcher,
@@ -131,11 +131,11 @@ export const getOrFetchServerPage = async ({
 
   const url = format(parsedUrl)
 
-  if (prefetchCache.has(url)) {
-    // console.log('cache HIT')
+  // if (prefetchCache.has(url)) {
+  //   // console.log('cache HIT')
 
-    return prefetchCache.get(url)
-  }
+  //   return prefetchCache.get(url)
+  // }
 
   // console.log('cache MISS', url, prefetchCache.keys())
 
@@ -159,7 +159,7 @@ export const getOrFetchServerPage = async ({
       return runtime
     })
 
-  prefetchCache.set(url, pagePromise)
+  // prefetchCache.set(url, pagePromise)
 
   return pagePromise
 }
