@@ -1,9 +1,9 @@
-import React, { MouseEvent, useCallback } from 'react'
+import { canUseDOM } from 'exenv'
+import React, { Component, MouseEvent, useCallback } from 'react'
 
 import { NavigateOptions, pathFromPageName } from '../utils/pages'
-import { runtimeFields } from '../utils/routes'
+import { getOrFetchServerPage } from '../utils/routes'
 import { useRuntime } from './RenderContext'
-import { canUseDOM } from 'exenv'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) =>
   event.button === 0
@@ -125,21 +125,42 @@ const Link: React.FunctionComponent<Props> = ({
       ? href.replace('/admin/app/', '/admin/')
       : href
 
-  if (canUseDOM) {
-    const fullURL = `${href}?__pickRuntime=${runtimeFields}`
-    fetch(fullURL).then(_ => console.log(`${fullURL} loaded`))
+  return (
+    <LinkWithPrefetch href={href}>
+      <a
+        target={target}
+        href={hrefWithoutIframePrefix}
+        {...linkProps}
+        onClick={handleClick}
+      >
+        {children}
+      </a>
+    </LinkWithPrefetch>
+  )
+}
+
+interface Props {
+  href: string
+}
+
+class LinkWithPrefetch extends Component<Props> {
+  private href: string | null = null
+
+  componentDidMount() {
+    if (canUseDOM && this.href && this.href.startsWith('/')) {
+      getOrFetchServerPage({
+        path: this.href,
+        fetcher: window.fetch,
+        query: {},
+      })
+    }
   }
 
-  return (
-    <a
-      target={target}
-      href={hrefWithoutIframePrefix}
-      {...linkProps}
-      onClick={handleClick}
-    >
-      {children}
-    </a>
-  )
+  render() {
+    const { children, href } = this.props
+    this.href = href
+    return children
+  }
 }
 
 export default Link

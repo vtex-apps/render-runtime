@@ -103,7 +103,9 @@ export const runtimeFields = [
   'settings',
 ].join(',')
 
-export const fetchServerPage = async ({
+export const prefetchCache = new Map<string, Promise<ServerPageResponse>>()
+
+export const getOrFetchServerPage = async ({
   fetcher,
   path,
   query: rawQuery,
@@ -111,15 +113,31 @@ export const fetchServerPage = async ({
   path: string
   query?: Record<string, string>
   fetcher: GlobalFetch['fetch']
-}): Promise<ParsedServerPageResponse> => {
+}) => {
   const parsedUrl = parse(path)
   parsedUrl.search = undefined
+  parsedUrl.path = undefined
+  parsedUrl.href = undefined
   parsedUrl.query = {
     ...rawQuery,
     __pickRuntime: runtimeFields,
   } as any
+
+  if (parsedUrl.pathname?.endsWith('/') && parsedUrl.pathname?.length > 1) {
+    parsedUrl.path = parsedUrl.pathname.slice(0, parsedUrl.pathname.length - 1)
+  }
+
   const url = format(parsedUrl)
-  const page: ServerPageResponse = await fetchWithRetry(
+
+  if (prefetchCache.has(url)) {
+    console.log('cache HIT')
+
+    return prefetchCache.get(url)
+  }
+
+  console.log('cache MISS', url, prefetchCache.keys())
+
+  const pagePromise = fetchWithRetry(
     url,
     {
       credentials: 'same-origin',
@@ -129,6 +147,26 @@ export const fetchServerPage = async ({
     },
     fetcher
   ).then(({ response }) => response.json())
+
+  prefetchCache.set(url, pagePromise)
+
+  return pagePromise
+}
+
+export const fetchServerPage = async ({
+  fetcher,
+  path,
+  query: rawQuery,
+}: {
+  path: string
+  query?: Record<string, string>
+  fetcher: GlobalFetch['fetch']
+}): Promise<ParsedServerPageResponse> => {
+  const page: ServerPageResponse = await getOrFetchServerPage({
+    fetcher,
+    path,
+    query: rawQuery,
+  })
   const {
     blocksTree,
     blocks,
