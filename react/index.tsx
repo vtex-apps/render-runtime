@@ -87,10 +87,10 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
     )
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
       setTimeout(() => {
-        performance.mark('render-start')
+        window?.performance?.mark('render-start')
         window.__RENDER_8_RUNTIME__.start()
-        performance.mark('render-end')
-        performance.measure(
+        window?.performance?.mark('render-end')
+        window?.performance?.measure(
           '[VTEX IO] Rendering/Hydration',
           'render-start',
           'render-end'
