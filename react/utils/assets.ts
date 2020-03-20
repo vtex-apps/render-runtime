@@ -72,7 +72,10 @@ function addStyleToPage(href: string) {
   if (isAbsolute(href)) {
     link.crossOrigin = 'anonymous'
   }
-  const overrideLink = document.getElementById('override_link_0')
+  const overrideLink =
+    document.getElementById('styles_overrides') ||
+    document.getElementById('override_link_0')
+
   if (overrideLink) {
     document.head.insertBefore(link, overrideLink)
   } else {
