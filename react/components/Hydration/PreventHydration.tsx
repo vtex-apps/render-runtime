@@ -92,8 +92,8 @@ const useTransplantImages = (id: string, shouldTransplant?: boolean) => {
     }
 
     transplantedImages.current.forEach(image => {
-      const src = image.getAttribute('src')
-      const anchor = element.querySelector(`[src="${src}"]`)
+      const src = image.getAttribute('src') || image.getAttribute('data-src')
+      const anchor = element.querySelector(`[data-src="${src}"],[src="${src}"]`)
       if (!anchor) {
         image.remove()
         return
