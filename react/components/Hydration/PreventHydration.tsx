@@ -67,14 +67,52 @@ function loadAssets(runtime: RenderRuntime, treePath: string) {
   return new Promise(() => {})
 }
 
-/** Transplants images elements from elements that will be removed to the
- * elements that will replace them. Used to prevent images from blinking
- * when "hydration" happens. */
+/** "Transplants" images elements from elements that will be removed to the
+ * elements that will replace them. Used to prevent images from blinking/
+ * flickering when the "hydration" happens. */
 const useTransplantImages = (id: string, shouldTransplant?: boolean) => {
   const transplantedImages = useRef<null | HTMLImageElement[]>(null)
   const { dehydratedElement } = useDehydratedContent(id)
   const didTransplantImages = useRef(false)
-  const isSSR = !canUseDOM
+
+  /** If it can and should transplant images from the "dehydrated" element
+   * to the "hydrated" one, takes all the images that are inside the server-
+   * side-rendered element and inserts them temporarily at the end of the body */
+  if (
+    shouldTransplant &&
+    dehydratedElement &&
+    !didTransplantImages.current &&
+    transplantedImages.current === null
+  ) {
+    const images = Array.from(dehydratedElement.querySelectorAll('img'))
+    transplantedImages.current = images
+    for (const image of images) {
+      window?.document?.body.appendChild(image)
+    }
+  }
+
+  /** Then, for each of them, look for the corresponding image element
+   * on the hydrated component (via its src), and replace it.
+   * This function is gonna be called by a useLayoutEffect below.
+   */
+  function transplantImages(element: Element, images: HTMLImageElement[]) {
+    images.forEach(image => {
+      const src = image.getAttribute('src') || image.getAttribute('data-src')
+
+      const anchor = element.querySelector(`
+        [data-src="${src}"]:not([data-hydration-transplanted]),
+        [src="${src}"]:not([data-hydration-transplanted])`)
+
+      if (!anchor) {
+        // If couldn't find the corresponding image for some reason, throw it away
+        image.remove()
+        return
+      }
+      anchor.before(image)
+      image.setAttribute('data-hydration-transplanted', 'true')
+      anchor.remove()
+    })
+  }
 
   useLayoutEffect(() => {
     if (
@@ -86,36 +124,14 @@ const useTransplantImages = (id: string, shouldTransplant?: boolean) => {
     }
 
     const element = document.querySelector(`[data-hydration-id="${id}"]`)
-
     if (!element) {
       return
     }
 
-    transplantedImages.current.forEach(image => {
-      const src = image.getAttribute('src') || image.getAttribute('data-src')
-      const anchor = element.querySelector(`[data-src="${src}"],[src="${src}"]`)
-      if (!anchor) {
-        image.remove()
-        return
-      }
-      anchor.before(image)
-      anchor.remove()
-    })
+    transplantImages(element, transplantedImages.current)
 
     didTransplantImages.current = true
   }, [id, didTransplantImages, transplantedImages, shouldTransplant])
-
-  if (isSSR || !shouldTransplant) {
-    return
-  }
-
-  if (dehydratedElement && transplantedImages.current === null) {
-    const images = Array.from(dehydratedElement.querySelectorAll('img'))
-    transplantedImages.current = images
-    for (const image of images) {
-      window?.document?.body.appendChild(image)
-    }
-  }
 }
 
 const useAssetLoading = (extensionPointId?: string, shouldLoad?: boolean) => {
