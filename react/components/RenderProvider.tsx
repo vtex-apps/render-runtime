@@ -767,7 +767,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public prefetchPage = (pageName: string) => {
     const { extensions } = this.state
-    const component = extensions[pageName] && extensions[pageName].component
+    const component = extensions[pageName]?.component
     if (component) {
       const { runtime } = this.props
       const { components } = this.state
@@ -821,6 +821,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     }
     const componentsToDownload = Object.values(extensions).reduce<string[]>(
       (acc, extension) => {
+        if (!extension) {
+          return acc
+        }
         if (extension.render === 'lazy') {
           return acc
         }

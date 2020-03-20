@@ -17,7 +17,9 @@ const useContextComponent = ({
 }: Props & RenderContextProps) => {
   const { extensions } = runtime
 
-  const { context, before, after, props: pageProps } = extensions[nestedPage]
+  const { context, before, after, props: pageProps } =
+    extensions[nestedPage] ?? {}
+
   const pageContextProps = pageProps && pageProps.context
 
   /** Allows rendering header/footer if the Context component is loading,

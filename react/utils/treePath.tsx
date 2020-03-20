@@ -28,7 +28,7 @@ const parseId = (id: string) => {
 export const getDirectChildren = (extensions: Extensions, treePath: string) => {
   return Object.entries(extensions)
     .filter(
-      ([id, extension]) => extension.component && isDirectChild(id, treePath)
+      ([id, extension]) => extension?.component && isDirectChild(id, treePath)
     )
     .map(([id]) => relative(treePath, id))
     .sort((idA, idB) => {

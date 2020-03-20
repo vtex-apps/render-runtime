@@ -90,7 +90,7 @@ declare global {
   }
 
   interface Extensions {
-    [name: string]: Extension
+    [name: string]: Extension?
   }
 
   interface LogEvent {

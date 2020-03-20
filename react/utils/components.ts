@@ -54,6 +54,9 @@ export const traverseExtension = (
   isRoot: boolean
 ): AssetEntry[] => {
   const extension = extensions[extensionId]
+  if (!extension) {
+    return []
+  }
   const children: string[] =
     extension.blocks?.map(
       (block: BlockInsertion) => `${extensionId}/${block.extensionPointId}`
