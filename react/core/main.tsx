@@ -116,7 +116,7 @@ const render = async (
   emitter = runtime.emitter
 
   const isPage =
-    !!pages[name] && !!pages[name].path && !!extensions[name].component
+    !!pages[name] && !!pages[name].path && !!extensions[name]?.component
   const created = !element && ensureContainer(page)
   const elem = element || getContainer()
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
@@ -185,7 +185,7 @@ function validateRootComponent(rootName: string, extensions: Extensions) {
     throw new Error(`Missing extension point for page ${rootName}`)
   }
 
-  if (!extensions[rootName].component) {
+  if (!extensions[rootName]?.component) {
     throw new Error(`Missing component for extension point ${rootName}`)
   }
 }
