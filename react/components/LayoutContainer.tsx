@@ -103,8 +103,12 @@ class Container extends Component<ContainerProps, ContainerState> {
     const lazyImagesFoldPosition = elements.indexOf(
       '__fold__.experimentalLazyImages'
     )
-
     const hasLazyImagesFold = lazyImagesFoldPosition > -1
+
+    const lazyAssetsFoldPosition = elements.indexOf(
+      '__fold__.experimentalLazyAssets'
+    )
+    const hasLazyAssetsFold = lazyAssetsFoldPosition > -1
 
     const returnValue: JSX.Element[] = elements
       .slice(0, elementsToRender)
@@ -121,7 +125,10 @@ class Container extends Component<ContainerProps, ContainerState> {
           </Container>
         )
 
-        if (hasLazyImagesFold && i > lazyImagesFoldPosition) {
+        if (
+          (hasLazyImagesFold && i > lazyImagesFoldPosition) ||
+          (hasLazyAssetsFold && i > lazyAssetsFoldPosition)
+        ) {
           container = (
             <LazyImages key={element.toString()}>{container}</LazyImages>
           )
