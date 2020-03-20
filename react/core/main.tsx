@@ -21,10 +21,10 @@ import { MaybeLazyImage, LazyImages } from '../components/LazyImages'
 import { LoadingContextProvider } from '../components/LoadingContext'
 
 import { ChildBlock, useChildBlock } from '../components/ChildBlock'
-import ExtensionContainer from '../components/ExtensionContainer'
+import ExtensionContainer from '../components/ExtensionPoint/ExtensionContainer'
 import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
-import LegacyExtensionContainer from '../components/LegacyExtensionContainer'
+import LegacyExtensionContainer from '../components/ExtensionPoint/LegacyExtensionContainer'
 import Link from '../components/Link'
 import {
   RenderContext,

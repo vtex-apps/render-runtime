@@ -3,7 +3,7 @@ import React, { Component, ReactPortal } from 'react'
 import { createPortal } from 'react-dom'
 
 import { PortalRenderingRequest } from './ExtensionManager'
-import ExtensionPoint from './ExtensionPoint'
+import ExtensionPoint from './index'
 
 interface Props {
   extension: PortalRenderingRequest

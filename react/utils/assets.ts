@@ -49,6 +49,7 @@ export function addScriptToPage(src: string): Promise<void> {
       throw new ServerSideAssetLoadingError()
     }
     const script = document.createElement('script')
+    script.type = 'text/javascript'
     script.onload = () => resolve()
     script.onerror = () => reject()
     script.async = false
@@ -56,7 +57,7 @@ export function addScriptToPage(src: string): Promise<void> {
     if (isAbsolute(src)) {
       script.crossOrigin = 'anonymous'
     }
-    document.head.appendChild(script)
+    document.body.appendChild(script)
   })
 }
 
@@ -238,11 +239,19 @@ export function fetchAssets(runtime: RenderRuntime, assets: AssetEntry[]) {
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
 
-  const scripts = getAssetsToAdd(runtime, assets, '.js', existingScripts)
   const styles = getAssetsToAdd(runtime, assets, '.css', existingStyles)
   styles.forEach(addStyleToPage)
-  return Promise.all(scripts.map(addScriptToPage)).then(() => {
-    return
+
+  const scripts = getAssetsToAdd(runtime, assets, '.js', existingScripts)
+
+  return new Promise(resolve => {
+    if (scripts.length === 0) {
+      resolve()
+    } else {
+      Promise.all(scripts.map(addScriptToPage)).then(() => {
+        resolve()
+      })
+    }
   })
 }
 

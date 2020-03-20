@@ -1,14 +1,14 @@
 import { mergeDeepRight, reduce } from 'ramda'
 import React, { FC, Fragment, Suspense } from 'react'
 
-import ExtensionPointComponent from './ExtensionPointComponent'
-import Loading from './Loading'
-import { useRuntime } from './RenderContext'
-import { useTreePath } from '../utils/treePath'
-import NoSSR from './NoSSR'
-import { withErrorBoundary } from './ErrorBoundary'
-import GenericPreview from './Preview/GenericPreview'
-import LoadingBar from './LoadingBar'
+import ComponentLoader from './ComponentLoader'
+import Loading from '../Loading'
+import { useRuntime } from '../RenderContext'
+import { useTreePath } from '../../utils/treePath'
+import NoSSR from '../NoSSR'
+import { withErrorBoundary } from '../ErrorBoundary'
+import GenericPreview from '../Preview/GenericPreview'
+import LoadingBar from '../LoadingBar'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectBlockWrapper = React.lazy(
@@ -34,7 +34,10 @@ function mountTreePath(currentId: string, parentTreePath: string) {
   if (parentTreePath === currentId) {
     return parentTreePath
   }
-  return [parentTreePath, currentId].filter(id => !!id).join('/')
+  if (parentTreePath && currentId) {
+    return `${parentTreePath}/${currentId}`
+  }
+  return parentTreePath || currentId
 }
 
 function getChildExtensions(runtime: RenderContext, treePath: string) {
@@ -73,6 +76,10 @@ function withOuterExtensions(
   props: any,
   element: JSX.Element
 ) {
+  if (before.length === 0 && after.length === 0 && around.length === 0) {
+    return element
+  }
+
   const beforeElements = before.map(beforeId => (
     <ExtensionPoint
       id={beforeId}
@@ -134,9 +141,7 @@ const ExtensionPoint: FC<Props> = props => {
     [id, props.treePath, treePathFromHook.treePath]
   )
 
-  const extension = React.useMemo(() => {
-    return runtime.extensions && runtime.extensions[newTreePath]
-  }, [newTreePath, runtime.extensions])
+  const extension = runtime.extensions && runtime.extensions[newTreePath]
 
   const {
     component = null,
@@ -145,6 +150,7 @@ const ExtensionPoint: FC<Props> = props => {
     before = [],
     content = {},
     render: renderStrategy = null,
+    hydration = 'always',
     props: extensionProps = {},
   } = extension || {}
 
@@ -190,11 +196,12 @@ const ExtensionPoint: FC<Props> = props => {
     newTreePath,
     mergedProps,
 
-    <ExtensionPointComponent
+    <ComponentLoader
       component={component}
       props={mergedProps}
       runtime={runtime}
       treePath={newTreePath}
+      hydration={hydration}
     >
       {component ? (
         componentChildren
@@ -203,7 +210,7 @@ const ExtensionPoint: FC<Props> = props => {
       ) : (
         <Loading />
       )}
-    </ExtensionPointComponent>
+    </ComponentLoader>
   )
 
   // "client" component assets are sent to server side rendering,

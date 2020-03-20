@@ -83,6 +83,7 @@ declare global {
     content?: Record<string, any>
     render?: RenderStrategy
     preview?: Preview
+    hydration?: Hydration
     composition?: Composition
     hasContentSchema?: boolean
     contentIds?: string[]
@@ -207,7 +208,7 @@ declare global {
     emitter: RenderRuntime['emitter']
     ensureSession: () => Promise<void>
     extensions: RenderRuntime['extensions']
-    fetchComponent: (component: string) => Promise<void>
+    fetchComponent: (component: string) => Promise
     fetchComponents: (
       components: RenderRuntime['components'],
       extensions?: RenderRuntime['extensions']
@@ -575,6 +576,7 @@ declare global {
     originalBlockId?: string
     preview?: Preview
     render: RenderStrategy
+    hydration?: Hydration
     track?: string[]
     title?: string
   }
@@ -589,6 +591,7 @@ declare global {
   }
 
   type RenderStrategy = 'client' | 'lazy' | 'server'
+  type Hydration = 'always' | 'on-view'
   type BlockContentTree = Record<string, TreeEntry>
   type Blocks = Record<string, BlockEntry>
 

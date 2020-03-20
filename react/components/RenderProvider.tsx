@@ -53,7 +53,7 @@ import {
 } from '../utils/routes'
 import { TreePathContextProvider } from '../utils/treePath'
 import BuildStatus from './BuildStatus'
-import ExtensionManager from './ExtensionManager'
+import ExtensionManager from './ExtensionPoint/ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
@@ -119,6 +119,12 @@ interface NavigationState {
   isNavigating: boolean
   lastOptions?: NavigateOptions
 }
+
+interface ComponentPromises {
+  [component: string]: Promise<any>
+}
+
+const componentsPromises: ComponentPromises = {}
 
 class RenderProvider extends Component<Props, RenderProviderState> {
   navigationState: NavigationState = { isNavigating: false }
@@ -839,16 +845,24 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.sendInfoFromIframe({ shouldUpdateRuntime: true })
   }
 
-  public fetchComponent = (component: string) => {
+  public fetchComponent: RenderContext['fetchComponent'] = component => {
     if (!canUseDOM) {
       throw new Error('Cannot fetch components during server side rendering.')
     }
 
     const { runtime } = this.props
     const { components } = this.state
+
+    const hasImplementation = !!hasComponentImplementation(component)
+
+    if (hasImplementation) {
+      return Promise.resolve()
+    }
+
     const componentsAssetsMap = traverseComponent(components, component)
 
     const assetsPromise = fetchAssets(runtime, componentsAssetsMap)
+
     assetsPromise.then(() => {
       this.sendInfoFromIframe({ shouldUpdateRuntime: true })
     })

@@ -1,9 +1,9 @@
 import React, { ReactPortal, FC, useState, useEffect, Fragment } from 'react'
 
-import { createPortal } from '../utils/dom'
-import { getDirectChildren, useTreePath } from '../utils/treePath'
-import ExtensionPoint from './ExtensionPoint'
-import { useRuntime } from './RenderContext'
+import { createPortal } from '../../utils/dom'
+import { getDirectChildren, useTreePath } from '../../utils/treePath'
+import ExtensionPoint from '.'
+import { useRuntime } from '../RenderContext'
 
 interface Props {
   query: any

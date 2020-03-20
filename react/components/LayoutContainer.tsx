@@ -103,13 +103,17 @@ class Container extends Component<ContainerProps, ContainerState> {
     const lazyImagesFoldPosition = elements.indexOf(
       '__fold__.experimentalLazyImages'
     )
-
     const hasLazyImagesFold = lazyImagesFoldPosition > -1
+
+    const lazyAssetsFoldPosition = elements.indexOf(
+      '__fold__.experimentalLazyAssets'
+    )
+    const hasLazyAssetsFold = lazyAssetsFoldPosition > -1
 
     const returnValue: JSX.Element[] = elements
       .slice(0, elementsToRender)
       .map((element: Element, i: number) => {
-        const container = (
+        let container = (
           <Container
             key={element.toString()}
             elements={element}
@@ -121,11 +125,16 @@ class Container extends Component<ContainerProps, ContainerState> {
           </Container>
         )
 
-        if (!hasLazyImagesFold || i < lazyImagesFoldPosition) {
-          return container
+        if (
+          (hasLazyImagesFold && i > lazyImagesFoldPosition) ||
+          (hasLazyAssetsFold && i > lazyAssetsFoldPosition)
+        ) {
+          container = (
+            <LazyImages key={element.toString()}>{container}</LazyImages>
+          )
         }
 
-        return <LazyImages key={element.toString()}>{container}</LazyImages>
+        return container
       })
 
     return (
@@ -149,10 +158,7 @@ const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = props => 
   const extension = extensions[treePath]
 
   const elements =
-    (extension &&
-      extension.blocks &&
-      extension.blocks.map(insertion => insertion.extensionPointId)) ||
-    []
+    extension?.blocks?.map?.(insertion => insertion.extensionPointId) ?? []
   const containerProps = { ...props, elements }
 
   const container = (
@@ -166,7 +172,7 @@ const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = props => 
 
   const isRootTreePath = treePath.indexOf('/') === -1
 
-  if (extension.preview && isRootTreePath) {
+  if (extension?.preview && isRootTreePath) {
     /** TODO: LoadingWrapper is in the end a makeshift Suspense.
      * Should probably be replaced in the future. */
     return <LoadingWrapper>{container}</LoadingWrapper>

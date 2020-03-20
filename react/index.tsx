@@ -83,11 +83,20 @@ if (window.ReactIntl) {
 if (window.__RUNTIME__.start && !window.__ERROR__) {
   if (canUseDOM) {
     const contentLoadedPromise = new Promise(resolve =>
-      document.addEventListener('DOMContentLoaded', resolve)
+      window.addEventListener('DOMContentLoaded', resolve)
     )
-    Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(
-      window.__RENDER_8_RUNTIME__.start
-    )
+    Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
+      setTimeout(() => {
+        window?.performance?.mark('render-start')
+        window.__RENDER_8_RUNTIME__.start()
+        window?.performance?.mark('render-end')
+        window?.performance?.measure(
+          '[VTEX IO] Rendering/Hydration',
+          'render-start',
+          'render-end'
+        )
+      }, 1)
+    })
   } else {
     window.__RENDER_8_RUNTIME__.start()
   }

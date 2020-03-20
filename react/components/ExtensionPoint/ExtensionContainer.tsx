@@ -1,8 +1,8 @@
 import React, { FC, Fragment } from 'react'
 
-import { getDirectChildren, useTreePath } from '../utils/treePath'
-import ExtensionPoint from './ExtensionPoint'
-import { useRuntime } from './RenderContext'
+import { getDirectChildren, useTreePath } from '../../utils/treePath'
+import ExtensionPoint from '.'
+import { useRuntime } from '../RenderContext'
 
 const join = (p: string | null, c: string | null): string =>
   [p, c].filter(id => !!id).join('/')

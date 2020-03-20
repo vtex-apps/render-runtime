@@ -6,10 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Partial hydration for top-level components that have their `hydration` value set to `on-view`.
+
+### Changed
+- Extension loading moved from ExtensionPointComponent to ComponentLoader, with separate components for sync and async component loading.
 
 ## [8.95.1] - 2020-03-11
-
-## [8.95.1-beta] - 2020-03-11
 
 ## [8.95.0] - 2020-03-10
 ### Removed

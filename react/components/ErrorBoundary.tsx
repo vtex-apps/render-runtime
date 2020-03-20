@@ -1,5 +1,5 @@
 import React, { ErrorInfo, FunctionComponent } from 'react'
-import ExtensionPointError from './ExtensionPointError'
+import ErrorDisplay from './ExtensionPoint/ErrorDisplay'
 import { useRuntime } from './RenderContext'
 
 interface Props {
@@ -25,7 +25,7 @@ class ErrorBoundary extends React.Component<Props> {
     const { error, errorInfo } = this.state
     if (error) {
       if (!production) {
-        return <ExtensionPointError error={error} errorInfo={errorInfo} />
+        return <ErrorDisplay error={error} errorInfo={errorInfo} />
       }
       return null
     }
