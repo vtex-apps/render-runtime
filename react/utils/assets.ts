@@ -1,3 +1,4 @@
+import { uncriticalPromise } from './uncritical'
 import queryString from 'query-string'
 import { getLoadedComponent } from './registerComponent'
 import { isEnabled } from './flags'
@@ -238,7 +239,14 @@ export function getExtensionImplementation<P = {}, S = {}>(
     : null
 }
 
-export function fetchAssets(runtime: RenderRuntime, assets: AssetEntry[]) {
+export async function fetchAssets(
+  runtime: RenderRuntime,
+  assets: AssetEntry[]
+) {
+  if (uncriticalPromise) {
+    await uncriticalPromise
+  }
+
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
 
@@ -246,16 +254,11 @@ export function fetchAssets(runtime: RenderRuntime, assets: AssetEntry[]) {
   styles.forEach(addStyleToPage)
 
   const scripts = getAssetsToAdd(runtime, assets, '.js', existingScripts)
+  if (scripts.length === 0) {
+    return
+  }
 
-  return new Promise(resolve => {
-    if (scripts.length === 0) {
-      resolve()
-    } else {
-      Promise.all(scripts.map(addScriptToPage)).then(() => {
-        resolve()
-      })
-    }
-  })
+  await Promise.all(scripts.map(addScriptToPage))
 }
 
 export function prefetchAssets(runtime: RenderRuntime, assets: AssetEntry[]) {

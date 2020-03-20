@@ -5,6 +5,7 @@ import { prop } from 'ramda'
 import { canUseDOM } from 'exenv'
 import * as runtimeGlobals from './core/main'
 import { createReactIntl } from './utils/reactIntl'
+import { handleUncriticalLoad } from './utils/uncritical'
 
 import { createCustomReactApollo } from './utils/reactApollo'
 
@@ -78,6 +79,10 @@ if (window.ReactApollo) {
 
 if (window.ReactIntl) {
   window.ReactIntl = createReactIntl()
+}
+
+if (!window.__ERROR__ && canUseDOM) {
+  handleUncriticalLoad()
 }
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
