@@ -11,7 +11,7 @@ interface LazyImagesContext {
 
 const LazyImagesContext = React.createContext<LazyImagesContext>({
   lazyLoad: false,
-  method: 'native',
+  method: 'lazysizes',
 })
 
 interface LazyImagesProps {
@@ -22,7 +22,7 @@ interface LazyImagesProps {
 const LazyImages: FC<LazyImagesProps> = ({
   children,
   lazyLoad = true,
-  experimentalMethod = 'native',
+  experimentalMethod = 'lazysizes',
 }) => {
   return (
     <LazyImagesContext.Provider
