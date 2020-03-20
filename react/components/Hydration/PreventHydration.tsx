@@ -176,6 +176,15 @@ const PreventHydration: FunctionComponent<Props> = ({
   return shouldHydrate && isLoaded ? (
     <div {...containerProps}>{children}</div>
   ) : (
+    /** This is the heart of this component (and it's a hack):
+     * In order to "prevent hydration", it renders the same div as the other
+     * return paths, but setting its innerHTML as an empty string. This makes
+     * React not touch the div's content, as it's "out of its domain" since
+     * it's a custom HTML it knows nothing about. So the effect is that the
+     * HTML that comes from the server is kept.
+     * This behaviour will (probably?) come from React itself in the future,
+     * so this hack is supposed to be temporary.
+     */
     <div
       {...containerProps}
       suppressHydrationWarning
