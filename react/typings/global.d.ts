@@ -541,6 +541,7 @@ declare global {
     __REQUEST_ID__: string
     __RUNTIME__: RenderRuntime
     __STATE__: NormalizedCacheObject
+    __UNCRITICAL_PROMISE__: Promise<void> | undefined
     browserHistory: History
     flags: Record<string, boolean>
     hrtime: NodeJS.Process['hrtime']

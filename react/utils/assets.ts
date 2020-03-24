@@ -72,7 +72,10 @@ function addStyleToPage(href: string) {
   if (isAbsolute(href)) {
     link.crossOrigin = 'anonymous'
   }
-  const overrideLink = document.getElementById('override_link_0')
+  const overrideLink =
+    document.getElementById('styles_overrides') ||
+    document.getElementById('override_link_0')
+
   if (overrideLink) {
     document.head.insertBefore(link, overrideLink)
   } else {
@@ -235,7 +238,14 @@ export function getExtensionImplementation<P = {}, S = {}>(
     : null
 }
 
-export function fetchAssets(runtime: RenderRuntime, assets: AssetEntry[]) {
+export async function fetchAssets(
+  runtime: RenderRuntime,
+  assets: AssetEntry[]
+) {
+  if (window.__UNCRITICAL_PROMISE__) {
+    await window.__UNCRITICAL_PROMISE__
+  }
+
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
 
@@ -243,16 +253,11 @@ export function fetchAssets(runtime: RenderRuntime, assets: AssetEntry[]) {
   styles.forEach(addStyleToPage)
 
   const scripts = getAssetsToAdd(runtime, assets, '.js', existingScripts)
+  if (scripts.length === 0) {
+    return
+  }
 
-  return new Promise(resolve => {
-    if (scripts.length === 0) {
-      resolve()
-    } else {
-      Promise.all(scripts.map(addScriptToPage)).then(() => {
-        resolve()
-      })
-    }
-  })
+  await Promise.all(scripts.map(addScriptToPage))
 }
 
 export function prefetchAssets(runtime: RenderRuntime, assets: AssetEntry[]) {

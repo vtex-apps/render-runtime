@@ -80,6 +80,28 @@ if (window.ReactIntl) {
   window.ReactIntl = createReactIntl()
 }
 
+if (
+  !window.__ERROR__ &&
+  canUseDOM &&
+  document.querySelector('styles#critical')
+) {
+  window.__UNCRITICAL_PROMISE__ = new Promise(resolve => {
+    window.addEventListener('load', () => {
+      const base = document.querySelector('noscript#styles_base')
+      if (base) {
+        base.insertAdjacentHTML('afterend', base.innerHTML)
+      }
+
+      const overrides = document.querySelector('noscript#styles_overrides')
+      if (overrides) {
+        overrides.insertAdjacentHTML('afterend', overrides.innerHTML)
+      }
+
+      resolve()
+    })
+  })
+}
+
 if (window.__RUNTIME__.start && !window.__ERROR__) {
   if (canUseDOM) {
     const contentLoadedPromise = new Promise(resolve =>
