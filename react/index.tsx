@@ -83,7 +83,7 @@ if (window.ReactIntl) {
 if (
   !window.__ERROR__ &&
   canUseDOM &&
-  document.querySelector('styles#critical')
+  document.querySelector('style#critical')
 ) {
   window.__UNCRITICAL_PROMISE__ = new Promise(resolve => {
     window.addEventListener('load', () => {
