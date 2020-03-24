@@ -1,4 +1,3 @@
-import { uncriticalPromise } from './uncritical'
 import queryString from 'query-string'
 import { getLoadedComponent } from './registerComponent'
 import { isEnabled } from './flags'
@@ -243,8 +242,8 @@ export async function fetchAssets(
   runtime: RenderRuntime,
   assets: AssetEntry[]
 ) {
-  if (uncriticalPromise) {
-    await uncriticalPromise
+  if (window.__UNCRITICAL_PROMISE__) {
+    await window.__UNCRITICAL_PROMISE__
   }
 
   const existingScripts = getExistingScriptSrcs()

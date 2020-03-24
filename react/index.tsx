@@ -5,7 +5,6 @@ import { prop } from 'ramda'
 import { canUseDOM } from 'exenv'
 import * as runtimeGlobals from './core/main'
 import { createReactIntl } from './utils/reactIntl'
-import { handleUncriticalLoad } from './utils/uncritical'
 
 import { createCustomReactApollo } from './utils/reactApollo'
 
@@ -81,8 +80,26 @@ if (window.ReactIntl) {
   window.ReactIntl = createReactIntl()
 }
 
-if (!window.__ERROR__ && canUseDOM) {
-  handleUncriticalLoad()
+if (
+  !window.__ERROR__ &&
+  canUseDOM &&
+  document.querySelector('styles#critical')
+) {
+  window.__UNCRITICAL_PROMISE__ = new Promise(resolve => {
+    window.addEventListener('load', () => {
+      const base = document.querySelector('noscript#styles_base')
+      if (base) {
+        base.insertAdjacentHTML('afterend', base.innerHTML)
+      }
+
+      const overrides = document.querySelector('noscript#styles_overrides')
+      if (overrides) {
+        overrides.insertAdjacentHTML('afterend', overrides.innerHTML)
+      }
+
+      resolve()
+    })
+  })
 }
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
