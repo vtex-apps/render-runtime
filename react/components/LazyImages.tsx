@@ -33,7 +33,7 @@ const LazyImages: FC<LazyImagesProps> = ({
   )
 }
 
-const useLazyImages = () => {
+export const useLazyImages = () => {
   const value = useContext(LazyImagesContext)
 
   return value

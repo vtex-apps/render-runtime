@@ -17,7 +17,11 @@ import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
 import { isEmpty } from 'ramda'
 import Loading from '../components/Loading'
-import { MaybeLazyImage, LazyImages } from '../components/LazyImages'
+import {
+  MaybeLazyImage,
+  LazyImages,
+  useLazyImages,
+} from '../components/LazyImages'
 import { LoadingContextProvider } from '../components/LoadingContext'
 
 import { ChildBlock, useChildBlock } from '../components/ChildBlock'
@@ -318,6 +322,7 @@ export {
   RenderContextConsumer,
   TreePathContextConsumer,
   LazyImages as ExperimentalLazyImages,
+  useLazyImages as useExperimentalLazyImages,
   canUseDOM,
   render,
   start,
