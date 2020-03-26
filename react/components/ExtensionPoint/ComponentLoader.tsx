@@ -80,7 +80,7 @@ const ComponentLoader: FunctionComponent<Props> = props => {
      * https://jsperf.com/js-regex-match-vs-substring) */
     treePath?.substring(treePath?.indexOf('/') + 1).indexOf('/') > -1
 
-  if (!shouldHydrate) {
+  if (!isSiteEditorIframe && !shouldHydrate) {
     content = (
       <Hydration treePath={treePath} hydration={hydration}>
         {content}
