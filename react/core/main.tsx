@@ -27,7 +27,9 @@ import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/ExtensionPoint/LegacyExtensionContainer'
 import Link from '../components/Link'
 import { RenderContext, withRuntimeContext } from '../components/RenderContext'
-// Important: Builder-Hub will only generate types of files imported from `core/main.tsx`
+/** Important: Builder-Hub will only export types of functions imported from individual files.
+ * So `useRuntime` should be imported from `../components/useRuntime` rather than
+ * being imported along with the other functions from `RenderContext` */
 import useRuntime from '../components/useRuntime'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
