@@ -1,15 +1,19 @@
 import {canUseDOM} from 'exenv'
 
-function inIframe() {
+function getRootDocument() {
   try {
-    return window.self !== window.top
+    // Check if in iFrame
+    if (window.self !== window.top) {
+      return window.top.document
+    }
   } catch (e) {
-    return true
+    // Do not break
   }
+  return document
 }
 
 const isRenderServedPage = () => {
-  const rootDoc = inIframe() ? window.top.document : document
+  const rootDoc = getRootDocument()
   const generatorMetaTag = rootDoc.querySelector(`meta[name='generator']`)
   const generator = generatorMetaTag && generatorMetaTag.getAttribute('content')
   return generator && generator.startsWith('vtex.render-server')
