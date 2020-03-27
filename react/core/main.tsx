@@ -26,11 +26,8 @@ import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/ExtensionPoint/LegacyExtensionContainer'
 import Link from '../components/Link'
-import {
-  RenderContext,
-  useRuntime,
-  withRuntimeContext,
-} from '../components/RenderContext'
+import { RenderContext, withRuntimeContext } from '../components/RenderContext'
+import useRuntime from '../components/useRuntime'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
