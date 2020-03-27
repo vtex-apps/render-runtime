@@ -4,7 +4,11 @@ function getRootDocument() {
   try {
     // Check if in iFrame
     if (window.self !== window.top) {
-      return window.top.document
+      let rootWindow = window.top
+      while (rootWindow.self !== rootWindow.top) {
+        rootWindow = rootWindow.top
+      }
+      return rootWindow.document
     }
   } catch (e) {
     // Do not break
