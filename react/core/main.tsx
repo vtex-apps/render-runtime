@@ -27,6 +27,7 @@ import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/ExtensionPoint/LegacyExtensionContainer'
 import Link from '../components/Link'
 import { RenderContext, withRuntimeContext } from '../components/RenderContext'
+// Important: Builder-Hub will only generate types of files imported from `core/main.tsx`
 import useRuntime from '../components/useRuntime'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
