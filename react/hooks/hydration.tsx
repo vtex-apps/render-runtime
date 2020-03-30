@@ -12,12 +12,13 @@ export const useDehydratedContent = (hydrationId: string) => {
     window?.document?.querySelector?.(`[data-hydration-id="${hydrationId}"]`)
   )
 
-  const [hasRenderedOnServer] = useState(
+  const [hasDehydratedContent] = useState(
     !!dehydratedElement && dehydratedElement.childElementCount > 0
   )
 
   return {
-    hasRenderedOnServer,
+    hasRenderedOnServer: !!dehydratedElement,
+    hasDehydratedContent,
     dehydratedElement,
   }
 }
