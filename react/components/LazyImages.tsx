@@ -33,7 +33,7 @@ const LazyImages: FC<LazyImagesProps> = ({
   )
 }
 
-export const useLazyImages = () => {
+const useLazyImagesContext = () => {
   const value = useContext(LazyImagesContext)
 
   return value
@@ -48,7 +48,7 @@ const MaybeLazyImage: FC<MaybeLazyImageProps> = ({
   createElement = React.createElement,
   imageProps,
 }) => {
-  const { lazyLoad, method } = useLazyImages()
+  const { lazyLoad, method } = useLazyImagesContext()
 
   if (lazyLoad) {
     let newImageProps = imageProps
@@ -82,4 +82,4 @@ const MaybeLazyImage: FC<MaybeLazyImageProps> = ({
   return createElement.apply(React, ['img', imageProps])
 }
 
-export { LazyImages, MaybeLazyImage }
+export { LazyImages, MaybeLazyImage, useLazyImagesContext }

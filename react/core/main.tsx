@@ -20,7 +20,7 @@ import Loading from '../components/Loading'
 import {
   MaybeLazyImage,
   LazyImages,
-  useLazyImages,
+  useLazyImagesContext,
 } from '../components/LazyImages'
 import { LoadingContextProvider } from '../components/LoadingContext'
 
@@ -322,7 +322,7 @@ export {
   RenderContextConsumer,
   TreePathContextConsumer,
   LazyImages as ExperimentalLazyImages,
-  useLazyImages as useExperimentalLazyImages,
+  useLazyImagesContext as useExperimentalLazyImagesContext,
   canUseDOM,
   render,
   start,
