@@ -7,6 +7,8 @@ import { isSiteEditorIframe } from '../../utils/dom'
 import SiteEditorWrapper from './SiteEditorWrapper'
 import Hydration from '../Hydration'
 import { LazyImages } from '../LazyImages'
+import { useRuntime } from '../../core/main'
+import { generateSlot } from '../../utils/slots'
 
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
@@ -45,7 +47,7 @@ async function fetchComponent(
 
 interface Props {
   component: string | null
-  props: any
+  props: Record<string, any>
   treePath: string
   runtime: RenderContext
   hydration: Hydration
@@ -59,6 +61,23 @@ const ComponentLoader: FunctionComponent<Props> = props => {
     props: componentProps,
     hydration,
   } = props
+  const { extensions } = useRuntime()
+
+  const capitalProps = Object.keys(componentProps).filter(
+    key => key[0] !== key[0].toLowerCase()
+  )
+
+  const slots = capitalProps.map(slotName => {
+    return generateSlot({
+      treePath,
+      slotName,
+      slotValue: componentProps[slotName],
+      runtimeExtensions: extensions,
+    })
+  })
+
+  const resultingSlotsProps: Record<string, React.FC> = {}
+  capitalProps.forEach((key, i) => (resultingSlotsProps[key] = slots[i]))
 
   if (component?.includes('Fold')) {
     return null
@@ -67,9 +86,23 @@ const ComponentLoader: FunctionComponent<Props> = props => {
   const Component = component && getImplementation(component)
 
   let content = Component ? (
-    <Component {...componentProps}>{children}</Component>
+    <Component
+      {...{
+        ...componentProps,
+        ...resultingSlotsProps,
+      }}
+    >
+      {children}
+    </Component>
   ) : (
-    <AsyncComponent {...props}>{children}</AsyncComponent>
+    <AsyncComponent
+      {...{
+        ...props,
+        ...resultingSlotsProps,
+      }}
+    >
+      {children}
+    </AsyncComponent>
   )
 
   const shouldHydrate =

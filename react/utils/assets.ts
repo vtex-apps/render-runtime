@@ -218,7 +218,10 @@ export function getLoadedImplementation<P = {}, S = {}>(component: string) {
   return getLoadedComponent(component) as RenderComponent<P, S>
 }
 
-export function getImplementation<P = {}, S = {}>(component: string) {
+export function getImplementation<P = {}, S = {}>(
+  component: string | undefined
+) {
+  if (!component) return null
   return window.__RENDER_8_COMPONENTS__[component] as RenderComponent<P, S>
 }
 
