@@ -10,7 +10,6 @@ import Hydration from '../Hydration'
 import { LazyImages } from '../LazyImages'
 import { useRuntime } from '../../core/main'
 import { generateSlot } from '../../utils/slots'
-import { LazyImages } from '../LazyImages'
 
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
