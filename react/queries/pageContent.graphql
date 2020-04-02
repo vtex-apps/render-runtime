@@ -1,0 +1,13 @@
+query PageContent($input: PageContentInput) {
+  pageContent(input: $input) {
+    contentMapJSON
+    userMessages {
+      key
+      message {
+        from
+        context
+        content
+      }
+    }
+  }
+}

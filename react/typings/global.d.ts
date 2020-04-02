@@ -280,7 +280,7 @@ declare global {
     path?: string
     renderMajor: number
     skipCache: boolean
-    query: string
+    query?: string
   }
 
   interface RenderComponent<P = {}, S = {}> {
@@ -356,6 +356,7 @@ declare global {
     route: MatchingServerPage
     settings: RenderRuntime['settings']
     queryData: RenderRuntime['queryData']
+    page: string
   }
 
   interface PageQueryResponse {
@@ -478,6 +479,7 @@ declare global {
       variables: any
       data: string
     }>
+    fidelis: any
   }
 
   interface CacheHints {
