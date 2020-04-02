@@ -61,7 +61,7 @@ const ComponentLoader: FunctionComponent<Props> = props => {
     props: componentProps,
     hydration,
   } = props
-  const { extensions } = useRuntime()
+  const runtime = useRuntime()
 
   const capitalProps = Object.keys(componentProps).filter(
     key => key[0] !== key[0].toLowerCase()
@@ -72,7 +72,7 @@ const ComponentLoader: FunctionComponent<Props> = props => {
       treePath,
       slotName,
       slotValue: componentProps[slotName],
-      runtimeExtensions: extensions,
+      runtime,
     })
   })
 
