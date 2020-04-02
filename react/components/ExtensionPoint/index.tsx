@@ -40,7 +40,7 @@ function mountTreePath(currentId: string, parentTreePath: string) {
   return parentTreePath || currentId
 }
 
-function getChildExtensions(runtime: RenderContext, treePath: string) {
+export function getChildExtensions(runtime: RenderContext, treePath: string) {
   const extension = runtime.extensions && runtime.extensions[treePath]
 
   if (!extension || !extension.blocks) {
