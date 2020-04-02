@@ -48,24 +48,27 @@ function getChildExtensions(runtime: RenderContext, treePath: string) {
   }
 
   // This filter condition is for backwards compatibility
-  return extension.blocks
-    .filter(block => block.children === undefined || block.children === true)
-    .map((child, i) => {
-      const childTreePath = mountTreePath(child.extensionPointId, treePath)
+  const childBlocks = extension.blocks.filter(
+    block =>
+      (block.children === undefined || block.children === true) && !block.slot
+  )
 
-      const childExtension =
-        runtime.extensions && runtime.extensions[childTreePath]
-      const childProps = childExtension ? childExtension.props : {}
+  return childBlocks.map((child, i) => {
+    const childTreePath = mountTreePath(child.extensionPointId, treePath)
 
-      return (
-        <ExtensionPoint
-          key={`around-${treePath}-${i}`}
-          id={child.extensionPointId}
-          blockProps={childProps}
-          treePath={treePath}
-        />
-      )
-    })
+    const childExtension =
+      runtime.extensions && runtime.extensions[childTreePath]
+    const childProps = childExtension ? childExtension.props : {}
+
+    return (
+      <ExtensionPoint
+        key={`around-${treePath}-${i}`}
+        id={child.extensionPointId}
+        blockProps={childProps}
+        treePath={treePath}
+      />
+    )
+  })
 }
 
 function withOuterExtensions(
@@ -213,11 +216,12 @@ const ExtensionPoint: FC<Props> = props => {
     </ComponentLoader>
   )
 
-  // "client" component assets are sent to server side rendering,
-  // but they should display a loading animation.
-  //
-  // "lazy" components might never be used, so they don't necessarily
-  // need a loading animation.
+  /**
+   * "client" component assets are sent to server side rendering,
+   * but they should display a loading animation.
+   * "lazy" components might never be used, so they don't necessarily
+   * need a loading animation.
+   */
   const maybeClientExtension = (
     <Fragment>
       {runtime.preview && isRootTreePath && <LoadingBar />}
