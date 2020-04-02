@@ -35,9 +35,9 @@ export function generateSlot({
   // }
 
   const SlotComponent: FC = props =>
-    Component ? <Component {...componentProps} {...props} /> : null
+    Component ? <Component {...props} {...componentProps} /> : null
 
-  SlotComponent.displayName = slotName
+  SlotComponent.displayName = `${slotName}Slot`
 
   return SlotComponent
 }
