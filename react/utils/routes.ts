@@ -224,7 +224,7 @@ const parseFecthRouteData = (data: any) => {
     blocksJSON: data.blocksJSON,
     components: JSON.parse(data.componentsJSON),
     contentMap: JSON.parse(data.contentMapJSON),
-    messages: data.messages,
+    messages: parseMessages(data.messages),
     matchingPage: {
       blockId,
       canonicalPath,

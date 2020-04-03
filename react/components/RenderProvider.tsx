@@ -671,26 +671,21 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     console.log('teste navigationRoute.path: ', navigationRoute.path)
     console.log('teste navigationRoute.pathData: ', window.__RUNTIME__.fidelis.pathData[navigationRoute.path])
-    if (window.__RUNTIME__.fidelis.pathData[navigationRoute.path]) {
+    const prefetchedData = window.__RUNTIME__.fidelis.pathData[navigationRoute.path]
+    if (prefetchedData && !prefetchedData.pending) {
       
-
-      // const extensions = window.__RUNTIME__.fidelis.extensions[navigationRoute.path]
-
-      const extensions = window.__RUNTIME__.fidelis.pathData[navigationRoute.path].extensions
-      // const messages = window.__RUNTIME__.fidelis.pathData[navigationRoute.path].messages || []
       const routeId = window.__RUNTIME__.fidelis.pathData[navigationRoute.path].routeId
+      const routeData = window.__RUNTIME__.fidelis.routeData[routeId].data
       const matchingPage = window.__RUNTIME__.fidelis.pathData[navigationRoute.path].matchingPage
-      // const matchingPage = window.__RUNTIME__.fidelis.routeMap[navigationRoute.path]
-      const routeData = window.__RUNTIME__.fidelis.routeData[routeId]
-      console.log('teste PREFETCHED!')
+      console.log('teste PREFETCHED!', routeData)
       this.setState(
         state => ({
           ...state,
           // appsEtag,
           components: { ...state.components, ...routeData.components },
-          extensions: { ...state.extensions, ...extensions },
+          extensions: { ...state.extensions, ...routeData.extensions },
           loadedPages: loadedPages.add(routeId),
-          // messages: { ...state.messages, ...messages },
+          messages: { ...state.messages, ...routeData.messages },
           page: routeId,
           // pages,
           preview: false,

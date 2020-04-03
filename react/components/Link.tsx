@@ -8,6 +8,7 @@ import { getPageForPath, fetchRouteData, getPageContent } from '../utils/routes'
 import { generateExtensions } from '../utils/blocks'
 import { hasComponentImplementation, fetchAssets } from '../utils/assets'
 import { traverseListOfComponents } from '../utils/components'
+import { parseMessages } from '../utils/messages'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) =>
   event.button === 0
@@ -135,11 +136,8 @@ const doCrazy = async ({ page, href, pages, client }: any) => {
     window.__RUNTIME__.fidelis = {}
     window.__RUNTIME__.fidelis.routeData = {}
     window.__RUNTIME__.fidelis.pathData = {}
-    // window.__RUNTIME__.fidelis.extensions = {}
-    // window.__RUNTIME__.fidelis.routeMap = {}
   }
-  // faz pickRuntime pedindo só page
-  console.log('teste args: ', { page, href, pages, client })
+
   if (href && href[0] !== '/') {
     // so funciona com path relativo
     return
@@ -147,58 +145,88 @@ const doCrazy = async ({ page, href, pages, client }: any) => {
   
 
 
-  if (href !== '/tank-top/p') {
+  // if (href !== '/tank-top/p') {
+  //   return
+  // }
+  if (href !== '/make-b-' && href !== 'make-b-') {
     return
   }
+  if (window.__RUNTIME__.fidelis.pathData[href]) {
+    return // dont redo work
+  }
+  window.__RUNTIME__.fidelis.pathData[href] = { pending: true }
   const navigationData = await getPageToNavigate(href)
+  if (navigationData.queryData) {
+    hydrateApolloCache(navigationData.queryData, client)
+  }
+  window.__RUNTIME__.fidelis.pathData[href].pending = false
+  
   const navigationPage = page ?? navigationData.page
+
+  window.__RUNTIME__.fidelis.pathData[href].routeId = navigationPage
+  window.__RUNTIME__.fidelis.pathData[href].matchingPage = navigationData.route
+
   const declarer = pages[navigationPage]?.declarer
 
-  // console.log('teste vars: ',{
-  //   declarer,
-  //   routeId: navigationPage,
-  //   renderMajor: 8,
-
-  // })
   console.log('teste LETS FETCH ROUTE DATA!')
-  const routeData = await fetchRouteData({ apolloClient: client, routeId: navigationPage, declarer })
-  window.__RUNTIME__.fidelis.routeData[page] = routeData
-  console.log('teste routedata result: ', routeData)
+  let globalRouteDataState = window.__RUNTIME__.fidelis.routeData[navigationPage]
+  if (!globalRouteDataState) {
+    const newState = {
+      promisePending: true,
+      promise: fetchRouteData({ apolloClient: client, routeId: navigationPage, declarer }),
+      data: null,
+    }
+    newState.promise.then((data: any) => {
+      const extensions = generateExtensions(data.blocksTree, data.blocks, data.contentMap, pages[navigationPage])
+      newState.promisePending = false
+      newState.data = data
+      newState.data!.extensions = extensions
+    }).catch(() => {
+      newState.promisePending = false
+    })
+    window.__RUNTIME__.fidelis.routeData[navigationPage] = newState
+    globalRouteDataState = newState
+  }
+  // let routeData = null
+  console.log('teste globalRouteDataState: ', globalRouteDataState)
+  if (globalRouteDataState.promisePending) {
+    await globalRouteDataState.promise
+    console.log('teste await done: ')
+  }
+  if (!globalRouteDataState.promisePending && !globalRouteDataState.data) {
+    console.log('teste early exit')
+    return
+  }
+  const routeData = globalRouteDataState.data
+  console.log('teste routeData: ', routeData)
 
-  // const extensions =
-  //   !isEmpty(blocksTree) && blocksTree && blocks && contentMap
-  //     ? generateExtensions(blocksTree, blocks, contentMap, pages[routeId])
-  //     : pageExtensions
-
-  //salvar na window
-  const extensions = generateExtensions(routeData.blocksTree, routeData.blocks, routeData.contentMap, pages[navigationPage])
-  console.log('teste EXTENSIONS GENERATED: ', extensions)
   const { contentResponse } = navigationData
-  window.__RUNTIME__.fidelis.pathData[href] = {}
-  if (contentResponse && extensions) {
+  const extensions = routeData.extensions
+  
+  if (contentResponse) {
     Object.assign(routeData.contentMap, JSON.parse(contentResponse.contentMapJSON))
-    // userMessages = userMessages.concat(contentResponse.userMessages)
-    // routeData.messages = contentResponse.userMessages.length > 0 ? uniqBy(({ key }: any) => key, routeData.messages.concat(contentResponse.userMessages)) : routeData.messages
+    if (contentResponse.userMessages.length > 0) {
+      // ver se precisa de parse essa messages mesmo
+      const parsedMessages = parseMessages(contentResponse.userMessages)
+      routeData.messages = { ...routeData.messages, ...parsedMessages }
+    }
+    console.log('teste UPDATING! ', contentResponse.extensionsContent)
     for (const {treePath, contentJSON, contentIds} of contentResponse.extensionsContent || []) {
+      // console.log('teste CHANGING ', { treePath, contentJSON})
+      if (contentJSON !== '{}') {
+        console.log('teste CHANGING ', { treePath, contentJSON })
+      }
       extensions[treePath]!.content = contentJSON ? JSON.parse(contentJSON) : undefined
       extensions[treePath]!.contentIds = contentIds
     }
-    window.__RUNTIME__.fidelis.pathData[href].messages = contentResponse.userMessages.length > 0 ? uniqBy(({ key }: any) => key, routeData.messages.concat(contentResponse.userMessages)) : routeData.messages
   }
 
-  window.__RUNTIME__.fidelis.pathData[href].extensions = extensions
   window.__RUNTIME__.fidelis.pathData[href].routeId = navigationPage
   window.__RUNTIME__.fidelis.pathData[href].matchingPage = navigationData.route
-  // window.__RUNTIME__.fidelis.pathData[href] = {
-  //   extensions,
-  //   routeId: navigationPage,
-  //   messages: 
+
+  // if (navigationData.queryData) {
+  //   await hydrateApolloCache(navigationData.queryData, client)
   // }
-  // window.__RUNTIME__.fidelis.extensions[href] = extensions
-  // window.__RUNTIME__.fidelis.routeMap[href] = navigationPage
-  if (navigationData.queryData) {
-    await hydrateApolloCache(navigationData.queryData, client)
-  }
   await fetchComponents(routeData.components, extensions)
   console.log('teste DONE!')
 }
