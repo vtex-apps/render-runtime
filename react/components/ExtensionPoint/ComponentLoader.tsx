@@ -6,6 +6,7 @@ import { TreePathContextProvider } from '../../utils/treePath'
 import { isSiteEditorIframe } from '../../utils/dom'
 import SiteEditorWrapper from './SiteEditorWrapper'
 import Hydration from '../Hydration'
+import { LazyImages } from '../LazyImages'
 
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
@@ -82,9 +83,11 @@ const ComponentLoader: FunctionComponent<Props> = props => {
 
   if (!isSiteEditorIframe && !shouldHydrate) {
     content = (
-      <Hydration treePath={treePath} hydration={hydration}>
-        {content}
-      </Hydration>
+      <LazyImages>
+        <Hydration treePath={treePath} hydration={hydration}>
+          {content}
+        </Hydration>
+      </LazyImages>
     )
   }
 
