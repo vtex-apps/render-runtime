@@ -1,4 +1,5 @@
 import React, { useEffect, useState, FunctionComponent } from 'react'
+
 import { getImplementation } from '../../utils/assets'
 import GenericPreview from '../Preview/GenericPreview'
 import Loading from '../Loading'
@@ -13,7 +14,7 @@ import { generateSlot } from '../../utils/slots'
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
 
-async function fetchComponent(
+export async function fetchComponent(
   component: string,
   runtimeFetchComponent: RenderContext['fetchComponent'],
   retries = 3
@@ -29,7 +30,7 @@ async function fetchComponent(
   } else if (componentPromiseResolvedMap[component]) {
     /** These retries perhaps are not needed anymore, but keeping just to be safe */
     if (retries > 0) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
       return fetchComponent(component, runtimeFetchComponent, retries - 1)
     }
 
@@ -53,7 +54,7 @@ interface Props {
   hydration: Hydration
 }
 
-const ComponentLoader: FunctionComponent<Props> = props => {
+const ComponentLoader: FunctionComponent<Props> = (props) => {
   const {
     component,
     children,
@@ -64,10 +65,10 @@ const ComponentLoader: FunctionComponent<Props> = props => {
   const runtime = useRuntime()
 
   const capitalProps = Object.keys(componentProps).filter(
-    key => key[0] !== key[0].toLowerCase()
+    (key) => key[0] !== key[0].toLowerCase()
   )
 
-  const slots = capitalProps.map(slotName => {
+  const slots = capitalProps.map((slotName) => {
     return generateSlot({
       treePath,
       slotName,
@@ -85,6 +86,16 @@ const ComponentLoader: FunctionComponent<Props> = props => {
 
   const Component = component && getImplementation(component)
 
+  const asyncComponentProps = {
+    ...{
+      ...props,
+      props: {
+        ...componentProps,
+        ...resultingSlotsProps,
+      },
+    },
+  }
+
   let content = Component ? (
     <Component
       {...{
@@ -95,14 +106,7 @@ const ComponentLoader: FunctionComponent<Props> = props => {
       {children}
     </Component>
   ) : (
-    <AsyncComponent
-      {...{
-        ...props,
-        ...resultingSlotsProps,
-      }}
-    >
-      {children}
-    </AsyncComponent>
+    <AsyncComponent {...asyncComponentProps}>{children}</AsyncComponent>
   )
 
   const shouldHydrate =
@@ -137,7 +141,7 @@ const ComponentLoader: FunctionComponent<Props> = props => {
   return content
 }
 
-const AsyncComponent: FunctionComponent<Props> = props => {
+const AsyncComponent: FunctionComponent<Props> = (props) => {
   const {
     component,
     children,
@@ -161,7 +165,7 @@ const AsyncComponent: FunctionComponent<Props> = props => {
     }
 
     // ...otherwise, fetches it and stores the result in the Component state
-    fetchComponent(component, runtime.fetchComponent).then(result => {
+    fetchComponent(component, runtime.fetchComponent).then((result) => {
       if (Component) {
         return
       }
