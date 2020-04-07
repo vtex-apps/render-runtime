@@ -56,7 +56,7 @@ export interface RenderProviderState {
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
-let isStorefrontIframe: (runtime: RenderContext | null, messages?: Record<string, string>, shouldUpdateRuntime?: boolean) => void | undefined
+let isStorefrontIframe: Window['__provideRuntime'] | undefined
 
 try {
   if (canUseDOM && window.top !== window.self && window.top.__provideRuntime) {
@@ -127,7 +127,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public sendInfoFromIframe = debounce((shouldUpdateRuntime?: boolean) => {
-    if (isStorefrontIframe !== undefined) {
+    if (isStorefrontIframe) {
       const { messages } = this.state
       window.top.__provideRuntime(this.getChildContext(), messages, shouldUpdateRuntime)
     }
