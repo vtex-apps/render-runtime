@@ -64,9 +64,11 @@ const ComponentLoader: FunctionComponent<Props> = (props) => {
   } = props
   const runtime = useRuntime()
 
-  const capitalProps = Object.keys(componentProps).filter(
-    (key) => key[0] !== key[0].toLowerCase()
-  )
+  const capitalProps = componentProps
+    ? Object.keys(componentProps).filter(
+        (key) => key[0] !== key[0].toLowerCase()
+      )
+    : []
 
   const slots = capitalProps.map((slotName) => {
     return generateSlot({
