@@ -127,7 +127,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public sendInfoFromIframe = debounce((shouldUpdateRuntime?: boolean) => {
-    if (isStorefrontIframe) {
+    if (isStorefrontIframe !== undefined) {
       const { messages } = this.state
       window.top.__provideRuntime(this.getChildContext(), messages, shouldUpdateRuntime)
     }
