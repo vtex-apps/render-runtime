@@ -649,11 +649,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
     }
 
-    // Sets the preloading state, which currently displays
-    // a loading bar at the top of the page
-    this.setState({
-      preview: true,
-    })
+    
 
     const paramsJSON = JSON.stringify(params)
     const apolloClient = this.apolloClient
@@ -663,6 +659,58 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     // well as the fields that need to be retrieved, but the logic
     // that the new state (extensions and assets) will be derived from
     // the results of this query will probably remain the same.
+
+    // console.log('teste DTA: ', {
+    //   declarer,
+    //   paramsJSON,
+    //   query: JSON.stringify(query),
+    //   renderMajor,
+    //   routeId,
+    // })
+    // if (window.__RUNTIME__.fidelis[])
+
+    console.log('teste navigationRoute.path: ', navigationRoute.path)
+    console.log('teste navigationRoute.pathData: ', window.__RUNTIME__.fidelis.pathData[navigationRoute.path])
+    const prefetchedData = window.__RUNTIME__.fidelis.pathData[navigationRoute.path]
+    if (prefetchedData && !prefetchedData.pending) {
+      
+      const routeId = window.__RUNTIME__.fidelis.pathData[navigationRoute.path].routeId
+      const routeData = window.__RUNTIME__.fidelis.routeData[routeId].data
+      const matchingPage = window.__RUNTIME__.fidelis.pathData[navigationRoute.path].matchingPage
+      console.log('teste PREFETCHED!', routeData)
+      this.setState(
+        state => ({
+          ...state,
+          // appsEtag,
+          components: { ...state.components, ...routeData.components },
+          extensions: { ...state.extensions, ...routeData.extensions },
+          loadedPages: loadedPages.add(routeId),
+          messages: { ...state.messages, ...routeData.messages },
+          page: routeId,
+          // pages,
+          preview: false,
+          query,
+          route: matchingPage,
+          // route: matchingPage,
+          // settings,
+        }),
+        () => {
+          this.navigationState = { isNavigating: false }
+          this.replaceRouteClass(routeId)
+          this.sendInfoFromIframe()
+          this.scrollTo(state.scrollOptions)
+        }
+      )
+
+      return Promise.resolve()
+    }
+
+    // Sets the preloading state, which currently displays
+    // a loading bar at the top of the page
+    this.setState({
+      preview: true,
+    })
+
     const navigationPromise = isEnabled('RENDER_NAVIGATION')
       ? fetchServerPage({
           fetcher: this.fetcher,
@@ -684,6 +732,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             }
 
             await this.fetchComponents(components, extensions)
+
+            console.log('teste matchingPage: ', matchingPage)
 
             this.setState(
               state => ({

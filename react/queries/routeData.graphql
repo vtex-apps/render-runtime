@@ -1,0 +1,35 @@
+query RouteData($routeId: String, $declarer: String, $query: String) {
+  pageBlocksOld(input:{ routeId:$routeId, renderMajor:8, declarer: $declarer, query: $query}) {
+    blocksJSON
+    componentsJSON
+    blocksTreeJSON
+    componentsJSON
+    messages {
+      key
+      message
+    }
+    contentMapJSON
+    page {
+      blockId
+      canonical
+      canonicalPath
+      disableExternals
+      domain
+      metaTags {
+        description
+        keywords
+      }
+      routeContextLocator
+      routeId
+      routePath
+      paramsMapJSON
+      paramsJSON
+      pageContext {
+        id
+        type
+      }
+      title
+      varyContentById
+    }
+  }
+}
