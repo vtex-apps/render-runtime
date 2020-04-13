@@ -1,0 +1,17 @@
+query ListContent(
+  $bindingId: String
+  $blockId: String
+  $pageContext: PageContextInput
+  $template: String
+  $treePath: String
+) {
+  listContent(
+    bindingId: $bindingId
+    blockId: $blockId
+    pageContext: $pageContext
+    template: $template
+    treePath: $treePath
+  ) {
+    contentJSON
+  }
+}
