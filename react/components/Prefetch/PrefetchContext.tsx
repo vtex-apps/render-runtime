@@ -3,8 +3,6 @@ import React, {
   createContext,
   FC,
   useEffect,
-  useState,
-  useMemo,
   useCallback,
   useRef,
   MutableRefObject,
@@ -59,6 +57,18 @@ const state: PrefetchState = {
 
 const PrefetchContext = createContext<PrefetchState>(state)
 
+export const getCacheForPage = (page: string) => {
+  if (page === 'store.product') {
+    return state.pathsCache.product
+  }
+
+  if (page.startsWith('store.search')) {
+    return state.pathsCache.search
+  }
+
+  return state.pathsCache.other
+}
+
 export const usePrefetch = () => useContext(PrefetchContext)
 
 export const PrefetchContextProvider: FC<{ history: History | null }> = ({
@@ -112,13 +122,9 @@ export const getPrefetechedData = (path: string) => {
     }
   }
   let prefetchedPathData = null
-  if (destinationRouteId === 'store.product') {
-    prefetchedPathData = state.pathsCache.product.get(path)
-  } else if (destinationRouteId?.startsWith('store.search')) {
-    prefetchedPathData = state.pathsCache.search.get(path)
-  } else {
-    prefetchedPathData = state.pathsCache.other.get(path)
-  }
+  const cache = getCacheForPage(destinationRouteId)
+  prefetchedPathData = cache.get(path)
+
   const routeData = prefetchedPathData
     ? state.routesCache.get(destinationRouteId)
     : null

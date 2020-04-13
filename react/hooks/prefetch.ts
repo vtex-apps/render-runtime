@@ -1,6 +1,7 @@
 import {
   PrefetchState,
   usePrefetch,
+  getCacheForPage,
 } from '../components/Prefetch/PrefetchContext'
 import {
   queryStringToMap,
@@ -42,7 +43,7 @@ const prefetchRequests = async ({
   hints,
   renderMajor,
 }: PrefetchRequestsArgs) => {
-  const { pathsCache, pathsState, routesCache, routePromise } = prefetchState
+  const { pathsState, routesCache, routePromise } = prefetchState
   const navigationData = await getPageToNavigate(navigationRoute.path)
 
   const navigationPage = page ?? navigationData.page
@@ -64,13 +65,8 @@ const prefetchRequests = async ({
     contentResponse: navigationData.contentResponse,
   }
 
-  if (navigationPage === 'store.product') {
-    pathsCache.product.set(navigationRoute.path, cacheObj)
-  } else if (navigationPage.startsWith('store.search')) {
-    pathsCache.search.set(navigationRoute.path, cacheObj)
-  } else {
-    pathsCache.other.set(navigationRoute.path, cacheObj)
-  }
+  const cache = getCacheForPage(navigationPage)
+  cache.set(navigationRoute.path, cacheObj)
 
   let routeDataCache = routesCache.get(navigationPage)
   const routePromiseValue = routePromise[navigationPage]
