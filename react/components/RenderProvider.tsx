@@ -1,5 +1,3 @@
-import { NormalizedCacheObject } from 'apollo-cache-inmemory'
-import ApolloClient from 'apollo-client'
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
@@ -58,12 +56,11 @@ import ExtensionManager from './ExtensionPoint/ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
-import { parseMessages } from '../utils/messages'
 import {
   getPrefetechedData,
-  clearQueue,
   PrefetchContextProvider,
 } from './Prefetch/PrefetchContext'
+import { hydrateApolloCache } from '../utils/apolloCache'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -439,7 +436,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       platform,
       prefetchDefaultPages: this.prefetchDefaultPages,
       addNavigationRouteModifier: this.addNavigationRouteModifier,
-      // bala: this.getNavigationRouteModifiers,
       navigationRouteModifiers: this.navigationRouteModifiers,
       prefetchPage: this.prefetchPage,
       preview,
@@ -455,7 +451,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
       workspace,
-      // teste: 'hello'
     }
   }
 
@@ -576,11 +571,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.navigationRouteModifiers.add(modifier)
   }
 
-  // public getNavigationRouteModifiers = () => {
-  //   // return this.navigationRouteModifiers
-  //   console.log('teste OIE')
-  // }
-
   public replaceRouteClass = (route: string) => {
     try {
       const containers = document.getElementsByClassName(RENDER_CONTAINER_CLASS)
@@ -670,41 +660,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const apolloClient = this.apolloClient
     const routeId = page
 
-    // navigationRoute: {path: "/Climbing/Climbing-Shoes/Youth", params: {…}, id: "", realHash: "", query: "map=c%2Cc%2CspecificationFilter_7721"}
-    //teste NAVIGATIN TO:  {path: "/climbing/climbing-shoes/Youth", params: {…}, id: "", realHash: "", query: "map=c,c,specificationFilter_7721"}
-    console.log('teste NAVIGATIN TO: ', navigationRoute)
-    // Retrieve the adequate assets for the new page. Naming will
-    // probably change (query will return something like routes) as
-    // well as the fields that need to be retrieved, but the logic
-    // that the new state (extensions and assets) will be derived from
-    // the results of this query will probably remain the same.
-
-    // console.log('teste DTA: ', {
-    //   declarer,
-    //   paramsJSON,
-    //   query: JSON.stringify(query),
-    //   renderMajor,
-    //   routeId,
-    // })
-    // if (window.__RUNTIME__.fidelis[])
-
-    // console.log('teste navigationRoute.path: ', navigationRoute.path)
-    // console.log('teste navigationRoute.pathData: ', window.__RUNTIME__.fidelis.pathData[navigationRoute.path])
-    // const prefetchedData = window.__RUNTIME__.fidelis.pathData[navigationRoute.path]
-    // const destinationRouteId = window.__RUNTIME__.fidelis.pathsInCache[navigationRoute.path]
-    // let prefetchedPathData = null
-    // if (destinationRouteId === 'store.product') {
-    //   prefetchedPathData = window.__RUNTIME__.fidelis.pathsCache.product.get(navigationRoute.path)
-    // } else if (destinationRouteId?.startsWith('store.search')) {
-    //   prefetchedPathData = window.__RUNTIME__.fidelis.pathsCache.search.get(navigationRoute.path)
-    // } else {
-    //   prefetchedPathData = window.__RUNTIME__.fidelis.pathsCache.other.get(navigationRoute.path)
-    // }
-    // const routeData = prefetchedPathData ? window.__RUNTIME__.fidelis.routesCache.get(destinationRouteId) : null
-
-    // console.log('teste routeData: ', routeData)
-    // console.log('teste prefetchedPathData: ', prefetchedPathData)
-    // console.log('teste destinationRouteId: ', destinationRouteId)
     const {
       prefetchedPathData,
       routeData,
@@ -717,8 +672,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       let extensions = routeData.extensions
       let messages = routeData.messages
       if (contentResponse) {
-        //create a fresh copy
-        // extensions = JSON.parse(routeData.extensionsJSON)
+        //create a fresh copy of extensions to not change the one in memory
         extensions = JSON.parse(JSON.stringify(routeData.extensions))
         messages = { ...messages, ...contentResponse.userMessages }
         for (const {
@@ -785,8 +739,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             }
 
             await this.fetchComponents(components, extensions)
-
-            console.log('teste matchingPage: ', matchingPage)
 
             this.setState(
               (state) => ({
@@ -1179,20 +1131,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       variables: Record<string, any>
     }>
   ) => {
-    forEach(({ data, query, variables }) => {
-      try {
-        this.apolloClient.writeQuery({
-          query: parse(query),
-          data: JSON.parse(data),
-          variables,
-        })
-      } catch (error) {
-        console.warn(
-          `Error writing query from render-server in Apollo's cache`,
-          error
-        )
-      }
-    }, queryData)
+    hydrateApolloCache(
+      queryData,
+      this.apolloClient,
+      "Error writing query from render-server in Apollo's cache"
+    )
   }
 
   // Deprecated
