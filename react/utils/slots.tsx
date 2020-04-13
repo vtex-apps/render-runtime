@@ -1,14 +1,16 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { FC } from 'react'
+import { useQuery } from 'react-apollo'
 
-import { getImplementation } from './assets'
 import { getChildExtensions } from '../components/ExtensionPoint'
-import { useRuntime } from '../core/main'
+import ComponentLoader from '../components/ExtensionPoint/ComponentLoader'
+import ListContent from '../queries/ListContent.graphql'
 
 interface GenerateSlotArgs {
   treePath: string
   slotName: string
   slotValue: string
   runtime: RenderContext
+  hydration: Hydration
 }
 
 export function generateSlot({
@@ -16,77 +18,59 @@ export function generateSlot({
   slotName,
   slotValue,
   runtime,
+  hydration,
 }: GenerateSlotArgs) {
   const newTreePath = `${treePath}/${slotValue}`
   let extension = runtime.extensions[newTreePath]
 
-  const Component = getImplementation(extension?.component)
   let slotChildren = getChildExtensions(runtime, newTreePath)
 
   let componentProps = extension?.props ?? {}
-  const capitalProps = Object.keys(componentProps).filter(
-    (key) => key[0] !== key[0].toLowerCase()
-  )
 
-  if (capitalProps.length > 0) {
-    const slots = capitalProps.map((slotName) => {
-      return generateSlot({
-        treePath: newTreePath,
-        slotName,
-        slotValue: componentProps[slotName],
-        runtime,
-      })
-    })
-
-    const resultingSlotsProps: Record<string, React.FC> = {}
-    capitalProps.forEach((key, i) => (resultingSlotsProps[key] = slots[i]))
-
-    componentProps = { ...componentProps, ...resultingSlotsProps }
-  }
-
-  const SlotComponent: FC<any> = (props) => {
+  const SlotComponent: FC<any> = props => {
     if (props.id) {
-      const dynamicTreePath = newTreePath + '#' + props.id
+      const hasLabel = slotValue.includes('#')
+      const dynamicTreePath = `${newTreePath}${hasLabel ? '-' : '#'}${props.id}`
 
-      extension = runtime.extensions[dynamicTreePath] ?? extension
+      if (!runtime.extensions[dynamicTreePath]) {
+        slotChildren =
+          getChildExtensions(runtime, dynamicTreePath) ?? slotChildren
+        componentProps = extension?.props ?? {}
+        const baseSlotBlockId = extension?.blockId
+
+        return (
+          <DynamicSlot
+            treePath={dynamicTreePath}
+            runtime={runtime}
+            hydration={hydration}
+            component={extension?.component ?? null}
+            props={{ ...props, ...componentProps }}
+            blockId={baseSlotBlockId}
+            baseTreePath={newTreePath}
+          >
+            {slotChildren}
+          </DynamicSlot>
+        )
+      }
+
+      extension = runtime.extensions[dynamicTreePath]
       slotChildren =
         getChildExtensions(runtime, dynamicTreePath) ?? slotChildren
       componentProps = extension?.props ?? {}
-
-      const capitalProps = Object.keys(componentProps).filter(
-        (key) => key[0] !== key[0].toLowerCase()
-      )
-
-      if (capitalProps.length > 0) {
-        const slots = capitalProps.map((slotName) => {
-          return generateSlot({
-            treePath: dynamicTreePath,
-            slotName,
-            slotValue: componentProps[slotName],
-            runtime,
-          })
-        })
-
-        const resultingSlotsProps: Record<string, React.FC> = {}
-        componentProps = { ...componentProps, ...resultingSlotsProps }
-
-        capitalProps.forEach((key, i) => (resultingSlotsProps[key] = slots[i]))
-      }
     }
 
-    return Component ? (
-      <Component {...props} {...componentProps}>
-        {slotChildren}
-      </Component>
-    ) : (
-      <AsyncSlot
-        {...props}
-        {...componentProps}
-        component={extension?.component}
+    const extensionContent = extension?.content
+
+    return (
+      <ComponentLoader
+        component={extension?.component ?? null}
+        props={{ ...props, ...componentProps, ...extensionContent }}
         treePath={newTreePath}
+        runtime={runtime}
+        hydration={hydration}
       >
         {slotChildren}
-      </AsyncSlot>
+      </ComponentLoader>
     )
   }
 
@@ -95,70 +79,68 @@ export function generateSlot({
   return SlotComponent
 }
 
-/**
- * These next two lines and the fetchComponent function are duplicated
- * from ContextLoader.
- */
-const componentPromiseMap: any = {}
-const componentPromiseResolvedMap: any = {}
-
-async function fetchComponent(
-  component: string,
-  runtimeFetchComponent: RenderContext['fetchComponent'],
-  retries = 3
-): Promise<any> {
-  const Component = component && getImplementation(component)
-
-  if (Component) {
-    return Component
-  }
-
-  if (!(component in componentPromiseMap)) {
-    componentPromiseMap[component] = runtimeFetchComponent(component)
-  } else if (componentPromiseResolvedMap[component]) {
-    /** These retries perhaps are not needed anymore, but keeping just to be safe */
-    if (retries > 0) {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      return fetchComponent(component, runtimeFetchComponent, retries - 1)
-    }
-
-    /* Loading was completed but the component was not registered.
-     * This means something wrong happened */
-    throw new Error(`Unable to fetch component ${component}`)
-  }
-
-  await componentPromiseMap[component]
-
-  componentPromiseResolvedMap[component] = true
-
-  return getImplementation(component)
+interface DynamicSlotProps {
+  component: any
+  props: any
+  blockId: string | undefined
+  treePath: string
+  runtime: RenderContext
+  hydration: Hydration
+  baseTreePath: string
 }
 
-const AsyncSlot: FC<any> = (props) => {
-  const runtime = useRuntime()
-  const { component, treePath, children, ...componentProps } = props
+const DynamicSlot: FC<DynamicSlotProps> = ({
+  treePath,
+  runtime,
+  hydration,
+  component,
+  props,
+  children,
+  blockId,
+  baseTreePath,
+}) => {
+  const { data, loading, error } = useQuery(ListContent, {
+    variables: {
+      bindingId: runtime.binding?.id,
+      template: runtime.page,
+      blockId,
+      treePath: treePath.replace(runtime.page, '*'),
+      pageContext: runtime.route.pageContext,
+    },
+  })
 
-  const [Component, setComponent] = useState(
-    () => (component && getImplementation(component)) || null
-  )
+  if (loading) {
+    return null
+  }
+  if (error) {
+    console.error(error)
+    return null
+  }
 
-  useEffect(() => {
-    // Does nothing if Component is loaded...
-    // (or if component is nil)
-    if (Component || !component) {
-      return
+  const extensionContent =
+    (data.listContent[1]?.contentJSON &&
+      JSON.parse(data.listContent[1]?.contentJSON)) ??
+    (data.listContent[0]?.contentJSON &&
+      JSON.parse(data.listContent[0]?.contentJSON))
+
+  if (!extensionContent) {
+    runtime.extensions[treePath] = runtime.extensions[baseTreePath]
+  } else {
+    runtime.extensions[treePath] = {
+      ...runtime.extensions[baseTreePath]!,
+      content: extensionContent,
     }
+  }
 
-    // ...otherwise, fetches it and stores the result in the Component state
-    fetchComponent(component, runtime.fetchComponent).then((result) => {
-      if (Component) {
-        return
-      }
-      setComponent(() => result)
-    })
-  }, [Component, component, runtime.fetchComponent])
-
-  return Component ? (
-    <Component {...componentProps}>{children}</Component>
-  ) : null
+  return (
+    <ComponentLoader
+      component={component ?? null}
+      props={{ ...props, ...extensionContent }}
+      treePath={treePath}
+      runtime={runtime}
+      hydration={hydration}
+    >
+      {children}
+    </ComponentLoader>
+  )
 }
