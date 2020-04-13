@@ -228,44 +228,40 @@ const mergePersistingQueries = (currentQuery: string, query: string) => {
   return mapToQueryString({ ...persisting, ...next })
 }
 
-export function navigate(
-  history: History | null,
+export function getNavigationRouteToNavigate(
   pages: Pages,
-  options: NavigateOptions
+  options: NavigateOptions,
+  showLogs = false
 ) {
   const {
     page,
     params,
     query: inputQuery,
     to: inputTo = '',
-    scrollOptions,
-    fallbackToWindowLocation = true,
     rootPath,
-    replace,
-    fetchPage = true,
-    preventRemount,
     modifiers,
     modifiersOptions,
   } = options
 
   if (!page && !inputTo) {
-    console.error(
-      `Invalid navigation options. You should use 'page' or 'to' parameters`
-    )
-    return false
+    showLogs &&
+      console.error(
+        `Invalid navigation options. You should use 'page' or 'to' parameters`
+      )
+    return null
   }
 
   if (inputTo && inputQuery) {
-    console.warn(
-      `You shouldn't pass 'query' in a separate prop when using 'to'`
-    )
+    showLogs &&
+      console.warn(
+        `You shouldn't pass 'query' in a separate prop when using 'to'`
+      )
   }
 
   // If the prop `to` is something like `to="#header"`
   // just change the hash using location, avoid doing a history navigation
   if (inputTo.indexOf('#') === 0 && inputTo.indexOf('?') === -1) {
-    window.location.hash = inputTo
-    return true
+    return { hash: inputTo }
   }
 
   const [to, extractedQuery] = (is(String, inputTo) ? inputTo : '').split('?')
@@ -290,12 +286,13 @@ export function navigate(
   }
 
   if (!navigationRoute) {
-    console.warn(
-      `Unable to find route for ${
-        page ? `page '${page}' and the passed parameters` : `path '${to}'`
-      }`
-    )
-    return false
+    showLogs &&
+      console.warn(
+        `Unable to find route for ${
+          page ? `page '${page}' and the passed parameters` : `path '${to}'`
+        }`
+      )
+    return null
   }
 
   navigationRoute.path = navigationRootPath(navigationRoute.path, rootPath)
@@ -310,15 +307,108 @@ export function navigate(
       query = fixedQuery || query
     }
   }
+  navigationRoute.realHash = realHash
+  navigationRoute.query = query
+  return navigationRoute
+}
+
+export function navigate(
+  history: History | null,
+  pages: Pages,
+  options: NavigateOptions
+) {
+  const {
+    scrollOptions,
+    fallbackToWindowLocation = true,
+    replace,
+    fetchPage = true,
+    preventRemount,
+  } = options
+
+  const navigationRoute = getNavigationRouteToNavigate(pages, options, true)
+  if (navigationRoute.hash) {
+    window.location.hash = navigationRoute.hash
+    return true
+  }
+
+  if (navigationRoute == null) {
+    return false
+  }
+
+  // if (!page && !inputTo) {
+  //   console.error(
+  //     `Invalid navigation options. You should use 'page' or 'to' parameters`
+  //   )
+  //   return false
+  // }
+
+  // if (inputTo && inputQuery) {
+  //   console.warn(
+  //     `You shouldn't pass 'query' in a separate prop when using 'to'`
+  //   )
+  // }
+
+  // If the prop `to` is something like `to="#header"`
+  // just change the hash using location, avoid doing a history navigation
+  // if (inputTo.indexOf('#') === 0 && inputTo.indexOf('?') === -1) {
+  //   window.location.hash = inputTo
+  //   return true
+  // }
+
+  // const [to, extractedQuery] = (is(String, inputTo) ? inputTo : '').split('?')
+  // const [realQuery, hash] = (is(String, extractedQuery)
+  //   ? extractedQuery
+  //   : ''
+  // ).split('#')
+  // const realHash = is(String, hash) ? `#${hash}` : ''
+  // let query = inputQuery || realQuery
+
+  // let navigationRoute: any = {}
+
+  // if (isEnabled('RENDER_NAVIGATION')) {
+  //   const fallbackPage = { path: to, params: {}, id: '' }
+  //   const routeFromPage = page && getRouteFromPageName(page, pages, params)
+  //   const routeFromPath = getRouteFromPath(to, pages)
+  //   navigationRoute = routeFromPage || routeFromPath || fallbackPage
+  // } else {
+  //   navigationRoute = page
+  //     ? getRouteFromPageName(page, pages, params)
+  //     : getRouteFromPathOld(to, pages, query, realHash)
+  // }
+
+  // if (!navigationRoute) {
+  //   console.warn(
+  //     `Unable to find route for ${
+  //     page ? `page '${page}' and the passed parameters` : `path '${to}'`
+  //     }`
+  //   )
+  //   return false
+  // }
+
+  // navigationRoute.path = navigationRootPath(navigationRoute.path, rootPath)
+  // if (modifiers) {
+  //   for (const modifier of modifiers) {
+  //     const { path, query: fixedQuery } = modifier({
+  //       path: navigationRoute.path,
+  //       query,
+  //       options: modifiersOptions,
+  //     })
+  //     navigationRoute.path = path || navigationRoute.path
+  //     query = fixedQuery || query
+  //   }
+  // }
 
   if (history) {
-    const nextQuery = mergePersistingQueries(history.location.search, query)
+    const nextQuery = mergePersistingQueries(
+      history.location.search,
+      navigationRoute.query
+    )
     const location = createLocationDescriptor(navigationRoute, {
       fetchPage,
       preventRemount,
       query: nextQuery,
       scrollOptions,
-      hash: realHash,
+      hash: navigationRoute.realHash,
     })
     const method = replace ? 'replace' : 'push'
     window.setTimeout(() => history[method](location), 0)
@@ -326,7 +416,7 @@ export function navigate(
   }
 
   if (fallbackToWindowLocation) {
-    window.location.href = `${navigationRoute.path}${query}`
+    window.location.href = `${navigationRoute.path}${navigationRoute.query}`
     return true
   }
 

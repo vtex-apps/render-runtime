@@ -1,0 +1,10 @@
+query RouteData($routeId: String, $declarer: String, $query: String, $device: UserDevice, $renderMajor: Int) {
+  prefetchBlocks(input:{ routeId:$routeId, renderMajor:$renderMajor, declarer: $declarer, query: $query, device: $device}) {
+    extensionsJSON
+    componentsJSON
+    messages {
+      key
+      message
+    }
+  }
+}

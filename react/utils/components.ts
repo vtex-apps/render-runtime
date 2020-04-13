@@ -1,9 +1,52 @@
 import { uniqWith } from 'ramda'
+import { hasComponentImplementation, fetchAssets } from './assets'
 
 const FILE_PATH_REX = /([^/]+?)(?:$|\?)/ // https://regex101.com/r/joJ2p7/1
 const FILE_EXT_REX = /(\.min)?(\.js|\.css)/ // https://regex101.com/r/8vmjes/1
 
 const uniqAsset = uniqWith<AssetEntry, AssetEntry>((a, b) => a.path === b.path)
+
+export const fetchComponents = async (
+  components: RenderRuntime['components'],
+  runtime: RenderRuntime,
+  extensions?: Extensions
+) => {
+  // In order for only fetching `components`, we create corresponding extensions
+  // for them if they weren't passed
+  if (!extensions) {
+    const componentsNames = Object.keys(components)
+    extensions = componentsNames.reduce((acc, component) => {
+      acc[component] = { component }
+      return acc
+    }, {} as RenderRuntime['extensions'])
+  }
+  const componentsToDownload = Object.values(extensions).reduce<string[]>(
+    (acc, extension) => {
+      if (!extension) {
+        return acc
+      }
+      if (extension.render === 'lazy') {
+        return acc
+      }
+      if (!hasComponentImplementation(extension.component)) {
+        acc.push(extension.component)
+      }
+      const context = extension?.context?.component
+      if (context && !hasComponentImplementation(context)) {
+        acc.push(context)
+      }
+      return acc
+    },
+    []
+  )
+
+  if (componentsToDownload.length === 0) {
+    return
+  }
+
+  const allAssets = traverseListOfComponents(components, componentsToDownload)
+  await fetchAssets(runtime, allAssets)
+}
 
 export const traverseListOfComponents = (
   componentsData: Components | Record<string, string[]>,
@@ -26,7 +69,7 @@ export const traverseComponent = (
   const entry = components[component]
   const [app] = component.split('/')
   if (Array.isArray(entry)) {
-    return entry.map(asset => {
+    return entry.map((asset) => {
       return { path: asset, app, name: assetName(asset) }
     })
   }
@@ -36,7 +79,7 @@ export const traverseComponent = (
       const depAssets = traverseComponent(components, dependency, false)
       return depAssets.concat(acc)
     },
-    assets.map(asset => {
+    assets.map((asset) => {
       return { path: asset, app, name: assetName(asset) }
     })
   )

@@ -4,6 +4,7 @@ import { parse, format } from 'url'
 
 import navigationPageQuery from '../queries/navigationPage.graphql'
 import routePreviews from '../queries/routePreviews.graphql'
+import routeDataQuery from '../queries/routeData.graphql'
 import { generateExtensions } from './blocks'
 import { fetchWithRetry } from './fetch'
 import { parseMessages } from './messages'
@@ -48,7 +49,7 @@ const parsePageQueryResponse = (
     componentsJSON,
     pagesJSON,
     appsSettingsJSON,
-  ].map(json => JSON.parse(json))
+  ].map((json) => JSON.parse(json))
 
   const extensions = isEmpty(blocksTree)
     ? JSON.parse(extensionsJSON)
@@ -162,6 +163,117 @@ export const fetchServerPage = async ({
   }
 }
 
+interface PrefetchPageResponse {
+  page: string
+  queryData: RenderRuntime['queryData']
+  contentResponse: ContentResponse | null
+  route: RenderRuntime['route']
+}
+
+export const getPrefetchForPath = async ({
+  fetcher,
+  path,
+  query: rawQuery,
+}: {
+  path: string
+  query?: Record<string, string>
+  fetcher: GlobalFetch['fetch']
+}): Promise<PrefetchPageResponse> => {
+  const parsedUrl = parse(path)
+  parsedUrl.search = undefined
+  parsedUrl.query = {
+    ...rawQuery,
+    __pickRuntime: 'page,queryData,contentResponse,route',
+  } as any
+  const url = format(parsedUrl)
+  const pageResponse: PrefetchPageResponse = await fetchWithRetry(
+    url,
+    {
+      credentials: 'same-origin',
+      headers: {
+        accept: 'application/json',
+      },
+    },
+    fetcher
+  )
+    .then(({ response }) => response.json())
+    .catch(() => null)
+  return pageResponse
+}
+
+const parseFecthRouteData = (data: PrefetchBlocks): PrefetchRouteData => {
+  console.log('tetse PARSING DATA: ', data)
+  return {
+    extensions: JSON.parse(data.extensionsJSON),
+    components: JSON.parse(data.componentsJSON),
+    messages: parseMessages(data.messages),
+  }
+}
+
+const getDeviceFromHint = (hints: RenderRuntime['hints']) => {
+  if (hints.desktop) {
+    return 'desktop'
+  }
+  if (hints.phone) {
+    return 'phone'
+  }
+  if (hints.tablet) {
+    return 'tablet'
+  }
+  return 'unknown'
+}
+
+interface FetchRouteDataArgs {
+  apolloClient: ApolloClientType
+  routeId: string
+  declarer: string
+  query?: string
+  hints: RenderRuntime['hints']
+  renderMajor: number
+}
+
+interface PrefetchBlocksQueryVars {
+  routeId: string
+  declarer: string
+  query?: string
+  device: 'desktop' | 'phone' | 'tablet' | 'unknown'
+  renderMajor: number
+}
+
+interface PrefetchBlocksQueryResult {
+  prefetchBlocks: PrefetchBlocks
+}
+
+interface PrefetchBlocks {
+  extensionsJSON: string
+  componentsJSON: string
+  messages: KeyedString[]
+}
+
+export const fetchRouteData = ({
+  apolloClient,
+  routeId,
+  declarer,
+  query,
+  hints,
+  renderMajor,
+}: FetchRouteDataArgs) =>
+  apolloClient
+    .query<PrefetchBlocksQueryResult, PrefetchBlocksQueryVars>({
+      fetchPolicy: 'no-cache',
+      query: routeDataQuery,
+      variables: {
+        declarer,
+        query,
+        routeId,
+        device: getDeviceFromHint(hints),
+        renderMajor,
+      },
+    })
+    .then(({ data: { prefetchBlocks }, errors }) =>
+      errors ? Promise.reject(errors) : parseFecthRouteData(prefetchBlocks)
+    )
+
 export const fetchNavigationPage = ({
   apolloClient,
   routeId,
@@ -195,8 +307,8 @@ export const fetchNavigationPage = ({
 
 const getRoutesParam = (routeIds: string[], pages: Pages) => {
   return routeIds
-    .filter(routeId => routeId in pages)
-    .map(routeId => {
+    .filter((routeId) => routeId in pages)
+    .map((routeId) => {
       const page = pages[routeId]
       return {
         declarer: page.declarer,

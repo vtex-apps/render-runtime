@@ -26,6 +26,7 @@ import { OperationContext } from '../utils/client/links/uriSwitchLink'
 import {
   traverseComponent,
   traverseListOfComponents,
+  fetchComponents,
 } from '../utils/components'
 import { setCookie } from '../utils/cookie'
 import {
@@ -57,12 +58,18 @@ import ExtensionManager from './ExtensionPoint/ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
 import RenderPage from './RenderPage'
+import { parseMessages } from '../utils/messages'
+import {
+  getPrefetechedData,
+  clearQueue,
+  PrefetchContextProvider,
+} from './Prefetch/PrefetchContext'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
   () =>
-    new Promise<{ default: any }>(resolve => {
-      import('@vtex/blocks-inspector').then(BlocksInspector => {
+    new Promise<{ default: any }>((resolve) => {
+      import('@vtex/blocks-inspector').then((BlocksInspector) => {
         resolve({ default: BlocksInspector.default.InspectorPopover })
       })
     })
@@ -173,6 +180,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     updateExtension: PropTypes.func,
     updateRuntime: PropTypes.func,
     workspace: PropTypes.string,
+    navigationRouteModifiers: PropTypes.object,
+    // teste: PropTypes.string,
   }
 
   public static propTypes = {
@@ -202,9 +211,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private rendered!: boolean
   private sessionPromise: Promise<void>
   private unlisten!: UnregisterCallback | null
-  private apolloClient: ApolloClient<NormalizedCacheObject>
+  private apolloClient: ApolloClientType
   private prefetchRoutes: Set<string>
-  private navigationRouteModifiers: Set<NavigationRouteModifier>
+  public navigationRouteModifiers: Set<NavigationRouteModifier>
   private navigationModifierOptions: Record<string, NavigationRouteChange>
   private fetcher: GlobalFetch['fetch']
 
@@ -430,6 +439,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       platform,
       prefetchDefaultPages: this.prefetchDefaultPages,
       addNavigationRouteModifier: this.addNavigationRouteModifier,
+      // bala: this.getNavigationRouteModifiers,
+      navigationRouteModifiers: this.navigationRouteModifiers,
       prefetchPage: this.prefetchPage,
       preview,
       production,
@@ -444,6 +455,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
       workspace,
+      // teste: 'hello'
     }
   }
 
@@ -469,11 +481,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const customMessages = componentsArray
       .map(getLoadedImplementation)
       .filter(
-        component =>
+        (component) =>
           component &&
           (component.getCustomMessages || component.WrappedComponent)
       )
-      .map(component => {
+      .map((component) => {
         const getCustomMessages =
           component.getCustomMessages ||
           (component.WrappedComponent &&
@@ -564,12 +576,17 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.navigationRouteModifiers.add(modifier)
   }
 
+  // public getNavigationRouteModifiers = () => {
+  //   // return this.navigationRouteModifiers
+  //   console.log('teste OIE')
+  // }
+
   public replaceRouteClass = (route: string) => {
     try {
       const containers = document.getElementsByClassName(RENDER_CONTAINER_CLASS)
       const currentRouteClass = containers[0].className
         .split(' ')
-        .find(c => c.startsWith(ROUTE_CLASS_PREFIX))
+        .find((c) => c.startsWith(ROUTE_CLASS_PREFIX))
       const newRouteClass = routeClass(route)
 
       Array.prototype.forEach.call(containers, (e: Element) => {
@@ -649,20 +666,104 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       )
     }
 
+    const paramsJSON = JSON.stringify(params)
+    const apolloClient = this.apolloClient
+    const routeId = page
+
+    // navigationRoute: {path: "/Climbing/Climbing-Shoes/Youth", params: {…}, id: "", realHash: "", query: "map=c%2Cc%2CspecificationFilter_7721"}
+    //teste NAVIGATIN TO:  {path: "/climbing/climbing-shoes/Youth", params: {…}, id: "", realHash: "", query: "map=c,c,specificationFilter_7721"}
+    console.log('teste NAVIGATIN TO: ', navigationRoute)
+    // Retrieve the adequate assets for the new page. Naming will
+    // probably change (query will return something like routes) as
+    // well as the fields that need to be retrieved, but the logic
+    // that the new state (extensions and assets) will be derived from
+    // the results of this query will probably remain the same.
+
+    // console.log('teste DTA: ', {
+    //   declarer,
+    //   paramsJSON,
+    //   query: JSON.stringify(query),
+    //   renderMajor,
+    //   routeId,
+    // })
+    // if (window.__RUNTIME__.fidelis[])
+
+    // console.log('teste navigationRoute.path: ', navigationRoute.path)
+    // console.log('teste navigationRoute.pathData: ', window.__RUNTIME__.fidelis.pathData[navigationRoute.path])
+    // const prefetchedData = window.__RUNTIME__.fidelis.pathData[navigationRoute.path]
+    // const destinationRouteId = window.__RUNTIME__.fidelis.pathsInCache[navigationRoute.path]
+    // let prefetchedPathData = null
+    // if (destinationRouteId === 'store.product') {
+    //   prefetchedPathData = window.__RUNTIME__.fidelis.pathsCache.product.get(navigationRoute.path)
+    // } else if (destinationRouteId?.startsWith('store.search')) {
+    //   prefetchedPathData = window.__RUNTIME__.fidelis.pathsCache.search.get(navigationRoute.path)
+    // } else {
+    //   prefetchedPathData = window.__RUNTIME__.fidelis.pathsCache.other.get(navigationRoute.path)
+    // }
+    // const routeData = prefetchedPathData ? window.__RUNTIME__.fidelis.routesCache.get(destinationRouteId) : null
+
+    // console.log('teste routeData: ', routeData)
+    // console.log('teste prefetchedPathData: ', prefetchedPathData)
+    // console.log('teste destinationRouteId: ', destinationRouteId)
+    const {
+      prefetchedPathData,
+      routeData,
+      destinationRouteId,
+    } = getPrefetechedData(navigationRoute.path)
+    if (prefetchedPathData && routeData && destinationRouteId) {
+      const routeId = destinationRouteId
+      const matchingPage = prefetchedPathData.matchingPage
+      const contentResponse = prefetchedPathData.contentResponse
+      let extensions = routeData.extensions
+      let messages = routeData.messages
+      if (contentResponse) {
+        //create a fresh copy
+        // extensions = JSON.parse(routeData.extensionsJSON)
+        extensions = JSON.parse(JSON.stringify(routeData.extensions))
+        messages = { ...messages, ...contentResponse.userMessages }
+        for (const {
+          treePath,
+          contentJSON,
+          contentIds,
+        } of contentResponse.extensionsContent || []) {
+          if (contentJSON !== '{}') {
+            extensions[treePath]!.content = contentJSON
+              ? JSON.parse(contentJSON)
+              : undefined
+          }
+          extensions[treePath]!.contentIds = contentIds
+        }
+      }
+
+      this.setState(
+        (state) => ({
+          ...state,
+          components: { ...state.components, ...routeData.components },
+          extensions: { ...state.extensions, ...extensions },
+          loadedPages: loadedPages.add(routeId),
+          messages: { ...state.messages, ...messages },
+          page: routeId,
+          preview: false,
+          query,
+          route: matchingPage,
+        }),
+        () => {
+          this.navigationState = { isNavigating: false }
+          this.replaceRouteClass(routeId)
+          this.sendInfoFromIframe()
+          this.scrollTo(state.scrollOptions)
+        }
+      )
+
+      return Promise.resolve()
+    }
+
     // Sets the preloading state, which currently displays
     // a loading bar at the top of the page
     this.setState({
       preview: true,
     })
 
-    const paramsJSON = JSON.stringify(params)
-    const apolloClient = this.apolloClient
-    const routeId = page
-    // Retrieve the adequate assets for the new page. Naming will
-    // probably change (query will return something like routes) as
-    // well as the fields that need to be retrieved, but the logic
-    // that the new state (extensions and assets) will be derived from
-    // the results of this query will probably remain the same.
     const navigationPromise = isEnabled('RENDER_NAVIGATION')
       ? fetchServerPage({
           fetcher: this.fetcher,
@@ -685,8 +786,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
             await this.fetchComponents(components, extensions)
 
+            console.log('teste matchingPage: ', matchingPage)
+
             this.setState(
-              state => ({
+              (state) => ({
                 ...state,
                 appsEtag,
                 components: { ...state.components, ...components },
@@ -792,7 +895,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         )
         return
       }
-      routeIds.forEach(routeId => this.prefetchRoutes.add(routeId))
+      routeIds.forEach((routeId) => this.prefetchRoutes.add(routeId))
     }
   }
 
@@ -810,45 +913,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     extensions?: RenderRuntime['extensions']
   ) => {
     const { runtime } = this.props
-    // In order for only fetching `components`, we create corresponding extensions
-    // for them if they weren't passed
-    if (!extensions) {
-      const componentsNames = Object.keys(components)
-      extensions = componentsNames.reduce((acc, component) => {
-        acc[component] = { component }
-        return acc
-      }, {} as RenderRuntime['extensions'])
-    }
-    const componentsToDownload = Object.values(extensions).reduce<string[]>(
-      (acc, extension) => {
-        if (!extension) {
-          return acc
-        }
-        if (extension.render === 'lazy') {
-          return acc
-        }
-        if (!hasComponentImplementation(extension.component)) {
-          acc.push(extension.component)
-        }
-        const context = extension?.context?.component
-        if (context && !hasComponentImplementation(context)) {
-          acc.push(context)
-        }
-        return acc
-      },
-      []
-    )
-
-    if (componentsToDownload.length === 0) {
-      return
-    }
-
-    const allAssets = traverseListOfComponents(components, componentsToDownload)
-    await fetchAssets(runtime, allAssets)
+    await fetchComponents(components, runtime, extensions)
     this.sendInfoFromIframe({ shouldUpdateRuntime: true })
   }
 
-  public fetchComponent: RenderContext['fetchComponent'] = component => {
+  public fetchComponent: RenderContext['fetchComponent'] = (component) => {
     if (!canUseDOM) {
       throw new Error('Cannot fetch components during server side rendering.')
     }
@@ -891,7 +960,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }
       this.patchSession(sessionData)
         .then(() => window.location.reload())
-        .catch(e => {
+        .catch((e) => {
           console.log('Failed to fetch new locale file.')
           console.error(e)
         })
@@ -944,9 +1013,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     await this.fetchComponents(components, extensions)
 
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       this.setState(
-        state => ({
+        (state) => ({
           appsEtag,
           cacheHints: isEnabled('RENDER_NAVIGATION')
             ? state.cacheHints
@@ -1006,7 +1075,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public updateExtension = async (name: string, extension: Extension) => {
     const { extensions } = this.state
 
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       this.setState(
         {
           extensions: {
@@ -1028,9 +1097,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public addMessages = async (newMessages: RenderRuntime['messages']) => {
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       this.setState(
-        state => ({
+        (state) => ({
           ...state,
           messages: {
             ...state.messages,
@@ -1081,19 +1150,21 @@ class RenderProvider extends Component<Props, RenderProviderState> {
               messages={mergedMessages}
               textComponent={Fragment}
             >
-              <Fragment>
-                <ExtensionManager runtime={this.props.runtime} />
-                {!production && !isSiteEditorIframe && <BuildStatus />}
-                {component}
-                {isSiteEditorIframe ? (
-                  <ExtensionPoint id="store/__overlay" />
-                ) : null}
-                {inspect && (
-                  <Suspense fallback={null}>
-                    <InspectorPopover />
-                  </Suspense>
-                )}
-              </Fragment>
+              <PrefetchContextProvider history={this.props.history}>
+                <Fragment>
+                  <ExtensionManager runtime={this.props.runtime} />
+                  {!production && !isSiteEditorIframe && <BuildStatus />}
+                  {component}
+                  {isSiteEditorIframe ? (
+                    <ExtensionPoint id="store/__overlay" />
+                  ) : null}
+                  {inspect && (
+                    <Suspense fallback={null}>
+                      <InspectorPopover />
+                    </Suspense>
+                  )}
+                </Fragment>
+              </PrefetchContextProvider>
             </IntlProvider>
           </ApolloProvider>
         </TreePathContextProvider>
@@ -1127,7 +1198,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   // Deprecated
   private updateMessages = (newMessages: RenderProviderState['messages']) => {
     this.setState(
-      prevState => ({
+      (prevState) => ({
         ...prevState,
         messages: { ...prevState.messages, ...newMessages },
       }),
