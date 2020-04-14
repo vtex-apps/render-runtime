@@ -32,11 +32,13 @@ export function generateSlot({
       const hasLabel = slotValue.includes('#')
       const dynamicTreePath = `${newTreePath}${hasLabel ? '-' : '#'}${props.id}`
 
+      slotChildren =
+        getChildExtensions(runtime, dynamicTreePath) ?? slotChildren
+
       if (!runtime.extensions[dynamicTreePath]) {
-        slotChildren =
-          getChildExtensions(runtime, dynamicTreePath) ?? slotChildren
         componentProps = extension?.props ?? {}
         const baseSlotBlockId = extension?.blockId
+        const dynamicSlotProps = { ...props, ...componentProps }
 
         return (
           <DynamicSlot
@@ -44,7 +46,7 @@ export function generateSlot({
             runtime={runtime}
             hydration={hydration}
             component={extension?.component ?? null}
-            props={{ ...props, ...componentProps }}
+            props={dynamicSlotProps}
             blockId={baseSlotBlockId}
             baseTreePath={newTreePath}
           >
@@ -54,17 +56,20 @@ export function generateSlot({
       }
 
       extension = runtime.extensions[dynamicTreePath]
-      slotChildren =
-        getChildExtensions(runtime, dynamicTreePath) ?? slotChildren
       componentProps = extension?.props ?? {}
     }
 
     const extensionContent = extension?.content
+    const componentLoaderPropsWithContent = {
+      ...props,
+      ...componentProps,
+      ...extensionContent,
+    }
 
     return (
       <ComponentLoader
         component={extension?.component ?? null}
-        props={{ ...props, ...componentProps, ...extensionContent }}
+        props={componentLoaderPropsWithContent}
         treePath={newTreePath}
         runtime={runtime}
         hydration={hydration}
@@ -89,6 +94,10 @@ interface DynamicSlotProps {
   baseTreePath: string
 }
 
+interface ListContentQuery {
+  listContent: Array<{ contentJSON: string }>
+}
+
 const DynamicSlot: FC<DynamicSlotProps> = ({
   treePath,
   runtime,
@@ -99,7 +108,7 @@ const DynamicSlot: FC<DynamicSlotProps> = ({
   blockId,
   baseTreePath,
 }) => {
-  const { data, loading, error } = useQuery(ListContent, {
+  const { data, loading, error } = useQuery<ListContentQuery>(ListContent, {
     variables: {
       bindingId: runtime.binding?.id,
       template: runtime.page,
@@ -117,25 +126,31 @@ const DynamicSlot: FC<DynamicSlotProps> = ({
     return null
   }
 
-  const extensionContent =
-    (data.listContent[1]?.contentJSON &&
-      JSON.parse(data.listContent[1]?.contentJSON)) ??
-    (data.listContent[0]?.contentJSON &&
-      JSON.parse(data.listContent[0]?.contentJSON))
+  let extensionContent =
+    (data?.listContent[1]?.contentJSON &&
+      (JSON.parse(data.listContent[1]?.contentJSON) as Record<string, any>)) ??
+    (data?.listContent[0]?.contentJSON &&
+      (JSON.parse(data.listContent[0]?.contentJSON) as Record<string, any>))
 
   if (!extensionContent) {
     runtime.extensions[treePath] = runtime.extensions[baseTreePath]
+    extensionContent = runtime.extensions[baseTreePath]?.content
   } else {
-    runtime.extensions[treePath] = {
-      ...runtime.extensions[baseTreePath]!,
-      content: extensionContent,
-    }
+    runtime.extensions[treePath] = runtime.extensions[baseTreePath]
+      ? {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          ...runtime.extensions[baseTreePath]!,
+          content: extensionContent,
+        }
+      : null
   }
+
+  const componentLoaderPropsWithContent = { ...props, ...extensionContent }
 
   return (
     <ComponentLoader
       component={component ?? null}
-      props={{ ...props, ...extensionContent }}
+      props={componentLoaderPropsWithContent}
       treePath={treePath}
       runtime={runtime}
       hydration={hydration}
