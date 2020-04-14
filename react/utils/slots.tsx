@@ -13,6 +13,20 @@ interface GenerateSlotArgs {
   hydration: Hydration
 }
 
+interface DynamicSlotProps {
+  component: string | null
+  props: Record<string, any>
+  blockId: string | undefined
+  treePath: string
+  runtime: RenderContext
+  hydration: Hydration
+  baseTreePath: string
+}
+
+interface ListContentQuery {
+  listContent: Array<{ contentJSON: string }>
+}
+
 export function generateSlot({
   treePath,
   slotName,
@@ -84,20 +98,6 @@ export function generateSlot({
   return SlotComponent
 }
 
-interface DynamicSlotProps {
-  component: any
-  props: any
-  blockId: string | undefined
-  treePath: string
-  runtime: RenderContext
-  hydration: Hydration
-  baseTreePath: string
-}
-
-interface ListContentQuery {
-  listContent: Array<{ contentJSON: string }>
-}
-
 const DynamicSlot: FC<DynamicSlotProps> = ({
   treePath,
   runtime,
@@ -145,7 +145,9 @@ const DynamicSlot: FC<DynamicSlotProps> = ({
       : null
   }
 
-  const componentLoaderPropsWithContent = { ...props, ...extensionContent }
+  const componentLoaderPropsWithContent = extensionContent
+    ? { ...props, ...extensionContent }
+    : props
 
   return (
     <ComponentLoader
