@@ -65,7 +65,7 @@ declare global {
     extensionPointId: string
     blockId: string
     children?: boolean
-    slot?: boolean
+    blockRole?: 'block' | 'children' | 'slot'
   }
 
   interface Extension {
