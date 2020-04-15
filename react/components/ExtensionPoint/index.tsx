@@ -50,7 +50,10 @@ export function getChildExtensions(runtime: RenderContext, treePath: string) {
   // This filter condition is for backwards compatibility
   const childBlocks = extension.blocks.filter(
     block =>
-      (block.children === undefined || block.children === true) && !block.slot
+      (block.children === undefined ||
+        block.children === true ||
+        block.blockRole === 'children') &&
+      block.blockRole !== 'slot'
   )
 
   return childBlocks.map((child, i) => {
