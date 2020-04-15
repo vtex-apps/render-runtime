@@ -10,6 +10,7 @@ import React, {
 import LRUCache from 'lru-cache'
 import PQueue from 'p-queue'
 import { History, UnregisterCallback } from 'history'
+import { isEnabled } from '../../utils/flags'
 
 const MAX_CONCURRENCY = 5
 
@@ -100,8 +101,9 @@ export const PrefetchContextProvider: FC<{ history: History | null }> = ({
     window.addEventListener(
       'load',
       () => {
-        console.log('teste INICIANDO!')
-        state.queue.start()
+        if (isEnabled('PREFETCH')) {
+          state.queue.start()
+        }
       },
       { once: true }
     )
