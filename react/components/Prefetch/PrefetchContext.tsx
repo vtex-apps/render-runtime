@@ -43,12 +43,18 @@ export interface PrefetchState {
   queue: PQueue
 }
 
+const HALF_HOUR_MS = 1000 * 60 * 30
+
 const state: PrefetchState = {
-  routesCache: new LRUCache({ max: 100 }),
+  routesCache: new LRUCache({ max: 100, maxAge: HALF_HOUR_MS }),
   pathsCache: {
-    product: new LRUCache({ max: 100, dispose: disposeFn }),
-    search: new LRUCache({ max: 75, dispose: disposeFn }),
-    other: new LRUCache({ max: 75, dispose: disposeFn }),
+    product: new LRUCache({
+      max: 100,
+      dispose: disposeFn,
+      maxAge: HALF_HOUR_MS,
+    }),
+    search: new LRUCache({ max: 75, dispose: disposeFn, maxAge: HALF_HOUR_MS }),
+    other: new LRUCache({ max: 75, dispose: disposeFn, maxAge: HALF_HOUR_MS }),
   },
   pathsState: {},
   routePromise: {},
@@ -94,6 +100,7 @@ export const PrefetchContextProvider: FC<{ history: History | null }> = ({
     window.addEventListener(
       'load',
       () => {
+        console.log('teste INICIANDO!')
         state.queue.start()
       },
       { once: true }

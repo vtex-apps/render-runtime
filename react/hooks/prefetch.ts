@@ -23,6 +23,10 @@ interface PrefetchRequestsArgs {
   prefetchState: PrefetchState
   hints: RenderRuntime['hints']
   renderMajor: RenderRuntime['renderMajor']
+  validCache: {
+    pathValid: boolean
+    routeValid: boolean
+  }
 }
 
 const getPageToNavigate = (path: string) => {
@@ -34,27 +38,21 @@ const getPageToNavigate = (path: string) => {
   })
 }
 
-const prefetchRequests = async ({
-  client,
-  navigationRoute,
-  page,
-  pages,
+const maybeUpdatePathCache = async ({
   prefetchState,
-  hints,
-  renderMajor,
-}: PrefetchRequestsArgs) => {
-  const { pathsState, routesCache, routePromise } = prefetchState
-  const navigationData = await getPageToNavigate(navigationRoute.path)
-
-  const navigationPage = page ?? navigationData.page
-
-  pathsState[navigationRoute.path] = { fetching: false, page: navigationPage }
-
-  const declarer = pages[navigationPage]?.declarer
-  if (!declarer) {
-    return
+  navigationRoute,
+  validCache,
+  page,
+  client,
+}: any) => {
+  const { pathsState } = prefetchState
+  if (validCache.pathValid) {
+    return pathsState[navigationRoute.path].page
   }
 
+  const navigationData = await getPageToNavigate(navigationRoute.path)
+  const navigationPage = page ?? navigationData.page
+  pathsState[navigationRoute.path] = { fetching: false, page: navigationPage }
   if (navigationData.queryData) {
     hydrateApolloCache(navigationData.queryData, client)
   }
@@ -66,7 +64,38 @@ const prefetchRequests = async ({
   }
 
   const cache = getCacheForPage(navigationPage)
+  console.log('teste saving for cache: ', navigationRoute.path)
   cache.set(navigationRoute.path, cacheObj)
+  return navigationPage
+}
+
+const prefetchRequests = async ({
+  client,
+  navigationRoute,
+  page,
+  pages,
+  prefetchState,
+  hints,
+  renderMajor,
+  validCache,
+}: PrefetchRequestsArgs) => {
+  const { pathsState, routesCache, routePromise } = prefetchState
+
+  const navigationPage = await maybeUpdatePathCache({
+    prefetchState,
+    navigationRoute,
+    validCache,
+    page,
+    client,
+  })
+
+  pathsState[navigationRoute.path] = { fetching: false, page: navigationPage }
+
+  const declarer = pages[navigationPage]?.declarer
+  if (typeof declarer === 'undefined') {
+    // Should not happen, but lets be safe
+    return
+  }
 
   let routeDataCache = routesCache.get(navigationPage)
   const routePromiseValue = routePromise[navigationPage]
@@ -118,6 +147,26 @@ interface UsePrefetchArgs {
   options: NavigateOptions
 }
 
+const getCacheValidData = (path: string, prefecthState: PrefetchState) => {
+  const { pathsState, routesCache } = prefecthState
+  const page = pathsState[path]?.page
+
+  if (!page) {
+    return {
+      pathValid: false,
+      routeValid: false,
+    }
+  }
+
+  const cache = getCacheForPage(page)
+  const validData = cache.has(path)
+  const validRoutesData = routesCache.has(page)
+  return {
+    pathValid: validData,
+    routeValid: validRoutesData,
+  }
+}
+
 export const usePrefetchAttempt = ({
   inView,
   page,
@@ -142,10 +191,21 @@ export const usePrefetchAttempt = ({
       options.modifiers = navigationRouteModifiers
       const navigationRoute = getNavigationRouteToNavigate(pages, options)
 
-      if (pathsState[navigationRoute.path]) {
-        return //dont redo
+      if (pathsState[navigationRoute.path]?.fetching) {
+        // already fetching, no need to go any further
+        return
       }
-      pathsState[navigationRoute.path] = { fetching: true }
+
+      const validCache = getCacheValidData(navigationRoute.path, prefetchState)
+
+      if (validCache.pathValid && validCache.routeValid) {
+        // cache all valid, no need to fetch anything
+        return
+      }
+
+      if (!validCache.pathValid) {
+        pathsState[navigationRoute.path] = { fetching: true }
+      }
 
       const priority = page === 'store.product' ? 1 : 0
       hasTried.current = true
@@ -160,6 +220,7 @@ export const usePrefetchAttempt = ({
             prefetchState,
             hints,
             renderMajor,
+            validCache,
           }),
         { priority }
       )

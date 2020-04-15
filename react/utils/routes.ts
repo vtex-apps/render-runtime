@@ -226,7 +226,7 @@ const getDeviceFromHint = (hints: RenderRuntime['hints']) => {
 interface FetchRouteDataArgs {
   apolloClient: ApolloClientType
   routeId: string
-  declarer: string
+  declarer: string | null
   query?: string
   hints: RenderRuntime['hints']
   renderMajor: number
@@ -234,7 +234,7 @@ interface FetchRouteDataArgs {
 
 interface PrefetchBlocksQueryVars {
   routeId: string
-  declarer: string
+  declarer: string | null
   query?: string
   device: 'desktop' | 'phone' | 'tablet' | 'unknown'
   renderMajor: number
