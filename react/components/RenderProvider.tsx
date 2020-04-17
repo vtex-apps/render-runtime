@@ -665,6 +665,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       routeData,
       destinationRouteId,
     } = getPrefetechedData(navigationRoute.path)
+
     if (prefetchedPathData && routeData && destinationRouteId) {
       const routeId = destinationRouteId
       const matchingPage = prefetchedPathData.matchingPage

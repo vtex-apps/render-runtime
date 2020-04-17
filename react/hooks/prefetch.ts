@@ -13,7 +13,7 @@ import { hydrateApolloCache } from '../utils/apolloCache'
 import { fetchComponents } from '../utils/components'
 import { useRuntime } from '../core/main'
 import { useApolloClient } from 'react-apollo'
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
 interface PrefetchRequestsArgs {
   client: ApolloClientType
@@ -64,7 +64,7 @@ const maybeUpdatePathCache = async ({
   }
 
   const cache = getCacheForPage(navigationPage)
-  console.log('teste saving for cache: ', navigationRoute.path)
+
   cache.set(navigationRoute.path, cacheObj)
   return navigationPage
 }
@@ -145,6 +145,7 @@ interface UsePrefetchArgs {
   page?: string
   href: string
   options: NavigateOptions
+  waitToPrefetch?: number
 }
 
 const getCacheValidData = (path: string, prefecthState: PrefetchState) => {
@@ -172,24 +173,37 @@ export const usePrefetchAttempt = ({
   page,
   href,
   options,
+  waitToPrefetch,
 }: UsePrefetchArgs) => {
   const runtime = useRuntime()
   const prefetchState = usePrefetch()
   const client = useApolloClient() as ApolloClientType
   const hasTried = useRef(false)
+  const [canPrefetch, setCanPrefetch] = useState(() => {
+    return !waitToPrefetch || waitToPrefetch === 0
+  })
+
+  useEffect(() => {
+    if (!canPrefetch) {
+      setTimeout(() => {
+        setCanPrefetch(true)
+      }, waitToPrefetch)
+    }
+  }, [canPrefetch, waitToPrefetch])
 
   const { pages, navigationRouteModifiers, hints, renderMajor } = runtime
 
   useEffect(() => {
-    if (inView && !hasTried.current) {
+    if (inView && !hasTried.current && canPrefetch) {
       const { pathsState, queue } = prefetchState
       if (href && href[0] !== '/') {
-        // so funciona com path relativo
+        // Should only work on relative paths
         return
       }
 
       options.modifiers = navigationRouteModifiers
       const navigationRoute = getNavigationRouteToNavigate(pages, options)
+      navigationRoute.original = options.to
 
       if (pathsState[navigationRoute.path]?.fetching) {
         // already fetching, no need to go any further
@@ -236,5 +250,6 @@ export const usePrefetchAttempt = ({
     pages,
     prefetchState,
     renderMajor,
+    canPrefetch,
   ])
 }

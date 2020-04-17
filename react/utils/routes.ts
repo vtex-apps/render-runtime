@@ -202,7 +202,6 @@ export const getPrefetchForPath = async ({
 }
 
 const parseFecthRouteData = (data: PrefetchBlocks): PrefetchRouteData => {
-  console.log('tetse PARSING DATA: ', data)
   return {
     extensions: JSON.parse(data.extensionsJSON),
     components: JSON.parse(data.componentsJSON),

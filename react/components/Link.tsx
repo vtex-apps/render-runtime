@@ -22,6 +22,7 @@ interface Props extends NavigateOptions {
   onClick?: (event: React.MouseEvent) => void
   className?: string
   target?: string
+  waitToPrefetch?: number
 }
 
 const Link: React.FunctionComponent<Props> = ({
@@ -36,6 +37,7 @@ const Link: React.FunctionComponent<Props> = ({
   replace,
   modifiersOptions,
   target,
+  waitToPrefetch,
   ...linkProps
 }) => {
   const {
@@ -130,7 +132,7 @@ const Link: React.FunctionComponent<Props> = ({
     triggerOnce: true,
   })
 
-  usePrefetchAttempt({ inView, page, href, options })
+  usePrefetchAttempt({ inView, page, href, options, waitToPrefetch })
 
   return (
     <a

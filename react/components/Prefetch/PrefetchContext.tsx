@@ -11,6 +11,7 @@ import LRUCache from 'lru-cache'
 import PQueue from 'p-queue'
 import { History, UnregisterCallback } from 'history'
 import { isEnabled } from '../../utils/flags'
+import { useRuntime } from '../../core/main'
 
 const MAX_CONCURRENCY = 5
 
@@ -62,6 +63,8 @@ const state: PrefetchState = {
   queue: new PQueue({ concurrency: MAX_CONCURRENCY, autoStart: false }),
 }
 
+// window.__RUNTIME__.fidelis = state
+
 const PrefetchContext = createContext<PrefetchState>(state)
 
 export const getCacheForPage = (page: string) => {
@@ -78,10 +81,13 @@ export const getCacheForPage = (page: string) => {
 
 export const usePrefetch = () => useContext(PrefetchContext)
 
+const getTimeout = (isMobile: boolean) => 3500 * (isMobile ? 2 : 1)
+
 export const PrefetchContextProvider: FC<{ history: History | null }> = ({
   children,
   history,
 }) => {
+  const { hints } = useRuntime()
   const unlistenRef = useRef<UnregisterCallback>(null) as MutableRefObject<
     UnregisterCallback
   >
@@ -102,7 +108,9 @@ export const PrefetchContextProvider: FC<{ history: History | null }> = ({
       'load',
       () => {
         if (isEnabled('PREFETCH')) {
-          state.queue.start()
+          setTimeout(() => {
+            state.queue.start()
+          }, getTimeout(hints.mobile))
         }
       },
       { once: true }
@@ -112,7 +120,7 @@ export const PrefetchContextProvider: FC<{ history: History | null }> = ({
         unlistenRef.current()
       }
     }
-  }, [history, onPageChanged, unlistenRef])
+  }, [hints.mobile, history, onPageChanged, unlistenRef])
 
   return (
     <PrefetchContext.Provider value={state}>
