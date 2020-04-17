@@ -38,16 +38,27 @@ const getPageToNavigate = (path: string) => {
   })
 }
 
+interface MaybeUpdatePathArgs {
+  prefetchState: PrefetchState
+  navigationRoute: any
+  validCache: {
+    pathValid: boolean
+    routeValid: boolean
+  }
+  page?: string
+  client: ApolloClientType
+}
+
 const maybeUpdatePathCache = async ({
   prefetchState,
   navigationRoute,
   validCache,
   page,
   client,
-}: any) => {
+}: MaybeUpdatePathArgs) => {
   const { pathsState } = prefetchState
   if (validCache.pathValid) {
-    return pathsState[navigationRoute.path].page
+    return pathsState[navigationRoute.path].page as string
   }
 
   const navigationData = await getPageToNavigate(navigationRoute.path)
