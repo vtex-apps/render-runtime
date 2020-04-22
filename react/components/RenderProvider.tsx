@@ -675,7 +675,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       if (contentResponse) {
         //create a fresh copy of extensions to not change the one in memory
         extensions = JSON.parse(JSON.stringify(routeData.extensions))
-        messages = { ...messages, ...contentResponse.userMessages }
+        messages = { ...messages, ...contentResponse.contentMessages }
         for (const {
           treePath,
           contentJSON,
