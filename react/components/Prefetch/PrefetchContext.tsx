@@ -63,8 +63,6 @@ const state: PrefetchState = {
   queue: new PQueue({ concurrency: MAX_CONCURRENCY, autoStart: false }),
 }
 
-// window.__RUNTIME__.fidelis = state
-
 const PrefetchContext = createContext<PrefetchState>(state)
 
 export const getCacheForPage = (page: string) => {

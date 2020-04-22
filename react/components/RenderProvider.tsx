@@ -178,7 +178,6 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     updateRuntime: PropTypes.func,
     workspace: PropTypes.string,
     navigationRouteModifiers: PropTypes.object,
-    // teste: PropTypes.string,
   }
 
   public static propTypes = {

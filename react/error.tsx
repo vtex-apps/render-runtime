@@ -136,9 +136,6 @@ if (window.__ERROR__) {
       props: {},
     }
 
-    //     const productCache = new LRUCache({ max: 100 })
-    // const searchCache = new LRUCache({ max: 75 })
-    // const otherCache = new LRUCache({ max: 125 })
     window.__RENDER_8_RUNTIME__.render('error', global.__RUNTIME__)
   }
 

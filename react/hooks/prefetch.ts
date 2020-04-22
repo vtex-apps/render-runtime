@@ -159,6 +159,8 @@ interface UsePrefetchArgs {
   waitToPrefetch?: number
 }
 
+// Returns an object that for a given path, tells us if the routes or path cache has valid data for the given input.
+// We do this to know when to hit the server. Will return false (as invalid data) if cached data has expired its max age.
 const getCacheValidData = (path: string, prefecthState: PrefetchState) => {
   const { pathsState, routesCache } = prefecthState
   const page = pathsState[path]?.page
@@ -178,6 +180,9 @@ const getCacheValidData = (path: string, prefecthState: PrefetchState) => {
     routeValid: validRoutesData,
   }
 }
+
+const getPriorityForPage = (page: string | undefined) =>
+  page === 'store.product' ? 1 : 0
 
 export const usePrefetchAttempt = ({
   inView,
@@ -232,7 +237,7 @@ export const usePrefetchAttempt = ({
         pathsState[navigationRoute.path] = { fetching: true }
       }
 
-      const priority = page === 'store.product' ? 1 : 0
+      const priority = getPriorityForPage(page)
       hasTried.current = true
 
       queue.add(
