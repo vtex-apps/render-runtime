@@ -294,9 +294,7 @@ export function insertUncriticalLinkElements({
   document.body.classList.add('.no-transitions')
   return Promise.all([
     ...base.map(ref => createPreloadLinkElement(ref, 'style#critical')),
-    ...overrides.map(ref =>
-      createPreloadLinkElement(ref, 'noscript#styles_overrides')
-    ),
+    ...overrides.map(ref => createPreloadLinkElement(ref, 'style#critical')),
   ]).then(
     linkElements =>
       new Promise(resolve => {
