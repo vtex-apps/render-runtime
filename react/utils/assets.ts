@@ -238,8 +238,11 @@ export function getExtensionImplementation<P = {}, S = {}>(
     : null
 }
 
-function createPreloadLinkElement(ref: StyleRef, selector: string): Promise<HTMLLinkElement | null> {
-  const {path, id, class: classname, crossorigin, media} = ref
+function createPreloadLinkElement(
+  ref: StyleRef,
+  selector: string
+): Promise<HTMLLinkElement | null> {
+  const { path, id, class: classname, crossorigin, media } = ref
   const link = document.createElement('link')
   if (media) {
     link.media = media
@@ -276,14 +279,19 @@ function createPreloadLinkElement(ref: StyleRef, selector: string): Promise<HTML
       resolve(null)
     }
 
-    element.insertAdjacentElement('afterend', link)
+    document.head.insertBefore(link, element)
   })
 }
 
-export async function insertUncriticalLinkElements({base = [], overrides = []}: StyleRefs) {
+export async function insertUncriticalLinkElements({
+  base = [],
+  overrides = [],
+}: StyleRefs) {
   const linkElements = await Promise.all([
     ...base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base')),
-    ...overrides.map(ref => createPreloadLinkElement(ref, 'noscript#styles_overrides')),
+    ...overrides.map(ref =>
+      createPreloadLinkElement(ref, 'noscript#styles_overrides')
+    ),
   ])
 
   for (const link of linkElements) {
