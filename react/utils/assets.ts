@@ -301,11 +301,14 @@ export function insertUncriticalLinkElements({
         requestAnimationFrame(() => {
           for (const item of linkElements) {
             if (item) {
-              item.link.onload = null
-              item.link.media = item.media
+              setTimeout(() => {
+                item.link.onload = null
+                item.link.media = item.media
+              }, 0)
             }
           }
-          setTimeout(resolve, 1000)
+
+          setTimeout(resolve, 25)
         })
       })
   )
