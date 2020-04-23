@@ -238,10 +238,7 @@ export function getExtensionImplementation<P = {}, S = {}>(
     : null
 }
 
-function createPreloadLinkElement(
-  ref: StyleRef,
-  selector: string
-): Promise<HTMLLinkElement | null> {
+function createPreloadLinkElement(ref: StyleRef, selector: string) {
   const { path, id, class: classname, crossorigin, media } = ref
   const link = document.createElement('link')
   if (media) {
@@ -260,54 +257,34 @@ function createPreloadLinkElement(
     link.crossOrigin = 'anonymous'
   }
 
-  link.href = path
   link.type = 'text/css'
   link.as = 'style'
-  link.rel = 'preload'
+  link.rel = 'stylesheet'
+  link.href = path
 
   const element = document.querySelector(selector)
   if (!element) {
     console.error(`Unable to find ${selector}`)
-    return Promise.resolve(null)
+    return null
   }
-
-  return new Promise(resolve => {
-    let insertedNode: HTMLLinkElement | null = null
-    link.onload = () => {
-      resolve(insertedNode)
-    }
-
-    link.onerror = () => {
-      resolve(null)
-    }
-
-    insertedNode = document.head.insertBefore(link, element)
-  })
+  document.head.insertBefore(link, element)
 }
 
 export function insertUncriticalLinkElements({
   base = [],
   overrides = [],
 }: StyleRefs) {
-  return Promise.all([
-    ...base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base')),
-    ...overrides.map(ref =>
-      createPreloadLinkElement(ref, 'noscript#styles_overrides')
-    ),
-  ]).then(
-    linkElements =>
-      new Promise(resolve => {
-        requestAnimationFrame(() => {
-          for (const link of linkElements) {
-            if (link) {
-              link.onload = null
-              link.rel = 'stylesheet'
-            }
-          }
-          setTimeout(resolve, 500)
-        })
-      })
-  )
+  return new Promise(resolve => {
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        overrides.map(ref =>
+          createPreloadLinkElement(ref, 'noscript#styles_overrides')
+        )
+        base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base'))
+        resolve()
+      }, 0)
+    })
+  })
 }
 
 export async function fetchAssets(
