@@ -274,6 +274,8 @@ export function insertUncriticalLinkElements({
   base = [],
   overrides = [],
 }: StyleRefs) {
+  document.body.style.webkitTransition = 'none !important'
+  document.body.style.transition = 'none !important'
   return new Promise(resolve => {
     requestAnimationFrame(() => {
       setTimeout(() => {
@@ -281,7 +283,12 @@ export function insertUncriticalLinkElements({
           createPreloadLinkElement(ref, 'noscript#styles_overrides')
         )
         base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base'))
-        resolve()
+
+        setTimeout(() => {
+          document.body.style.webkitTransition = ''
+          document.body.style.transition = ''
+          resolve()
+        }, 1000)
       }, 0)
     })
   })
