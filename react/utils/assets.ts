@@ -263,11 +263,11 @@ function createPreloadLinkElement(ref: StyleRef, selector: string) {
   link.href = path
 
   const element = document.querySelector(selector)
-  if (!element) {
+  if (element) {
+    document.head.insertBefore(link, element)
+  } else {
     console.error(`Unable to find ${selector}`)
-    return null
   }
-  document.head.insertBefore(link, element)
 }
 
 export function insertUncriticalLinkElements({
