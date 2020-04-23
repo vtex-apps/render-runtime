@@ -292,6 +292,7 @@ export function insertUncriticalLinkElements({
   base = [],
   overrides = [],
 }: StyleRefs) {
+  document.body.classList.add('.no-transitions')
   return Promise.all([
     ...base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base')),
     ...overrides.map(ref =>
@@ -312,6 +313,7 @@ export function insertUncriticalLinkElements({
             }
 
             requestAnimationFrame(() => {
+              document.body.classList.remove('.no-transitions')
               setTimeout(resolve, 100)
             })
           })
