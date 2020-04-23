@@ -427,6 +427,20 @@ declare global {
     canonicalBaseAddress: string
   }
 
+  interface StyleRef {
+    path: string
+    id?: string
+    class?: string
+    crossorigin?: boolean
+    preload?: boolean
+    media?: string
+  }
+
+  interface StyleRefs {
+    base: StyleRef[]
+    overrides: StyleRef[]
+  }
+
   interface RenderRuntime {
     amp: boolean
     account: string
@@ -478,6 +492,7 @@ declare global {
       variables: any
       data: string
     }>
+    uncriticalStyleRefs?: StyleRefs
   }
 
   interface CacheHints {

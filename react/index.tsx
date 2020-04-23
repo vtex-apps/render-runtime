@@ -7,6 +7,7 @@ import * as runtimeGlobals from './core/main'
 import { createReactIntl } from './utils/reactIntl'
 
 import { createCustomReactApollo } from './utils/reactApollo'
+import { insertUncriticalLinkElements } from './utils/assets'
 
 window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
 
@@ -87,17 +88,12 @@ if (
 ) {
   window.__UNCRITICAL_PROMISE__ = new Promise(resolve => {
     window.addEventListener('load', () => {
-      const base = document.querySelector('noscript#styles_base')
-      if (base) {
-        base.insertAdjacentHTML('afterend', base.innerHTML)
+      const {
+        __RUNTIME__: { uncriticalStyleRefs },
+      } = window
+      if (uncriticalStyleRefs) {
+        insertUncriticalLinkElements(uncriticalStyleRefs).finally(resolve)
       }
-
-      const overrides = document.querySelector('noscript#styles_overrides')
-      if (overrides) {
-        overrides.insertAdjacentHTML('afterend', overrides.innerHTML)
-      }
-
-      resolve()
     })
   })
 }
