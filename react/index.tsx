@@ -36,6 +36,18 @@ if (
   intlPolyfillPromise = import('./intl-polyfill').then(prop('default'))
 }
 
+if (canUseDOM) {
+  const style = document.createElement('style')
+  style.type = 'text/css'
+  style.innerHTML = `.no-transitions * {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -ms-transition: none !important;
+    -o-transition: none !important;
+  }`
+  document.getElementsByTagName('head')[0].appendChild(style)
+}
+
 if (module.hot) {
   module.hot.accept('./core/main', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
