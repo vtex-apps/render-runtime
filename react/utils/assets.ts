@@ -238,12 +238,12 @@ export function getExtensionImplementation<P = {}, S = {}>(
     : null
 }
 
-function createPreloadLinkElement(ref: StyleRef, selector: string) {
-  const { path, id, class: classname, crossorigin, media } = ref
+function createPreloadLinkElement(
+  ref: StyleRef,
+  selector: string
+): Promise<{ link: HTMLLinkElement; media: string } | null> {
+  const { path, id, class: classname, crossorigin, media = 'all' } = ref
   const link = document.createElement('link')
-  if (media) {
-    link.media = media
-  }
 
   if (classname) {
     link.className = classname
@@ -257,41 +257,58 @@ function createPreloadLinkElement(ref: StyleRef, selector: string) {
     link.crossOrigin = 'anonymous'
   }
 
+  link.media = 'print'
   link.type = 'text/css'
-  link.as = 'style'
   link.rel = 'stylesheet'
   link.href = path
 
   const element = document.querySelector(selector)
-  if (element) {
-    document.head.insertBefore(link, element)
-  } else {
+  if (!element) {
     console.error(`Unable to find ${selector}`)
+    return Promise.resolve(null)
   }
+
+  return new Promise(resolve => {
+    let insertedNode: HTMLLinkElement | null = null
+    link.onload = () => {
+      if (insertedNode) {
+        resolve({ link: insertedNode, media })
+      } else {
+        resolve(null)
+      }
+    }
+
+    link.onerror = () => {
+      resolve(null)
+    }
+
+    insertedNode = document.head.insertBefore(link, element)
+  })
 }
 
 export function insertUncriticalLinkElements({
   base = [],
   overrides = [],
 }: StyleRefs) {
-  document.body.style.webkitTransition = 'none !important'
-  document.body.style.transition = 'none !important'
-  return new Promise(resolve => {
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        overrides.map(ref =>
-          createPreloadLinkElement(ref, 'noscript#styles_overrides')
-        )
-        base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base'))
-
-        setTimeout(() => {
-          document.body.style.webkitTransition = ''
-          document.body.style.transition = ''
-          resolve()
-        }, 1000)
-      }, 0)
-    })
-  })
+  return Promise.all([
+    ...base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base')),
+    ...overrides.map(ref =>
+      createPreloadLinkElement(ref, 'noscript#styles_overrides')
+    ),
+  ]).then(
+    linkElements =>
+      new Promise(resolve => {
+        requestAnimationFrame(() => {
+          for (const item of linkElements) {
+            if (item) {
+              item.link.onload = null
+              item.link.media = item.media
+            }
+          }
+          setTimeout(resolve, 1000)
+        })
+      })
+  )
 }
 
 export async function fetchAssets(
