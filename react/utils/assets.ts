@@ -271,15 +271,16 @@ function createPreloadLinkElement(
   }
 
   return new Promise(resolve => {
+    let insertedNode: HTMLLinkElement | null = null
     link.onload = () => {
-      resolve(link)
+      resolve(insertedNode)
     }
 
     link.onerror = () => {
       resolve(null)
     }
 
-    document.head.insertBefore(link, element)
+    insertedNode = document.head.insertBefore(link, element)
   })
 }
 
