@@ -303,10 +303,10 @@ export function insertUncriticalLinkElements({
           requestAnimationFrame(() => {
             for (const item of linkElements.reverse()) {
               if (item) {
-                setTimeout(() => {
+                queueMicrotask(() => {
                   item.link.onload = null
                   item.link.media = item.media
-                }, 0)
+                })
               }
             }
 
