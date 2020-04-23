@@ -262,6 +262,7 @@ function createPreloadLinkElement(
 
   link.href = path
   link.type = 'text/css'
+  link.as = 'style'
   link.rel = 'preload'
 
   const element = document.querySelector(selector)
