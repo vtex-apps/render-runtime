@@ -291,10 +291,10 @@ export function insertUncriticalLinkElements({
   overrides = [],
 }: StyleRefs) {
   return Promise.all([
-    ...base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base')),
     ...overrides.map(ref =>
       createPreloadLinkElement(ref, 'noscript#styles_overrides')
     ),
+    ...base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base')),
   ]).then(
     linkElements =>
       new Promise(resolve => {
@@ -308,7 +308,9 @@ export function insertUncriticalLinkElements({
             }
           }
 
-          setTimeout(resolve, 25)
+          requestAnimationFrame(() => {
+            setTimeout(resolve, 100)
+          })
         })
       })
   )
