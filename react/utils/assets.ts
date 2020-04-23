@@ -285,23 +285,29 @@ function createPreloadLinkElement(
   })
 }
 
-export async function insertUncriticalLinkElements({
+export function insertUncriticalLinkElements({
   base = [],
   overrides = [],
 }: StyleRefs) {
-  const linkElements = await Promise.all([
+  return Promise.all([
     ...base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base')),
     ...overrides.map(ref =>
       createPreloadLinkElement(ref, 'noscript#styles_overrides')
     ),
-  ])
-
-  for (const link of linkElements) {
-    if (link) {
-      link.onload = null
-      link.rel = 'stylesheet'
-    }
-  }
+  ]).then(
+    linkElements =>
+      new Promise(resolve => {
+        requestAnimationFrame(() => {
+          for (const link of linkElements) {
+            if (link) {
+              link.onload = null
+              link.rel = 'stylesheet'
+            }
+          }
+          setTimeout(resolve, 500)
+        })
+      })
+  )
 }
 
 export async function fetchAssets(
