@@ -279,6 +279,7 @@ function createPreloadLinkElement(
     }
 
     link.onerror = () => {
+      console.error(`Error loading ${path}`)
       resolve(null)
     }
 
@@ -291,27 +292,29 @@ export function insertUncriticalLinkElements({
   overrides = [],
 }: StyleRefs) {
   return Promise.all([
+    ...base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base')),
     ...overrides.map(ref =>
       createPreloadLinkElement(ref, 'noscript#styles_overrides')
     ),
-    ...base.map(ref => createPreloadLinkElement(ref, 'noscript#styles_base')),
   ]).then(
     linkElements =>
       new Promise(resolve => {
-        requestAnimationFrame(() => {
-          for (const item of linkElements) {
-            if (item) {
-              setTimeout(() => {
-                item.link.onload = null
-                item.link.media = item.media
-              }, 0)
-            }
-          }
-
+        setTimeout(() => {
           requestAnimationFrame(() => {
-            setTimeout(resolve, 100)
+            for (const item of linkElements.reverse()) {
+              if (item) {
+                setTimeout(() => {
+                  item.link.onload = null
+                  item.link.media = item.media
+                }, 0)
+              }
+            }
+
+            requestAnimationFrame(() => {
+              setTimeout(resolve, 100)
+            })
           })
-        })
+        }, 1000)
       })
   )
 }
