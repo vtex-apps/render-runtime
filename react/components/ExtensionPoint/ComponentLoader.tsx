@@ -1,4 +1,10 @@
-import React, { useEffect, useState, FunctionComponent, ReactNode } from 'react'
+import React, {
+  useEffect,
+  useState,
+  FunctionComponent,
+  ReactNode,
+  useMemo,
+} from 'react'
 
 import { getImplementation } from '../../utils/assets'
 import GenericPreview from '../Preview/GenericPreview'
@@ -65,43 +71,60 @@ const ComponentLoader: FunctionComponent<Props> = props => {
   const runtime = useRuntime()
 
   // Each prop that receives a slot should always be PascalCased.
-  const capitalProps = componentProps
-    ? Object.keys(componentProps).filter(key => key[0] !== key[0].toLowerCase())
-    : []
+  const capitalProps = useMemo(
+    () =>
+      componentProps
+        ? Object.keys(componentProps).filter(
+            key => key[0] !== key[0].toLowerCase()
+          )
+        : [],
+    [componentProps]
+  )
   const componentReceivedSlots = capitalProps.length > 0
   const resultingSlotsProps: Record<string, ReactNode> = {}
 
   // Resolve Slots received by the component via its props.
-  if (componentReceivedSlots) {
-    const slots = capitalProps.map(slotName => {
-      return generateSlot({
-        treePath,
-        slotName,
-        slotValue: componentProps[slotName],
-        runtime,
-        hydration,
+  const slots = useMemo(
+    () => {
+      return capitalProps.map(slotName => {
+        return generateSlot({
+          treePath,
+          slotName,
+          slotValue: componentProps[slotName],
+          runtime,
+          hydration,
+        })
       })
-    })
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [capitalProps]
+  )
 
-    capitalProps.forEach((key, i) => (resultingSlotsProps[key] = slots[i]))
-  }
+  capitalProps.forEach((key, i) => (resultingSlotsProps[key] = slots[i]))
+
+  const componentPropsWithSlots = useMemo(
+    () => ({
+      ...componentProps,
+      ...resultingSlotsProps,
+    }),
+    [componentProps, resultingSlotsProps]
+  )
+  const asyncComponentProps = useMemo(
+    () =>
+      componentReceivedSlots
+        ? {
+            ...props,
+            props: componentPropsWithSlots,
+          }
+        : props,
+    [componentPropsWithSlots, componentReceivedSlots, props]
+  )
 
   if (component?.includes('Fold')) {
     return null
   }
 
   const Component = component && getImplementation(component)
-
-  const componentPropsWithSlots = {
-    ...componentProps,
-    ...resultingSlotsProps,
-  }
-  const asyncComponentProps = componentReceivedSlots
-    ? {
-        ...props,
-        props: componentPropsWithSlots,
-      }
-    : props
 
   let content = Component ? (
     <Component {...componentPropsWithSlots}>{children}</Component>
