@@ -72,9 +72,7 @@ function addStyleToPage(href: string) {
   if (isAbsolute(href)) {
     link.crossOrigin = 'anonymous'
   }
-  const overrideLink =
-    document.getElementById('styles_overrides') ||
-    document.getElementById('override_link_0')
+  const overrideLink = document.getElementById('override_link_0')
 
   if (overrideLink) {
     document.head.insertBefore(link, overrideLink)
@@ -238,84 +236,50 @@ export function getExtensionImplementation<P = {}, S = {}>(
     : null
 }
 
-function createPreloadLinkElement(
-  ref: StyleRef,
-  selector: string
-): Promise<{ link: HTMLLinkElement; media: string } | null> {
-  const { path, id, class: classname, crossorigin, media = 'all' } = ref
-  const link = document.createElement('link')
+export function createLazyLinkElements(
+  refs: StyleRef[],
+  refChild: Element
+): Promise<LazyLinksResult> {
+  const lazyLinks = refs.map(ref => {
+    const { path, id, class: classname, crossorigin, media = '' } = ref
+    const link = document.createElement('link')
 
-  if (classname) {
-    link.className = classname
-  }
-
-  if (id) {
-    link.id = id
-  }
-
-  if (crossorigin) {
-    link.crossOrigin = 'anonymous'
-  }
-
-  link.media = 'print'
-  link.type = 'text/css'
-  link.rel = 'stylesheet'
-  link.href = path
-
-  const element = document.querySelector(selector)
-  if (!element) {
-    console.error(`Unable to find ${selector}`)
-    return Promise.resolve(null)
-  }
-
-  return new Promise(resolve => {
-    let insertedNode: HTMLLinkElement | null = null
-    link.onload = () => {
-      if (insertedNode) {
-        resolve({ link: insertedNode, media })
-      } else {
-        resolve(null)
-      }
+    if (classname) {
+      link.className = classname
     }
 
-    link.onerror = () => {
-      console.error(`Error loading ${path}`)
-      resolve(null)
+    if (id) {
+      link.id = id
     }
 
-    insertedNode = document.head.insertBefore(link, element)
+    if (crossorigin) {
+      link.crossOrigin = 'anonymous'
+    }
+
+    link.media = 'print'
+    link.type = 'text/css'
+    link.rel = 'stylesheet'
+    link.href = path
+
+    return { link, media }
   })
-}
 
-export function insertUncriticalLinkElements({
-  base = [],
-  overrides = [],
-}: StyleRefs) {
-  document.body.classList.add('.no-transitions')
-  return Promise.all([
-    ...base.map(ref => createPreloadLinkElement(ref, 'style#critical')),
-    ...overrides.map(ref => createPreloadLinkElement(ref, 'style#critical')),
-  ]).then(
-    linkElements =>
-      new Promise(resolve => {
-        setTimeout(() => {
-          requestAnimationFrame(() => {
-            for (const item of linkElements.reverse()) {
-              if (item) {
-                queueMicrotask(() => {
-                  item.link.onload = null
-                  item.link.media = item.media
-                })
-              }
-            }
+  return Promise.all(
+    lazyLinks.map(
+      ({ link, media }) =>
+        new Promise<LazyLinkItem>(resolve => {
+          link.onload = () => {
+            resolve({ link, media })
+          }
 
-            requestAnimationFrame(() => {
-              document.body.classList.remove('.no-transitions')
-              setTimeout(resolve, 100)
-            })
-          })
-        }, 1000)
-      })
+          link.onerror = () => {
+            console.error(`Error loading ${link.href}`)
+            resolve(null)
+          }
+
+          document.head.insertBefore(link, refChild)
+        })
+    )
   )
 }
 
@@ -463,3 +427,7 @@ function hasBundledAsset(
 ) {
   return !!assetsByApp[app] && assetsByApp[app].indexOf(asset) !== -1
 }
+
+export type LazyLinkItem = { link: HTMLLinkElement; media: string } | null
+
+export type LazyLinksResult = Array<LazyLinkItem>

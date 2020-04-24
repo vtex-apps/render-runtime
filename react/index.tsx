@@ -7,7 +7,7 @@ import * as runtimeGlobals from './core/main'
 import { createReactIntl } from './utils/reactIntl'
 
 import { createCustomReactApollo } from './utils/reactApollo'
-import { insertUncriticalLinkElements } from './utils/assets'
+import { createLazyLinkElements, LazyLinkItem } from './utils/assets'
 
 window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
 
@@ -93,21 +93,48 @@ if (window.ReactIntl) {
   window.ReactIntl = createReactIntl()
 }
 
-if (
-  !window.__ERROR__ &&
-  canUseDOM &&
-  document.querySelector('style#critical')
-) {
-  window.__UNCRITICAL_PROMISE__ = new Promise(resolve => {
-    window.addEventListener('load', () => {
-      const {
-        __RUNTIME__: { uncriticalStyleRefs },
-      } = window
-      if (uncriticalStyleRefs) {
-        insertUncriticalLinkElements(uncriticalStyleRefs).finally(resolve)
+function createLazyLinksTrigger() {
+  const {
+    __RUNTIME__: { uncriticalStyleRefs },
+  } = window
+  const criticalElement = document.querySelector('style#critical')
+
+  if (!uncriticalStyleRefs || !criticalElement) {
+    return () => {}
+  }
+
+  let lazyLinksPromise: Promise<Array<LazyLinkItem>>
+  const loadPromise = new Promise(resolve =>
+    window.addEventListener('load', resolve)
+  )
+
+  window.__UNCRITICAL_PROMISE__ = loadPromise
+    .then(() => lazyLinksPromise)
+    .then(lazyLinks => {
+      if (!lazyLinks) {
+        console.error('Missing lazy links')
+        return
       }
+
+      for (const item of lazyLinks) {
+        if (item) {
+          item.link.onload = null
+          item.link.media = item.media
+        }
+      }
+
+      setTimeout(() => {
+        criticalElement.parentNode?.removeChild(criticalElement)
+      }, 0)
     })
-  })
+
+  return () => {
+    const { base = [], overrides = [] } = uncriticalStyleRefs
+    lazyLinksPromise = createLazyLinkElements(
+      [...base, ...overrides],
+      criticalElement
+    )
+  }
 }
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
@@ -115,6 +142,8 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
     const contentLoadedPromise = new Promise(resolve =>
       window.addEventListener('DOMContentLoaded', resolve)
     )
+
+    const triggerLazyLinks = createLazyLinksTrigger()
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
       setTimeout(() => {
         window?.performance?.mark('render-start')
@@ -125,6 +154,7 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
           'render-start',
           'render-end'
         )
+        triggerLazyLinks()
       }, 1)
     })
   } else {
