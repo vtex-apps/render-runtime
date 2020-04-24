@@ -51,14 +51,11 @@ export interface OperationContext {
   >
 }
 
-const equals = (a: string, b: string) =>
-  a && b && a.toLowerCase() === b.toLowerCase()
-
 const extractHints = (query: ASTNode, meta: CacheHints) => {
   const { operationType, queryScope } = assetsFromQuery(query)
 
   let hints
-  if (equals(operationType, 'query')) {
+  if (operationType?.toLowerCase() === 'query') {
     hints = meta ? meta : { scope: queryScope }
   } else {
     hints = { ...meta, scope: 'private' }
@@ -103,14 +100,10 @@ export const createUriSwitchLink = (
         route: { domain },
       } = initialRuntime
       const hash = generateHash(operation.query)
-      const {
-        maxAge,
-        scope,
-        version,
-        operationType,
-        provider,
-        sender,
-      } = extractHints(operation.query, cacheHints[hash])
+      const { maxAge, scope, version, provider, sender } = extractHints(
+        operation.query,
+        cacheHints[hash]
+      )
       const requiresAuthorization = path(
         ['settings', `vtex.${domain}`, 'requiresAuthorization'],
         initialRuntime
@@ -119,9 +112,7 @@ export const createUriSwitchLink = (
       const oldMethod = fetchOptions.method || 'POST'
       const protocol = canUseDOM ? 'https:' : 'http:'
       const method =
-        equals(scope, 'private') && equals(operationType, 'query')
-          ? 'POST'
-          : oldMethod
+        customScope?.toLowerCase() === 'private' ? 'POST' : oldMethod
       extensions.persistedQuery = {
         ...extensions.persistedQuery,
         sender,
