@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react'
+import React, { FC } from 'react'
 import { useQuery } from 'react-apollo'
 
 import { getChildExtensions } from '../components/ExtensionPoint'
@@ -41,19 +41,16 @@ export function generateSlot({
   const newTreePath = `${treePathWithoutSlotMarker}/${slotValue}`
   let extension = runtime.extensions[newTreePath]
 
-  let slotChildren = getChildExtensions(runtime, newTreePath)
+  const slotChildren = getChildExtensions(runtime, newTreePath)
 
   let componentProps = extension?.props ?? {}
 
-  const SlotComponent: FC<any> = memo(props => {
+  const SlotComponent: FC<any> = props => {
     if (props.id) {
       const hasLabel = slotValue.includes('#')
       const dynamicTreePath = `${newTreePath}${hasLabel ? '-' : '#'}slot${
         props.id
       }`
-
-      slotChildren =
-        getChildExtensions(runtime, dynamicTreePath) ?? slotChildren
 
       if (!runtime.extensions[dynamicTreePath]) {
         componentProps = extension?.props ?? {}
@@ -97,78 +94,73 @@ export function generateSlot({
         {slotChildren}
       </ComponentLoader>
     )
-  })
+  }
 
   SlotComponent.displayName = `${slotName}Slot`
 
   return SlotComponent
 }
 
-const DynamicSlot: FC<DynamicSlotProps> = memo(
-  ({
-    treePath,
-    runtime,
-    hydration,
-    component,
-    props,
-    children,
-    blockId,
-    baseTreePath,
-  }) => {
-    const { data, loading, error } = useQuery<ListContentQuery>(ListContent, {
-      variables: {
-        bindingId: runtime.binding?.id,
-        template: runtime.page,
-        blockId,
-        treePath: treePath.replace(runtime.page, '*'),
-        pageContext: runtime.route.pageContext,
-      },
-    })
+const DynamicSlot: FC<DynamicSlotProps> = ({
+  treePath,
+  runtime,
+  hydration,
+  component,
+  props,
+  children,
+  blockId,
+  baseTreePath,
+}) => {
+  const { data, loading, error } = useQuery<ListContentQuery>(ListContent, {
+    variables: {
+      bindingId: runtime.binding?.id,
+      template: runtime.page,
+      blockId,
+      treePath: treePath.replace(runtime.page, '*'),
+      pageContext: runtime.route.pageContext,
+    },
+  })
 
-    if (loading) {
-      return null
-    }
-    if (error) {
-      console.error(error)
-      return null
-    }
-
-    let extensionContent =
-      (data?.listContent[1]?.contentJSON &&
-        (JSON.parse(data.listContent[1]?.contentJSON) as Record<
-          string,
-          any
-        >)) ??
-      (data?.listContent[0]?.contentJSON &&
-        (JSON.parse(data.listContent[0]?.contentJSON) as Record<string, any>))
-
-    if (!extensionContent) {
-      runtime.extensions[treePath] = runtime.extensions[baseTreePath]
-      extensionContent = runtime.extensions[baseTreePath]?.content
-    } else {
-      runtime.extensions[treePath] = runtime.extensions[baseTreePath]
-        ? {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            ...runtime.extensions[baseTreePath]!,
-            content: extensionContent,
-          }
-        : null
-    }
-
-    const componentLoaderPropsWithContent = extensionContent
-      ? { ...props, ...extensionContent }
-      : props
-
-    return (
-      <ComponentLoader
-        component={component ?? null}
-        props={componentLoaderPropsWithContent}
-        treePath={treePath}
-        runtime={runtime}
-        hydration={hydration}
-      >
-        {children}
-      </ComponentLoader>
-    )
+  if (loading) {
+    return null
   }
-)
+  if (error) {
+    console.error(error)
+    return null
+  }
+
+  let extensionContent =
+    (data?.listContent[1]?.contentJSON &&
+      (JSON.parse(data.listContent[1]?.contentJSON) as Record<string, any>)) ??
+    (data?.listContent[0]?.contentJSON &&
+      (JSON.parse(data.listContent[0]?.contentJSON) as Record<string, any>))
+
+  if (!extensionContent) {
+    runtime.extensions[treePath] = runtime.extensions[baseTreePath]
+    extensionContent = runtime.extensions[baseTreePath]?.content
+  } else {
+    runtime.extensions[treePath] = runtime.extensions[baseTreePath]
+      ? {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          ...runtime.extensions[baseTreePath]!,
+          content: extensionContent,
+        }
+      : null
+  }
+
+  const componentLoaderPropsWithContent = extensionContent
+    ? { ...props, ...extensionContent }
+    : props
+
+  return (
+    <ComponentLoader
+      component={component ?? null}
+      props={componentLoaderPropsWithContent}
+      treePath={treePath}
+      runtime={runtime}
+      hydration={hydration}
+    >
+      {children}
+    </ComponentLoader>
+  )
+}
