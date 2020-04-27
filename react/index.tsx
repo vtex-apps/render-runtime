@@ -131,9 +131,8 @@ function createUncriticalCSSTrigger() {
 
   return () => {
     const { overrides = [] } = uncriticalStyleRefs
-    lazyOverridesPromise = createLazyLinkElements(
-      overrides,
-      document.head.appendChild
+    lazyOverridesPromise = createLazyLinkElements(overrides, link =>
+      document.head.appendChild(link)
     )
   }
 }
