@@ -493,6 +493,7 @@ declare global {
       data: string
     }>
     uncriticalStyleRefs?: StyleRefs
+    uncriticalCSS?: string
   }
 
   interface CacheHints {

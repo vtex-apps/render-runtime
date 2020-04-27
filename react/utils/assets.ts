@@ -238,7 +238,7 @@ export function getExtensionImplementation<P = {}, S = {}>(
 
 export function createLazyLinkElements(
   refs: StyleRef[],
-  refChild: Element
+  addElement: (link: HTMLLinkElement) => void
 ): Promise<LazyLinksResult> {
   const lazyLinks = refs.map(ref => {
     const { path, id, class: classname, crossorigin, media = '' } = ref
@@ -277,7 +277,7 @@ export function createLazyLinkElements(
             resolve(null)
           }
 
-          document.head.insertBefore(link, refChild)
+          addElement(link)
         })
     )
   )

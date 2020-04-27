@@ -93,23 +93,28 @@ if (window.ReactIntl) {
   window.ReactIntl = createReactIntl()
 }
 
-function createLazyLinksTrigger() {
+function createUncriticalCSSTrigger() {
   const {
-    __RUNTIME__: { uncriticalStyleRefs },
+    __RUNTIME__: { uncriticalCSS, uncriticalStyleRefs },
   } = window
   const criticalElement = document.querySelector('style#critical')
 
-  if (!uncriticalStyleRefs || !criticalElement) {
+  if (!uncriticalCSS || !uncriticalStyleRefs || !criticalElement) {
     return () => {}
   }
 
-  let lazyLinksPromise: Promise<Array<LazyLinkItem>>
+  let lazyOverridesPromise: Promise<Array<LazyLinkItem>>
   const loadPromise = new Promise(resolve =>
     window.addEventListener('load', resolve)
   )
 
   window.__UNCRITICAL_PROMISE__ = loadPromise
-    .then(() => lazyLinksPromise)
+    .then(() => {
+      const style = document.createElement('style')
+      style.innerHTML = uncriticalCSS
+      criticalElement.insertAdjacentElement('afterend', style)
+    })
+    .then(() => lazyOverridesPromise)
     .then(lazyLinks => {
       if (!lazyLinks) {
         console.error('Missing lazy links')
@@ -122,17 +127,13 @@ function createLazyLinksTrigger() {
           item.link.media = item.media
         }
       }
-
-      setTimeout(() => {
-        criticalElement.parentNode?.removeChild(criticalElement)
-      }, 0)
     })
 
   return () => {
-    const { base = [], overrides = [] } = uncriticalStyleRefs
-    lazyLinksPromise = createLazyLinkElements(
-      [...base, ...overrides],
-      criticalElement
+    const { overrides = [] } = uncriticalStyleRefs
+    lazyOverridesPromise = createLazyLinkElements(
+      overrides,
+      document.head.appendChild
     )
   }
 }
@@ -143,7 +144,7 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
       window.addEventListener('DOMContentLoaded', resolve)
     )
 
-    const triggerLazyLinks = createLazyLinksTrigger()
+    const triggerUncriticalCSS = createUncriticalCSSTrigger()
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
       setTimeout(() => {
         window?.performance?.mark('render-start')
@@ -154,7 +155,7 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
           'render-start',
           'render-end'
         )
-        triggerLazyLinks()
+        triggerUncriticalCSS()
       }, 1)
     })
   } else {
