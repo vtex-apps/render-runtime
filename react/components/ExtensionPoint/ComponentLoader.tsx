@@ -84,21 +84,17 @@ const ComponentLoader: FunctionComponent<Props> = props => {
   const resultingSlotsProps: Record<string, ReactNode> = {}
 
   // Resolve Slots received by the component via its props.
-  const slots = useMemo(
-    () => {
-      return capitalProps.map(slotName => {
-        return generateSlot({
-          treePath,
-          slotName,
-          slotValue: componentProps[slotName],
-          runtime,
-          hydration,
-        })
+  const slots = useMemo(() => {
+    return capitalProps.map(slotName => {
+      return generateSlot({
+        treePath,
+        slotName,
+        slotValue: componentProps[slotName],
+        runtime,
+        hydration,
       })
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [capitalProps]
-  )
+    })
+  }, [capitalProps, componentProps, hydration, runtime, treePath])
 
   capitalProps.forEach((key, i) => (resultingSlotsProps[key] = slots[i]))
 
