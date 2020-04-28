@@ -241,44 +241,20 @@ export function createLazyLinkElements(
   refs: StyleRef[],
   refChild: Element
 ): Promise<LazyLinksResult> {
-  const lazyLinks = refs.map(ref => {
-    const { path, id, class: classname, crossorigin, media = '' } = ref
-    const link = document.createElement('link')
-
-    if (classname) {
-      link.className = classname
-    }
-
-    if (id) {
-      link.id = id
-    }
-
-    if (crossorigin) {
-      link.crossOrigin = 'anonymous'
-    }
-
-    link.media = 'print'
-    link.type = 'text/css'
-    link.rel = 'stylesheet'
-    link.href = path
-
-    return { link, media }
-  })
-
   return Promise.all(
-    lazyLinks.map(
-      ({ link, media }) =>
+    refs.map(
+      ref =>
         new Promise<LazyLinkItem>(resolve => {
-          link.onload = () => {
-            resolve({ link, media })
-          }
-
-          link.onerror = () => {
-            console.error(`Error loading ${link.href}`)
-            resolve(null)
-          }
-
-          document.head.insertBefore(link, refChild)
+          const { path, id, class: className, media = '' } = ref
+          fetch(path)
+            .then(async response => {
+              const body = await response.text()
+              resolve({ id, className, media, body })
+            })
+            .catch(error => {
+              console.error(`Error loading uncritical style.`, error)
+              resolve({ id, className, media, body: '' })
+            })
         })
     )
   )
@@ -429,6 +405,11 @@ function hasBundledAsset(
   return !!assetsByApp[app] && assetsByApp[app].indexOf(asset) !== -1
 }
 
-export type LazyLinkItem = { link: HTMLLinkElement; media: string } | null
+export type LazyLinkItem = {
+  media: string
+  className?: string
+  id?: string
+  body: string
+} | null
 
 export type LazyLinksResult = Array<LazyLinkItem>
