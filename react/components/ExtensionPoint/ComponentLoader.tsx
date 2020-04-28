@@ -66,10 +66,16 @@ const ComponentLoader: FunctionComponent<Props> = props => {
     treePath,
     props: componentProps,
     hydration,
-    runtime,
   } = props
 
-  // Each prop that receives a slot should always be PascalCased.
+  /**
+   * Props that function as Slots are ALWAYS CamelCased.
+   * It is OK to not include componentProps in the dependency array
+   * since there is currently no way for users to ADD or UPDATE slots via CMS.
+   * What this means is that the slots variable below only needs to be
+   * computed once during runtime, since we know that, even if componentProps
+   * is updated, the props that function as Slots will NOT change.
+   */
   const slots = useMemo(() => {
     if (!componentProps) {
       return {}
@@ -86,13 +92,13 @@ const ComponentLoader: FunctionComponent<Props> = props => {
           treePath,
           slotName,
           slotValue: componentProps[slotName],
-          runtime,
           hydration,
         }))
     )
 
     return resultingSlotsProps
-  }, [componentProps, hydration, runtime, treePath])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydration, treePath])
 
   const componentPropsWithSlots = useMemo(
     () => ({
