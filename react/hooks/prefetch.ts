@@ -29,12 +29,11 @@ interface PrefetchRequestsArgs {
   }
 }
 
-const getPageToNavigate = (path: string) => {
-  const query = queryStringToMap(location.search) as RenderRuntime['query']
+const getPageToNavigate = (path: string, query: string) => {
   return getPrefetchForPath({
     path: path,
     fetcher: fetch,
-    query,
+    query: queryStringToMap(query),
   })
 }
 
@@ -61,7 +60,10 @@ const maybeUpdatePathCache = async ({
     return pathsState[navigationRoute.path].page as string
   }
 
-  const navigationData = await getPageToNavigate(navigationRoute.path)
+  const navigationData = await getPageToNavigate(
+    navigationRoute.path,
+    navigationRoute.query
+  )
   const navigationPage = page ?? navigationData.page
   pathsState[navigationRoute.path] = { fetching: false, page: navigationPage }
   if (navigationData.queryData) {
