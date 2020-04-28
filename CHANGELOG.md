@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.41.0] - 2020-04-28
+### Fixed
+- Uses query as POST when hashing fails
+
 ## [7.40.1] - 2020-04-07
 ### Fixed
 - Fix base uri when rendered inside iFrame and parent not in IO.

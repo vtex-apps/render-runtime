@@ -53,7 +53,7 @@ export const getState = (runtime: RenderRuntime) => {
 }
 
 export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContextLink: ApolloLink, ensureSessionLink: ApolloLink, cacheControl?: PageCacheControl) => {
-  const {account, workspace, culture: { locale }, route } = runtime
+  const {account, workspace, culture: { locale }, route, production } = runtime
   const domainFromPath = route.path && route.path.split('/')[1]
    // We only support admin or store products in render 7
   const domain = domainFromPath === 'admin'? domainFromPath: 'store'
@@ -85,7 +85,7 @@ export const getClient = (runtime: RenderRuntime, baseURI: string, runtimeContex
       useGETForHashedQueries: true,
     })
 
-    const uriSwitchLink = createUriSwitchLink(baseURI, workspace, locale, domain)
+    const uriSwitchLink = createUriSwitchLink(baseURI, workspace, locale, production, domain)
 
     const cacheLink = cacheControl ? [cachingLink(cacheControl)] : []
 
