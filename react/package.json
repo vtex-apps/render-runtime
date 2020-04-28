@@ -1,6 +1,6 @@
 {
   "name": "vtex.render-runtime",
-  "version": "7.40.1",
+  "version": "7.41.1",
   "license": "UNLICENSED",
   "scripts": {
     "lint": "tsc --noEmit --pretty && tslint src/**/*.ts"
