@@ -1,15 +1,15 @@
-import React, { FC, memo } from 'react'
+import React, { FC, memo, useMemo } from 'react'
 import { useQuery } from 'react-apollo'
 
 import { getChildExtensions } from '../components/ExtensionPoint'
 import ComponentLoader from '../components/ExtensionPoint/ComponentLoader'
 import ListContent from '../queries/ListContent.graphql'
+import { useRuntime } from '../core/main'
 
 interface GenerateSlotArgs {
   treePath: string
   slotName: string
   slotValue: string
-  runtime: RenderContext
   hydration: Hydration
 }
 
@@ -31,7 +31,6 @@ export function generateSlot({
   treePath,
   slotName,
   slotValue,
-  runtime,
   hydration,
 }: GenerateSlotArgs) {
   const hasSlotMarker = treePath.indexOf('slot') > -1
@@ -39,11 +38,12 @@ export function generateSlot({
     ? treePath.substring(0, treePath.indexOf('-slot'))
     : treePath
   const newTreePath = `${treePathWithoutSlotMarker}/${slotValue}`
-  let extension = runtime.extensions[newTreePath]
-
-  const slotChildren = getChildExtensions(runtime, newTreePath)
 
   const SlotComponent: FC<any> = memo(props => {
+    const runtime = useRuntime()
+    let extension = runtime.extensions[newTreePath]
+
+    const slotChildren = getChildExtensions(runtime, newTreePath)
     let componentProps = extension?.props ?? {}
 
     if (props.id) {
@@ -121,6 +121,17 @@ const DynamicSlot: FC<DynamicSlotProps> = ({
     },
   })
 
+  let extensionContent =
+    (data?.listContent[1]?.contentJSON &&
+      (JSON.parse(data.listContent[1]?.contentJSON) as Record<string, any>)) ??
+    (data?.listContent[0]?.contentJSON &&
+      (JSON.parse(data.listContent[0]?.contentJSON) as Record<string, any>))
+
+  const componentLoaderPropsWithContent = useMemo(
+    () => (extensionContent ? { ...props, ...extensionContent } : props),
+    [extensionContent, props]
+  )
+
   if (loading) {
     return null
   }
@@ -128,12 +139,6 @@ const DynamicSlot: FC<DynamicSlotProps> = ({
     console.error(error)
     return null
   }
-
-  let extensionContent =
-    (data?.listContent[1]?.contentJSON &&
-      (JSON.parse(data.listContent[1]?.contentJSON) as Record<string, any>)) ??
-    (data?.listContent[0]?.contentJSON &&
-      (JSON.parse(data.listContent[0]?.contentJSON) as Record<string, any>))
 
   if (!extensionContent) {
     runtime.extensions[treePath] = runtime.extensions[baseTreePath]
@@ -147,10 +152,6 @@ const DynamicSlot: FC<DynamicSlotProps> = ({
         }
       : null
   }
-
-  const componentLoaderPropsWithContent = extensionContent
-    ? { ...props, ...extensionContent }
-    : props
 
   return (
     <ComponentLoader
