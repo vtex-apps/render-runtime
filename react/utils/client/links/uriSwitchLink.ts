@@ -53,11 +53,18 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
   }
 }
 
-export const createUriSwitchLink = (baseURI: string, workspace: string, locale: string, domain?: string) =>
+export const createUriSwitchLink = (baseURI: string, workspace: string, locale: string, production: boolean, domain?: string) =>
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     operation.setContext((oldContext: OperationContext) => {
       const { fetchOptions = {}, runtime: {appsEtag, cacheHints} } = oldContext
       const hash = generateHash(operation.query)
+
+      if (!production && !hash) {
+        throw new Error(
+          'Could not generate hash from query. Are you using graphql-tag ? Split your graphql queries in .graphql files and import them instead'
+        )
+      }
+
       const includeQuery = (oldContext as any).http?.includeQuery || !hash
       const oldMethod = includeQuery ? 'POST' : (fetchOptions.method || 'POST')
       const protocol = canUseDOM ? 'https:' : 'http:'
