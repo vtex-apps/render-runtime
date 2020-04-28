@@ -113,16 +113,50 @@ function createLazyLinksTrigger() {
         return
       }
 
-      for (const item of lazyLinks) {
-        if (item) {
-          item.link.onload = null
-          item.link.media = item.media
+      const debugCriticalCSS = window.__RUNTIME__.query?.__debugCriticalCSS
+
+      const createUncriticalStyle = (lazyLink: LazyLinkItem) => {
+        if (!lazyLink) {
+          return
         }
+        const style = document.createElement('style')
+
+        style.id = lazyLink.id ?? ''
+        style.className = lazyLink.className ?? ''
+        style.media = lazyLink.media
+        style.innerHTML = lazyLink.body
+
+        document.head.appendChild(style)
       }
 
-      setTimeout(() => {
-        criticalElement.parentNode?.removeChild(criticalElement)
-      }, 0)
+      const applyUncritical = () => {
+        lazyLinks.forEach(createUncriticalStyle)
+        criticalElement.remove()
+      }
+
+      if (debugCriticalCSS === 'manual') {
+        ;(window as any).applyUncritical = applyUncritical
+
+        let currentUncritical = 0
+        ;(window as any).stepUncritical = () => {
+          if (currentUncritical === -1) {
+            console.log('Uncritical has finished being applied.')
+          }
+          const current = lazyLinks[currentUncritical]
+          if (!current) {
+            console.log('All uncritical styles applied. Cleaning critical.')
+            criticalElement.remove()
+            currentUncritical = -1
+          }
+          console.log('Applying uncritical style', current)
+          createUncriticalStyle(current)
+          currentUncritical++
+        }
+      } else {
+        applyUncritical()
+      }
+
+      return
     })
 
   return () => {
