@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, memo } from 'react'
 import { useQuery } from 'react-apollo'
 
 import { getChildExtensions } from '../components/ExtensionPoint'
@@ -43,9 +43,9 @@ export function generateSlot({
 
   const slotChildren = getChildExtensions(runtime, newTreePath)
 
-  let componentProps = extension?.props ?? {}
+  const SlotComponent: FC<any> = memo(props => {
+    let componentProps = extension?.props ?? {}
 
-  const SlotComponent: FC<any> = props => {
     if (props.id) {
       const hasLabel = slotValue.includes('#')
       const dynamicTreePath = `${newTreePath}${hasLabel ? '-' : '#'}slot${
@@ -94,7 +94,7 @@ export function generateSlot({
         {slotChildren}
       </ComponentLoader>
     )
-  }
+  })
 
   SlotComponent.displayName = `${slotName}Slot`
 
