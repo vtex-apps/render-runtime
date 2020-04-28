@@ -98,8 +98,15 @@ export const createUriSwitchLink = (
         binding,
         workspace,
         route: { domain },
+        production,
       } = initialRuntime
       const hash = generateHash(operation.query)
+
+      if (!production && !hash) {
+        throw new Error(
+          'Could not generate hash from query. Are you using graphql-tag ? Split your graphql queries in .graphql files and import them instead'
+        )
+      }
 
       const includeQuery = (oldContext as any).http?.includeQuery || !hash
       const { maxAge, scope, version, provider, sender } = extractHints(
