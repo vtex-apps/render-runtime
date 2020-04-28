@@ -57,13 +57,18 @@ export const createUriSwitchLink = (baseURI: string, workspace: string, locale: 
   new ApolloLink((operation: Operation, forward?: NextLink) => {
     operation.setContext((oldContext: OperationContext) => {
       const { fetchOptions = {}, runtime: {appsEtag, cacheHints} } = oldContext
-      const oldMethod = fetchOptions.method || 'POST'
       const hash = generateHash(operation.query)
+      const includeQuery = (oldContext as any).http?.includeQuery || !hash
+      const oldMethod = includeQuery ? 'POST' : (fetchOptions.method || 'POST')
       const protocol = canUseDOM ? 'https:' : 'http:'
       const {maxAge, scope, version, operationType} = extractHints(operation.query, cacheHints[hash])
       const method = (equals(scope, 'private') && equals(operationType, 'query')) ? 'POST' : oldMethod
       return {
         ...oldContext,
+        http: {
+          ...(oldContext as any).http,
+          includeQuery,
+        },
         fetchOptions: {...fetchOptions, method},
         uri: `${protocol}//${baseURI}/_v/${scope}/graphql/v${version}?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}&locale=${locale}`,
       }
