@@ -14,7 +14,6 @@ import { isSiteEditorIframe } from '../../utils/dom'
 import SiteEditorWrapper from './SiteEditorWrapper'
 import Hydration from '../Hydration'
 import { LazyImages } from '../LazyImages'
-import { useRuntime } from '../../core/main'
 import { generateSlot } from '../../utils/slots'
 
 const componentPromiseMap: any = {}
@@ -67,60 +66,56 @@ const ComponentLoader: FunctionComponent<Props> = props => {
     treePath,
     props: componentProps,
     hydration,
+    runtime,
   } = props
-  const runtime = useRuntime()
 
   // Each prop that receives a slot should always be PascalCased.
-  const capitalProps = useMemo(
-    () =>
-      componentProps
-        ? Object.keys(componentProps).filter(
-            key => key[0] !== key[0].toLowerCase()
-          )
-        : [],
-    [componentProps]
-  )
-  const componentReceivedSlots = capitalProps.length > 0
-  const resultingSlotsProps: Record<string, ReactNode> = {}
-
-  // Resolve Slots received by the component via its props.
   const slots = useMemo(() => {
-    return capitalProps.map(slotName => {
-      return generateSlot({
-        treePath,
-        slotName,
-        slotValue: componentProps[slotName],
-        runtime,
-        hydration,
-      })
-    })
-  }, [capitalProps, componentProps, hydration, runtime, treePath])
+    if (!componentProps) {
+      return {}
+    }
 
-  capitalProps.forEach((key, i) => (resultingSlotsProps[key] = slots[i]))
+    const slotNames = Object.keys(componentProps).filter(
+      key => key[0] !== key[0].toLowerCase()
+    )
+    const resultingSlotsProps: Record<string, ReactNode> = {}
+
+    slotNames.forEach(
+      slotName =>
+        (resultingSlotsProps[slotName] = generateSlot({
+          treePath,
+          slotName,
+          slotValue: componentProps[slotName],
+          runtime,
+          hydration,
+        }))
+    )
+
+    return resultingSlotsProps
+  }, [componentProps, hydration, runtime, treePath])
 
   const componentPropsWithSlots = useMemo(
     () => ({
       ...componentProps,
-      ...resultingSlotsProps,
+      ...slots,
     }),
-    [componentProps, resultingSlotsProps]
+    [componentProps, slots]
   )
   const asyncComponentProps = useMemo(
-    () =>
-      componentReceivedSlots
-        ? {
-            ...props,
-            props: componentPropsWithSlots,
-          }
-        : props,
-    [componentPropsWithSlots, componentReceivedSlots, props]
+    () => ({
+      ...props,
+      props: componentPropsWithSlots,
+    }),
+    [componentPropsWithSlots, props]
   )
+
+  const Component = useMemo(() => component && getImplementation(component), [
+    component,
+  ])
 
   if (component?.includes('Fold')) {
     return null
   }
-
-  const Component = component && getImplementation(component)
 
   let content = Component ? (
     <Component {...componentPropsWithSlots}>{children}</Component>
