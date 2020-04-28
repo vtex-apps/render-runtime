@@ -98,8 +98,17 @@ export const createUriSwitchLink = (
         binding,
         workspace,
         route: { domain },
+        production,
       } = initialRuntime
       const hash = generateHash(operation.query)
+
+      if (!production && !hash) {
+        throw new Error(
+          'Could not generate hash from query. Are you using graphql-tag ? Split your graphql queries in .graphql files and import them instead'
+        )
+      }
+
+      const includeQuery = (oldContext as any).http?.includeQuery || !hash
       const { maxAge, scope, version, provider, sender } = extractHints(
         operation.query,
         cacheHints[hash]
@@ -109,7 +118,7 @@ export const createUriSwitchLink = (
         initialRuntime
       )
       const customScope = requiresAuthorization ? 'private' : scope
-      const oldMethod = fetchOptions.method || 'POST'
+      const oldMethod = includeQuery ? 'POST' : fetchOptions.method || 'POST'
       const protocol = canUseDOM ? 'https:' : 'http:'
       const method =
         customScope?.toLowerCase() === 'private' ? 'POST' : oldMethod
@@ -126,6 +135,10 @@ export const createUriSwitchLink = (
 
       return {
         ...oldContext,
+        http: {
+          ...(oldContext as any).http,
+          includeQuery,
+        },
         scope: customScope,
         fetchOptions: { ...fetchOptions, method },
         uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}${query}`,
