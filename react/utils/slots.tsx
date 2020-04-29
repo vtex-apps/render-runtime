@@ -121,15 +121,25 @@ const DynamicSlot: FC<DynamicSlotProps> = ({
     },
   })
 
-  let extensionContent =
-    (data?.listContent[1]?.contentJSON &&
-      (JSON.parse(data.listContent[1]?.contentJSON) as Record<string, any>)) ??
-    (data?.listContent[0]?.contentJSON &&
-      (JSON.parse(data.listContent[0]?.contentJSON) as Record<string, any>))
+  const contentFromCMS =
+    data?.listContent[1]?.contentJSON &&
+    (JSON.parse(data.listContent[1]?.contentJSON) as Record<string, any>)
+  /**
+   * This default content for a certain blockId is often just the same values
+   * passed by users in their themes.
+   */
+  const defaultContentForBlockId =
+    data?.listContent[0]?.contentJSON &&
+    (JSON.parse(data.listContent[0]?.contentJSON) as Record<string, any>)
+
+  let extensionContentFromCMS = contentFromCMS ?? defaultContentForBlockId
 
   const componentLoaderPropsWithContent = useMemo(
-    () => (extensionContent ? { ...props, ...extensionContent } : props),
-    [extensionContent, props]
+    () =>
+      extensionContentFromCMS
+        ? { ...props, ...extensionContentFromCMS }
+        : props,
+    [extensionContentFromCMS, props]
   )
 
   if (loading) {
@@ -140,15 +150,15 @@ const DynamicSlot: FC<DynamicSlotProps> = ({
     return null
   }
 
-  if (!extensionContent) {
+  if (!extensionContentFromCMS) {
     runtime.extensions[treePath] = runtime.extensions[baseTreePath]
-    extensionContent = runtime.extensions[baseTreePath]?.content
+    extensionContentFromCMS = runtime.extensions[baseTreePath]?.content
   } else {
     runtime.extensions[treePath] = runtime.extensions[baseTreePath]
       ? {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           ...runtime.extensions[baseTreePath]!,
-          content: extensionContent,
+          content: extensionContentFromCMS,
         }
       : null
   }
