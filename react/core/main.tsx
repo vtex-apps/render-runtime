@@ -217,12 +217,12 @@ function start() {
       )
     }
 
-    if (canUseDOM && window.location.search) {
-      const browserQuery = queryString.parse(window.location.search)
-      window.__RUNTIME__.query = {
-        ...browserQuery,
-        ...(window.__RUNTIME__.query || {}),
-      }
+    if (canUseDOM) {
+      const browserQuery = window.location.search
+        ? queryString.parse(window.location.search)
+        : {}
+      const serverQuery = window.__RUNTIME__.serverQuery ?? {}
+      window.__RUNTIME__.query = { ...serverQuery, ...browserQuery }
     }
 
     const runtime = window.__RUNTIME__
