@@ -459,6 +459,7 @@ declare global {
     components: Components
     renderMajor: number
     query?: Record<string, string>
+    serverQuery?: Record<string, string>
     start: boolean
     runtimeMeta: {
       version: string
