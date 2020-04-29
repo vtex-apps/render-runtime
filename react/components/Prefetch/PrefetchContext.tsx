@@ -19,7 +19,7 @@ const disposeFn = (key: string) => delete state.pathsState[key]
 
 interface PathState {
   fetching: boolean
-  page?: string
+  page?: string | null
 }
 
 interface RoutePromise {

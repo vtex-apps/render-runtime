@@ -64,9 +64,12 @@ const maybeUpdatePathCache = async ({
     navigationRoute.path,
     navigationRoute.query
   )
-  const navigationPage = page ?? navigationData.page
+  const navigationPage = page ?? navigationData?.page
   pathsState[navigationRoute.path] = { fetching: false, page: navigationPage }
-  if (navigationData.queryData) {
+  if (navigationData == null || navigationPage == null) {
+    return null
+  }
+  if (navigationData?.queryData) {
     hydrateApolloCache(navigationData.queryData, client)
   }
 
@@ -103,6 +106,9 @@ const prefetchRequests = async ({
   })
 
   pathsState[navigationRoute.path] = { fetching: false, page: navigationPage }
+  if (navigationPage == null) {
+    return
+  }
 
   const declarer = pages[navigationPage]?.declarer
   if (typeof declarer === 'undefined') {

@@ -170,6 +170,29 @@ interface PrefetchPageResponse {
   route: RenderRuntime['route']
 }
 
+const prefetchCounters = {
+  pages: 0,
+  render: 0,
+}
+
+const promiseWithCounterWrapper = <T = any>(
+  promise: Promise<T>,
+  counterName: 'pages' | 'render'
+) => {
+  return promise
+    .then((data) => {
+      prefetchCounters[counterName] = 0
+      return data
+    })
+    .catch((error) => {
+      prefetchCounters[counterName]++
+      throw error
+    })
+}
+
+export const isPrefetchActive = () =>
+  prefetchCounters.pages < 4 && prefetchCounters.render < 4
+
 export const getPrefetchForPath = async ({
   fetcher,
   path,
@@ -178,7 +201,7 @@ export const getPrefetchForPath = async ({
   path: string
   query?: Record<string, string>
   fetcher: GlobalFetch['fetch']
-}): Promise<PrefetchPageResponse> => {
+}): Promise<PrefetchPageResponse | null> => {
   const parsedUrl = parse(path)
   parsedUrl.search = undefined
   parsedUrl.query = {
@@ -186,7 +209,7 @@ export const getPrefetchForPath = async ({
     __pickRuntime: 'page,queryData,contentResponse,route',
   } as any
   const url = format(parsedUrl)
-  const pageResponse: PrefetchPageResponse = await fetchWithRetry(
+  const pageResponsePromise = fetchWithRetry(
     url,
     {
       credentials: 'same-origin',
@@ -194,10 +217,14 @@ export const getPrefetchForPath = async ({
         accept: 'application/json',
       },
     },
-    fetcher
-  )
-    .then(({ response }) => response.json())
-    .catch(() => null)
+    fetcher,
+    0
+  ).then(({ response }) => response.json())
+  const pageResponse: PrefetchPageResponse | null = await promiseWithCounterWrapper(
+    pageResponsePromise,
+    'render'
+  ).catch(() => null)
+
   return pageResponse
 }
 
@@ -256,8 +283,8 @@ export const fetchRouteData = ({
   query,
   hints,
   renderMajor,
-}: FetchRouteDataArgs) =>
-  apolloClient
+}: FetchRouteDataArgs) => {
+  const promise = apolloClient
     .query<PrefetchBlocksQueryResult, PrefetchBlocksQueryVars>({
       fetchPolicy: 'no-cache',
       query: routeDataQuery,
@@ -272,6 +299,8 @@ export const fetchRouteData = ({
     .then(({ data: { prefetchBlocks }, errors }) =>
       errors ? Promise.reject(errors) : parseFecthRouteData(prefetchBlocks)
     )
+  return promiseWithCounterWrapper(promise, 'pages')
+}
 
 export const fetchNavigationPage = ({
   apolloClient,
