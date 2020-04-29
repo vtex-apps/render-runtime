@@ -165,17 +165,18 @@ function getExistingScriptSrcs() {
 }
 
 function getExistingStyleHrefs() {
-  const hrefs: string[] = []
-  for (let i = 0; i < document.styleSheets.length; i++) {
-    const stylesheet = document.styleSheets.item(i)
-    if (stylesheet !== null) {
-      const href = stylesheet.href
-      if (href) {
-        hrefs.push(href)
-      }
+  return Array.from(
+    document.head.querySelectorAll('link[type="text/css"],style')
+  ).reduce<string[]>((hrefs, styleSheet) => {
+    const href =
+      (styleSheet as HTMLLinkElement).href ||
+      styleSheet.getAttribute('data-href')
+
+    if (href) {
+      hrefs.push(href)
     }
-  }
-  return hrefs
+    return hrefs
+  }, [])
 }
 
 function getExistingPrefetchScriptLinks() {
@@ -237,9 +238,8 @@ export function getExtensionImplementation<P = {}, S = {}>(
     : null
 }
 
-export function createLazyLinkElements(
-  refs: StyleRef[],
-  refChild: Element
+export function fetchUncriticalStyles(
+  refs: StyleRef[]
 ): Promise<LazyLinksResult> {
   return Promise.all(
     refs.map(
@@ -249,11 +249,11 @@ export function createLazyLinkElements(
           fetch(path)
             .then(async response => {
               const body = await response.text()
-              resolve({ id, className, media, body })
+              resolve({ href: path, id, className, media, body })
             })
             .catch(error => {
               console.error(`Error loading uncritical style.`, error)
-              resolve({ id, className, media, body: '' })
+              resolve({ href: path, id, className, media, body: '' })
             })
         })
     )
@@ -406,6 +406,7 @@ function hasBundledAsset(
 }
 
 export type LazyLinkItem = {
+  href: string
   media: string
   className?: string
   id?: string

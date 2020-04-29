@@ -7,7 +7,10 @@ import * as runtimeGlobals from './core/main'
 import { createReactIntl } from './utils/reactIntl'
 
 import { createCustomReactApollo } from './utils/reactApollo'
-import { createLazyLinkElements, LazyLinkItem } from './utils/assets'
+import {
+  fetchUncriticalStyles,
+  LazyLinkItem as UncriticalStyle,
+} from './utils/assets'
 
 window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
 
@@ -90,47 +93,46 @@ if (window.ReactIntl) {
   window.ReactIntl = createReactIntl()
 }
 
-function createLazyLinksTrigger() {
+function triggerUncriticalStyles() {
   const {
     __RUNTIME__: { uncriticalStyleRefs },
   } = window
   const criticalElement = document.querySelector('style#critical')
 
   if (!uncriticalStyleRefs || !criticalElement) {
-    return () => {}
+    return
   }
 
-  let lazyLinksPromise: Promise<Array<LazyLinkItem>>
-  const loadPromise = new Promise(resolve =>
-    window.addEventListener('load', resolve)
-  )
+  const { base = [], overrides = [] } = uncriticalStyleRefs
+  const uncriticalStylesPromise = fetchUncriticalStyles([...base, ...overrides])
 
-  window.__UNCRITICAL_PROMISE__ = loadPromise
-    .then(() => lazyLinksPromise)
-    .then(lazyLinks => {
-      if (!lazyLinks) {
+  window.__UNCRITICAL_PROMISE__ = uncriticalStylesPromise
+    .then(() => uncriticalStylesPromise)
+    .then(uncriticalStyles => {
+      if (!uncriticalStyles) {
         console.error('Missing lazy links')
         return
       }
 
       const debugCriticalCSS = window.__RUNTIME__.query?.__debugCriticalCSS
 
-      const createUncriticalStyle = (lazyLink: LazyLinkItem) => {
-        if (!lazyLink) {
+      const createUncriticalStyle = (uncriticalStyle: UncriticalStyle) => {
+        if (!uncriticalStyle) {
           return
         }
         const style = document.createElement('style')
 
-        style.id = lazyLink.id ?? ''
-        style.className = lazyLink.className ?? ''
-        style.media = lazyLink.media
-        style.innerHTML = lazyLink.body
+        style.id = uncriticalStyle.id ?? ''
+        style.className = `uncritical ${uncriticalStyle.className ?? ''}`
+        style.media = uncriticalStyle.media
+        style.innerHTML = uncriticalStyle.body
+        style.setAttribute('data-href', uncriticalStyle.href)
 
         document.head.appendChild(style)
       }
 
       const applyUncritical = () => {
-        lazyLinks.forEach(createUncriticalStyle)
+        uncriticalStyles.forEach(createUncriticalStyle)
         criticalElement.remove()
       }
 
@@ -142,7 +144,7 @@ function createLazyLinksTrigger() {
           if (currentUncritical === -1) {
             console.log('Uncritical has finished being applied.')
           }
-          const current = lazyLinks[currentUncritical]
+          const current = uncriticalStyles[currentUncritical]
           if (!current) {
             console.log('All uncritical styles applied. Cleaning critical.')
             criticalElement.remove()
@@ -158,14 +160,6 @@ function createLazyLinksTrigger() {
 
       return
     })
-
-  return () => {
-    const { base = [], overrides = [] } = uncriticalStyleRefs
-    lazyLinksPromise = createLazyLinkElements(
-      [...base, ...overrides],
-      criticalElement
-    )
-  }
 }
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
@@ -174,7 +168,6 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
       window.addEventListener('DOMContentLoaded', resolve)
     )
 
-    const triggerLazyLinks = createLazyLinksTrigger()
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
       setTimeout(() => {
         window?.performance?.mark?.('render-start')
@@ -185,7 +178,7 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
           'render-start',
           'render-end'
         )
-        triggerLazyLinks()
+        triggerUncriticalStyles()
       }, 1)
     })
   } else {
