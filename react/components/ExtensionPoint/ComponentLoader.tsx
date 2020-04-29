@@ -69,7 +69,7 @@ const ComponentLoader: FunctionComponent<Props> = props => {
   } = props
 
   /**
-   * Props that function as Slots are ALWAYS CamelCased.
+   * Props that function as Slots are ALWAYS PascalCased.
    * It is OK to not include componentProps in the dependency array
    * since there is currently no way for users to ADD or UPDATE slots via CMS.
    * What this means is that the slots variable below only needs to be
