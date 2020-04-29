@@ -8,7 +8,11 @@ import {
   NavigateOptions,
   getNavigationRouteToNavigate,
 } from '../utils/pages'
-import { getPrefetchForPath, fetchRouteData } from '../utils/routes'
+import {
+  getPrefetchForPath,
+  fetchRouteData,
+  isPrefetchActive,
+} from '../utils/routes'
 import { hydrateApolloCache } from '../utils/apolloCache'
 import { fetchComponents } from '../utils/components'
 import { useRuntime } from '../core/main'
@@ -96,6 +100,9 @@ const prefetchRequests = async ({
   validCache,
 }: PrefetchRequestsArgs) => {
   const { pathsState, routesCache, routePromise } = prefetchState
+  if (!isPrefetchActive()) {
+    return
+  }
 
   const navigationPage = await maybeUpdatePathCache({
     prefetchState,
@@ -218,7 +225,7 @@ export const usePrefetchAttempt = ({
   const { pages, navigationRouteModifiers, hints, renderMajor } = runtime
 
   useEffect(() => {
-    if (inView && !hasTried.current && canPrefetch) {
+    if (inView && !hasTried.current && canPrefetch && isPrefetchActive()) {
       const { pathsState, queue } = prefetchState
       if (href && href[0] !== '/') {
         // Should only work on relative paths
