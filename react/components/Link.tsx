@@ -23,6 +23,8 @@ interface Props extends NavigateOptions {
   className?: string
   target?: string
   waitToPrefetch?: number
+  onMouseOver?: (event: React.MouseEvent) => void
+  onFocus?: (event: React.FocusEvent) => void
 }
 
 const Link: React.FunctionComponent<Props> = ({
@@ -38,6 +40,8 @@ const Link: React.FunctionComponent<Props> = ({
   modifiersOptions,
   target,
   waitToPrefetch,
+  onMouseOver,
+  onFocus,
   ...linkProps
 }) => {
   const {
@@ -45,6 +49,7 @@ const Link: React.FunctionComponent<Props> = ({
     navigate,
     rootPath = '',
     route: { domain },
+    hints,
   } = useRuntime()
 
   const options = useMemo(
@@ -132,7 +137,13 @@ const Link: React.FunctionComponent<Props> = ({
     triggerOnce: true,
   })
 
-  usePrefetchAttempt({ inView, page, href, options, waitToPrefetch })
+  const executePrefetch = usePrefetchAttempt({
+    inView,
+    page,
+    href,
+    options,
+    waitToPrefetch,
+  })
 
   return (
     <a
@@ -141,6 +152,14 @@ const Link: React.FunctionComponent<Props> = ({
       href={hrefWithoutIframePrefix}
       {...linkProps}
       onClick={handleClick}
+      onMouseOver={(event) => {
+        onMouseOver && onMouseOver(event)
+        executePrefetch()
+      }}
+      onFocus={(event) => {
+        onFocus && onFocus(event)
+        executePrefetch()
+      }}
     >
       {children}
     </a>

@@ -17,7 +17,7 @@ import { hydrateApolloCache } from '../utils/apolloCache'
 import { fetchComponents } from '../utils/components'
 import { useRuntime } from '../core/main'
 import { useApolloClient } from 'react-apollo'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 
 interface PrefetchRequestsArgs {
   client: ApolloClientType
@@ -224,8 +224,8 @@ export const usePrefetchAttempt = ({
 
   const { pages, navigationRouteModifiers, hints, renderMajor } = runtime
 
-  useEffect(() => {
-    if (inView && !hasTried.current && canPrefetch && isPrefetchActive()) {
+  const attemptPrefetch = useCallback(() => {
+    if (!hasTried.current && isPrefetchActive() && canPrefetch) {
       const { pathsState, queue } = prefetchState
       if (href && href[0] !== '/') {
         // Should only work on relative paths
@@ -271,16 +271,29 @@ export const usePrefetchAttempt = ({
       )
     }
   }, [
+    canPrefetch,
     client,
     hints,
     href,
-    inView,
     navigationRouteModifiers,
     options,
     page,
     pages,
     prefetchState,
     renderMajor,
-    canPrefetch,
   ])
+
+  useEffect(() => {
+    if (inView && hints.mobile) {
+      attemptPrefetch()
+    }
+  }, [attemptPrefetch, inView, hints.mobile])
+
+  const executePrefetch = useCallback(() => {
+    if (hints.desktop) {
+      attemptPrefetch()
+    }
+  }, [attemptPrefetch, hints.desktop])
+
+  return executePrefetch
 }
