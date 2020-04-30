@@ -131,13 +131,23 @@ function triggerUncriticalStyles() {
         document.head.appendChild(style)
       }
 
-      const applyUncritical = () => {
-        uncriticalStyles.forEach(createUncriticalStyle)
-        criticalElement.remove()
+      const clearCritical = () => {
+        if (criticalElement.parentElement) {
+          criticalElement.remove()
+        }
       }
 
+      const applyUncritical = () => {
+        uncriticalStyles.forEach(createUncriticalStyle)
+        clearCritical()
+      }
+
+      /** Doesn't apply uncritical CSS automatically--exposes functions
+       * to the window to manually do it, for debugging purposes
+       */
       if (debugCriticalCSS === 'manual') {
         ;(window as any).applyUncritical = applyUncritical
+        ;(window as any).clearCritical = clearCritical
 
         let currentUncritical = 0
         ;(window as any).stepUncritical = () => {
@@ -146,14 +156,24 @@ function triggerUncriticalStyles() {
           }
           const current = uncriticalStyles[currentUncritical]
           if (!current) {
-            console.log('All uncritical styles applied. Cleaning critical.')
-            criticalElement.remove()
+            console.log(
+              'All uncritical styles applied. Cleaning critical styles.'
+            )
+            clearCritical()
             currentUncritical = -1
           }
           console.log('Applying uncritical style', current)
           createUncriticalStyle(current)
           currentUncritical++
         }
+
+        console.log(
+          `Run the following functions on the console to manually apply uncritical CSS:
+            - applyUncritical()
+            - stepUncritical()
+            - clearCritical()
+          `
+        )
       } else {
         applyUncritical()
       }
