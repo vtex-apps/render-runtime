@@ -7,10 +7,7 @@ import * as runtimeGlobals from './core/main'
 import { createReactIntl } from './utils/reactIntl'
 
 import { createCustomReactApollo } from './utils/reactApollo'
-import {
-  fetchUncriticalStyles,
-  LazyLinkItem as UncriticalStyle,
-} from './utils/assets'
+import { fetchUncriticalStyles, UncriticalStyle } from './utils/assets'
 
 window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
 

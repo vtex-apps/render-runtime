@@ -240,11 +240,11 @@ export function getExtensionImplementation<P = {}, S = {}>(
 
 export function fetchUncriticalStyles(
   refs: StyleRef[]
-): Promise<LazyLinksResult> {
+): Promise<Array<UncriticalStyle>> {
   return Promise.all(
     refs.map(
       ref =>
-        new Promise<LazyLinkItem>(resolve => {
+        new Promise<UncriticalStyle>(resolve => {
           const { path, id, class: className, media = '' } = ref
           fetch(path)
             .then(async response => {
@@ -405,12 +405,10 @@ function hasBundledAsset(
   return !!assetsByApp[app] && assetsByApp[app].indexOf(asset) !== -1
 }
 
-export type LazyLinkItem = {
+export type UncriticalStyle = {
   href: string
   media: string
   className?: string
   id?: string
   body: string
 } | null
-
-export type LazyLinksResult = Array<LazyLinkItem>
