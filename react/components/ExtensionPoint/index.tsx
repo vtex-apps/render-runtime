@@ -47,14 +47,19 @@ export function getChildExtensions(runtime: RenderContext, treePath: string) {
     return
   }
 
-  // This filter condition is for backwards compatibility
-  const childBlocks = extension.blocks.filter(
-    block =>
-      (block.children === undefined ||
-        block.children === true ||
-        block.blockRole === 'children') &&
-      block.blockRole !== 'slot'
-  )
+  const childBlocks = extension.blocks.filter(block => {
+    /* This weird conditional check is for backwards compatibility.
+     * Blocks that were built prior to https://github.com/vtex/builder-hub/pull/856
+     * would not have the 'children' property (block.children === undefined).
+     */
+    const isChild =
+      block.children === undefined ||
+      block.children === true ||
+      block.blockRole === 'children'
+    const isNotSlot = block.blockRole !== 'slot'
+
+    return isChild && isNotSlot
+  })
 
   return childBlocks.map((child, i) => {
     const childTreePath = mountTreePath(child.extensionPointId, treePath)

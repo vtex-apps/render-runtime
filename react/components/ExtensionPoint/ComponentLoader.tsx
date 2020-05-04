@@ -86,15 +86,14 @@ const ComponentLoader: FunctionComponent<Props> = props => {
     )
     const resultingSlotsProps: Record<string, ReactNode> = {}
 
-    slotNames.forEach(
-      slotName =>
-        (resultingSlotsProps[slotName] = generateSlot({
-          treePath,
-          slotName,
-          slotValue: componentProps[slotName],
-          hydration,
-        }))
-    )
+    for (const slotName of slotNames) {
+      resultingSlotsProps[slotName] = generateSlot({
+        treePath,
+        slotName,
+        slotValue: componentProps[slotName],
+        hydration,
+      })
+    }
 
     return resultingSlotsProps
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -54,7 +54,7 @@ export function generateSlot({
         props.id
       }`
 
-      if (!runtime.extensions[dynamicTreePath]) {
+      if (!(dynamicTreePath in runtime.extensions)) {
         componentProps = extension?.props ?? {}
         const baseSlotBlockId = extension?.blockId
         const dynamicSlotProps = { ...props, ...componentProps }
