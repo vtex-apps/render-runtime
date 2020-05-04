@@ -104,82 +104,82 @@ function triggerUncriticalStyles() {
   }
 
   const { base = [], overrides = [] } = uncriticalStyleRefs
-  const uncriticalStylesPromise = fetchUncriticalStyles([...base, ...overrides])
 
-  window.__UNCRITICAL_PROMISE__ = uncriticalStylesPromise
-    .then(() => uncriticalStylesPromise)
-    .then((uncriticalStyles) => {
-      if (!uncriticalStyles) {
-        console.error('Missing lazy links')
+  window.__UNCRITICAL_PROMISE__ = fetchUncriticalStyles([
+    ...base,
+    ...overrides,
+  ]).then((uncriticalStyles) => {
+    if (!uncriticalStyles) {
+      console.error('Missing lazy links')
+      return
+    }
+
+    const debugCriticalCSS = window.__RUNTIME__.query?.__debugCriticalCSS
+
+    const createUncriticalStyle = (uncriticalStyle: UncriticalStyle) => {
+      if (!uncriticalStyle) {
         return
       }
+      const style = document.createElement('style')
 
-      const debugCriticalCSS = window.__RUNTIME__.query?.__debugCriticalCSS
+      style.id = uncriticalStyle.id ?? ''
+      style.className = `uncritical ${uncriticalStyle.className ?? ''}`
+      style.media = uncriticalStyle.media
+      style.innerHTML = uncriticalStyle.body
+      style.setAttribute('data-href', uncriticalStyle.href)
 
-      const createUncriticalStyle = (uncriticalStyle: UncriticalStyle) => {
-        if (!uncriticalStyle) {
-          return
+      document.head.appendChild(style)
+    }
+
+    const clearCritical = () => {
+      if (criticalElement.parentElement) {
+        criticalElement.remove()
+      }
+    }
+
+    const applyUncritical = () => {
+      uncriticalStyles.forEach(createUncriticalStyle)
+      clearCritical()
+    }
+
+    /** Doesn't apply uncritical CSS automatically--exposes functions
+     * to the window to manually do it, for debugging purposes
+     */
+    if (debugCriticalCSS === 'manual') {
+      ;(window as any).applyUncritical = applyUncritical
+      ;(window as any).clearCritical = clearCritical
+
+      let currentUncritical = 0
+      ;(window as any).stepUncritical = () => {
+        if (currentUncritical === -1) {
+          console.log('Uncritical has finished being applied.')
         }
-        const style = document.createElement('style')
-
-        style.id = uncriticalStyle.id ?? ''
-        style.className = `uncritical ${uncriticalStyle.className ?? ''}`
-        style.media = uncriticalStyle.media
-        style.innerHTML = uncriticalStyle.body
-        style.setAttribute('data-href', uncriticalStyle.href)
-
-        document.head.appendChild(style)
+        const current = uncriticalStyles[currentUncritical]
+        if (!current) {
+          console.log(
+            'All uncritical styles applied. Cleaning critical styles.'
+          )
+          clearCritical()
+          currentUncritical = -1
+        }
+        console.log('Applying uncritical style', current)
+        createUncriticalStyle(current)
+        currentUncritical++
       }
 
-      const clearCritical = () => {
-        if (criticalElement.parentElement) {
-          criticalElement.remove()
-        }
-      }
-
-      const applyUncritical = () => {
-        uncriticalStyles.forEach(createUncriticalStyle)
-        clearCritical()
-      }
-
-      /** Doesn't apply uncritical CSS automatically--exposes functions
-       * to the window to manually do it, for debugging purposes
-       */
-      if (debugCriticalCSS === 'manual') {
-        ;(window as any).applyUncritical = applyUncritical
-        ;(window as any).clearCritical = clearCritical
-
-        let currentUncritical = 0
-        ;(window as any).stepUncritical = () => {
-          if (currentUncritical === -1) {
-            console.log('Uncritical has finished being applied.')
-          }
-          const current = uncriticalStyles[currentUncritical]
-          if (!current) {
-            console.log(
-              'All uncritical styles applied. Cleaning critical styles.'
-            )
-            clearCritical()
-            currentUncritical = -1
-          }
-          console.log('Applying uncritical style', current)
-          createUncriticalStyle(current)
-          currentUncritical++
-        }
-
-        console.log(
-          `Run the following functions on the console to manually apply uncritical CSS:
+      console.log(
+        `Run the following functions on the console to manually apply uncritical CSS:
             - applyUncritical()
             - stepUncritical()
             - clearCritical()
           `
-        )
-      } else {
-        applyUncritical()
-      }
+      )
+    } else {
+      applyUncritical()
+    }
 
-      return
-    })
+    return
+  })
 }
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
