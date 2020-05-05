@@ -79,12 +79,21 @@ export const getMarkups = (
   return markups
 }
 
-export const isSiteEditorIframe =
-  canUseDOM &&
-  window.top !== window.self &&
-  window.top.__provideRuntime &&
-  !!window.top.__provideRuntime &&
-  window.__RUNTIME__.route.domain === 'store'
+const checkIsSiteEditorIframe = () => {
+  try {
+    return (
+      canUseDOM &&
+      window.top !== window.self &&
+      window.top.__provideRuntime &&
+      !!window.top.__provideRuntime &&
+      window.__RUNTIME__.route.domain === 'store'
+    )
+  } catch {
+    return false
+  }
+}
+
+export const isSiteEditorIframe = checkIsSiteEditorIframe()
 
 export const getContainer = () => {
   return canUseDOM
