@@ -114,9 +114,7 @@ const ComponentLoader: FunctionComponent<Props> = props => {
     [componentPropsWithSlots, props]
   )
 
-  const Component = useMemo(() => component && getImplementation(component), [
-    component,
-  ])
+  const Component = component && getImplementation(component)
 
   if (component?.includes('Fold')) {
     return null
