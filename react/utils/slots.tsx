@@ -17,13 +17,7 @@ export function generateSlot({
   slotValue,
   hydration,
 }: GenerateSlotArgs) {
-  const slotMarkerRegex = /(-|#)slot/
-  const slotMarkerInTreePath = treePath.match(slotMarkerRegex)
-  const treePathWithoutSlotMarker = slotMarkerInTreePath
-    ? treePath.substring(0, treePath.indexOf(slotMarkerInTreePath[0]))
-    : treePath
-
-  const newTreePath = `${treePathWithoutSlotMarker}/${slotValue}`
+  const newTreePath = `${treePath}/${slotValue}`
 
   const SlotComponent: FC<any> = props => {
     const runtime = useRuntime()
