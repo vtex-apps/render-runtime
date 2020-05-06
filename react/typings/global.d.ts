@@ -64,6 +64,12 @@ declare global {
   interface BlockInsertion {
     extensionPointId: string
     blockId: string
+    /**
+     * This property was replaced by blockRole,
+     * but it cannot be removed since that would be a breaking-change
+     * in builder-hub. Prefer using blockRole since it can tell you more
+     * about the BlockInsertion.
+     */
     children?: boolean
     blockRole?: 'block' | 'children' | 'slot'
   }
