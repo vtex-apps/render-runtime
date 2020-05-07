@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [8.100.4] - 2020-05-07
 ### Fixed
 - Issue that would cause React to not run hydration on some (mostly old) browsers.
 
