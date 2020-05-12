@@ -56,7 +56,7 @@ const MyComponent = () => {
 const MyOtherComponent = ({ navigate }) => {
 }
 
-export withRuntimeContext(MyOtherComponent)
+export default withRuntimeContext(MyOtherComponent)
 ```
 
 You can pass a handful of configuration props to navigate:
