@@ -8,6 +8,7 @@ import { generateExtensions } from './blocks'
 import { fetchWithRetry } from './fetch'
 import { parseMessages } from './messages'
 import { isEnabled } from './flags'
+import { DeviceInfo } from './withDevice'
 
 const parsePageQueryResponse = (
   page: PageQueryResponse

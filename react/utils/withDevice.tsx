@@ -53,9 +53,9 @@ const useDevice = (hints: RenderHints) => {
 }
 
 export const withDevice = <P extends Props>(
-  Component: ComponentType<P>
-): FC<P & WithDeviceProps> => {
-  const WithDevice = ({ ...props }: P & WithDeviceProps) => {
+  Component: ComponentType<P & WithDeviceProps>
+): FC<P> => {
+  const WithDevice = ({ ...props }: P) => {
     const hints = props.runtime.hints
     const deviceInfo = useDevice(hints)
 
