@@ -970,6 +970,7 @@ class RenderProvider extends Component<
       culture: { locale },
       route,
       query,
+      deviceInfo,
     } = this.state
     const declarer = pagesState[page] && pagesState[page].declarer
     const { pathname } = window.location
@@ -992,6 +993,7 @@ class RenderProvider extends Component<
           query,
           fetcher: this.fetcher,
           workspace: workspaceFromQuery,
+          deviceInfo,
         })
       : await fetchNavigationPage({
           apolloClient: this.apolloClient,
