@@ -23,6 +23,7 @@ const RETRY_STATUSES = [
 const canRetry = (status: number) => RETRY_STATUSES.includes(status)
 
 const ok = (status: number) => 200 <= status && status < 300
+const isNotFound = (status: number) => status === 404
 
 export const fetchWithRetry = (
   url: string,
@@ -37,7 +38,7 @@ export const fetchWithRetry = (
     fetcher(url, init)
       .then(response => {
         status = response.status
-        return ok(status)
+        return ok(status) || isNotFound(status)
           ? { response, error: null }
           : response
               .json()
