@@ -140,7 +140,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     components: PropTypes.object,
     culture: PropTypes.object,
     defaultExtensions: PropTypes.object,
+    // TODO: the prop "device" might be legacy. Figure out if it's still being used.
     device: PropTypes.string,
+    // named "deviceInfo" to avoid conflicts with the possibly legacy "device".
+    deviceInfo: PropTypes.shape({
+      type: PropTypes.oneOf(['desktop', 'tablet', 'phone', 'unknown']),
+      isMobile: PropTypes.bool,
+    }),
+    isMobile: PropTypes.bool,
     emitter: PropTypes.object,
     ensureSession: PropTypes.func,
     extensions: PropTypes.object,
