@@ -586,6 +586,25 @@ class RenderProvider extends Component<
     return pageNavigate(history, pages, options)
   }
 
+  private updateDeviceBlocks = async (deviceInfo: DeviceInfo) => {
+    const query = queryStringToMap(location.search) as RenderRuntime['query']
+
+    const { components, extensions, messages } = await fetchServerPage({
+      fetcher: this.fetcher,
+      path: this.state.route.path,
+      query,
+      deviceInfo,
+    })
+
+    await this.fetchComponents(components, extensions)
+
+    this.setState(state => ({
+      extensions: { ...state.extensions, ...extensions },
+      components: { ...state.components, ...components },
+      messages: { ...state.messages, ...messages },
+    }))
+  }
+
   public addNavigationRouteModifier = (modifier: NavigationRouteModifier) => {
     this.navigationRouteModifiers.add(modifier)
   }
@@ -1109,6 +1128,48 @@ class RenderProvider extends Component<
     })
 
     await this.sendInfoFromIframe()
+  }
+
+  private updateDevice = debounce(
+    async (deviceInfo: DeviceInfo) => {
+      if (!deviceInfo) {
+        return
+      }
+      if (!this.state.loadedDevices.includes(deviceInfo.type)) {
+        /** If resizing from a smaller to a larger device, keeps the current
+         * blocks while the new ones are being loaded.
+         * If resizing from a larger to a smaller one, can't do this because
+         * the larger blocks would overflow the window and look bad.
+         */
+        const deviceOrder = ['desktop', 'tablet', 'phone']
+        const prevDeviceType = this.state.deviceInfo.type
+        const keepCurrentDevice =
+          deviceOrder.indexOf(deviceInfo.type) <
+          deviceOrder.indexOf(prevDeviceType)
+        if (!keepCurrentDevice) {
+          this.setState({ deviceInfo })
+        }
+
+        this.setState(state => ({
+          preview: true,
+          loadedDevices: [...state.loadedDevices, deviceInfo.type],
+        }))
+
+        await this.updateDeviceBlocks(deviceInfo)
+      }
+      this.setState({
+        deviceInfo,
+        preview: false,
+      })
+    },
+    200, // debounce timeout
+    false // means "don't call this function immediately, wait for the debounce timeout"
+  )
+
+  public componentDidUpdate() {
+    if (!equals(this.state.deviceInfo, this.props.deviceInfo)) {
+      this.updateDevice(this.props.deviceInfo)
+    }
   }
 
   public render() {
