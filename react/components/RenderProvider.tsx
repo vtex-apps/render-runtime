@@ -89,6 +89,7 @@ export interface RenderProviderState {
   culture: RenderRuntime['culture']
   defaultExtensions: RenderRuntime['defaultExtensions']
   device: ConfigurationDevice
+  deviceInfo: DeviceInfo
   extensions: RenderRuntime['extensions']
   inspect: RenderRuntime['inspect']
   messages: RenderRuntime['messages']
@@ -99,6 +100,7 @@ export interface RenderProviderState {
   query: RenderRuntime['query']
   settings: RenderRuntime['settings']
   route: RenderRuntime['route']
+  loadedDevices: RenderRuntime['loadedDevices']
   loadedPages: Set<string>
   blocksTree?: RenderRuntime['blocksTree']
   blocks?: RenderRuntime['blocks']
