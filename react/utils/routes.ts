@@ -133,11 +133,13 @@ export const fetchServerPage = async ({
   path,
   query: rawQuery,
   workspace,
+  deviceInfo,
 }: {
   path: string
   query?: Record<string, string>
   fetcher: GlobalFetch['fetch']
   workspace?: string
+  deviceInfo?: DeviceInfo
 }): Promise<ParsedServerPageResponse> => {
   const url = getRelativeURLWithQuery({
     path,
@@ -145,6 +147,9 @@ export const fetchServerPage = async ({
       ...rawQuery,
       ...(workspace ? { workspace } : {}),
       __pickRuntime: runtimeFields,
+      ...(deviceInfo && {
+        __device: deviceInfo.type,
+      }),
     },
   })
   const page: ServerPageResponse = await fetchWithRetry(
