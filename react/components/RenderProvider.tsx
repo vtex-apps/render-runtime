@@ -244,8 +244,9 @@ class RenderProvider extends Component<
       route,
       settings,
       queryData,
+      loadedDevices,
     } = props.runtime
-    const { history, baseURI, cacheControl } = props
+    const { history, baseURI, cacheControl, deviceInfo } = props
     const ignoreCanonicalReplacement = query && query.map
     this.fetcher = fetch
 
@@ -311,6 +312,8 @@ class RenderProvider extends Component<
       culture,
       defaultExtensions: {},
       device: 'any',
+      loadedDevices,
+      deviceInfo,
       extensions,
       loadedPages: new Set([page]),
       messages,
