@@ -360,9 +360,14 @@ class RenderProvider extends Component<
   }
 
   public UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    // If RenderProvider is being re-rendered, the global runtime might have changed
-    // so we must update all extensions.
-    if (this.rendered) {
+    const updatedProps = difference(
+      Object.entries(nextProps),
+      Object.entries(this.props)
+    ).map(([propName]) => propName)
+
+    const hasUpdatedRuntime = updatedProps.includes('runtime')
+
+    if (this.rendered && hasUpdatedRuntime) {
       const {
         runtime: { extensions },
       } = nextProps
