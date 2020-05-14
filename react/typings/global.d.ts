@@ -11,6 +11,7 @@ import { TreePathProps } from '../utils/treePath'
 import { LayoutContainer } from '../core/main'
 import { IntrospectionResultData } from 'apollo-cache-inmemory'
 import { NavigationRouteModifier } from '../utils/pages'
+import { Device, DeviceInfo } from '../utils/withDevice'
 
 declare global {
   interface RenderMetric {
@@ -213,6 +214,7 @@ declare global {
     culture: RenderRuntime['culture']
     defaultExtensions: RenderRuntime['defaultExtensions']
     device: ConfigurationDevice
+    deviceInfo: DeviceInfo
     emitter: RenderRuntime['emitter']
     ensureSession: () => Promise<void>
     extensions: RenderRuntime['extensions']
@@ -482,6 +484,7 @@ declare global {
     preview: boolean
     production: boolean
     publicEndpoint: string
+    loadedDevices: Device[]
     messages: Locale
     components: Components
     renderMajor: number
