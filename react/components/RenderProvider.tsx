@@ -785,6 +785,7 @@ class RenderProvider extends Component<
                 appsEtag,
                 components: { ...state.components, ...components },
                 extensions: { ...state.extensions, ...extensions },
+                loadedDevices: [deviceInfo.type],
                 loadedPages: loadedPages.add(matchingPage.routeId),
                 messages: { ...state.messages, ...messages },
                 page: matchingPage.routeId,
