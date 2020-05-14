@@ -125,12 +125,6 @@ interface NavigationState {
   lastOptions?: NavigateOptions
 }
 
-interface ComponentPromises {
-  [component: string]: Promise<any>
-}
-
-const componentsPromises: ComponentPromises = {}
-
 class RenderProvider extends Component<Props, RenderProviderState> {
   navigationState: NavigationState = { isNavigating: false }
   public static childContextTypes = {
