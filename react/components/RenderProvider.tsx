@@ -365,6 +365,7 @@ class RenderProvider extends Component<
       Object.entries(this.props)
     ).map(([propName]) => propName)
 
+    /** Update all extensions if runtime has changed. */
     const hasUpdatedRuntime = updatedProps.includes('runtime')
 
     if (this.rendered && hasUpdatedRuntime) {
