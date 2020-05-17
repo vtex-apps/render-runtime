@@ -146,7 +146,7 @@ export const getClient = (
        * Should look into why it is needed in the first place.
        * https://github.com/apollographql/apollo-client-devtools/issues/238
        */
-      typeDefs: {} as any,
+      typeDefs: [],
     })
   }
 
