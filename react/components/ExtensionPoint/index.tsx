@@ -40,32 +40,42 @@ function mountTreePath(currentId: string, parentTreePath: string) {
   return parentTreePath || currentId
 }
 
-function getChildExtensions(runtime: RenderContext, treePath: string) {
+export function getChildExtensions(runtime: RenderContext, treePath: string) {
   const extension = runtime.extensions && runtime.extensions[treePath]
 
   if (!extension || !extension.blocks) {
     return
   }
 
-  // This filter condition is for backwards compatibility
-  return extension.blocks
-    .filter(block => block.children === undefined || block.children === true)
-    .map((child, i) => {
-      const childTreePath = mountTreePath(child.extensionPointId, treePath)
+  const childBlocks = extension.blocks.filter(block => {
+    /* This weird conditional check is for backwards compatibility.
+     * Blocks that were built prior to https://github.com/vtex/builder-hub/pull/856
+     * would not have the 'children' property (block.children === undefined).
+     */
+    const isChild =
+      block.children === undefined ||
+      block.children === true ||
+      block.blockRole === 'children'
+    const isNotSlot = block.blockRole !== 'slot'
 
-      const childExtension =
-        runtime.extensions && runtime.extensions[childTreePath]
-      const childProps = childExtension ? childExtension.props : {}
+    return isChild && isNotSlot
+  })
 
-      return (
-        <ExtensionPoint
-          key={`around-${treePath}-${i}`}
-          id={child.extensionPointId}
-          blockProps={childProps}
-          treePath={treePath}
-        />
-      )
-    })
+  return childBlocks.map((child, i) => {
+    const childTreePath = mountTreePath(child.extensionPointId, treePath)
+
+    const childExtension = runtime?.extensions[childTreePath]
+    const childProps = childExtension?.props ?? {}
+
+    return (
+      <ExtensionPoint
+        key={`around-${treePath}-${i}`}
+        id={child.extensionPointId}
+        blockProps={childProps}
+        treePath={treePath}
+      />
+    )
+  })
 }
 
 function withOuterExtensions(
@@ -213,11 +223,12 @@ const ExtensionPoint: FC<Props> = props => {
     </ComponentLoader>
   )
 
-  // "client" component assets are sent to server side rendering,
-  // but they should display a loading animation.
-  //
-  // "lazy" components might never be used, so they don't necessarily
-  // need a loading animation.
+  /**
+   * "client" component assets are sent to server side rendering,
+   * but they should display a loading animation.
+   * "lazy" components might never be used, so they don't necessarily
+   * need a loading animation.
+   */
   const maybeClientExtension = (
     <Fragment>
       {runtime.preview && isRootTreePath && <LoadingBar />}

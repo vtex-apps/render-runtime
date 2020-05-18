@@ -1,4 +1,11 @@
-import React, { useEffect, useState, FunctionComponent } from 'react'
+import React, {
+  useEffect,
+  useState,
+  FunctionComponent,
+  ReactNode,
+  useMemo,
+} from 'react'
+
 import { getImplementation } from '../../utils/assets'
 import GenericPreview from '../Preview/GenericPreview'
 import Loading from '../Loading'
@@ -7,11 +14,12 @@ import { isSiteEditorIframe } from '../../utils/dom'
 import SiteEditorWrapper from './SiteEditorWrapper'
 import Hydration from '../Hydration'
 import { LazyImages } from '../LazyImages'
+import { generateSlot } from '../../utils/slots'
 
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
 
-async function fetchComponent(
+export async function fetchComponent(
   component: string,
   runtimeFetchComponent: RenderContext['fetchComponent'],
   retries = 3
@@ -45,7 +53,7 @@ async function fetchComponent(
 
 interface Props {
   component: string | null
-  props: any
+  props: Record<string, any>
   treePath: string
   runtime: RenderContext
   hydration: Hydration
@@ -60,16 +68,62 @@ const ComponentLoader: FunctionComponent<Props> = props => {
     hydration,
   } = props
 
+  /**
+   * Slot props should ALWAYS be PascalCased.
+   * It is OK to not include componentProps in the dependency array
+   * since there is currently no way for users to ADD or UPDATE slots via CMS.
+   * What this means is that the slots variable below only needs to be
+   * computed once during runtime, since we know that, even if componentProps
+   * is updated, the props that function as Slots will NOT change.
+   */
+  const slots = useMemo(() => {
+    if (!componentProps) {
+      return {}
+    }
+
+    const slotNames = Object.keys(componentProps).filter(
+      key => key[0] !== key[0].toLowerCase()
+    )
+    const resultingSlotsProps: Record<string, ReactNode> = {}
+
+    for (const slotName of slotNames) {
+      resultingSlotsProps[slotName] = generateSlot({
+        treePath,
+        slotName,
+        slotValue: componentProps[slotName],
+        hydration,
+      })
+    }
+
+    return resultingSlotsProps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydration, treePath])
+
+  const componentPropsWithSlots = useMemo(
+    () => ({
+      ...componentProps,
+      ...slots,
+    }),
+    [componentProps, slots]
+  )
+  const asyncComponentProps = useMemo(
+    () => ({
+      ...props,
+      props: componentPropsWithSlots,
+    }),
+    [componentPropsWithSlots, props]
+  )
+
+  const Component = component && getImplementation(component)
+
   if (component?.includes('Fold')) {
     return null
   }
 
-  const Component = component && getImplementation(component)
-
   let content = Component ? (
-    <Component {...componentProps}>{children}</Component>
+    <Component {...componentPropsWithSlots}>{children}</Component>
   ) : (
-    <AsyncComponent {...props}>{children}</AsyncComponent>
+    <AsyncComponent {...asyncComponentProps}>{children}</AsyncComponent>
   )
 
   const shouldHydrate =
