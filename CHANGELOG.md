@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.101.0] - 2020-05-18
+
 ## [8.100.5] - 2020-05-18
 ### Fixed
 - Issue with Apollo Devtools turning up blank.
