@@ -142,6 +142,11 @@ export const getClient = (
       link,
       resolvers: {},
       ssrMode: !canUseDOM,
+      /** TODO: The empty typedefs below fixes an issue with Apollo Devtools.
+       * Should look into why it is needed in the first place.
+       * https://github.com/apollographql/apollo-client-devtools/issues/238
+       */
+      typeDefs: [],
     })
   }
 
