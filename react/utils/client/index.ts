@@ -24,7 +24,7 @@ import { createUriSwitchLink } from './links/uriSwitchLink'
 import { versionSplitterLink } from './links/versionSplitterLink'
 
 interface ApolloClientsRegistry {
-  [key: string]: ApolloClient<NormalizedCacheObject>
+  [key: string]: ApolloClientType
 }
 
 const buildCacheId = (

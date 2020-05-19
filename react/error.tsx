@@ -9,6 +9,7 @@ const ERROR_PAGE_COMPONENT = 'ErrorPage'
 import ErrorImg from './images/error-img.png'
 
 import style from './error.css'
+import LRUCache from 'lru-cache'
 
 const toSplunkLink = (rid: string) =>
   `https://splunk72.vtex.com/en-US/app/vtex_io_apps/search?q=search%20index%3Dvtex_io_logs%20app%3Dvtex.render-server%40*%20data.requestId%3D${rid}&display.page.search.mode=verbose&dispatch.sample_ratio=1&earliest=-5m%40m&latest=now`
@@ -73,7 +74,7 @@ class ErrorPage extends Component {
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
           <img
             src={ErrorImg}
-            onKeyDown={e => e.key === 'Enter' && this.handleImageClick()}
+            onKeyDown={(e) => e.key === 'Enter' && this.handleImageClick()}
             onClick={this.handleImageClick}
             className={`${style.imgHeight} pb6 pb0-ns`}
             alt=""
@@ -134,6 +135,7 @@ if (window.__ERROR__) {
       component: ERROR_PAGE_COMPONENT,
       props: {},
     }
+
     window.__RENDER_8_RUNTIME__.render('error', global.__RUNTIME__)
   }
 

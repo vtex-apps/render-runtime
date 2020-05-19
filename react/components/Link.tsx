@@ -1,6 +1,8 @@
-import React, { MouseEvent, useCallback } from 'react'
+import React, { MouseEvent, useCallback, useMemo } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { NavigateOptions, pathFromPageName } from '../utils/pages'
 import { useRuntime } from './RenderContext'
+import { usePrefetchAttempt } from '../hooks/prefetch'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) =>
   event.button === 0
@@ -20,6 +22,9 @@ interface Props extends NavigateOptions {
   onClick?: (event: React.MouseEvent) => void
   className?: string
   target?: string
+  waitToPrefetch?: number
+  onMouseOver?: (event: React.MouseEvent) => void
+  onFocus?: (event: React.FocusEvent) => void
 }
 
 const Link: React.FunctionComponent<Props> = ({
@@ -34,6 +39,9 @@ const Link: React.FunctionComponent<Props> = ({
   replace,
   modifiersOptions,
   target,
+  waitToPrefetch,
+  onMouseOver,
+  onFocus,
   ...linkProps
 }) => {
   const {
@@ -41,7 +49,34 @@ const Link: React.FunctionComponent<Props> = ({
     navigate,
     rootPath = '',
     route: { domain },
+    hints,
   } = useRuntime()
+
+  const options = useMemo(
+    () => ({
+      fallbackToWindowLocation: false,
+      page,
+      params,
+      query,
+      rootPath,
+      scrollOptions,
+      to,
+      modifiers,
+      replace,
+      modifiersOptions,
+    }),
+    [
+      page,
+      params,
+      query,
+      rootPath,
+      scrollOptions,
+      to,
+      modifiers,
+      replace,
+      modifiersOptions,
+    ]
+  )
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLAnchorElement>) => {
@@ -55,39 +90,13 @@ const Link: React.FunctionComponent<Props> = ({
 
       onClick(event)
 
-      const options: NavigateOptions = {
-        fallbackToWindowLocation: false,
-        page,
-        params,
-        query,
-        rootPath,
-        scrollOptions,
-        to,
-        modifiers,
-        replace,
-        modifiersOptions,
-      }
-
       // If you pass a target different from "_self" the component
       // will behave just like a normal anchor element
       if ((target === '_self' || !target) && navigate(options)) {
         event.preventDefault()
       }
     },
-    [
-      to,
-      onClick,
-      page,
-      params,
-      query,
-      rootPath,
-      scrollOptions,
-      modifiers,
-      navigate,
-      replace,
-      modifiersOptions,
-      target,
-    ]
+    [to, onClick, navigate, target, options]
   )
 
   const getHref = () => {
@@ -122,12 +131,35 @@ const Link: React.FunctionComponent<Props> = ({
       ? href.replace('/admin/app/', '/admin/')
       : href
 
+  const [inViewRef, inView] = useInView({
+    // Triggers the event when the element is 75% visible
+    threshold: 0.75,
+    triggerOnce: true,
+  })
+
+  const executePrefetch = usePrefetchAttempt({
+    inView,
+    page,
+    href,
+    options,
+    waitToPrefetch,
+  })
+
   return (
     <a
+      ref={inViewRef}
       target={target}
       href={hrefWithoutIframePrefix}
       {...linkProps}
       onClick={handleClick}
+      onMouseOver={(event) => {
+        onMouseOver && onMouseOver(event)
+        executePrefetch()
+      }}
+      onFocus={(event) => {
+        onFocus && onFocus(event)
+        executePrefetch()
+      }}
     >
       {children}
     </a>
