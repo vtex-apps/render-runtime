@@ -94,7 +94,9 @@ export const PrefetchContextProvider: FC<{ history: History | null }> = ({
     state.queue.pause()
     state.queue.clear()
     setTimeout(() => {
-      state.queue.start()
+      if (isEnabled('PREFETCH')) {
+        state.queue.start()
+      }
     }, 1000)
   }, [])
 
