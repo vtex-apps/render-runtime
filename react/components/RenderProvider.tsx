@@ -1,10 +1,9 @@
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
-import { parse } from 'graphql'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { equals, forEach, merge, mergeWith } from 'ramda'
+import { equals, merge, mergeWith, difference } from 'ramda'
 import React, { Component, Fragment, ReactElement, Suspense } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -63,7 +62,6 @@ import {
 } from './Prefetch/PrefetchContext'
 import { hydrateApolloCache } from '../utils/apolloCache'
 import { withDevice, WithDeviceProps, DeviceInfo } from '../utils/withDevice'
-import difference from 'ramda/es/difference'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -599,7 +597,7 @@ class RenderProvider extends Component<
 
     await this.fetchComponents(components, extensions)
 
-    this.setState(state => ({
+    this.setState((state) => ({
       extensions: { ...state.extensions, ...extensions },
       components: { ...state.components, ...components },
       messages: { ...state.messages, ...messages },
@@ -1151,7 +1149,7 @@ class RenderProvider extends Component<
           this.setState({ deviceInfo })
         }
 
-        this.setState(state => ({
+        this.setState((state) => ({
           preview: true,
           loadedDevices: [...state.loadedDevices, deviceInfo.type],
         }))
