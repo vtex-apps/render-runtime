@@ -8,6 +8,7 @@ import routeDataQuery from '../queries/routeData.graphql'
 import { generateExtensions } from './blocks'
 import { fetchWithRetry } from './fetch'
 import { parseMessages } from './messages'
+import { isEnabled } from './flags'
 
 const parsePageQueryResponse = (
   page: PageQueryResponse
@@ -191,7 +192,9 @@ const promiseWithCounterWrapper = <T = any>(
 }
 
 export const isPrefetchActive = () =>
-  prefetchCounters.pages < 4 && prefetchCounters.render < 4
+  prefetchCounters.pages < 4 &&
+  prefetchCounters.render < 4 &&
+  isEnabled('PREFETCH')
 
 export const getPrefetchForPath = async ({
   fetcher,
