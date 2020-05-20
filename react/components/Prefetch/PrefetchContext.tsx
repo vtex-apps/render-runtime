@@ -31,6 +31,7 @@ interface PrefetchCacheObject {
   routeId: string
   matchingPage: RenderRuntime['route']
   contentResponse: ContentResponse | null
+  queryData: RenderRuntime['queryData']
 }
 
 export interface PrefetchState {

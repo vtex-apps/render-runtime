@@ -49,7 +49,6 @@ interface MaybeUpdatePathArgs {
     routeValid: boolean
   }
   page?: string
-  client: ApolloClientType
 }
 
 const maybeUpdatePathCache = async ({
@@ -57,7 +56,6 @@ const maybeUpdatePathCache = async ({
   navigationRoute,
   validCache,
   page,
-  client,
 }: MaybeUpdatePathArgs) => {
   const { pathsState } = prefetchState
   if (validCache.pathValid) {
@@ -73,14 +71,12 @@ const maybeUpdatePathCache = async ({
   if (navigationData == null || navigationPage == null) {
     return null
   }
-  if (navigationData?.queryData) {
-    hydrateApolloCache(navigationData.queryData, client)
-  }
 
   const cacheObj = {
     routeId: navigationPage,
     matchingPage: navigationData.route,
     contentResponse: navigationData.contentResponse,
+    queryData: navigationData.queryData,
   }
 
   const cache = getCacheForPage(navigationPage)
@@ -109,7 +105,6 @@ const prefetchRequests = async ({
     navigationRoute,
     validCache,
     page,
-    client,
   })
 
   pathsState[navigationRoute.path] = { fetching: false, page: navigationPage }

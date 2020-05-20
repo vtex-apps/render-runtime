@@ -669,6 +669,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       const routeId = destinationRouteId
       const matchingPage = prefetchedPathData.matchingPage
       const contentResponse = prefetchedPathData.contentResponse
+      const queryData = prefetchedPathData.queryData
       let extensions = routeData.extensions
       let messages = routeData.messages
       if (contentResponse) {
@@ -687,6 +688,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           }
           extensions[treePath]!.contentIds = contentIds
         }
+      }
+
+      if (queryData) {
+        this.hydrateApolloCache(queryData)
       }
 
       this.setState(
