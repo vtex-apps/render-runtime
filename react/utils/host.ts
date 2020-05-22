@@ -1,4 +1,5 @@
 import { canUseDOM } from 'exenv'
+import { appendRootPath } from './rootPath'
 
 const isRenderServedPage = () => {
   const generatorMetaTag = document.querySelector(`meta[name='generator']`)
@@ -15,7 +16,7 @@ export const getBaseURI = (runtime: RenderRuntime) => {
       location: { hostname },
     } = window
     return hostname.endsWith(`.${publicEndpoint}`) || isRenderServedPage()
-      ? hostname + rootPath
+      ? appendRootPath(rootPath, hostname)
       : `${hostname}/api/io`
   }
 }

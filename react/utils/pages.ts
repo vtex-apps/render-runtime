@@ -5,6 +5,7 @@ import { difference, is, isEmpty, keys, startsWith } from 'ramda'
 import RouteParser from 'route-parser'
 
 import { isEnabled } from './flags'
+import { prependRootPath } from './rootPath'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
@@ -363,7 +364,7 @@ export function navigate(
 function navigationRootPath(path: string, rootPath?: string) {
   // Prefix any non-absolute paths (e.g. http:// or https://) with runtime.rootPath
   if (rootPath && !path.startsWith('http')) {
-    return rootPath + path
+    return prependRootPath(rootPath, path)
   }
 
   return path

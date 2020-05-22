@@ -61,12 +61,13 @@ import {
   PrefetchContextProvider,
 } from './Prefetch/PrefetchContext'
 import { hydrateApolloCache } from '../utils/apolloCache'
+import { prependRootPath } from '../utils/rootPath'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
   () =>
-    new Promise<{ default: any }>((resolve) => {
-      import('@vtex/blocks-inspector').then((BlocksInspector) => {
+    new Promise<{ default: any }>(resolve => {
+      import('@vtex/blocks-inspector').then(BlocksInspector => {
         resolve({ default: BlocksInspector.default.InspectorPopover })
       })
     })
@@ -256,7 +257,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         pathname:
           ignoreCanonicalReplacement || !route.canonicalPath
             ? history.location.pathname
-            : rootPath + route.canonicalPath,
+            : prependRootPath(rootPath, route.canonicalPath),
         state: {
           navigationRoute: {
             id: route.id,
@@ -475,11 +476,11 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const customMessages = componentsArray
       .map(getLoadedImplementation)
       .filter(
-        (component) =>
+        component =>
           component &&
           (component.getCustomMessages || component.WrappedComponent)
       )
-      .map((component) => {
+      .map(component => {
         const getCustomMessages =
           component.getCustomMessages ||
           (component.WrappedComponent &&
@@ -575,7 +576,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       const containers = document.getElementsByClassName(RENDER_CONTAINER_CLASS)
       const currentRouteClass = containers[0].className
         .split(' ')
-        .find((c) => c.startsWith(ROUTE_CLASS_PREFIX))
+        .find(c => c.startsWith(ROUTE_CLASS_PREFIX))
       const newRouteClass = routeClass(route)
 
       Array.prototype.forEach.call(containers, (e: Element) => {
@@ -690,7 +691,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }
 
       this.setState(
-        (state) => ({
+        state => ({
           ...state,
           components: { ...state.components, ...routeData.components },
           extensions: { ...state.extensions, ...extensions },
@@ -741,7 +742,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             await this.fetchComponents(components, extensions)
 
             this.setState(
-              (state) => ({
+              state => ({
                 ...state,
                 appsEtag,
                 components: { ...state.components, ...components },
@@ -847,7 +848,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         )
         return
       }
-      routeIds.forEach((routeId) => this.prefetchRoutes.add(routeId))
+      routeIds.forEach(routeId => this.prefetchRoutes.add(routeId))
     }
   }
 
@@ -869,7 +870,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     this.sendInfoFromIframe({ shouldUpdateRuntime: true })
   }
 
-  public fetchComponent: RenderContext['fetchComponent'] = (component) => {
+  public fetchComponent: RenderContext['fetchComponent'] = component => {
     if (!canUseDOM) {
       throw new Error('Cannot fetch components during server side rendering.')
     }
@@ -912,7 +913,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       }
       this.patchSession(sessionData)
         .then(() => window.location.reload())
-        .catch((e) => {
+        .catch(e => {
           console.log('Failed to fetch new locale file.')
           console.error(e)
         })
@@ -965,9 +966,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     await this.fetchComponents(components, extensions)
 
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       this.setState(
-        (state) => ({
+        state => ({
           appsEtag,
           cacheHints: isEnabled('RENDER_NAVIGATION')
             ? state.cacheHints
@@ -1027,7 +1028,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   public updateExtension = async (name: string, extension: Extension) => {
     const { extensions } = this.state
 
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       this.setState(
         {
           extensions: {
@@ -1049,9 +1050,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public addMessages = async (newMessages: RenderRuntime['messages']) => {
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       this.setState(
-        (state) => ({
+        state => ({
           ...state,
           messages: {
             ...state.messages,
@@ -1141,7 +1142,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   // Deprecated
   private updateMessages = (newMessages: RenderProviderState['messages']) => {
     this.setState(
-      (prevState) => ({
+      prevState => ({
         ...prevState,
         messages: { ...prevState.messages, ...newMessages },
       }),

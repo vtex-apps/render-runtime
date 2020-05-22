@@ -3,6 +3,7 @@ import { useInView } from 'react-intersection-observer'
 import { NavigateOptions, pathFromPageName } from '../utils/pages'
 import { useRuntime } from './RenderContext'
 import { usePrefetchAttempt } from '../hooks/prefetch'
+import { prependRootPath } from '../utils/rootPath'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) =>
   event.button === 0
@@ -110,7 +111,7 @@ const Link: React.FunctionComponent<Props> = ({
         !isTelephoneUrl(to) &&
         !isMailToUrl(to)
       ) {
-        return rootPath + to
+        return prependRootPath(rootPath, to)
       }
       return to
     }
@@ -118,7 +119,7 @@ const Link: React.FunctionComponent<Props> = ({
       const path = pathFromPageName(page, pages, params)
       const qs = query ? `?${query}` : ''
       if (path) {
-        return rootPath + path + qs
+        return prependRootPath(rootPath, path + qs)
       }
     }
     return '#'
@@ -152,11 +153,11 @@ const Link: React.FunctionComponent<Props> = ({
       href={hrefWithoutIframePrefix}
       {...linkProps}
       onClick={handleClick}
-      onMouseOver={(event) => {
+      onMouseOver={event => {
         onMouseOver && onMouseOver(event)
         executePrefetch()
       }}
-      onFocus={(event) => {
+      onFocus={event => {
         onFocus && onFocus(event)
         executePrefetch()
       }}

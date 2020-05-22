@@ -1,6 +1,7 @@
 import queryString from 'query-string'
 import { getLoadedComponent } from './registerComponent'
 import { isEnabled } from './flags'
+import { prependRootPath } from './rootPath'
 
 const imageHost = isEnabled('VTEX_ASSETS_URL')
   ? 'vtexassets.com'
@@ -30,7 +31,9 @@ const getAbsoluteURL = (
     return url
   }
 
-  return production ? `${getVTEXImgHost(account)}${url}` : rootPath + url
+  return production
+    ? `${getVTEXImgHost(account)}${url}`
+    : prependRootPath(rootPath, url)
 }
 
 class ServerSideAssetLoadingError extends Error {
