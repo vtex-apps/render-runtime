@@ -1,5 +1,5 @@
 import React, { useMemo, Fragment, FC } from 'react'
-import ComponentLoader from '../components/ExtensionPoint/ComponentLoader'
+import ComponentLoader from './ComponentLoader'
 import { RenderContextProps } from './RenderContext'
 import { ExtensionPoint } from '../core/main'
 
@@ -28,13 +28,13 @@ const useContextComponent = ({
    * from the context, but doing so introduces bugs on some stores. */
   const beforeElements =
     before &&
-    before.map(beforeId => (
+    before.map((beforeId) => (
       <ExtensionPoint id={beforeId} key={beforeId} treePath={nestedPage} />
     ))
 
   const afterElements =
     after &&
-    after.map(afterId => (
+    after.map((afterId) => (
       <ExtensionPoint id={afterId} key={afterId} treePath={nestedPage} />
     ))
 
@@ -81,7 +81,7 @@ const MaybeContext: FC<Props> = ({
   return contextComponent ? (
     <ComponentLoader
       component={contextComponent}
-      props={contextProps}
+      componentProps={contextProps}
       runtime={runtime}
       treePath={nestedPage}
       hydration="always"

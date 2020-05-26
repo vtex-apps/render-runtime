@@ -508,6 +508,7 @@ declare global {
   interface RuntimeExports {
     ExtensionContainer: ExtensionContainer
     ExtensionPoint: ExtensionPoint
+    VirtualComponent: VirtualComponent
     Link: Link
     NoSSR: any
     LayoutContainer: any

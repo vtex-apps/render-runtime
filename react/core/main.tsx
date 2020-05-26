@@ -25,6 +25,7 @@ import {
 import { LoadingContextProvider } from '../components/LoadingContext'
 
 import { ChildBlock, useChildBlock } from '../components/ChildBlock'
+import VirtualComponent from '../components/VirtualComponent'
 import ExtensionContainer from '../components/ExtensionPoint/ExtensionContainer'
 import ExtensionPoint from '../components/ExtensionPoint'
 import LayoutContainer from '../components/LayoutContainer'
@@ -313,6 +314,7 @@ export {
    */
   ExtensionPoint as Block,
   ExtensionPoint,
+  VirtualComponent,
   LayoutContainer,
   LegacyExtensionContainer,
   Helmet,

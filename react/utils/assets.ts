@@ -200,7 +200,7 @@ function getExistingPrefetchLinks(prefetchType: string[] | string) {
 }
 
 function assetOnList(path: string, assets: string[]) {
-  return assets.some(asset => asset.indexOf(path) !== -1)
+  return assets.some((asset) => asset.indexOf(path) !== -1)
 }
 
 function isScript(path: string) {
@@ -219,7 +219,7 @@ export function getLoadedImplementation<P = {}, S = {}>(component: string) {
 }
 
 export function getImplementation<P = {}, S = {}>(
-  component: string | undefined
+  component: string | null | undefined
 ) {
   if (!component) return null
   return window.__RENDER_8_COMPONENTS__[component] as RenderComponent<P, S>
