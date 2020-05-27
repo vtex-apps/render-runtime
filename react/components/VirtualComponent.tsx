@@ -1,4 +1,5 @@
 import React, { ReactElement, FC } from 'react'
+
 import { WrappedComponent } from './ComponentLoader'
 import { useTreePath, useRuntime } from '../core/main'
 
@@ -12,7 +13,7 @@ interface Props {
   virtual: VirtualComponent
 }
 
-interface ThoseProps {
+interface RenderVirtualArgs {
   runtime: any
   treePath: string
   hydration: Hydration
@@ -26,10 +27,20 @@ function renderVirtualComponent({
   treePath,
   virtual,
   key = treePath,
-}: ThoseProps): ReactElement<unknown> | null {
+}: RenderVirtualArgs): ReactElement<unknown> | null {
   if (virtual.$component == null) {
     return null
   }
+
+  const children = virtual.children?.map((virtualChild, i) => {
+    return renderVirtualComponent({
+      hydration,
+      runtime,
+      treePath,
+      key: `${key}-${virtualChild.$component}-${i}`,
+      virtual: virtualChild,
+    })
+  })
 
   return (
     <WrappedComponent
@@ -40,19 +51,10 @@ function renderVirtualComponent({
       runtime={runtime}
       key={key}
     >
-      {virtual.children?.map((virtualChild, i) => {
-        return renderVirtualComponent({
-          hydration,
-          runtime,
-          treePath,
-          key: `${treePath}-${virtualChild.$component}-${i}`,
-          virtual: virtualChild,
-        })
-      })}
+      {children ?? null}
     </WrappedComponent>
   )
 }
-
 const VirtualComponent: FC<Props> = ({ virtual }) => {
   const { treePath } = useTreePath()
   const runtime = useRuntime()
