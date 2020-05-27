@@ -2,22 +2,24 @@ import React, { ReactElement, FC } from 'react'
 
 import { WrappedComponent } from './ComponentLoader'
 import { useTreePath, useRuntime } from '../core/main'
+import { flatObj, transformLeaves } from '../utils/object'
 
-interface VirtualComponent {
-  $component: string
+interface VirtualTree {
+  interface: string
   props?: Record<string, unknown>
-  children?: VirtualComponent[]
+  children?: VirtualTree[]
 }
 
 interface Props {
-  virtual: VirtualComponent
+  virtual: VirtualTree
+  props?: Record<string, unknown>
 }
 
 interface RenderVirtualArgs {
   runtime: any
   treePath: string
   hydration: Hydration
-  virtual: VirtualComponent
+  tree: VirtualTree
   key?: string
 }
 
@@ -25,27 +27,27 @@ function renderVirtualComponent({
   hydration,
   runtime,
   treePath,
-  virtual,
+  tree,
   key = treePath,
 }: RenderVirtualArgs): ReactElement<unknown> | null {
-  if (virtual.$component == null) {
+  if (tree.interface == null) {
     return null
   }
 
-  const children = virtual.children?.map((virtualChild, i) => {
+  const children = tree.children?.map((virtualChild, i) => {
     return renderVirtualComponent({
       hydration,
       runtime,
       treePath,
-      key: `${key}-${virtualChild.$component}-${i}`,
-      virtual: virtualChild,
+      key: `${key}-${virtualChild.interface}-${i}`,
+      tree: virtualChild,
     })
   })
 
   return (
     <WrappedComponent
-      component={virtual.$component}
-      componentProps={virtual.props}
+      component={tree.interface}
+      componentProps={tree.props ?? {}}
       treePath={treePath}
       hydration={hydration}
       runtime={runtime}
@@ -55,9 +57,24 @@ function renderVirtualComponent({
     </WrappedComponent>
   )
 }
-const VirtualComponent: FC<Props> = ({ virtual }) => {
+
+const VirtualComponent: FC<Props> = ({ virtual, props = {} }) => {
   const { treePath } = useTreePath()
   const runtime = useRuntime()
+
+  const flatProps = flatObj(props)
+
+  const parsedTree = transformLeaves<VirtualTree>(virtual, ({ value }) => {
+    if (typeof value !== 'string') return
+
+    const isDynamicValue = value.startsWith('$')
+    if (!isDynamicValue) return
+
+    const propKey = value.slice(1)
+    if (!(propKey in flatProps)) return
+
+    return flatProps[propKey]
+  })
 
   const extension = runtime.extensions[treePath]
   if (extension == null) {
@@ -71,7 +88,7 @@ const VirtualComponent: FC<Props> = ({ virtual }) => {
     hydration,
     runtime,
     treePath,
-    virtual,
+    tree: parsedTree,
   })
 }
 

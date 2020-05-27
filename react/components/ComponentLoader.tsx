@@ -15,7 +15,7 @@ const componentPromiseResolvedMap: any = {}
 
 interface Props {
   component: string | null
-  componentProps: Record<string, any> | undefined
+  componentProps: Record<string, any>
   treePath: string
   runtime: RenderContext
   hydration: Hydration

@@ -12,11 +12,12 @@ function renderVirtualComponent({
   extensions,
   fetchComponent,
   virtual,
+  props,
 }: any) {
   return render(
     <RenderContextProvider runtime={{ extensions, fetchComponent } as any}>
       <TreePathContextProvider treePath={treePath}>
-        <VirtualComponent virtual={virtual} />
+        <VirtualComponent virtual={virtual} props={props} />
       </TreePathContextProvider>
     </RenderContextProvider>
   )
@@ -36,7 +37,7 @@ test(`renders a shallow virtual block with only real blocks`, () => {
   }
 
   const virtual = {
-    $component: 'div',
+    interface: 'div',
     props: {
       blockClass: 'shelf',
     },
@@ -63,37 +64,29 @@ test(`renders a deep virtual block with only real blocks`, () => {
       <div className={blockClass}>{children}</div>
     )) as any,
     rich: (({ text }: any) => <span>{text}</span>) as any,
-    slider: (({ children }: any) => (
-      <>
-        Slider
-        <ul>{children}</ul>
-      </>
-    )) as any,
+    slider: (({ children }: any) => <ul data-slider>{children}</ul>) as any,
     list: (({ categoryId, children }: any) => (
-      <>
-        <span>Category: {categoryId}</span>
-        <ul>{children}</ul>
-      </>
+      <ul data-category={categoryId}>{children}</ul>
     )) as any,
   }
 
   const virtual = {
-    $component: 'div',
+    interface: 'div',
     props: {
       blockClass: 'shelf',
     },
     children: [
       {
-        $component: 'rich',
+        interface: 'rich',
         props: {
           text: 'some title',
         },
       },
       {
-        $component: 'slider',
+        interface: 'slider',
         children: [
           {
-            $component: 'list',
+            interface: 'list',
             props: {
               categoryId: 'some-category',
             },
@@ -117,13 +110,12 @@ test(`renders a deep virtual block with only real blocks`, () => {
         <span>
           some title
         </span>
-        Slider
-        <ul>
-          <span>
-            Category: 
-            some-category
-          </span>
-          <ul />
+        <ul
+          data-slider="true"
+        >
+          <ul
+            data-category="some-category"
+          />
         </ul>
       </div>
     </div>
@@ -139,37 +131,29 @@ test(`renders async children`, async () => {
   }
 
   const asyncComponents: any = {
-    slider: (({ children }: any) => (
-      <>
-        Slider
-        <ul>{children}</ul>
-      </>
-    )) as any,
+    slider: (({ children }: any) => <ul data-slider>{children}</ul>) as any,
     list: (({ categoryId, children }: any) => (
-      <>
-        <span>Category: {categoryId}</span>
-        <ul>{children}</ul>
-      </>
+      <ul data-category={categoryId}>{children}</ul>
     )) as any,
   }
 
   const virtual = {
-    $component: 'div',
+    interface: 'div',
     props: {
       blockClass: 'shelf',
     },
     children: [
       {
-        $component: 'rich',
+        interface: 'rich',
         props: {
           text: 'some title',
         },
       },
       {
-        $component: 'slider',
+        interface: 'slider',
         children: [
           {
-            $component: 'list',
+            interface: 'list',
             props: {
               categoryId: 'some-category',
             },
@@ -198,14 +182,128 @@ test(`renders async children`, async () => {
         <span>
           some title
         </span>
-        Slider
-        <ul>
-          <span>
-            Category: 
-            some-category
-          </span>
-          <ul />
+        <ul
+          data-slider="true"
+        >
+          <ul
+            data-category="some-category"
+          />
         </ul>
+      </div>
+    </div>
+  `)
+})
+
+test(`renders a virtual component inside a virtual component`, async () => {
+  window.__RENDER_8_COMPONENTS__ = {
+    VirtualComponent: VirtualComponent as any,
+    div: (({ children, blockClass }: any) => (
+      <div className={blockClass}>{children}</div>
+    )) as any,
+    rich: (({ text }: any) => <span>{text}</span>) as any,
+    slider: (({ children }: any) => <ul data-slider>{children}</ul>) as any,
+    list: (({ categoryId, children }: any) => (
+      <ul data-category={categoryId}>{children}</ul>
+    )) as any,
+  }
+
+  const virtual = {
+    interface: 'div',
+    props: {
+      blockClass: 'shelf',
+    },
+    children: [
+      {
+        interface: 'rich',
+        props: {
+          text: 'some title',
+        },
+      },
+      {
+        interface: 'VirtualComponent',
+        props: {
+          virtual: {
+            interface: 'slider',
+            children: [
+              {
+                interface: 'list',
+                props: {
+                  categoryId: 'some-category',
+                },
+              },
+            ],
+          },
+        },
+      },
+    ],
+  }
+
+  const { container } = renderVirtualComponent({
+    extensions: { 'store.home/VirtualComponent': {} },
+    treePath: 'store.home/VirtualComponent',
+    virtual,
+  })
+
+  expect(container).toMatchInlineSnapshot(`
+    <div>
+      <div
+        class="shelf"
+      >
+        <span>
+          some title
+        </span>
+        <ul
+          data-slider="true"
+        >
+          <ul
+            data-category="some-category"
+          />
+        </ul>
+      </div>
+    </div>
+  `)
+})
+
+test(`renders a virtual block with shallow props`, () => {
+  window.__RENDER_8_COMPONENTS__ = {
+    div: (({ children, blockClass }: any) => (
+      <div className={blockClass}>{children}</div>
+    )) as any,
+    rich: (({ text }: any) => <span>{text}</span>) as any,
+  }
+
+  const virtual = {
+    interface: 'div',
+    props: {
+      blockClass: 'shelf',
+    },
+    children: [
+      {
+        interface: 'rich',
+        props: {
+          text: '$title',
+        },
+      },
+    ],
+  }
+
+  const { container } = renderVirtualComponent({
+    extensions: { 'store.home/VirtualComponent': {} },
+    treePath: 'store.home/VirtualComponent',
+    virtual,
+    props: {
+      title: 'Shelf custom title',
+    },
+  })
+
+  expect(container).toMatchInlineSnapshot(`
+    <div>
+      <div
+        class="shelf"
+      >
+        <span>
+          Shelf custom title
+        </span>
       </div>
     </div>
   `)
