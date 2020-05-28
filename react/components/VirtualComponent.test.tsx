@@ -23,8 +23,8 @@ function renderVirtualComponent({
   )
 }
 
-afterEach(cleanup)
 afterEach(() => {
+  cleanup()
   window.__RENDER_8_COMPONENTS__ = {}
 })
 
@@ -292,7 +292,7 @@ test(`renders a virtual block with shallow props`, () => {
     treePath: 'store.home/VirtualComponent',
     virtual,
     props: {
-      title: 'Shelf custom title',
+      title: 'Shelf custom shallow title',
     },
   })
 
@@ -302,7 +302,54 @@ test(`renders a virtual block with shallow props`, () => {
         class="shelf"
       >
         <span>
-          Shelf custom title
+          Shelf custom shallow title
+        </span>
+      </div>
+    </div>
+  `)
+})
+
+test(`renders a virtual block with deep props`, () => {
+  window.__RENDER_8_COMPONENTS__ = {
+    div: (({ children, blockClass }: any) => (
+      <div className={blockClass}>{children}</div>
+    )) as any,
+    rich: (({ text }: any) => <span>{text}</span>) as any,
+  }
+
+  const virtual = {
+    interface: 'div',
+    props: {
+      blockClass: 'shelf',
+    },
+    children: [
+      {
+        interface: 'rich',
+        props: {
+          text: '$potato.title',
+        },
+      },
+    ],
+  }
+
+  const { container } = renderVirtualComponent({
+    extensions: { 'store.home/VirtualComponent': {} },
+    treePath: 'store.home/VirtualComponent',
+    virtual,
+    props: {
+      potato: {
+        title: 'Shelf custom deep title',
+      },
+    },
+  })
+
+  expect(container).toMatchInlineSnapshot(`
+    <div>
+      <div
+        class="shelf"
+      >
+        <span>
+          Shelf custom deep title
         </span>
       </div>
     </div>
