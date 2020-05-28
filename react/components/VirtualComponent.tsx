@@ -1,4 +1,4 @@
-import React, { ReactElement, FC } from 'react'
+import React, { ReactElement, FC, useMemo } from 'react'
 
 import { WrappedComponent } from './ComponentLoader'
 import { useTreePath, useRuntime } from '../core/main'
@@ -39,7 +39,7 @@ function renderVirtualComponent({
       hydration,
       runtime,
       treePath,
-      key: `${key}-${virtualChild.interface}-${i}`,
+      key: `${key}-${i}-${virtualChild.interface}`,
       tree: virtualChild,
     })
   })
@@ -62,19 +62,20 @@ const VirtualComponent: FC<Props> = ({ virtual, props = {} }) => {
   const { treePath } = useTreePath()
   const runtime = useRuntime()
 
-  const flatProps = flatObj(props)
+  const parsedTree = useMemo(() => {
+    const flatProps = flatObj(props)
+    return transformLeaves<VirtualTree>(virtual, ({ value }) => {
+      if (typeof value !== 'string') return
 
-  const parsedTree = transformLeaves<VirtualTree>(virtual, ({ value }) => {
-    if (typeof value !== 'string') return
+      const isDynamicValue = value.startsWith('$')
+      if (!isDynamicValue) return
 
-    const isDynamicValue = value.startsWith('$')
-    if (!isDynamicValue) return
+      const propKey = value.slice(1)
+      if (!(propKey in flatProps)) return
 
-    const propKey = value.slice(1)
-    if (!(propKey in flatProps)) return
-
-    return flatProps[propKey]
-  })
+      return flatProps[propKey]
+    })
+  }, [props, virtual])
 
   const extension = runtime.extensions[treePath]
   if (extension == null) {
