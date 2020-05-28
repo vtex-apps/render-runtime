@@ -1,6 +1,6 @@
 import React, { ReactElement, FC, useMemo } from 'react'
 
-import { WrappedComponent } from './ExtensionPoint/ComponentLoader'
+import ComponentGetter from './ExtensionPoint/ComponentGetter'
 import { useTreePath, useRuntime } from '../core/main'
 import { flatObj, transformLeaves } from '../utils/object'
 
@@ -43,7 +43,7 @@ function renderVirtualComponent({
   })
 
   return (
-    <WrappedComponent
+    <ComponentGetter
       component={tree.interface}
       props={tree.props ?? {}}
       treePath={treePath}
@@ -52,7 +52,7 @@ function renderVirtualComponent({
       key={key}
     >
       {children ?? null}
-    </WrappedComponent>
+    </ComponentGetter>
   )
 }
 const VirtualComponent: FC<Props> = ({ treeId, props = {} }) => {
