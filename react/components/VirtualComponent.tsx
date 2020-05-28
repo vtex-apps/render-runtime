@@ -4,14 +4,8 @@ import { WrappedComponent } from './ComponentLoader'
 import { useTreePath, useRuntime } from '../core/main'
 import { flatObj, transformLeaves } from '../utils/object'
 
-interface VirtualTree {
-  interface: string
-  props?: Record<string, unknown>
-  children?: VirtualTree[]
-}
-
 interface Props {
-  virtual: VirtualTree
+  treeId: string
   props?: Record<string, unknown>
 }
 
@@ -21,6 +15,10 @@ interface RenderVirtualArgs {
   hydration: Hydration
   tree: VirtualTree
   key?: string
+}
+
+function getVirtualTree(treeId: string) {
+  return window.__RUNTIME__.virtualTrees[treeId]
 }
 
 function renderVirtualComponent({
@@ -57,14 +55,15 @@ function renderVirtualComponent({
     </WrappedComponent>
   )
 }
-
-const VirtualComponent: FC<Props> = ({ virtual, props = {} }) => {
+const VirtualComponent: FC<Props> = ({ treeId, props = {} }) => {
   const { treePath } = useTreePath()
   const runtime = useRuntime()
 
   const parsedTree = useMemo(() => {
+    const tree = getVirtualTree(treeId)
     const flatProps = flatObj(props)
-    return transformLeaves<VirtualTree>(virtual, ({ value }) => {
+
+    return transformLeaves<VirtualTree>(tree, ({ value }) => {
       if (typeof value !== 'string') return
 
       const isDynamicValue = value.startsWith('$')
@@ -75,7 +74,7 @@ const VirtualComponent: FC<Props> = ({ virtual, props = {} }) => {
 
       return flatProps[propKey]
     })
-  }, [props, virtual])
+  }, [props, treeId])
 
   const extension = runtime.extensions[treePath]
   if (extension == null) {

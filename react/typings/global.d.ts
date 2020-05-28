@@ -491,6 +491,13 @@ declare global {
       variables: any
       data: string
     }>
+    virtualTrees: Record<string, VirtualTree>
+  }
+
+  interface VirtualTree {
+    interface: string
+    props?: Record<string, unknown>
+    children?: VirtualTree[]
   }
 
   interface CacheHints {
