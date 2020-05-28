@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react'
+import React, { FC, useMemo, ReactNode } from 'react'
 
 import { getChildExtensions } from '../components/ExtensionPoint'
 import ComponentLoader from '../components/ExtensionPoint/ComponentLoader'
@@ -19,7 +19,7 @@ export function generateSlot({
 }: GenerateSlotArgs) {
   const newTreePath = `${treePath}/${slotValue}`
 
-  const SlotComponent: FC<any> = props => {
+  const SlotComponent: FC<any> = (props) => {
     const runtime = useRuntime()
     const extension = runtime.extensions[newTreePath]
 
@@ -59,4 +59,39 @@ export function generateSlot({
   SlotComponent.displayName = `${slotName}Slot`
 
   return SlotComponent
+}
+
+/**
+ * Slot props should ALWAYS be PascalCased.
+ * It is OK to not include componentProps in the dependency array
+ * since there is currently no way for users to ADD or UPDATE slots via CMS.
+ * What this means is that the slots variable below only needs to be
+ * computed once during runtime, since we know that, even if componentProps
+ * is updated, the props that function as Slots will NOT change.
+ */
+export function useSlots({ props, treePath, hydration }: any) {
+  const slots = useMemo(() => {
+    if (!props) {
+      return {}
+    }
+
+    const slotNames = Object.keys(props).filter(
+      (key) => key[0] !== key[0].toLowerCase()
+    )
+    const resultingSlotsProps: Record<string, ReactNode> = {}
+
+    for (const slotName of slotNames) {
+      resultingSlotsProps[slotName] = generateSlot({
+        treePath,
+        slotName,
+        slotValue: props[slotName],
+        hydration,
+      })
+    }
+
+    return resultingSlotsProps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydration, treePath])
+
+  return slots
 }

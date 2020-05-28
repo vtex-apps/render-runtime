@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  FunctionComponent,
-  ReactNode,
-  useMemo,
-} from 'react'
+import React, { useEffect, useState, FunctionComponent } from 'react'
 
 import { getImplementation } from '../../utils/assets'
 import GenericPreview from '../Preview/GenericPreview'
@@ -14,7 +8,15 @@ import { isSiteEditorIframe } from '../../utils/dom'
 import SiteEditorWrapper from './SiteEditorWrapper'
 import Hydration from '../Hydration'
 import { LazyImages } from '../LazyImages'
-import { generateSlot } from '../../utils/slots'
+import { useSlots } from '../../utils/slots'
+
+interface Props {
+  component: string | null
+  props: Record<string, any>
+  treePath: string
+  runtime: RenderContext
+  hydration: Hydration
+}
 
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
@@ -24,7 +26,7 @@ export async function fetchComponent(
   runtimeFetchComponent: RenderContext['fetchComponent'],
   retries = 3
 ): Promise<any> {
-  const Component = component && getImplementation(component)
+  const Component = getImplementation(component)
 
   if (Component) {
     return Component
@@ -35,7 +37,7 @@ export async function fetchComponent(
   } else if (componentPromiseResolvedMap[component]) {
     /** These retries perhaps are not needed anymore, but keeping just to be safe */
     if (retries > 0) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
       return fetchComponent(component, runtimeFetchComponent, retries - 1)
     }
 
@@ -51,22 +53,93 @@ export async function fetchComponent(
   return getImplementation(component)
 }
 
-interface Props {
-  component: string | null
-  props: Record<string, any>
-  treePath: string
-  runtime: RenderContext
-  hydration: Hydration
-}
-
-const ComponentLoader: FunctionComponent<Props> = props => {
+const AsyncComponent: FunctionComponent<Props> = (props) => {
   const {
     component,
     children,
     treePath,
     props: componentProps,
-    hydration,
+    runtime,
   } = props
+
+  const isRootTreePath = treePath.indexOf('/') === -1
+  const isAround = treePath.indexOf('$around') !== -1
+
+  const [Component, setComponent] = useState(
+    () => (component && getImplementation(component)) || null
+  )
+
+  useEffect(() => {
+    // Does nothing if Component is loaded...
+    // (or if component is nil)
+    if (Component || !component) {
+      return
+    }
+
+    // ...otherwise, fetches it and stores the result in the Component state
+    fetchComponent(component, runtime.fetchComponent).then((result) => {
+      if (Component) {
+        return
+      }
+      setComponent(() => result)
+    })
+  }, [Component, component, runtime.fetchComponent])
+
+  return Component ? (
+    <Component {...componentProps}>{children}</Component>
+  ) : /** If the component is not loaded yet, renders a "loading"
+   * state. This currently only applies to root components
+   * (e.g. "store.home") */
+  isRootTreePath || isAround ? (
+    <>
+      {componentProps.beforeElements}
+      <GenericPreview />
+      {componentProps.afterElements}
+    </>
+  ) : (
+    <Loading />
+  )
+}
+
+export const WrappedComponent: FunctionComponent<Props> = ({
+  component,
+  props = {},
+  treePath,
+  hydration,
+  runtime,
+  children,
+}) => {
+  const slotProps = useSlots({
+    props,
+    hydration,
+    treePath,
+  })
+
+  const Component = getImplementation(component)
+
+  if (Component) {
+    return (
+      <Component {...props} {...slotProps}>
+        {children}
+      </Component>
+    )
+  }
+
+  return (
+    <AsyncComponent
+      component={component}
+      props={{ ...props, ...slotProps }}
+      treePath={treePath}
+      runtime={runtime}
+      hydration={hydration}
+    >
+      {children}
+    </AsyncComponent>
+  )
+}
+
+const ComponentLoader: FunctionComponent<Props> = (loaderProps) => {
+  const { component, treePath, hydration } = loaderProps
 
   /**
    * Slot props should ALWAYS be PascalCased.
@@ -76,55 +149,12 @@ const ComponentLoader: FunctionComponent<Props> = props => {
    * computed once during runtime, since we know that, even if componentProps
    * is updated, the props that function as Slots will NOT change.
    */
-  const slots = useMemo(() => {
-    if (!componentProps) {
-      return {}
-    }
-
-    const slotNames = Object.keys(componentProps).filter(
-      key => key[0] !== key[0].toLowerCase()
-    )
-    const resultingSlotsProps: Record<string, ReactNode> = {}
-
-    for (const slotName of slotNames) {
-      resultingSlotsProps[slotName] = generateSlot({
-        treePath,
-        slotName,
-        slotValue: componentProps[slotName],
-        hydration,
-      })
-    }
-
-    return resultingSlotsProps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydration, treePath])
-
-  const componentPropsWithSlots = useMemo(
-    () => ({
-      ...componentProps,
-      ...slots,
-    }),
-    [componentProps, slots]
-  )
-  const asyncComponentProps = useMemo(
-    () => ({
-      ...props,
-      props: componentPropsWithSlots,
-    }),
-    [componentPropsWithSlots, props]
-  )
-
-  const Component = component && getImplementation(component)
 
   if (component?.includes('Fold')) {
     return null
   }
 
-  let content = Component ? (
-    <Component {...componentPropsWithSlots}>{children}</Component>
-  ) : (
-    <AsyncComponent {...asyncComponentProps}>{children}</AsyncComponent>
-  )
+  let content = <WrappedComponent {...loaderProps} />
 
   const shouldHydrate =
     !hydration ||
@@ -152,58 +182,10 @@ const ComponentLoader: FunctionComponent<Props> = props => {
   )
 
   if (isSiteEditorIframe) {
-    content = <SiteEditorWrapper {...props}>{content}</SiteEditorWrapper>
+    content = <SiteEditorWrapper {...loaderProps}>{content}</SiteEditorWrapper>
   }
 
   return content
-}
-
-const AsyncComponent: FunctionComponent<Props> = props => {
-  const {
-    component,
-    children,
-    treePath,
-    props: componentProps,
-    runtime,
-  } = props
-
-  const isRootTreePath = treePath.indexOf('/') === -1
-  const isAround = treePath.indexOf('$around') !== -1
-
-  const [Component, setComponent] = useState(
-    () => (component && getImplementation(component)) || null
-  )
-
-  useEffect(() => {
-    // Does nothing if Component is loaded...
-    // (or if component is nil)
-    if (Component || !component) {
-      return
-    }
-
-    // ...otherwise, fetches it and stores the result in the Component state
-    fetchComponent(component, runtime.fetchComponent).then(result => {
-      if (Component) {
-        return
-      }
-      setComponent(() => result)
-    })
-  }, [Component, component, runtime.fetchComponent])
-
-  return Component ? (
-    <Component {...componentProps}>{children}</Component>
-  ) : /** If the component is not loaded yet, renders a "loading"
-   * state. This currently only applies to root components
-   * (e.g. "store.home") */
-  isRootTreePath || isAround ? (
-    <>
-      {componentProps.beforeElements}
-      <GenericPreview />
-      {componentProps.afterElements}
-    </>
-  ) : (
-    <Loading />
-  )
 }
 
 export default ComponentLoader
