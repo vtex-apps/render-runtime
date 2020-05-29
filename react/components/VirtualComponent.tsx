@@ -28,7 +28,7 @@ function renderVirtualComponent({
   tree,
   key = treePath,
 }: RenderVirtualArgs): ReactElement<unknown> | null {
-  if (tree.interface == null) {
+  if (tree.$component == null) {
     return null
   }
 
@@ -37,14 +37,14 @@ function renderVirtualComponent({
       hydration,
       runtime,
       treePath,
-      key: `${key}-${i}-${virtualChild.interface}`,
+      key: `${key}-${i}-${virtualChild.$component}`,
       tree: virtualChild,
     })
   })
 
   return (
     <ComponentGetter
-      component={tree.interface}
+      component={tree.$component}
       props={tree.props ?? {}}
       treePath={treePath}
       hydration={hydration}

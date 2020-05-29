@@ -506,6 +506,13 @@ declare global {
       data: string
     }>
     uncriticalStyleRefs?: StyleRefs
+    virtualTrees: Record<string, VirtualTree>
+  }
+
+  interface VirtualTree {
+    $component: string
+    props: Record<string, any>
+    children: VirtualTree[]
   }
 
   interface CacheHints {
