@@ -1,8 +1,24 @@
-interface MapSetValue<T> {
-  count: number
-  time: number
-  value: T
+class Node<T> {
+  public next: Node<T> | null
+  public prev: Node<T> | null
+  public key: string
+  public value: T
+  public time: number
+  constructor(
+    key: string,
+    value: T,
+    next: Node<T> | null = null,
+    prev: Node<T> | null = null,
+    time?: number
+  ) {
+    this.next = next
+    this.value = value
+    this.prev = prev
+    this.key = key
+    this.time = time ?? Date.now()
+  }
 }
+
 interface Options {
   max?: number
   maxSize?: number
@@ -11,41 +27,53 @@ interface Options {
 }
 
 class LRU<T> {
-  private map: Map<string, MapSetValue<T>>
+  private map: Map<string, Node<T>>
   private maxSize = Infinity
   private maxAge = 0
   private disposeFn: ((key: string) => void) | undefined
 
-  private drop = 0
-  private count = 0
+  private head: Node<T> | null = null
+  private tail: Node<T> | null = null
+
   constructor(options: Options) {
-    this.map = new Map() as Map<string, MapSetValue<T>>
+    this.map = new Map() as Map<string, Node<T>>
     const n = typeof options === 'number'
     this.maxSize =
       (n ? (options as number) : options.max || options.maxSize) || Infinity
     this.maxAge = n ? 0 : options.maxAge || 0
     this.disposeFn = options.disposeFn
-    this.drop = 0
-    this.count = 0
   }
 
-  private isExpired(value: MapSetValue<T>) {
+  private isExpired(value: Node<T>) {
     const expiration = Date.now() - this.maxAge
     return value.time < expiration
   }
 
-  private _dropCount() {
-    ;[...this.map[Symbol.iterator]()]
-      .sort(([_1, entry1], [_2, entry2]) => {
-        const prop = entry1.time === entry2.time ? 'count' : 'time'
-        return entry2[prop] - entry1[prop]
-      })
-      .slice(this.maxSize)
-      .forEach(([key]) => {
-        this.map.delete(key)
-        this.disposeFn && this.disposeFn(key)
-      })
-    this.drop = 0
+  private ensureLimit() {
+    if (this.map.size === this.maxSize && this.tail) {
+      this.remove(this.tail.key)
+      this.disposeFn && this.disposeFn(this.tail.key)
+    }
+  }
+
+  private remove(key: string) {
+    const node = this.map.get(key)
+    if (!node) {
+      return
+    }
+    if (node.prev !== null) {
+      node.prev.next = node.next
+    } else {
+      this.head = node.next
+    }
+
+    if (node.next !== null) {
+      node.next.prev = node.prev
+    } else {
+      this.tail = node.prev
+    }
+
+    this.map.delete(key)
   }
 
   public get(key: string) {
@@ -56,7 +84,11 @@ class LRU<T> {
       return undefined
     }
     if (entry) {
-      entry.count = this.count++
+      // node removed from it's position and cache
+      this.remove(key)
+      // write node again to the head of LinkedList to make it most recently used
+      this.set(key, entry.value, entry.time)
+
       return entry.value
     }
     return undefined
@@ -72,17 +104,20 @@ class LRU<T> {
     return !!entry
   }
 
-  public set(key: string, value: T) {
-    const { maxSize } = this
-    if (!this.drop && this.map.size === maxSize) {
-      this.drop = setTimeout(() => this._dropCount())
+  public set(key: string, value: T, nodeTime?: number) {
+    this.ensureLimit()
+
+    if (!this.head) {
+      //set new node to head and tail
+      this.head = this.tail = new Node(key, value)
+    } else {
+      const node = new Node(key, value, this.head, null, nodeTime)
+      //set new node to head
+      this.head.prev = node
+      this.head = node
     }
 
-    this.map.set(key, {
-      count: this.count++,
-      time: Date.now(),
-      value,
-    })
+    this.map.set(key, this.head)
   }
 }
 
