@@ -17,7 +17,7 @@ function renderVirtualComponent({
   return render(
     <RenderContextProvider runtime={{ extensions, fetchComponent } as any}>
       <TreePathContextProvider treePath={treePath}>
-        <VirtualComponent treeId={treeId} props={props} />
+        <VirtualComponent virtualTreeId={treeId} props={props} />
       </TreePathContextProvider>
     </RenderContextProvider>
   )
@@ -42,7 +42,7 @@ test(`renders a shallow virtual block with only real blocks`, () => {
 
   window.__RUNTIME__.virtualTrees = {
     someTreeId: {
-      interface: 'div',
+      $component: 'div',
       props: {
         blockClass: 'shelf',
       },
@@ -76,22 +76,22 @@ test(`renders a deep virtual block with only real blocks`, () => {
 
   window.__RUNTIME__.virtualTrees = {
     someTreeId: {
-      interface: 'div',
+      $component: 'div',
       props: {
         blockClass: 'shelf',
       },
       children: [
         {
-          interface: 'rich',
+          $component: 'rich',
           props: {
             text: 'some title',
           },
         },
         {
-          interface: 'slider',
+          $component: 'slider',
           children: [
             {
-              interface: 'list',
+              $component: 'list',
               props: {
                 categoryId: 'some-category',
               },
@@ -139,22 +139,22 @@ test(`renders async children`, async () => {
 
   window.__RUNTIME__.virtualTrees = {
     someTreeId: {
-      interface: 'div',
+      $component: 'div',
       props: {
         blockClass: 'shelf',
       },
       children: [
         {
-          interface: 'rich',
+          $component: 'rich',
           props: {
             text: 'some title',
           },
         },
         {
-          interface: 'slider',
+          $component: 'slider',
           children: [
             {
-              interface: 'list',
+              $component: 'list',
               props: {
                 categoryId: 'some-category',
               },
@@ -205,19 +205,19 @@ test(`renders a virtual component inside a virtual component`, async () => {
 
   window.__RUNTIME__.virtualTrees = {
     someTreeId: {
-      interface: 'div',
+      $component: 'div',
       props: {
         blockClass: 'shelf',
       },
       children: [
         {
-          interface: 'rich',
+          $component: 'rich',
           props: {
             text: 'some title',
           },
         },
         {
-          interface: 'VirtualComponent',
+          $component: 'VirtualComponent',
           props: {
             treeId: 'otherTreeId',
           },
@@ -225,10 +225,10 @@ test(`renders a virtual component inside a virtual component`, async () => {
       ],
     },
     otherTreeId: {
-      interface: 'slider',
+      $component: 'slider',
       children: [
         {
-          interface: 'list',
+          $component: 'list',
           props: {
             categoryId: 'some-category',
           },
@@ -273,13 +273,13 @@ test(`renders a virtual block with shallow props`, () => {
 
   window.__RUNTIME__.virtualTrees = {
     someTreeId: {
-      interface: 'div',
+      $component: 'div',
       props: {
         blockClass: 'shelf',
       },
       children: [
         {
-          interface: 'rich',
+          $component: 'rich',
           props: {
             text: '$title',
           },
@@ -316,13 +316,13 @@ test(`renders a virtual block with deep props`, () => {
 
   window.__RUNTIME__.virtualTrees = {
     someTreeId: {
-      interface: 'div',
+      $component: 'div',
       props: {
         blockClass: 'shelf',
       },
       children: [
         {
-          interface: 'rich',
+          $component: 'rich',
           props: {
             text: '$potato.title',
           },

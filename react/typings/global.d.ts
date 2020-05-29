@@ -511,8 +511,8 @@ declare global {
 
   interface VirtualTree {
     $component: string
-    props: Record<string, any>
-    children: VirtualTree[]
+    props?: Record<string, any>
+    children?: VirtualTree[]
   }
 
   interface CacheHints {
