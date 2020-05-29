@@ -7,7 +7,7 @@ import React, {
   useRef,
   MutableRefObject,
 } from 'react'
-import LRUCache from 'lru-cache'
+import LRUCache from './LRUCache'
 import PQueue from 'p-queue'
 import { History, UnregisterCallback } from 'history'
 import { isEnabled } from '../../utils/flags'
@@ -34,11 +34,11 @@ interface PrefetchCacheObject {
 }
 
 export interface PrefetchState {
-  routesCache: LRUCache<string, PrefetchRouteData>
+  routesCache: LRUCache<PrefetchRouteData>
   pathsCache: {
-    other: LRUCache<string, PrefetchCacheObject>
-    product: LRUCache<string, PrefetchCacheObject>
-    search: LRUCache<string, PrefetchCacheObject>
+    other: LRUCache<PrefetchCacheObject>
+    product: LRUCache<PrefetchCacheObject>
+    search: LRUCache<PrefetchCacheObject>
   }
   pathsState: Record<string, PathState>
   routePromise: Record<string, RoutePromise | null>
@@ -50,13 +50,9 @@ const HALF_HOUR_MS = 1000 * 60 * 30
 const state: PrefetchState = {
   routesCache: new LRUCache({ max: 100, maxAge: HALF_HOUR_MS }),
   pathsCache: {
-    product: new LRUCache({
-      max: 100,
-      dispose: disposeFn,
-      maxAge: HALF_HOUR_MS,
-    }),
-    search: new LRUCache({ max: 75, dispose: disposeFn, maxAge: HALF_HOUR_MS }),
-    other: new LRUCache({ max: 75, dispose: disposeFn, maxAge: HALF_HOUR_MS }),
+    product: new LRUCache({ max: 100, disposeFn, maxAge: HALF_HOUR_MS }),
+    search: new LRUCache({ max: 75, disposeFn, maxAge: HALF_HOUR_MS }),
+    other: new LRUCache({ max: 75, disposeFn, maxAge: HALF_HOUR_MS }),
   },
   pathsState: {},
   routePromise: {},
