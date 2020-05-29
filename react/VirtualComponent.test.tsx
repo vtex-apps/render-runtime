@@ -3,8 +3,8 @@ import React from 'react'
 import { cleanup, render, waitForDomChange } from '@vtex/test-tools/react'
 
 import 'jest-dom/extend-expect'
-import { TreePathContextProvider } from '../utils/treePath'
-import { RenderContextProvider } from './RenderContext'
+import { TreePathContextProvider } from './utils/treePath'
+import { RenderContextProvider } from './components/RenderContext'
 import VirtualComponent from './VirtualComponent'
 
 function renderVirtualComponent({

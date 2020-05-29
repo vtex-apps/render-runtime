@@ -1,11 +1,11 @@
 import React, { ReactElement, FC, useMemo } from 'react'
 
-import ComponentGetter from './ExtensionPoint/ComponentGetter'
-import { useTreePath, useRuntime } from '../core/main'
-import { flatObj, transformLeaves } from '../utils/object'
+import ComponentGetter from './components/ExtensionPoint/ComponentGetter'
+import { useTreePath, useRuntime } from './core/main'
+import { flatObj, transformLeaves } from './utils/object'
 
 interface Props {
-  treeId: string
+  virtualTreeId: string
   props?: Record<string, unknown>
 }
 
@@ -17,8 +17,8 @@ interface RenderVirtualArgs {
   key?: string
 }
 
-function getVirtualTree(treeId: string) {
-  return window.__RUNTIME__.virtualTrees[treeId]
+function getVirtualTree(virtualTreeId: string) {
+  return window.__RUNTIME__.virtualTrees[virtualTreeId]
 }
 
 function renderVirtualComponent({
@@ -55,12 +55,12 @@ function renderVirtualComponent({
     </ComponentGetter>
   )
 }
-const VirtualComponent: FC<Props> = ({ treeId, props = {} }) => {
+const VirtualComponent: FC<Props> = ({ virtualTreeId, props = {} }) => {
   const { treePath } = useTreePath()
   const runtime = useRuntime()
 
   const parsedTree = useMemo(() => {
-    const tree = getVirtualTree(treeId)
+    const tree = getVirtualTree(virtualTreeId)
     const flatProps = flatObj(props)
 
     return transformLeaves<VirtualTree>(tree, ({ value }) => {
@@ -74,7 +74,7 @@ const VirtualComponent: FC<Props> = ({ treeId, props = {} }) => {
 
       return flatProps[propKey]
     })
-  }, [props, treeId])
+  }, [props, virtualTreeId])
 
   const extension = runtime.extensions[treePath]
   if (extension == null) {
