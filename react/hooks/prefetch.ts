@@ -226,7 +226,7 @@ export const usePrefetchAttempt = ({
 
   const attemptPrefetch = useCallback(() => {
     if (!hasTried.current && isPrefetchActive() && canPrefetch) {
-      const { pathsState, queue } = prefetchState
+      const { pathsState } = prefetchState
       if (href && href[0] !== '/') {
         // Should only work on relative paths
         return
@@ -255,32 +255,30 @@ export const usePrefetchAttempt = ({
       const priority = getPriorityForPage(page)
       hasTried.current = true
 
-      queue.add(
-        async () =>
-          prefetchRequests({
-            client,
-            navigationRoute,
-            page,
-            pages,
-            prefetchState,
-            hints,
-            renderMajor,
-            validCache,
-          }),
-        { priority }
-      )
+      // queue.add(
+      //   async () =>
+      //     prefetchRequests({
+      //       client,
+      //       navigationRoute,
+      //       page,
+      //       pages,
+      //       prefetchState,
+      //       hints,
+      //       renderMajor,
+      //       validCache,
+      //     }),
+      //   { priority }
+      // )
+      console.log('attempting prefetch!', priority, navigationRoute)
     }
   }, [
     canPrefetch,
-    client,
-    hints,
     href,
     navigationRouteModifiers,
     options,
     page,
     pages,
     prefetchState,
-    renderMajor,
   ])
 
   useEffect(() => {

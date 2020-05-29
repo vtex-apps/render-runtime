@@ -8,12 +8,10 @@ import React, {
   MutableRefObject,
 } from 'react'
 import LRUCache from './LRUCache'
-import PQueue from 'p-queue-es5'
+import PQueue from './PQueue'
 import { History, UnregisterCallback } from 'history'
 import { isEnabled } from '../../utils/flags'
 import { useRuntime } from '../../core/main'
-
-const MAX_CONCURRENCY = 5
 
 const disposeFn = (key: string) => delete state.pathsState[key]
 
@@ -56,7 +54,7 @@ const state: PrefetchState = {
   },
   pathsState: {},
   routePromise: {},
-  queue: new PQueue({ concurrency: MAX_CONCURRENCY, autoStart: false }),
+  queue: new PQueue(),
 }
 
 const PrefetchContext = createContext<PrefetchState>(state)
@@ -105,7 +103,6 @@ export const PrefetchContextProvider: FC<{ history: History | null }> = ({
       () => {
         if (isEnabled('PREFETCH')) {
           setTimeout(() => {
-            console.log('teste starting')
             state.queue.start()
           }, getTimeout(hints.mobile))
         }
