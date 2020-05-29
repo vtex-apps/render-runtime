@@ -119,7 +119,7 @@ function getRelativeURLWithQuery({
   urlObj.search = ''
 
   Object.entries(query).forEach(([key, value]) => {
-    urlObj.searchParams.set(key, value as any)
+    urlObj.searchParams.set(key, value)
   })
 
   return urlObj.href.slice(baseUrl.length)
