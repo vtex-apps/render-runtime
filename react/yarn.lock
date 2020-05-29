@@ -2117,13 +2117,6 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.3.tgz#ebfe83507ac506bc3486314a8aa395be66af8d23"
   integrity sha512-opgSsy+cEF9N8MgaVPnWVtdJ3o4mV2aMHvDq7thkQUFt0EuOHJon4rQpJfhjmNHB+ikl0Cd6WhWIErOyQ+f7tw==
 
-"@types/p-queue@^3.2.1":
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/@types/p-queue/-/p-queue-3.2.1.tgz#614957d9ed05cf6e02d08ed8f09041c4d100ef70"
-  integrity sha512-tgAdn5zEs05NuHzOyRM34cMO0rczStphR/kLo/ZJwwwJ5S2+QVxwA6gST3vDHWPB1oDfUuT6wOouhJvJkBCA0w==
-  dependencies:
-    p-queue "*"
-
 "@types/prop-types@*", "@types/prop-types@^15.5.2", "@types/prop-types@^15.7.0":
   version "15.7.1"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.1.tgz#f1a11e7babb0c3cad68100be381d1e064c68f1f6"
@@ -4195,12 +4188,12 @@ esutils@^2.0.0, esutils@^2.0.2:
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.2.tgz#0abf4f1caa5bcb1f7a9d8acc6dea4faaa04bac9b"
   integrity sha1-Cr9PHKpbyx96nYrMbepPqqBLrJs=
 
-eventemitter3@*, eventemitter3@^4.0.0:
+eventemitter3@*:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.0.tgz#d65176163887ee59f386d64c82610b696a4a74eb"
   integrity sha512-qerSRB0p+UDEssxTtm6EDKcE7W4OaoisfIMl4CngyEhjpYglocpNg6UEqCvemdGhosAsg4sO2dXJOdyBifPGCg==
 
-eventemitter3@^3.0.0:
+eventemitter3@^3.0.0, eventemitter3@^3.1.0:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
   integrity sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
@@ -6555,12 +6548,12 @@ p-map@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-map/-/p-map-2.1.0.tgz#310928feef9c9ecc65b68b17693018a665cea175"
   integrity sha512-y3b8Kpd8OAN444hxfBbFfj1FY/RjtTd8tzYwhUqNYXx0fXx2iX4maP4Qr6qhIKbQXI02wTLAda4fYUbDagTUFw==
 
-p-queue@*, p-queue@^6.3.0:
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-6.3.0.tgz#19bfa4485db7e6a0c135049ff6716375880d9c3a"
-  integrity sha512-fg5dJlFpd5+3CgG3/0ogpVZUeJbjiyXFg0nu53hrOYsybqSiDyxyOpad0Rm6tAiGjgztAwkyvhlYHC53OiAJOA==
+p-queue-es5@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/p-queue-es5/-/p-queue-es5-6.0.2.tgz#8bee125bda638c249e9f973264b3ccadc3622c80"
+  integrity sha512-3kOouw1w/EPcBuWqAcCK6q/gmb3ux5+BtldP6pYCAElXAR1ILoy7rn3qd7KOi45AYpX3q46BajfsnYedtFVy4Q==
   dependencies:
-    eventemitter3 "^4.0.0"
+    eventemitter3 "^3.1.0"
     p-timeout "^3.1.0"
 
 p-reduce@^1.0.0:

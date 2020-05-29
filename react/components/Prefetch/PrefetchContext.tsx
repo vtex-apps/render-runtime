@@ -8,7 +8,7 @@ import React, {
   MutableRefObject,
 } from 'react'
 import LRUCache from './LRUCache'
-import PQueue from 'p-queue'
+import PQueue from 'p-queue-es5'
 import { History, UnregisterCallback } from 'history'
 import { isEnabled } from '../../utils/flags'
 import { useRuntime } from '../../core/main'
@@ -105,6 +105,7 @@ export const PrefetchContextProvider: FC<{ history: History | null }> = ({
       () => {
         if (isEnabled('PREFETCH')) {
           setTimeout(() => {
+            console.log('teste starting')
             state.queue.start()
           }, getTimeout(hints.mobile))
         }
