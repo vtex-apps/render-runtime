@@ -1,6 +1,5 @@
 import { stringify } from 'query-string'
 import { isEmpty } from 'ramda'
-import { parse, format } from 'url'
 
 import navigationPageQuery from '../queries/navigationPage.graphql'
 import routePreviews from '../queries/routePreviews.graphql'
@@ -105,6 +104,27 @@ const runtimeFields = [
   'settings',
 ].join(',')
 
+function getRelativeURLWithQuery({
+  path,
+  query,
+}: {
+  path: string
+  query: Record<string, any>
+}) {
+  // we don't need to have the rootPath here because only
+  // the relative path matters
+  const baseUrl = window.location.origin
+  const urlObj = new URL(path, baseUrl)
+
+  urlObj.search = ''
+
+  Object.entries(query).forEach(([key, value]) => {
+    urlObj.searchParams.set(key, value)
+  })
+
+  return urlObj.href.slice(baseUrl.length)
+}
+
 export const fetchServerPage = async ({
   fetcher,
   path,
@@ -114,13 +134,13 @@ export const fetchServerPage = async ({
   query?: Record<string, string>
   fetcher: GlobalFetch['fetch']
 }): Promise<ParsedServerPageResponse> => {
-  const parsedUrl = parse(path)
-  parsedUrl.search = undefined
-  parsedUrl.query = {
-    ...rawQuery,
-    __pickRuntime: runtimeFields,
-  } as any
-  const url = format(parsedUrl)
+  const url = getRelativeURLWithQuery({
+    path,
+    query: {
+      ...rawQuery,
+      __pickRuntime: runtimeFields,
+    },
+  })
   const page: ServerPageResponse = await fetchWithRetry(
     url,
     {
@@ -205,13 +225,14 @@ export const getPrefetchForPath = async ({
   query?: Record<string, string>
   fetcher: GlobalFetch['fetch']
 }): Promise<PrefetchPageResponse | null> => {
-  const parsedUrl = parse(path)
-  parsedUrl.search = undefined
-  parsedUrl.query = {
-    ...rawQuery,
-    __pickRuntime: 'page,queryData,contentResponse,route',
-  } as any
-  const url = format(parsedUrl)
+  const url = getRelativeURLWithQuery({
+    path,
+    query: {
+      ...rawQuery,
+      __pickRuntime: 'page,queryData,contentResponse,route',
+    },
+  })
+
   const pageResponsePromise = fetchWithRetry(
     url,
     {
