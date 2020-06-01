@@ -45,14 +45,17 @@ class LRU<T> {
   }
 
   private isExpired(value: Node<T>) {
+    if (this.maxAge <= 0) {
+      return false
+    }
     const expiration = Date.now() - this.maxAge
     return value.time < expiration
   }
 
   private ensureLimit() {
     if (this.map.size === this.maxSize && this.tail) {
-      this.remove(this.tail.key)
       this.disposeFn && this.disposeFn(this.tail.key)
+      this.remove(this.tail.key)
     }
   }
 
@@ -91,6 +94,7 @@ class LRU<T> {
 
       return entry.value
     }
+    // console.log('teste ')
     return undefined
   }
 
