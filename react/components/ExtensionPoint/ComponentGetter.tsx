@@ -1,4 +1,4 @@
-import React, { useEffect, useState, FunctionComponent } from 'react'
+import React, { useEffect, useState, FunctionComponent, useMemo } from 'react'
 
 import { getImplementation } from '../../utils/assets'
 import GenericPreview from '../Preview/GenericPreview'
@@ -85,6 +85,7 @@ const AsyncComponent: FunctionComponent<Props> = (props) => {
   ) : /** If the component is not loaded yet, renders a "loading"
    * state. This currently only applies to root components
    * (e.g. "store.home") */
+
   isRootTreePath || isAround ? (
     <>
       {componentProps.beforeElements}
@@ -96,41 +97,43 @@ const AsyncComponent: FunctionComponent<Props> = (props) => {
   )
 }
 
-const ComponentGetter: FunctionComponent<Props> = ({
-  component,
-  props = {},
-  treePath,
-  hydration,
-  runtime,
-  children,
-}) => {
+const ComponentGetter: FunctionComponent<Props> = (getterProps) => {
+  const {
+    component,
+    props: componentProps = {},
+    treePath,
+    hydration,
+    children,
+  } = getterProps
+
   const slotProps = useSlots({
-    props,
+    props: componentProps,
     hydration,
     treePath,
   })
 
   const Component = getImplementation(component)
 
+  const componentPropsWithSlots = useMemo(
+    () => ({
+      ...componentProps,
+      ...slotProps,
+    }),
+    [componentProps, slotProps]
+  )
+  const asyncComponentProps = useMemo(
+    () => ({
+      ...getterProps,
+      props: componentPropsWithSlots,
+    }),
+    [componentPropsWithSlots, getterProps]
+  )
+
   if (Component) {
-    return (
-      <Component {...props} {...slotProps}>
-        {children}
-      </Component>
-    )
+    return <Component {...componentPropsWithSlots}>{children}</Component>
   }
 
-  return (
-    <AsyncComponent
-      component={component}
-      props={{ ...props, ...slotProps }}
-      treePath={treePath}
-      runtime={runtime}
-      hydration={hydration}
-    >
-      {children}
-    </AsyncComponent>
-  )
+  return <AsyncComponent {...asyncComponentProps}>{children}</AsyncComponent>
 }
 
 export default ComponentGetter
