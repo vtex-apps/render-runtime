@@ -140,9 +140,14 @@ export const createUriSwitchLink = (
       }
 
       let query = Object.keys(queryObj).reduce(
-        (queryString: string, objKey: string, index: number) => {
+        (
+          queryString: string,
+          objKey: string,
+          index: number,
+          queryObjKeys: string[]
+        ) => {
           let nextKeyPrefix = ''
-          if (index < Object.keys(queryObj).length - 1) {
+          if (index < queryObjKeys.length - 1) {
             nextKeyPrefix = '&'
           }
           return `${queryString}${objKey}=${queryObj[objKey]}${nextKeyPrefix}`
