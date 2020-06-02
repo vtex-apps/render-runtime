@@ -526,6 +526,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
     return pageNavigate(history, pages, {
       fetchPage: false,
+      skipSetPath: true,
       page,
       params,
       query: nextQuery,

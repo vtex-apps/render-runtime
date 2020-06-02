@@ -46,10 +46,10 @@ function createLocationDescriptor(
     scrollOptions,
     fetchPage,
     preventRemount,
+    skipSetPath,
   }: Partial<NavigateOptions>
 ): LocationDescriptorObject {
   return {
-    pathname: navigationRoute.path,
     state: {
       fetchPage,
       navigationRoute,
@@ -57,6 +57,7 @@ function createLocationDescriptor(
       renderRouting: true,
       scrollOptions,
     },
+    ...(skipSetPath ? {} : { pathname: navigationRoute.path }),
     ...(query && { search: query }),
     ...(hash && { hash }),
   }
@@ -323,6 +324,7 @@ export function navigate(
     replace,
     fetchPage = true,
     preventRemount,
+    skipSetPath = false,
   } = options
 
   const navigationRoute = getNavigationRouteToNavigate(pages, options, true)
@@ -346,6 +348,7 @@ export function navigate(
       query: nextQuery,
       scrollOptions,
       hash: navigationRoute.realHash,
+      skipSetPath,
     })
     const method = replace ? 'replace' : 'push'
     window.setTimeout(() => history[method](location), 0)
@@ -523,6 +526,7 @@ export interface NavigateOptions {
   rootPath?: string
   modifiers?: Set<NavigationRouteModifier>
   modifiersOptions?: Record<string, any>
+  skipSetPath?: boolean
 }
 
 export interface NavigationRouteChange {
