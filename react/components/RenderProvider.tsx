@@ -86,6 +86,7 @@ export interface RenderProviderState {
   cacheHints: RenderRuntime['cacheHints']
   components: RenderRuntime['components']
   culture: RenderRuntime['culture']
+  salesChannel: RenderRuntime['salesChannel']
   defaultExtensions: RenderRuntime['defaultExtensions']
   device: ConfigurationDevice
   extensions: RenderRuntime['extensions']
@@ -142,6 +143,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     contentMap: PropTypes.object,
     components: PropTypes.object,
     culture: PropTypes.object,
+    salesChannel: PropTypes.string,
     defaultExtensions: PropTypes.object,
     device: PropTypes.string,
     emitter: PropTypes.object,
@@ -223,6 +225,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       cacheHints,
       contentMap,
       culture,
+      salesChannel,
       messages,
       components,
       exposeBindingAddress,
@@ -300,6 +303,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       contentMap,
       components,
       culture,
+      salesChannel,
       defaultExtensions: {},
       device: 'any',
       extensions,
@@ -386,6 +390,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       pages,
       preview,
       culture,
+      salesChannel,
       device,
       route,
       query,
@@ -414,6 +419,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       components,
       contentMap,
       culture,
+      salesChannel,
       defaultExtensions,
       device,
       emitter,
@@ -1001,6 +1007,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         cacheHints,
         components,
         culture,
+        salesChannel,
         extensions,
         messages,
         pages,
@@ -1014,6 +1021,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
               cacheHints,
               components,
               culture,
+              salesChannel,
               extensions,
               messages,
               pages,
