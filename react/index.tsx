@@ -22,9 +22,6 @@ if (window.IntlPolyfill) {
   window.IntlPolyfill.__disableRegExpRestore()
   if (!window.Intl) {
     window.Intl = window.IntlPolyfill
-  } else if (!canUseDOM) {
-    window.Intl.NumberFormat = window.IntlPolyfill.NumberFormat
-    window.Intl.DateTimeFormat = window.IntlPolyfill.DateTimeFormat
   }
 }
 if (
@@ -85,7 +82,7 @@ if (
   canUseDOM &&
   document.querySelector('style#critical')
 ) {
-  window.__UNCRITICAL_PROMISE__ = new Promise(resolve => {
+  window.__UNCRITICAL_PROMISE__ = new Promise((resolve) => {
     window.addEventListener('load', () => {
       const base = document.querySelector('noscript#styles_base')
       if (base) {
@@ -104,7 +101,7 @@ if (
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
   if (canUseDOM) {
-    const contentLoadedPromise = new Promise(resolve =>
+    const contentLoadedPromise = new Promise((resolve) =>
       window.addEventListener('DOMContentLoaded', resolve)
     )
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
