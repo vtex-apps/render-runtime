@@ -362,7 +362,11 @@ export function navigate(
 
 function navigationRootPath(path: string, rootPath?: string) {
   // Prefix any non-absolute paths (e.g. http:// or https://) with runtime.rootPath
-  if (rootPath && !path.startsWith('http')) {
+  if (
+    rootPath &&
+    !path.startsWith('http') &&
+    !path.startsWith(`${rootPath}/`)
+  ) {
     return rootPath + path
   }
 
