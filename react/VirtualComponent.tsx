@@ -55,6 +55,7 @@ function renderVirtualComponent({
     </ComponentGetter>
   )
 }
+
 const VirtualComponent: FC<Props> = ({ virtualTreeId, props = {} }) => {
   const { treePath } = useTreePath()
   const runtime = useRuntime()
