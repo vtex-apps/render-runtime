@@ -94,6 +94,7 @@ declare global {
     composition?: Composition
     hasContentSchema?: boolean
     contentIds?: string[]
+    virtualTreeId?: string
   }
 
   interface Extensions {

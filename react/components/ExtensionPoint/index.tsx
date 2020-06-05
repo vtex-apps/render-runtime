@@ -163,6 +163,7 @@ const ExtensionPoint: FC<Props> = (props) => {
     render: renderStrategy = null,
     hydration = 'always',
     props: extensionProps = {},
+    virtualTreeId,
   } = extension || {}
 
   const appName = component?.substr(0, component.indexOf('@'))
@@ -177,15 +178,16 @@ const ExtensionPoint: FC<Props> = (props) => {
       parentProps,
       /** Props that are read from runtime.extensions, that come from the blocks files
        */
-      extensionProps,
+      virtualTreeId ? { virtualTreeId, props: extensionProps } : extensionProps,
       /** Props from the blockProps prop, used when the user wants to prevent overriding
        * the native ExtensionPoint props (such as `id`)
        */
       blockProps || {},
-      content,
+      virtualTreeId ? { virtualTreeId, props: content } : content,
       { params, query },
     ])
   }, [
+    virtualTreeId,
     parentProps,
     extensionProps,
     blockProps,
