@@ -1,7 +1,7 @@
 type Primitive = string | boolean | number
 
 /**
- * Flattens a deep object, building props separate by a dot.
+ * Flattens a deep object, building props separated by a dot.
  */
 export const flatObj = (
   obj: Record<string, any>,
