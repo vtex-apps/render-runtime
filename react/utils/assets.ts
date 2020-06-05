@@ -260,6 +260,10 @@ export function fetchUncriticalStyles(
   )
 }
 
+export function getVirtualTree(virtualTreeId: string) {
+  return window.__RUNTIME__.virtualTrees[virtualTreeId]
+}
+
 export async function fetchAssets(
   runtime: RenderRuntime,
   assets: AssetEntry[]

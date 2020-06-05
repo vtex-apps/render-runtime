@@ -3,6 +3,7 @@ import React, { ReactElement, FC, useMemo } from 'react'
 import ComponentGetter from './components/ExtensionPoint/ComponentGetter'
 import { useTreePath, useRuntime } from './core/main'
 import { flatObj, transformLeaves } from './utils/object'
+import { getVirtualTree } from './utils/assets'
 
 interface Props {
   virtualTreeId: string
@@ -10,15 +11,11 @@ interface Props {
 }
 
 interface RenderVirtualArgs {
-  runtime: any
+  runtime: RenderContext
   treePath: string
   hydration: Hydration
   tree: VirtualTree
   key?: string
-}
-
-function getVirtualTree(virtualTreeId: string) {
-  return window.__RUNTIME__.virtualTrees[virtualTreeId]
 }
 
 function renderVirtualComponent({

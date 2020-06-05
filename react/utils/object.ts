@@ -35,24 +35,24 @@ export const transformLeaves = <T>(
     return obj
   }
 
-  const copy = { ...obj }
+  const transformed = { ...obj }
 
-  for (const key in copy) {
-    const value = copy[key]
+  for (const key in transformed) {
+    const value = transformed[key]
     if (Array.isArray(value)) {
-      copy[key] = value.map((item: unknown) =>
+      transformed[key] = value.map((item: unknown) =>
         transformLeaves(item, transformer)
       )
     } else if (typeof value === 'object') {
-      copy[key] = transformLeaves(value, transformer)
+      transformed[key] = transformLeaves(value, transformer)
     } else {
       // dealing with a leaf node
-      const result = transformer({ key, value: copy[key] })
+      const result = transformer({ key, value: transformed[key] })
       if (typeof result !== 'undefined') {
-        copy[key] = result
+        transformed[key] = result
       }
     }
   }
 
-  return copy
+  return transformed
 }
