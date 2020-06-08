@@ -68,7 +68,12 @@ const VirtualComponent: FC<Props> = ({ virtualTreeId, props = {} }) => {
       if (!isDynamicValue) return
 
       const propKey = value.slice(1)
-      if (!(propKey in flatProps)) return
+      if (!(propKey in flatProps)) {
+        console.warn(
+          `[VirtualComponent] Prop "${propKey}" was not defined for component with virtual tree ID "${virtualTreeId}".`
+        )
+        return
+      }
 
       return flatProps[propKey]
     })
