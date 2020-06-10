@@ -140,7 +140,7 @@ function withOuterExtensions(
 const ExtensionPoint: FC<Props> = props => {
   const runtime = useRuntime()
 
-  const { inspect } = runtime
+  const { inspect, getSettings } = runtime
 
   const treePathFromHook = useTreePath()
 
@@ -164,8 +164,12 @@ const ExtensionPoint: FC<Props> = props => {
     props: extensionProps = {},
   } = extension || {}
 
+  const appName = component?.substr(0, component.indexOf('@'))
+  const appSettings = appName ? getSettings(appName) : {}
+
   const mergedProps = React.useMemo(() => {
     return reduce(mergeDeepRight, {} as any, [
+      appSettings ? { appSettings } : {},
       /** Extra props passed to the ExtensionPoint component
        * e.g. <ExtensionPoint foo="bar" />
        */
@@ -180,7 +184,15 @@ const ExtensionPoint: FC<Props> = props => {
       content,
       { params, query },
     ])
-  }, [parentProps, extensionProps, blockProps, content, params, query])
+  }, [
+    parentProps,
+    extensionProps,
+    blockProps,
+    content,
+    params,
+    query,
+    appSettings,
+  ])
 
   if (
     /* Stops rendering if the extension is not found. Useful for optional ExtensionPoints */
