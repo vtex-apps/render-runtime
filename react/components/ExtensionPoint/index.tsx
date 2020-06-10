@@ -13,8 +13,8 @@ import LoadingBar from '../LoadingBar'
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectBlockWrapper = React.lazy(
   () =>
-    new Promise<{ default: any }>(resolve => {
-      import('@vtex/blocks-inspector').then(BlocksInspector => {
+    new Promise<{ default: any }>((resolve) => {
+      import('@vtex/blocks-inspector').then((BlocksInspector) => {
         resolve({ default: BlocksInspector.default.ExtensionPointWrapper })
       })
     })
@@ -47,7 +47,7 @@ export function getChildExtensions(runtime: RenderContext, treePath: string) {
     return
   }
 
-  const childBlocks = extension.blocks.filter(block => {
+  const childBlocks = extension.blocks.filter((block) => {
     /* This weird conditional check is for backwards compatibility.
      * Blocks that were built prior to https://github.com/vtex/builder-hub/pull/856
      * would not have the 'children' property (block.children === undefined).
@@ -90,7 +90,7 @@ function withOuterExtensions(
     return element
   }
 
-  const beforeElements = before.map(beforeId => (
+  const beforeElements = before.map((beforeId) => (
     <ExtensionPoint
       id={beforeId}
       key={beforeId}
@@ -100,7 +100,7 @@ function withOuterExtensions(
     />
   ))
 
-  const afterElements = after.map(afterId => (
+  const afterElements = after.map((afterId) => (
     <ExtensionPoint
       id={afterId}
       key={afterId}
@@ -137,7 +137,7 @@ function withOuterExtensions(
   }, wrapped)
 }
 
-const ExtensionPoint: FC<Props> = props => {
+const ExtensionPoint: FC<Props> = (props) => {
   const runtime = useRuntime()
 
   const { inspect, getSettings } = runtime
