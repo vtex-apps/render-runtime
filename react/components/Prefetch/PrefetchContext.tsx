@@ -13,6 +13,8 @@ import { History, UnregisterCallback } from 'history'
 import { isEnabled } from '../../utils/flags'
 import { useRuntime } from '../../core/main'
 
+const MAX_CONCURRENCY = 5
+
 const disposeFn = (key: string) => delete state.pathsState[key]
 
 interface PathState {
@@ -29,6 +31,7 @@ interface PrefetchCacheObject {
   routeId: string
   matchingPage: RenderRuntime['route']
   contentResponse: ContentResponse | null
+  queryData?: RenderRuntime['queryData']
 }
 
 export interface PrefetchState {
@@ -54,7 +57,7 @@ const state: PrefetchState = {
   },
   pathsState: {},
   routePromise: {},
-  queue: new PQueue(),
+  queue: new PQueue({ autoStart: false, concurrency: MAX_CONCURRENCY }),
 }
 
 const PrefetchContext = createContext<PrefetchState>(state)

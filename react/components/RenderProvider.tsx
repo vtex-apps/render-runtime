@@ -690,6 +690,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
         }
       }
 
+      if (prefetchedPathData.queryData) {
+        this.hydrateApolloCache(prefetchedPathData.queryData)
+      }
+
       this.setState(
         (state) => ({
           ...state,
