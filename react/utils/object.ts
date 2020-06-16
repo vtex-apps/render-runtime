@@ -12,10 +12,13 @@ export const flatObj = (
   // could use a reduce, but a simple for-in has less footprint
   for (const key in obj) {
     const flatKey = prefix + key
+
     // we want plain objects and arrays
     if (typeof obj[key] === 'object') {
       Object.assign(flatted, flatObj(obj[key], `${flatKey}.`))
-    } else {
+    }
+
+    if (typeof obj[key] !== 'object' || Array.isArray(obj[key])) {
       flatted[flatKey] = obj[key]
     }
   }
@@ -40,6 +43,7 @@ export const transformLeaves = <T>(
   for (const key in transformed) {
     const value = transformed[key]
     if (Array.isArray(value)) {
+      transformed[key] = value
       transformed[key] = value.map((item: unknown) =>
         transformLeaves(item, transformer)
       )

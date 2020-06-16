@@ -17,8 +17,10 @@ test('flattens a deep object with array values', () => {
     e: { f: ['foo', 'bar'] },
   }
   expect(flatObj(obj)).toMatchObject({
+    'a.b.c.d': ['foo', 'bar'],
     'a.b.c.d.0': 'foo',
     'a.b.c.d.1': 'bar',
+    'e.f': ['foo', 'bar'],
     'e.f.0': 'foo',
     'e.f.1': 'bar',
   })
