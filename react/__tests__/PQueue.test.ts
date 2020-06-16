@@ -48,36 +48,37 @@ it('should respect the maximum concurrency', async () => {
 })
 
 it('should add with priority', async () => {
-  const mockFn = jest.fn()
-  const mockPriorityFn = jest.fn()
-  const myPromiseFn = () =>
+  const counters = [0, 0, 0, 0, 0]
+  const myPromiseFn = (count: number) =>
     new Promise(async (resolve) => {
-      await sleep(500)
-      mockFn()
+      await sleep(300)
+      counters[count]++
       resolve()
     })
 
-  const myPromisePriorityFn = () =>
-    new Promise(async (resolve) => {
-      await sleep(500)
-      mockPriorityFn()
-      resolve()
-    })
+  const queue = new PQueue({ concurrency: 2, autoStart: false })
+  queue.add(() => myPromiseFn(0))
+  queue.add(() => myPromiseFn(1), { priority: 1 })
+  queue.add(() => myPromiseFn(2), { priority: 2 })
+  queue.add(() => myPromiseFn(3), { priority: 3 })
 
-  const queue = new PQueue({ concurrency: 2 })
-  queue.add(myPromiseFn)
-  queue.add(myPromiseFn)
+  queue.start()
   await sleep(100)
-  queue.add(myPromisePriorityFn, { priority: 1 })
-  queue.add(myPromiseFn)
-  queue.add(myPromiseFn)
 
-  await sleep(700)
-  expect(mockFn).toBeCalledTimes(2)
+  queue.add(() => myPromiseFn(4), { priority: 4 })
+  queue.add(() => myPromiseFn(3), { priority: 3 })
+  queue.add(() => myPromiseFn(0), { priority: 0 })
+  await sleep(250)
 
-  await sleep(400)
-  expect(mockFn).toBeCalledTimes(3)
-  expect(mockPriorityFn).toBeCalledTimes(1)
+  // Should have resolved the two promises with high priorities
+  expect(counters).toStrictEqual([0, 0, 1, 1, 0])
+  await sleep(300)
+  // Should have resolved the two promises with higher priorities at the moment (4 and 3)
+  expect(counters).toStrictEqual([0, 0, 1, 2, 1])
+
+  await sleep(600)
+  // All of them should have resolved
+  expect(counters).toStrictEqual([2, 1, 1, 2, 1])
 })
 
 it('should respect autoStart false argument', async () => {

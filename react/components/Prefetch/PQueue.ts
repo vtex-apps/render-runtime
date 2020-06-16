@@ -2,7 +2,7 @@ type PromiseFn = () => Promise<any>
 
 interface QueueObject {
   promise: PromiseFn
-  priority: number | undefined
+  priority: number
 }
 
 interface AddOptions {
@@ -14,8 +14,17 @@ interface Options {
   autoStart?: boolean
 }
 
-function compareNumbers(a: QueueObject, b: QueueObject) {
-  return (b.priority ?? 0) - (a.priority ?? 0)
+// Shifts the whole array in place one position to the right until a given index
+function moveToRight<T>(array: T[], fromIndex: number) {
+  for (let i = array.length - 1; i >= fromIndex; i--) {
+    array[i + 1] = array[i]
+  }
+}
+
+// Find first element where the given priority is bigger than it
+// This could be a Binary Search if performance become an issue.
+const findFirstSmallerElement = (array: QueueObject[], priority: number) => {
+  return array.findIndex((obj) => priority > obj.priority)
 }
 
 class PQueue {
@@ -90,8 +99,21 @@ class PQueue {
   }
 
   private enqueue(promise: PromiseFn, options: AddOptions = {}) {
-    this.queue.push({ promise, priority: options.priority })
-    this.queue.sort(compareNumbers)
+    const newItem = { promise, priority: options.priority ?? 0 }
+    if (this.queue.length > 1) {
+      const lastElem = this.queue[this.queue.length - 1]
+      if (newItem.priority > lastElem.priority) {
+        const correctPosition = findFirstSmallerElement(
+          this.queue,
+          newItem.priority
+        )
+        moveToRight(this.queue, correctPosition)
+        this.queue[correctPosition] = newItem
+        return
+      }
+    }
+
+    this.queue.push(newItem)
   }
 }
 

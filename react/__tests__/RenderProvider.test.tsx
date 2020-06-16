@@ -32,6 +32,13 @@ const renderFakeProvider = ({ children }: { children: JSX.Element }) => {
           path: 'page/:id',
         },
       },
+      hints: {
+        mobile: false,
+        desktop: true,
+        tablet: false,
+        phone: false,
+        unknown: false,
+      },
     },
     history: {
       location: {
