@@ -178,16 +178,15 @@ const ExtensionPoint: FC<Props> = (props) => {
       parentProps,
       /** Props that are read from runtime.extensions, that come from the blocks files
        */
-      virtualTreeId ? { virtualTreeId, props: extensionProps } : extensionProps,
+      extensionProps,
       /** Props from the blockProps prop, used when the user wants to prevent overriding
        * the native ExtensionPoint props (such as `id`)
        */
       blockProps || {},
-      virtualTreeId ? { virtualTreeId, props: content } : content,
+      content,
       { params, query },
     ])
   }, [
-    virtualTreeId,
     parentProps,
     extensionProps,
     blockProps,
@@ -223,7 +222,9 @@ const ExtensionPoint: FC<Props> = (props) => {
 
     <ComponentLoader
       component={component}
-      props={mergedProps}
+      props={
+        virtualTreeId ? { virtualTreeId, props: mergedProps } : mergedProps
+      }
       runtime={runtime}
       treePath={newTreePath}
       hydration={hydration}

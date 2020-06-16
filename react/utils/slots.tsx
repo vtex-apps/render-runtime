@@ -26,6 +26,7 @@ export function generateSlot({
     const slotChildren = getChildExtensions(runtime, newTreePath)
     const componentProps = extension?.props ?? {}
     const extensionContent = extension?.content ?? {}
+    const virtualTreeId = extension?.virtualTreeId
 
     const componentLoaderPropsWithContent = useMemo(
       () => ({
@@ -46,7 +47,11 @@ export function generateSlot({
     return (
       <ComponentLoader
         component={extension?.component ?? null}
-        props={componentLoaderPropsWithContent}
+        props={
+          virtualTreeId
+            ? { virtualTreeId, props: componentLoaderPropsWithContent }
+            : componentLoaderPropsWithContent
+        }
         treePath={newTreePath}
         runtime={runtime}
         hydration={hydration}
