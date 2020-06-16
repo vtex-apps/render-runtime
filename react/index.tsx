@@ -89,14 +89,14 @@ function createUncriticalPromise() {
     return resolve
   }
 
-  window.__UNCRITICAL_PROMISE__ = new Promise<void>(r => {
+  window.__UNCRITICAL_PROMISE__ = new Promise<void>((r) => {
     resolve = r
   })
     .then(() => {
       const { base = [], overrides = [] } = uncriticalStyleRefs
       return fetchUncriticalStyles([...base, ...overrides])
     })
-    .then(uncriticalStyles => {
+    .then((uncriticalStyles) => {
       if (!uncriticalStyles) {
         console.error('Missing lazy links')
         return

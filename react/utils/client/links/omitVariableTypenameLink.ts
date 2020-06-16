@@ -4,7 +4,7 @@ import { canUseDOM } from 'exenv'
 const deepCopyFiles = (src: any, dst: any) =>
   src &&
   typeof src === 'object' &&
-  Object.keys(src).forEach(key => {
+  Object.keys(src).forEach((key) => {
     if (
       src[key] instanceof File ||
       src[key] instanceof Blob ||

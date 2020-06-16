@@ -35,7 +35,7 @@ export async function fetchComponent(
   } else if (componentPromiseResolvedMap[component]) {
     /** These retries perhaps are not needed anymore, but keeping just to be safe */
     if (retries > 0) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
       return fetchComponent(component, runtimeFetchComponent, retries - 1)
     }
 
@@ -59,7 +59,7 @@ interface Props {
   hydration: Hydration
 }
 
-const ComponentLoader: FunctionComponent<Props> = props => {
+const ComponentLoader: FunctionComponent<Props> = (props) => {
   const {
     component,
     children,
@@ -82,7 +82,7 @@ const ComponentLoader: FunctionComponent<Props> = props => {
     }
 
     const slotNames = Object.keys(componentProps).filter(
-      key => key[0] !== key[0].toLowerCase()
+      (key) => key[0] !== key[0].toLowerCase()
     )
     const resultingSlotsProps: Record<string, ReactNode> = {}
 
@@ -158,7 +158,7 @@ const ComponentLoader: FunctionComponent<Props> = props => {
   return content
 }
 
-const AsyncComponent: FunctionComponent<Props> = props => {
+const AsyncComponent: FunctionComponent<Props> = (props) => {
   const {
     component,
     children,
@@ -182,7 +182,7 @@ const AsyncComponent: FunctionComponent<Props> = props => {
     }
 
     // ...otherwise, fetches it and stores the result in the Component state
-    fetchComponent(component, runtime.fetchComponent).then(result => {
+    fetchComponent(component, runtime.fetchComponent).then((result) => {
       if (Component) {
         return
       }
