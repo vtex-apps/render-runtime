@@ -7,6 +7,7 @@ import * as runtimeGlobals from './core/main'
 import { createReactIntl } from './utils/reactIntl'
 
 import { createCustomReactApollo } from './utils/reactApollo'
+import { fetchUncriticalStyles, UncriticalStyle } from './utils/assets'
 
 window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
 
@@ -77,26 +78,96 @@ if (window.ReactIntl) {
   window.ReactIntl = createReactIntl()
 }
 
-if (
-  !window.__ERROR__ &&
-  canUseDOM &&
-  document.querySelector('style#critical')
-) {
-  window.__UNCRITICAL_PROMISE__ = new Promise((resolve) => {
-    window.addEventListener('load', () => {
-      const base = document.querySelector('noscript#styles_base')
-      if (base) {
-        base.insertAdjacentHTML('afterend', base.innerHTML)
-      }
+function createUncriticalPromise() {
+  const {
+    __RUNTIME__: { uncriticalStyleRefs },
+  } = window
+  const criticalElement = document.querySelector('style#critical')
+  let resolve = () => {}
 
-      const overrides = document.querySelector('noscript#styles_overrides')
-      if (overrides) {
-        overrides.insertAdjacentHTML('afterend', overrides.innerHTML)
-      }
+  if (!uncriticalStyleRefs || !criticalElement) {
+    return resolve
+  }
 
-      resolve()
-    })
+  window.__UNCRITICAL_PROMISE__ = new Promise<void>((r) => {
+    resolve = r
   })
+    .then(() => {
+      const { base = [], overrides = [] } = uncriticalStyleRefs
+      return fetchUncriticalStyles([...base, ...overrides])
+    })
+    .then((uncriticalStyles) => {
+      if (!uncriticalStyles) {
+        console.error('Missing lazy links')
+        return
+      }
+
+      const debugCriticalCSS = window.__RUNTIME__.query?.__debugCriticalCSS
+
+      const createUncriticalStyle = (uncriticalStyle: UncriticalStyle) => {
+        if (!uncriticalStyle) {
+          return
+        }
+        const style = document.createElement('style')
+
+        style.id = uncriticalStyle.id ?? ''
+        style.className = `uncritical ${uncriticalStyle.className ?? ''}`
+        style.media = uncriticalStyle.media
+        style.innerHTML = uncriticalStyle.body
+        style.setAttribute('data-href', uncriticalStyle.href)
+
+        document.head.appendChild(style)
+      }
+
+      const clearCritical = () => {
+        if (criticalElement.parentElement) {
+          criticalElement.remove()
+        }
+      }
+
+      const applyUncritical = () => {
+        uncriticalStyles.forEach(createUncriticalStyle)
+        clearCritical()
+      }
+
+      /** Doesn't apply uncritical CSS automatically--exposes functions
+       * to the window to manually do it, for debugging purposes
+       */
+      if (debugCriticalCSS === 'manual') {
+        ;(window as any).applyUncritical = applyUncritical
+        ;(window as any).clearCritical = clearCritical
+
+        let currentUncritical = 0
+        ;(window as any).stepUncritical = () => {
+          if (currentUncritical === -1) {
+            console.log('Uncritical has finished being applied.')
+          }
+          const current = uncriticalStyles[currentUncritical]
+          if (!current) {
+            console.log(
+              'All uncritical styles applied. Cleaning critical styles.'
+            )
+            clearCritical()
+            currentUncritical = -1
+          }
+          console.log('Applying uncritical style', current)
+          createUncriticalStyle(current)
+          currentUncritical++
+        }
+
+        console.log(
+          `Run the following functions on the console to manually apply uncritical CSS:
+            - applyUncritical()
+            - stepUncritical()
+            - clearCritical()
+          `
+        )
+      } else {
+        applyUncritical()
+      }
+    })
+
+  return resolve
 }
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
@@ -104,6 +175,8 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
     const contentLoadedPromise = new Promise((resolve) =>
       window.addEventListener('DOMContentLoaded', resolve)
     )
+
+    const resolveUncriticalPromise = createUncriticalPromise()
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
       setTimeout(() => {
         window?.performance?.mark?.('render-start')
@@ -114,6 +187,7 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
           'render-start',
           'render-end'
         )
+        resolveUncriticalPromise()
       }, 1)
     })
   } else {

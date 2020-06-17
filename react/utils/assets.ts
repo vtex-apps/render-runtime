@@ -72,9 +72,7 @@ function addStyleToPage(href: string) {
   if (isAbsolute(href)) {
     link.crossOrigin = 'anonymous'
   }
-  const overrideLink =
-    document.getElementById('styles_overrides') ||
-    document.getElementById('override_link_0')
+  const overrideLink = document.getElementById('override_link_0')
 
   if (overrideLink) {
     document.head.insertBefore(link, overrideLink)
@@ -167,17 +165,18 @@ function getExistingScriptSrcs() {
 }
 
 function getExistingStyleHrefs() {
-  const hrefs: string[] = []
-  for (let i = 0; i < document.styleSheets.length; i++) {
-    const stylesheet = document.styleSheets.item(i)
-    if (stylesheet !== null) {
-      const href = stylesheet.href
-      if (href) {
-        hrefs.push(href)
-      }
+  return Array.from(
+    document.head.querySelectorAll('link[type="text/css"],style')
+  ).reduce<string[]>((hrefs, styleSheet) => {
+    const href =
+      (styleSheet as HTMLLinkElement).href ||
+      styleSheet.getAttribute('data-href')
+
+    if (href) {
+      hrefs.push(href)
     }
-  }
-  return hrefs
+    return hrefs
+  }, [])
 }
 
 function getExistingPrefetchScriptLinks() {
@@ -237,6 +236,28 @@ export function getExtensionImplementation<P = {}, S = {}>(
   return extension && extension.component
     ? getImplementation<P, S>(extension.component)
     : null
+}
+
+export function fetchUncriticalStyles(
+  refs: StyleRef[]
+): Promise<Array<UncriticalStyle>> {
+  return Promise.all(
+    refs.map(
+      ref =>
+        new Promise<UncriticalStyle>(resolve => {
+          const { path, id, class: className, media = '' } = ref
+          fetch(path)
+            .then(async response => {
+              const body = await response.text()
+              resolve({ href: path, id, className, media, body })
+            })
+            .catch(error => {
+              console.error(`Error loading uncritical style.`, error)
+              resolve({ href: path, id, className, media, body: '' })
+            })
+        })
+    )
+  )
 }
 
 export async function fetchAssets(
@@ -383,3 +404,11 @@ function hasBundledAsset(
 ) {
   return !!assetsByApp[app] && assetsByApp[app].indexOf(asset) !== -1
 }
+
+export type UncriticalStyle = {
+  href: string
+  media: string
+  className?: string
+  id?: string
+  body: string
+} | null
