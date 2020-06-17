@@ -13,7 +13,6 @@ import {
   fetchRouteData,
   isPrefetchActive,
 } from '../utils/routes'
-import { hydrateApolloCache } from '../utils/apolloCache'
 import { fetchComponents } from '../utils/components'
 import { useRuntime } from '../core/main'
 import { useApolloClient } from 'react-apollo'
@@ -49,7 +48,6 @@ interface MaybeUpdatePathArgs {
     routeValid: boolean
   }
   page?: string
-  client: ApolloClientType
 }
 
 const maybeUpdatePathCache = async ({
@@ -57,7 +55,6 @@ const maybeUpdatePathCache = async ({
   navigationRoute,
   validCache,
   page,
-  client,
 }: MaybeUpdatePathArgs) => {
   const { pathsState } = prefetchState
   if (validCache.pathValid) {
@@ -68,19 +65,18 @@ const maybeUpdatePathCache = async ({
     navigationRoute.path,
     navigationRoute.query
   )
+
   const navigationPage = page ?? navigationData?.page
   pathsState[navigationRoute.path] = { fetching: false, page: navigationPage }
   if (navigationData == null || navigationPage == null) {
     return null
-  }
-  if (navigationData?.queryData) {
-    hydrateApolloCache(navigationData.queryData, client)
   }
 
   const cacheObj = {
     routeId: navigationPage,
     matchingPage: navigationData.route,
     contentResponse: navigationData.contentResponse,
+    queryData: navigationData.queryData,
   }
 
   const cache = getCacheForPage(navigationPage)
@@ -109,7 +105,6 @@ const prefetchRequests = async ({
     navigationRoute,
     validCache,
     page,
-    client,
   })
 
   pathsState[navigationRoute.path] = { fetching: false, page: navigationPage }
@@ -226,7 +221,7 @@ export const usePrefetchAttempt = ({
 
   const attemptPrefetch = useCallback(() => {
     if (!hasTried.current && isPrefetchActive() && canPrefetch) {
-      const { pathsState } = prefetchState
+      const { pathsState, queue } = prefetchState
       if (href && href[0] !== '/') {
         // Should only work on relative paths
         return
@@ -238,6 +233,7 @@ export const usePrefetchAttempt = ({
 
       if (pathsState[navigationRoute.path]?.fetching) {
         // already fetching, no need to go any further
+        hasTried.current = true
         return
       }
 
@@ -245,6 +241,7 @@ export const usePrefetchAttempt = ({
 
       if (validCache.pathValid && validCache.routeValid) {
         // cache all valid, no need to fetch anything
+        hasTried.current = true
         return
       }
 
@@ -255,30 +252,32 @@ export const usePrefetchAttempt = ({
       const priority = getPriorityForPage(page)
       hasTried.current = true
 
-      // queue.add(
-      //   async () =>
-      //     prefetchRequests({
-      //       client,
-      //       navigationRoute,
-      //       page,
-      //       pages,
-      //       prefetchState,
-      //       hints,
-      //       renderMajor,
-      //       validCache,
-      //     }),
-      //   { priority }
-      // )
-      console.log('attempting prefetch!', priority, navigationRoute)
+      queue.add(
+        async () =>
+          prefetchRequests({
+            client,
+            navigationRoute,
+            page,
+            pages,
+            prefetchState,
+            hints,
+            renderMajor,
+            validCache,
+          }),
+        { priority }
+      )
     }
   }, [
     canPrefetch,
+    client,
+    hints,
     href,
     navigationRouteModifiers,
     options,
     page,
     pages,
     prefetchState,
+    renderMajor,
   ])
 
   useEffect(() => {
