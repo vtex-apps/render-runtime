@@ -10,12 +10,15 @@ import VirtualComponent from './VirtualComponent'
 function renderVirtualComponent({
   treePath,
   extensions,
+  virtualTrees,
   fetchComponent,
   treeId,
   props,
 }: any) {
   return render(
-    <RenderContextProvider runtime={{ extensions, fetchComponent } as any}>
+    <RenderContextProvider
+      runtime={{ extensions, fetchComponent, virtualTrees } as any}
+    >
       <TreePathContextProvider treePath={treePath}>
         <VirtualComponent virtualTreeId={treeId} props={props} />
       </TreePathContextProvider>
@@ -24,7 +27,6 @@ function renderVirtualComponent({
 }
 
 beforeEach(() => {
-  window.__RUNTIME__ = { virtualTrees: {} } as any
   window.__RENDER_8_COMPONENTS__ = {}
 })
 
@@ -40,7 +42,7 @@ test(`renders a shallow virtual block with only real blocks`, () => {
     rich: (({ text }: any) => <span>{text}</span>) as any,
   }
 
-  window.__RUNTIME__.virtualTrees = {
+  const virtualTrees = {
     someTreeId: {
       $component: 'div',
       props: {
@@ -51,13 +53,16 @@ test(`renders a shallow virtual block with only real blocks`, () => {
 
   const { container } = renderVirtualComponent({
     extensions: { 'store.home/VirtualComponent': {} },
+    virtualTrees,
     treePath: 'store.home/VirtualComponent',
     treeId: 'someTreeId',
   })
 
   expect(container).toMatchInlineSnapshot(`
     <div>
-      <div />
+      <div
+        class="shelf"
+      />
     </div>
   `)
 })
@@ -74,7 +79,7 @@ test(`renders a deep virtual block with only real blocks`, () => {
     )) as any,
   }
 
-  window.__RUNTIME__.virtualTrees = {
+  const virtualTrees = {
     someTreeId: {
       $component: 'div',
       props: {
@@ -104,18 +109,25 @@ test(`renders a deep virtual block with only real blocks`, () => {
 
   const { container } = renderVirtualComponent({
     extensions: { 'store.home/VirtualComponent': {} },
+    virtualTrees,
     treePath: 'store.home/VirtualComponent',
     treeId: 'someTreeId',
   })
 
   expect(container).toMatchInlineSnapshot(`
     <div>
-      <div>
-        <span />
+      <div
+        class="shelf"
+      >
+        <span>
+          some title
+        </span>
         <ul
           data-slider="true"
         >
-          <ul />
+          <ul
+            data-category="some-category"
+          />
         </ul>
       </div>
     </div>
@@ -137,7 +149,7 @@ test(`renders async children`, async () => {
     )) as any,
   }
 
-  window.__RUNTIME__.virtualTrees = {
+  const virtualTrees = {
     someTreeId: {
       $component: 'div',
       props: {
@@ -167,6 +179,7 @@ test(`renders async children`, async () => {
 
   const { container } = renderVirtualComponent({
     extensions: { 'store.home/VirtualComponent': {} },
+    virtualTrees,
     treePath: 'store.home/VirtualComponent',
     fetchComponent: async (name: string) => {
       window.__RENDER_8_COMPONENTS__[name] = asyncComponents[name]
@@ -178,12 +191,18 @@ test(`renders async children`, async () => {
 
   expect(container).toMatchInlineSnapshot(`
     <div>
-      <div>
-        <span />
+      <div
+        class="shelf"
+      >
+        <span>
+          some title
+        </span>
         <ul
           data-slider="true"
         >
-          <ul />
+          <ul
+            data-category="some-category"
+          />
         </ul>
       </div>
     </div>
@@ -203,7 +222,7 @@ test(`renders a virtual component inside a virtual component`, async () => {
     )) as any,
   }
 
-  window.__RUNTIME__.virtualTrees = {
+  const virtualTrees = {
     someTreeId: {
       $component: 'div',
       props: {
@@ -219,7 +238,7 @@ test(`renders a virtual component inside a virtual component`, async () => {
         {
           $component: 'VirtualComponent',
           props: {
-            treeId: 'otherTreeId',
+            virtualTreeId: 'otherTreeId',
           },
         },
       ],
@@ -239,28 +258,29 @@ test(`renders a virtual component inside a virtual component`, async () => {
 
   const { container } = renderVirtualComponent({
     extensions: { 'store.home/VirtualComponent': {} },
+    virtualTrees,
     treePath: 'store.home/VirtualComponent',
     treeId: 'someTreeId',
   })
 
   expect(container).toMatchInlineSnapshot(`
-        <div>
-          <div
-            class="shelf"
-          >
-            <span>
-              some title
-            </span>
-            <ul
-              data-slider="true"
-            >
-              <ul
-                data-category="some-category"
-              />
-            </ul>
-          </div>
-        </div>
-    `)
+            <div>
+              <div
+                class="shelf"
+              >
+                <span>
+                  some title
+                </span>
+                <ul
+                  data-slider="true"
+                >
+                  <ul
+                    data-category="some-category"
+                  />
+                </ul>
+              </div>
+            </div>
+      `)
 })
 
 test(`renders a virtual block with shallow props`, () => {
@@ -271,7 +291,7 @@ test(`renders a virtual block with shallow props`, () => {
     rich: (({ text }: any) => <span>{text}</span>) as any,
   }
 
-  window.__RUNTIME__.virtualTrees = {
+  const virtualTrees = {
     someTreeId: {
       $component: 'div',
       props: {
@@ -290,6 +310,7 @@ test(`renders a virtual block with shallow props`, () => {
 
   const { container } = renderVirtualComponent({
     extensions: { 'store.home/VirtualComponent': {} },
+    virtualTrees,
     treePath: 'store.home/VirtualComponent',
     treeId: 'someTreeId',
     props: {
@@ -299,8 +320,12 @@ test(`renders a virtual block with shallow props`, () => {
 
   expect(container).toMatchInlineSnapshot(`
     <div>
-      <div>
-        <span />
+      <div
+        class="shelf"
+      >
+        <span>
+          Shelf custom shallow title
+        </span>
       </div>
     </div>
   `)
@@ -314,7 +339,7 @@ test(`renders a virtual block with deep props`, () => {
     rich: (({ text }: any) => <span>{text}</span>) as any,
   }
 
-  window.__RUNTIME__.virtualTrees = {
+  const virtualTrees = {
     someTreeId: {
       $component: 'div',
       props: {
@@ -333,6 +358,7 @@ test(`renders a virtual block with deep props`, () => {
 
   const { container } = renderVirtualComponent({
     extensions: { 'store.home/VirtualComponent': {} },
+    virtualTrees,
     treePath: 'store.home/VirtualComponent',
     treeId: 'someTreeId',
     props: {
@@ -344,8 +370,12 @@ test(`renders a virtual block with deep props`, () => {
 
   expect(container).toMatchInlineSnapshot(`
     <div>
-      <div>
-        <span />
+      <div
+        class="shelf"
+      >
+        <span>
+          Shelf custom deep title
+        </span>
       </div>
     </div>
   `)

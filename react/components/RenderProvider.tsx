@@ -102,6 +102,7 @@ export interface RenderProviderState {
   blocksTree?: RenderRuntime['blocksTree']
   blocks?: RenderRuntime['blocks']
   contentMap?: RenderRuntime['contentMap']
+  virtualTrees: RenderRuntime['virtualTrees']
 }
 
 const SEND_INFO_DEBOUNCE_MS = 100
@@ -178,6 +179,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     updateRuntime: PropTypes.func,
     workspace: PropTypes.string,
     navigationRouteModifiers: PropTypes.object,
+    virtualTrees: PropTypes.object,
   }
 
   public static propTypes = {
@@ -234,6 +236,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       rootPath = '',
       route,
       settings,
+      virtualTrees,
       queryData,
     } = props.runtime
     const { history, baseURI, cacheControl } = props
@@ -312,6 +315,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       query,
       route,
       settings: settings || {},
+      virtualTrees,
       inspect: false,
     }
 
@@ -390,6 +394,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       route,
       query,
       defaultExtensions,
+      virtualTrees,
     } = this.state
 
     const {
@@ -449,6 +454,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       updateComponentAssets: this.updateComponentAssets,
       updateExtension: this.updateExtension,
       updateRuntime: this.updateRuntime,
+      virtualTrees,
       workspace,
     }
   }
@@ -738,6 +744,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             pages,
             settings,
             queryData,
+            virtualTrees,
           }: ParsedServerPageResponse) => {
             if (queryData) {
               this.hydrateApolloCache(queryData)
@@ -759,6 +766,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 query,
                 route: matchingPage,
                 settings,
+                virtualTrees: { ...state.virtualTrees, ...virtualTrees },
               }),
               () => {
                 this.navigationState = { isNavigating: false }
@@ -789,6 +797,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             messages,
             pages,
             settings,
+            virtualTrees,
           }: ParsedPageQueryResponse) => {
             const updatedRoute = { ...transientRoute, ...matchingPage }
             await this.fetchComponents(components, extensions)
@@ -807,6 +816,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 query,
                 route: updatedRoute,
                 settings,
+                virtualTrees: { ...this.state.virtualTrees, ...virtualTrees },
               },
               () => {
                 this.navigationState = { isNavigating: false }
@@ -948,6 +958,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       messages,
       pages,
       settings,
+      virtualTrees,
     } = isEnabled('RENDER_NAVIGATION')
       ? await fetchServerPage({
           path: route.path,
@@ -990,6 +1001,10 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           pages,
           route,
           settings,
+          virtualTrees: {
+            ...state.virtualTrees,
+            ...virtualTrees,
+          },
         }),
         resolve
       )

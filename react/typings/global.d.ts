@@ -248,6 +248,7 @@ declare global {
       query?: Record<string, any>,
       options?: SetQueryOptions
     ) => boolean
+    virtualTrees: RenderRuntime['virtualTrees']
     updateComponentAssets: (availableComponents: Components) => void
     updateExtension: (name: string, extension: Extension) => Promise<void>
     updateRuntime: (options?: PageContextOptions) => Promise<void>
@@ -368,6 +369,7 @@ declare global {
     route: MatchingServerPage
     settings: RenderRuntime['settings']
     queryData: RenderRuntime['queryData']
+    virtualTrees: RenderRuntime['virtualTrees']
     page: string
   }
 
@@ -383,6 +385,7 @@ declare global {
     appsEtag: string
     cacheHintsJSON: string
     page: MatchingPage
+    virtualTrees: Record<string, VirtualTree>
   }
 
   interface DefaultPagesQueryResponse {
@@ -411,6 +414,7 @@ declare global {
     appsEtag: RenderRuntime['appsEtag']
     settings: RenderRuntime['settings']
     cacheHints: RenderRuntime['cacheHints']
+    virtualTrees: RenderRuntime['virtualTrees']
     matchingPage: MatchingPage
   }
 

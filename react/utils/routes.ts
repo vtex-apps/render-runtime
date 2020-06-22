@@ -23,6 +23,7 @@ const parsePageQueryResponse = (
     extensionsJSON,
     messages,
     pagesJSON,
+    virtualTrees,
     page: {
       blockId,
       canonicalPath,
@@ -74,6 +75,7 @@ const parsePageQueryResponse = (
     messages: parseMessages(messages),
     pages,
     settings,
+    virtualTrees,
   }
 }
 
@@ -102,6 +104,7 @@ const runtimeFields = [
   'route',
   'runtimeMeta',
   'settings',
+  'virtualTrees',
 ].join(',')
 
 function getRelativeURLWithQuery({
@@ -160,6 +163,7 @@ export const fetchServerPage = async ({
     route,
     route: { routeId },
     queryData,
+    virtualTrees,
   } = page
   if (routeId === 'redirect') {
     window.location.href = route.path
@@ -181,6 +185,7 @@ export const fetchServerPage = async ({
       path: routePath,
     },
     queryData,
+    virtualTrees,
   }
 }
 

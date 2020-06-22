@@ -3,7 +3,6 @@ import React, { ReactElement, FC, useMemo } from 'react'
 import ComponentGetter from './components/ExtensionPoint/ComponentGetter'
 import { useTreePath, useRuntime } from './core/main'
 import { flatObj, transformLeaves } from './utils/object'
-import { getVirtualTree } from './utils/assets'
 
 interface Props {
   virtualTreeId: string
@@ -57,8 +56,9 @@ const VirtualComponent: FC<Props> = ({ virtualTreeId, props = {} }) => {
   const { treePath } = useTreePath()
   const runtime = useRuntime()
 
+  const tree = runtime.virtualTrees[virtualTreeId]
+
   const parsedTree = useMemo(() => {
-    const tree = getVirtualTree(virtualTreeId)
     const flatProps = flatObj(props)
 
     return transformLeaves<VirtualTree>(tree, ({ value }) => {
@@ -77,7 +77,7 @@ const VirtualComponent: FC<Props> = ({ virtualTreeId, props = {} }) => {
 
       return flatProps[propKey]
     })
-  }, [props, virtualTreeId])
+  }, [props, tree, virtualTreeId])
 
   const extension = runtime.extensions[treePath]
   if (extension == null) {
