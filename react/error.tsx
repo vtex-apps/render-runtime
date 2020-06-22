@@ -132,6 +132,7 @@ if (window.__ERROR__) {
     global.__RUNTIME__.disableSSR = true
     global.__RUNTIME__.extensions.error = {
       component: ERROR_PAGE_COMPONENT,
+      extraComponents: [],
       props: {},
     }
 

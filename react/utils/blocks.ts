@@ -43,12 +43,13 @@ const createExtensions = (
     {
       treePath: extensionPath,
       extension: {
-        after: after.map(insertion => insertion.extensionPointId),
-        around: around.map(insertion => insertion.extensionPointId),
-        before: before.map(insertion => insertion.extensionPointId),
+        after: after.map((insertion) => insertion.extensionPointId),
+        around: around.map((insertion) => insertion.extensionPointId),
+        before: before.map((insertion) => insertion.extensionPointId),
         blockId: block.originalBlockId || blockId,
         blocks: blocks,
         component: block.component,
+        extraComponents: [],
         composition: block.composition,
         content,
         contentIds,
@@ -67,7 +68,7 @@ const createExtensions = (
     after,
     around,
     before,
-  ].map(outer => {
+  ].map((outer) => {
     return outer.reduce((acc, { extensionPointId }) => {
       const outerExtensionPath = `${extensionPath}/${extensionPointId}`
       const outerResults = createExtensions(
@@ -129,7 +130,7 @@ export const generateExtensions = (
     blocks,
     contentMap
   )
-  routeResult.forEach(eachResult => {
+  routeResult.forEach((eachResult) => {
     extensions[eachResult.treePath] = eachResult.extension
   })
 

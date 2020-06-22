@@ -16,7 +16,7 @@ export const fetchComponents = async (
   if (!extensions) {
     const componentsNames = Object.keys(components)
     extensions = componentsNames.reduce((acc, component) => {
-      acc[component] = { component }
+      acc[component] = { component, extraComponents: [] }
       return acc
     }, {} as RenderRuntime['extensions'])
   }
@@ -30,6 +30,11 @@ export const fetchComponents = async (
       }
       if (!hasComponentImplementation(extension.component)) {
         acc.push(extension.component)
+      }
+      for (const extraComponent in extension.extraComponents) {
+        if (!hasComponentImplementation(extraComponent)) {
+          acc.push(extraComponent)
+        }
       }
       const context = extension?.context?.component
       if (context && !hasComponentImplementation(context)) {

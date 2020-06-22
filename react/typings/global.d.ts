@@ -85,6 +85,7 @@ declare global {
       props?: any
     }
     component: string
+    extraComponents: string[]
     track?: string[]
     props?: any
     content?: Record<string, any>
