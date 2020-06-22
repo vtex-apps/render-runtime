@@ -14,11 +14,11 @@ export const flatObj = (
     const flatKey = prefix + key
 
     // we want plain objects and arrays
-    if (typeof obj[key] === 'object') {
+    if (!Array.isArray(obj[key]) && typeof obj[key] === 'object') {
       Object.assign(flatted, flatObj(obj[key], `${flatKey}.`))
     }
 
-    if (typeof obj[key] !== 'object' || Array.isArray(obj[key])) {
+    if (Array.isArray(obj[key]) || typeof obj[key] !== 'object') {
       flatted[flatKey] = obj[key]
     }
   }
