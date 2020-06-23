@@ -2,7 +2,7 @@ import React, { ReactElement, FC, useMemo } from 'react'
 
 import ComponentGetter from './components/ExtensionPoint/ComponentGetter'
 import { useTreePath, useRuntime } from './core/main'
-import { flatObj, transformLeaves } from './utils/object'
+import { flatObjOnly, transformLeaves } from './utils/object'
 
 interface Props {
   virtualTreeId: string
@@ -59,7 +59,7 @@ const VirtualComponent: FC<Props> = ({ virtualTreeId, props = {} }) => {
   const tree = runtime.virtualTrees[virtualTreeId]
 
   const parsedTree = useMemo(() => {
-    const flatProps = flatObj(props)
+    const flatProps = flatObjOnly(props)
 
     return transformLeaves<VirtualTree>(tree, ({ value }) => {
       if (typeof value !== 'string') return

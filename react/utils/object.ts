@@ -3,7 +3,7 @@ type Primitive = string | boolean | number
 /**
  * Flattens a deep object, building props separated by a dot.
  */
-export const flatObj = (
+export const flatObjOnly = (
   obj: Record<string, any>,
   prefix = ''
 ): Record<string, Primitive> => {
@@ -12,13 +12,10 @@ export const flatObj = (
   // could use a reduce, but a simple for-in has less footprint
   for (const key in obj) {
     const flatKey = prefix + key
-
-    // we want plain objects and arrays
-    if (!Array.isArray(obj[key]) && typeof obj[key] === 'object') {
-      Object.assign(flatted, flatObj(obj[key], `${flatKey}.`))
-    }
-
-    if (Array.isArray(obj[key]) || typeof obj[key] !== 'object') {
+    // we only want plain objects, arrays are kept as they are
+    if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+      Object.assign(flatted, flatObjOnly(obj[key], `${flatKey}.`))
+    } else {
       flatted[flatKey] = obj[key]
     }
   }
@@ -43,7 +40,6 @@ export const transformLeaves = <T>(
   for (const key in transformed) {
     const value = transformed[key]
     if (Array.isArray(value)) {
-      transformed[key] = value
       transformed[key] = value.map((item: unknown) =>
         transformLeaves(item, transformer)
       )
