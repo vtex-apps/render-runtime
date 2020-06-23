@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Add support for root paths. It is necessary for legacy-extensions on stores with root path.
 
 ## [7.41.1] - 2020-04-28
 
