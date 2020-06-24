@@ -114,7 +114,7 @@ function createUncriticalPromise() {
         style.className = `uncritical ${uncriticalStyle.className ?? ''}`
         style.media = uncriticalStyle.media
         style.innerHTML = uncriticalStyle.body
-        style.setAttribute('data-href', uncriticalStyle.href)
+        style.setAttribute('href', uncriticalStyle.href)
 
         document.head.appendChild(style)
       }
