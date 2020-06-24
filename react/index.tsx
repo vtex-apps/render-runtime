@@ -108,15 +108,12 @@ function createUncriticalPromise() {
         if (!uncriticalStyle) {
           return
         }
-        const style = document.createElement('style')
+        const style = document.createElement('link')
 
         style.id = uncriticalStyle.id ?? ''
         style.className = `uncritical ${uncriticalStyle.className ?? ''}`
         style.media = uncriticalStyle.media
         style.innerHTML = uncriticalStyle.body
-
-        console.log('creating uncritical style', uncriticalStyle.href)
-
         style.setAttribute('href', uncriticalStyle.href)
 
         document.head.appendChild(style)
