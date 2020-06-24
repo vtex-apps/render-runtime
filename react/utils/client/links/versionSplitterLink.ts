@@ -111,7 +111,7 @@ const isTypeQuery = (docNode: DocumentNode) => {
 }
 
 const assertSingleOperation = (query: DocumentNode) => {
-  const ops = query.definitions.filter(definition =>
+  const ops = query.definitions.filter((definition) =>
     operationWhiteList.includes(
       (definition as OperationDefinitionNode).operation
     )
@@ -135,7 +135,7 @@ const queriesByRuntimeMetaDirective = (query: DocumentNode) => {
 
 const mergeRecursively = (accumulator: any, value: any) => {
   if (value) {
-    Object.keys(value).forEach(key => {
+    Object.keys(value).forEach((key) => {
       if (accumulator[key] && typeof value[key] === 'object') {
         accumulator[key] = mergeRecursively(accumulator[key], value[key])
       } else {
@@ -165,7 +165,7 @@ const operationByRuntimeMetaDirective = (operation: Operation) => {
 }
 
 const observableFromOperations = (operations: Operation[], forward: NextLink) =>
-  new Observable(observer => {
+  new Observable((observer) => {
     const reduced = {}
     let togo = 0
 
@@ -178,11 +178,11 @@ const observableFromOperations = (operations: Operation[], forward: NextLink) =>
             observer.complete()
           }
         },
-        error: err => {
+        error: (err) => {
           togo++
           observer.error(err)
         },
-        next: data => {
+        next: (data) => {
           togo++
           mergeRecursively(reduced, data)
         },

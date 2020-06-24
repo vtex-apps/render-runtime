@@ -199,7 +199,7 @@ function getExistingPrefetchLinks(prefetchType: string[] | string) {
 }
 
 function assetOnList(path: string, assets: string[]) {
-  return assets.some(asset => asset.indexOf(path) !== -1)
+  return assets.some((asset) => asset.indexOf(path) !== -1)
 }
 
 function isScript(path: string) {
@@ -243,15 +243,15 @@ export function fetchUncriticalStyles(
 ): Promise<Array<UncriticalStyle>> {
   return Promise.all(
     refs.map(
-      ref =>
-        new Promise<UncriticalStyle>(resolve => {
+      (ref) =>
+        new Promise<UncriticalStyle>((resolve) => {
           const { path, id, class: className, media = '' } = ref
           fetch(path)
-            .then(async response => {
+            .then(async (response) => {
               const body = await response.text()
               resolve({ href: path, id, className, media, body })
             })
-            .catch(error => {
+            .catch((error) => {
               console.error(`Error loading uncritical style.`, error)
               resolve({ href: path, id, className, media, body: '' })
             })

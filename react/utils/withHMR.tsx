@@ -22,7 +22,7 @@ export default (module: Module, InitialImplementer: any) => {
   }
 
   const unregisterInstance = (instance: HMRComponent) => {
-    const index = instances.findIndex(registered => registered === instance)
+    const index = instances.findIndex((registered) => registered === instance)
     if (index !== -1) {
       instances.splice(index, 1)
     }
@@ -45,7 +45,7 @@ export default (module: Module, InitialImplementer: any) => {
     public static hotReload = (NewImplementer: ComponentType) => {
       HMRComponent.Implementer = NewImplementer
       hoistNonReactStatics(HMRComponent, NewImplementer)
-      instances.forEach(instance => instance.updateComponent())
+      instances.forEach((instance) => instance.updateComponent())
     }
 
     private static Implementer = InitialImplementer as ComponentType

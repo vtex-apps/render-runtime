@@ -20,7 +20,7 @@ const LegacyExtensionContainer: FC<Props> = ({ query, params }) => {
   return (
     <Fragment>
       {getDirectChildren(extensions, treePath).map(
-        id =>
+        (id) =>
           createPortal(
             <ExtensionPoint id={id} query={query} params={params} />,
             `${treePath}/${id}`,
