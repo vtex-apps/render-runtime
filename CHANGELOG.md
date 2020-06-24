@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [8.108.0] - 2020-06-24
 ### Changed
 - Images on `before` and `after` (i.e. header and footer) are loaded lazily.
 
