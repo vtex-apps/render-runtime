@@ -9,6 +9,7 @@ import NoSSR from '../NoSSR'
 import { withErrorBoundary } from '../ErrorBoundary'
 import GenericPreview from '../Preview/GenericPreview'
 import LoadingBar from '../LoadingBar'
+import { LazyImages } from '../LazyImages'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectBlockWrapper = React.lazy(
@@ -114,10 +115,10 @@ function withOuterExtensions(
 
   const wrapped = (
     <Fragment key={`wrapped-${treePath}`}>
-      {beforeElements}
+      <LazyImages>{beforeElements}</LazyImages>
       {element}
       {isRootTreePath && <div className="flex flex-grow-1" />}
-      {afterElements}
+      <LazyImages>{afterElements}</LazyImages>
     </Fragment>
   )
 
