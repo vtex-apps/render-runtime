@@ -37,7 +37,7 @@ async function verifyComponentImplementation(
 
   if (retries > 0) {
     const timeout = 1100 - retries * 100
-    await new Promise(resolve => setTimeout(resolve, timeout))
+    await new Promise((resolve) => setTimeout(resolve, timeout))
     const result = await verifyComponentImplementation(
       runtime,
       treePath,
@@ -58,7 +58,7 @@ function loadAssets(runtime: RenderRuntime, treePath: string) {
       true
     )
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       fetchAssets(runtime, extensionAssets).then(() => {
         verifyComponentImplementation(runtime, treePath).then(resolve)
       })
@@ -96,7 +96,7 @@ const useTransplantImages = (id: string, shouldTransplant?: boolean) => {
    * This function is gonna be called by a useLayoutEffect below.
    */
   function transplantImages(element: Element, images: HTMLImageElement[]) {
-    images.forEach(image => {
+    images.forEach((image) => {
       const src = image.getAttribute('src') || image.getAttribute('data-src')
 
       const anchor = element.querySelector(`

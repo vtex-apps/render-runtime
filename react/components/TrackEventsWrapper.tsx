@@ -29,7 +29,7 @@ class TrackEventsWrapper extends PureComponent<Props> {
       // eslint-disable-next-line react/no-find-dom-node
       const element = ReactDOM.findDOMNode(this)
       if (element && element.addEventListener) {
-        forEach(event => {
+        forEach((event) => {
           this.eventsHandler[event] = () => sendEvent(id, event)
           element.addEventListener(event, this.eventsHandler[event])
         }, events)
@@ -44,7 +44,7 @@ class TrackEventsWrapper extends PureComponent<Props> {
       const element = ReactDOM.findDOMNode(this)
       if (element && element.addEventListener) {
         forEach(
-          event =>
+          (event) =>
             element.removeEventListener(event, this.eventsHandler[event]),
           events
         )
