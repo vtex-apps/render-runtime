@@ -213,7 +213,7 @@ const promiseWithCounterWrapper = <T = any>(
 
 export const isPrefetchEnabled = (
   storeSettings: Record<string, any> | null | undefined
-) => isEnabled('PREFETCH') && storeSettings?.enablePrefetch
+) => Boolean(isEnabled('PREFETCH') && storeSettings?.enablePrefetch)
 
 export const isPrefetchActive = (
   storeSettings: Record<string, any> | null | undefined
