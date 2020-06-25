@@ -129,7 +129,7 @@ export const resolveUncriticalPromise = () => {
     const criticalElement = document.querySelector('style#critical')
 
     if (!uncriticalStyleRefs || !criticalElement) {
-      return resolve
+      return resolve()
     }
 
     const { base = [], overrides = [] } = uncriticalStyleRefs
@@ -151,7 +151,7 @@ export const resolveUncriticalPromise = () => {
       )
     }
 
-    return resolve
+    return resolve()
   })
   return window.__UNCRITICAL_PROMISE__
 }
