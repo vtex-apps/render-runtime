@@ -12,7 +12,7 @@ const hydrateStyle = (id: string | null) => {
   }
 }
 
-const clearCritical = async () => {
+const clearCritical = () => {
   const critical = document.querySelector('style#critical')
   if (critical?.parentElement) {
     console.log('[critical]: cleaning style#critical')
@@ -59,7 +59,7 @@ const createStepUncritical = () => {
 
 const applyUncritical = () => {
   loadedStylesToArray().forEach(hydrateStyle)
-  clearCritical()
+  new Promise((resolve) => resolve(clearCritical()))
   stylesHydrated = true
   console.log('🦄 UnCritical Hydration Finished !', {
     hydrated: totalStylesCount,
