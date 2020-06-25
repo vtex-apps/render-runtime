@@ -60,7 +60,7 @@ const createStepUncritical = () => {
 const applyUncritical = () => {
   loadedStylesToArray().forEach(hydrateStyle)
   stylesHydrated = true
-  setTimeout(clearCritical, 0)
+  setTimeout(clearCritical, 1e3)
   console.log('🦄 UnCritical Hydration Finished !', {
     hydrated: totalStylesCount,
   })
