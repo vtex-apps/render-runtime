@@ -30,6 +30,7 @@ interface PrefetchRequestsArgs {
     pathValid: boolean
     routeValid: boolean
   }
+  storeSettings: Record<string, any>
 }
 
 const getPageToNavigate = (path: string, query: string) => {
@@ -94,9 +95,10 @@ const prefetchRequests = async ({
   hints,
   renderMajor,
   validCache,
+  storeSettings,
 }: PrefetchRequestsArgs) => {
   const { pathsState, routesCache, routePromise } = prefetchState
-  if (!isPrefetchActive()) {
+  if (!isPrefetchActive(storeSettings)) {
     return
   }
 
@@ -217,10 +219,16 @@ export const usePrefetchAttempt = ({
     }
   }, [canPrefetch, waitToPrefetch])
 
-  const { pages, navigationRouteModifiers, hints, renderMajor } = runtime
-
+  const {
+    pages,
+    navigationRouteModifiers,
+    hints,
+    renderMajor,
+    getSettings,
+  } = runtime
+  const storeSettings = getSettings('vtex.store')
   const attemptPrefetch = useCallback(() => {
-    if (!hasTried.current && isPrefetchActive() && canPrefetch) {
+    if (!hasTried.current && isPrefetchActive(storeSettings) && canPrefetch) {
       const { pathsState, queue } = prefetchState
       if (href && href[0] !== '/') {
         // Should only work on relative paths
@@ -263,6 +271,7 @@ export const usePrefetchAttempt = ({
             hints,
             renderMajor,
             validCache,
+            storeSettings,
           }),
         { priority }
       )
@@ -278,6 +287,7 @@ export const usePrefetchAttempt = ({
     pages,
     prefetchState,
     renderMajor,
+    storeSettings,
   ])
 
   useEffect(() => {

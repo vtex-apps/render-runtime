@@ -211,10 +211,16 @@ const promiseWithCounterWrapper = <T = any>(
     })
 }
 
-export const isPrefetchActive = () =>
+export const isPrefetchEnabled = (
+  storeSettings: Record<string, any> | null | undefined
+) => Boolean(isEnabled('PREFETCH') && storeSettings?.enablePrefetch)
+
+export const isPrefetchActive = (
+  storeSettings: Record<string, any> | null | undefined
+) =>
   prefetchCounters.pages < 4 &&
   prefetchCounters.render < 4 &&
-  isEnabled('PREFETCH')
+  isPrefetchEnabled(storeSettings)
 
 export const getPrefetchForPath = async ({
   fetcher,

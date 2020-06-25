@@ -12,6 +12,7 @@ import PQueue from './PQueue'
 import { History, UnregisterCallback } from 'history'
 import { isEnabled } from '../../utils/flags'
 import { useRuntime } from '../../core/main'
+import { isPrefetchEnabled } from '../../utils/routes'
 
 const MAX_CONCURRENCY = 5
 
@@ -82,20 +83,22 @@ export const PrefetchContextProvider: FC<{ history: History | null }> = ({
   children,
   history,
 }) => {
-  const { hints } = useRuntime()
+  const { hints, getSettings } = useRuntime()
   const unlistenRef = useRef<UnregisterCallback>(null) as MutableRefObject<
     UnregisterCallback
   >
+
+  const storeSettings = getSettings('vtex.store')
 
   const onPageChanged = useCallback(() => {
     state.queue.pause()
     state.queue.clear()
     setTimeout(() => {
-      if (isEnabled('PREFETCH')) {
+      if (isPrefetchEnabled(storeSettings)) {
         state.queue.start()
       }
     }, 1000)
-  }, [])
+  }, [storeSettings])
 
   useEffect(() => {
     if (history) {
@@ -104,7 +107,7 @@ export const PrefetchContextProvider: FC<{ history: History | null }> = ({
     window.addEventListener(
       'load',
       () => {
-        if (isEnabled('PREFETCH')) {
+        if (isPrefetchEnabled(storeSettings)) {
           setTimeout(() => {
             state.queue.start()
           }, getTimeout(hints.mobile))
@@ -117,7 +120,7 @@ export const PrefetchContextProvider: FC<{ history: History | null }> = ({
         unlistenRef.current()
       }
     }
-  }, [hints.mobile, history, onPageChanged, unlistenRef])
+  }, [hints.mobile, history, onPageChanged, unlistenRef, storeSettings])
 
   return (
     <PrefetchContext.Provider value={state}>
