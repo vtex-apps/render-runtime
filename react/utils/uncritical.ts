@@ -41,14 +41,12 @@ const createStepUncritical = () => {
 }
 
 const applyUncritical = () => {
-  if (debugCriticalCSS !== 'manual') {
-    loadedStyles.forEach(hydrateStyle)
-    clearCritical()
-    stylesHydrated = true
-    console.log('🦄 UnCritical Hydration Finished !', {
-      hydrated: totalStylesCount,
-    })
-  }
+  loadedStyles.forEach(hydrateStyle)
+  clearCritical()
+  stylesHydrated = true
+  console.log('🦄 UnCritical Hydration Finished !', {
+    hydrated: totalStylesCount,
+  })
 }
 
 const registerLoadedStyle = (
@@ -59,7 +57,10 @@ const registerLoadedStyle = (
   loadedStyles.push(id)
   if (stylesHydrated === true) {
     hydrateStyle(id)
-  } else if (loadedStyles.length === totalStylesCount) {
+  } else if (
+    loadedStyles.length === totalStylesCount &&
+    debugCriticalCSS !== 'manual'
+  ) {
     applyUncritical()
   }
 }
