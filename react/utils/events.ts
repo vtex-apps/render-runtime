@@ -65,19 +65,19 @@ const initSSE = (
       switch (code) {
         case 'start':
           console.log(`[build] Build started. app=${subject}`)
-          emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+          emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
             e.emit('build.status', code)
           )
           break
         case 'success':
           console.log(`[build] Build success. app=${subject}`)
-          emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+          emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
             e.emit('build.status', code)
           )
           break
         case 'fail':
           console.log(`[build] Build failed. app=${subject}`)
-          emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+          emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
             e.emit('build.status', code)
           )
           break
@@ -87,7 +87,7 @@ const initSSE = (
 
     if (key === 'link_interrupted') {
       console.log(`[colossus] Link interrupted.`)
-      emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+      emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
         e.emit('link_interrupted', code)
       )
     }
@@ -101,7 +101,7 @@ const initSSE = (
         break
       case 'reload':
         console.log(`[react2] Received reload. app=${subject}`)
-        emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+        emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
           e.emit('build.status', 'reload')
         )
         location.reload(true)
@@ -110,31 +110,31 @@ const initSSE = (
         console.log(
           `[react2] Received locale update. appId=${subject} locales=${locales}`
         )
-        emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+        emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
           e.emit('localesUpdated', locales)
         )
         break
       case 'changed':
         console.log('[pages0] Extensions changed.')
-        emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+        emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
           e.emit('extensionsUpdated')
         )
         break
       case 'blocks':
         console.log('[pages1] Blocks changed.')
-        emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+        emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
           e.emit('blocksUpdated')
         )
         break
       case 'styles':
         console.log('[styles] Styles changed.')
         if (updated.indexOf('style.json') > -1) {
-          emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+          emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
             e.emit('styleTachyonsUpdate')
           )
         }
         if (updated.indexOf('overrides.css') > -1) {
-          emittersByWorkspace[`${account}/${workspace}`].forEach(e =>
+          emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
             e.emit('styleOverrides')
           )
         }

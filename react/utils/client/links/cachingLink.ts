@@ -4,7 +4,7 @@ import PageCacheControl from '../../cacheControl'
 export const cachingLink = (cacheControl: PageCacheControl) => {
   return new ApolloLink((operation: Operation, forward?: NextLink) => {
     if (forward) {
-      return forward(operation).map(data => {
+      return forward(operation).map((data) => {
         const { response } = operation.getContext()
         cacheControl.evaluate(response)
         return data

@@ -14,7 +14,7 @@ const usesUpload = (value: any): boolean => {
     return false
   }
 
-  return Object.values(value).some(v => usesUpload(v))
+  return Object.values(value).some((v) => usesUpload(v))
 }
 
 const useHttpLink = (operation: Operation) => {

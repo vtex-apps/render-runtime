@@ -75,9 +75,9 @@ export function withTreePath<TOriginalProps>(
     return <Component {...props} treePath={treePath} />
   }
 
-  WithTreePath.displayName = `TreePath(${Component.displayName ||
-    Component.name ||
-    'Component'})`
+  WithTreePath.displayName = `TreePath(${
+    Component.displayName || Component.name || 'Component'
+  })`
   WithTreePath.WrappedComponent = Component
 
   return hoistNonReactStatics<TOriginalProps, TreePathProps>(

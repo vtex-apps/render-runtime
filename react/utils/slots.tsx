@@ -19,7 +19,7 @@ export function generateSlot({
 }: GenerateSlotArgs) {
   const newTreePath = `${treePath}/${slotValue}`
 
-  const SlotComponent: FC<any> = props => {
+  const SlotComponent: FC<any> = (props) => {
     const runtime = useRuntime()
     const extension = runtime.extensions[newTreePath]
 

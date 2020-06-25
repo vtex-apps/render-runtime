@@ -28,13 +28,13 @@ const useContextComponent = ({
    * from the context, but doing so introduces bugs on some stores. */
   const beforeElements =
     before &&
-    before.map(beforeId => (
+    before.map((beforeId) => (
       <ExtensionPoint id={beforeId} key={beforeId} treePath={nestedPage} />
     ))
 
   const afterElements =
     after &&
-    after.map(afterId => (
+    after.map((afterId) => (
       <ExtensionPoint id={afterId} key={afterId} treePath={nestedPage} />
     ))
 

@@ -24,7 +24,7 @@ const assetsFromQuery = (query: ASTNode) => {
       if (node.name.value === 'context') {
         const scopeArg =
           node.arguments &&
-          node.arguments.find(argNode => argNode.name.value === 'scope')
+          node.arguments.find((argNode) => argNode.name.value === 'scope')
         if (scopeArg) {
           assets.queryScope = (scopeArg.value as StringValueNode).value
         }

@@ -8,7 +8,7 @@ interface Props {
   query?: Record<string, string>
 }
 
-const RenderPage: FC<Props> = props => {
+const RenderPage: FC<Props> = (props) => {
   const runtime = useRuntime()
   const { page, query } = props
   const {
