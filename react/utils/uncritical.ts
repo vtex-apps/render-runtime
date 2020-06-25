@@ -1,6 +1,6 @@
 const debugCriticalCSS = window.__RUNTIME__.query?.__debugCriticalCSS
 const UNCRITICAL_ID = 'uncritical_style'
-const loadedStyles: (string | null)[] = []
+const loadedStyles: Set<string | null> = new Set()
 let totalStylesCount = 0
 let stylesHydrated = false
 
@@ -25,7 +25,7 @@ const createStepUncritical = () => {
       console.log('Uncritical has finished being applied.')
       return
     }
-    const uncritical = loadedStyles[it]
+    const uncritical = Array.from(loadedStyles)[it]
     if (!uncritical) {
       console.log('All uncritical styles applied. Cleaning critical styles.')
       clearCritical()
@@ -41,7 +41,7 @@ const createStepUncritical = () => {
 }
 
 const applyUncritical = () => {
-  loadedStyles.forEach(hydrateStyle)
+  Array.from(loadedStyles).forEach(hydrateStyle)
   clearCritical()
   stylesHydrated = true
   console.log('🦄 UnCritical Hydration Finished !', {
@@ -54,11 +54,15 @@ const registerLoadedStyle = (
   status: 'loaded' | 'error' = 'error'
 ) => () => {
   const id = status === 'loaded' ? styleId : null
-  loadedStyles.push(id)
+  // sometimes the id is loaded twice. Let's just register it once
+  if (loadedStyles.has(id)) {
+    return
+  }
+  loadedStyles.add(id)
   if (stylesHydrated === true) {
     hydrateStyle(id)
   } else if (
-    loadedStyles.length === totalStylesCount &&
+    loadedStyles.size === totalStylesCount &&
     debugCriticalCSS !== 'manual'
   ) {
     applyUncritical()
