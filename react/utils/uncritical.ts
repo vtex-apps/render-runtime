@@ -57,20 +57,14 @@ const createStepUncritical = () => {
   }
 }
 
-const applyUncritical = () =>
-  Promise.resolve()
-    .then(() => {
-      loadedStylesToArray().forEach(hydrateStyle)
-      stylesHydrated = true
-    })
-    .then(() => {
-      clearCritical()
-    })
-    .then(() => {
-      console.log('🦄 UnCritical Hydration Finished !', {
-        hydrated: totalStylesCount,
-      })
-    })
+const applyUncritical = () => {
+  loadedStylesToArray().forEach(hydrateStyle)
+  stylesHydrated = true
+  setTimeout(clearCritical, 0)
+  console.log('🦄 UnCritical Hydration Finished !', {
+    hydrated: totalStylesCount,
+  })
+}
 
 const registerLoadedStyle = (
   styleId: string,
