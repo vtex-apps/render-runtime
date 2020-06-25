@@ -166,7 +166,9 @@ function getExistingScriptSrcs() {
 
 function getExistingStyleHrefs() {
   return Array.from(
-    document.head.querySelectorAll('link[type="text/css"],style')
+    document.head.querySelectorAll(
+      'link[type="text/css"],link[as="style"],style'
+    )
   ).reduce<string[]>((hrefs, styleSheet) => {
     const href =
       (styleSheet as HTMLLinkElement).href ||
