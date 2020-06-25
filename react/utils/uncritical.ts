@@ -7,6 +7,7 @@ let stylesHydrated = false
 const hydrateStyle = (id: string | null) => {
   const element = id && document.getElementById(id)
   if (element) {
+    console.log('[critical]: hydrating', id)
     element.setAttribute('rel', 'stylesheet')
   }
 }
@@ -32,7 +33,7 @@ const createStepUncritical = () => {
       return
     }
     console.log(
-      'Applying uncritical style',
+      '[critical]: Applying uncritical style',
       document.getElementById(uncritical)
     )
     hydrateStyle(uncritical)
@@ -60,11 +61,13 @@ const registerLoadedStyle = (
   }
   loadedStyles.add(id)
   if (stylesHydrated === true) {
+    console.log('[critical]: Late hydration', id)
     hydrateStyle(id)
   } else if (
     loadedStyles.size === totalStylesCount &&
     debugCriticalCSS !== 'manual'
   ) {
+    console.log('[critical]: Applying critical for', ...loadedStyles)
     applyUncritical()
   }
 }
