@@ -41,7 +41,7 @@ class BuildStatus extends Component<RenderContextProps, State> {
   }
 
   private handleMouseOver = () => {
-    this.setState(state => ({
+    this.setState((state) => ({
       anchor: state.anchor === 'left' ? 'right' : 'left',
     }))
   }
