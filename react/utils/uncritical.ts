@@ -19,6 +19,21 @@ const clearCritical = () => {
   }
 }
 
+const cmp = (id1: string | null, id2: string | null) => {
+  if (!id1) {
+    return -1
+  }
+  if (!id2) {
+    return 1
+  }
+  const replacer = `${UNCRITICAL_ID}_`
+  const a = id1.replace(replacer, '')
+  const b = id2.replace(replacer, '')
+  return Number(a) - Number(b)
+}
+
+const loadedStylesToArray = () => Array.from(loadedStyles).sort(cmp)
+
 const createStepUncritical = () => {
   let it = 0
   return () => {
@@ -26,7 +41,7 @@ const createStepUncritical = () => {
       console.log('Uncritical has finished being applied.')
       return
     }
-    const uncritical = Array.from(loadedStyles)[it]
+    const uncritical = loadedStylesToArray()[it]
     if (!uncritical) {
       console.log('All uncritical styles applied. Cleaning critical styles.')
       clearCritical()
@@ -41,21 +56,8 @@ const createStepUncritical = () => {
   }
 }
 
-const cmp = (id1: string | null, id2: string | null) => {
-  if (!id1) {
-    return -1
-  }
-  if (!id2) {
-    return 1
-  }
-  const replacer = `${UNCRITICAL_ID}_`
-  const a = id1.replace(replacer, '')
-  const b = id2.replace(replacer, '')
-  return Number(a) - Number(b)
-}
-
 const applyUncritical = () => {
-  Array.from(loadedStyles).sort(cmp).forEach(hydrateStyle)
+  loadedStylesToArray().forEach(hydrateStyle)
   clearCritical()
   stylesHydrated = true
   console.log('🦄 UnCritical Hydration Finished !', {
