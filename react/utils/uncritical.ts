@@ -29,7 +29,7 @@ const cmp = (id1: string | null, id2: string | null) => {
   const replacer = `${UNCRITICAL_ID}_`
   const a = id1.replace(replacer, '')
   const b = id2.replace(replacer, '')
-  return -(Number(a) - Number(b))
+  return Number(a) - Number(b)
 }
 
 const loadedStylesToArray = () => Array.from(loadedStyles).sort(cmp)
@@ -57,7 +57,14 @@ const createStepUncritical = () => {
 }
 
 const applyUncritical = () => {
-  loadedStylesToArray().forEach(hydrateStyle)
+  loadedStylesToArray()
+    .map((id) => id && document.getElementById(id))
+    .forEach((element) => {
+      if (element) {
+        console.log('[critical]: hydrating', element.id)
+        ;(element as HTMLLinkElement).rel = 'stylesheet'
+      }
+    })
   clearCritical()
   stylesHydrated = true
   console.log('🦄 UnCritical Hydration Finished !', {
