@@ -15,6 +15,8 @@ const hydrateStyle = (id: string | null) => {
   if (element) {
     log('hydrating', id)
     element.setAttribute('rel', 'stylesheet')
+    element.setAttribute('type', 'text/css')
+    element.removeAttribute('as')
   }
 }
 
