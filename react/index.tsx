@@ -8,7 +8,7 @@ import { prop } from 'ramda'
 import * as runtimeGlobals from './core/main'
 import { createCustomReactApollo } from './utils/reactApollo'
 import { createReactIntl } from './utils/reactIntl'
-import { resolveUncriticalPromise } from './utils/uncritical'
+import { fireUncriticalLoading } from './utils/uncritical'
 
 window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
 
@@ -85,6 +85,7 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
       window.addEventListener('DOMContentLoaded', resolve)
     )
 
+    fireUncriticalLoading()
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
       setTimeout(() => {
         window?.performance?.mark?.('render-start')
@@ -95,7 +96,6 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
           'render-start',
           'render-end'
         )
-        resolveUncriticalPromise()
       }, 1)
     })
   } else {

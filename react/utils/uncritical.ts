@@ -1,8 +1,11 @@
+type Fn = () => void
+
 const debugCriticalCSS = window.__RUNTIME__.query?.__debugCriticalCSS
 const UNCRITICAL_ID = 'uncritical_style'
 const loadedStyles: Set<string | null> = new Set()
 let totalStylesCount = 0
 let stylesHydrated = false
+let resolveUncritical: Fn | null = null
 
 const log = (...args: any) => {
   if (debugCriticalCSS) {
@@ -53,7 +56,8 @@ const createStepUncritical = () => {
     const uncritical = loadedStylesToArray()[it]
     if (!uncritical) {
       log('All uncritical styles applied. Cleaning critical styles.')
-      clearCritical()
+      resolveUncritical && resolveUncritical()
+      stylesHydrated = true
       return
     }
     log('Applying uncritical style', document.getElementById(uncritical))
@@ -63,8 +67,11 @@ const createStepUncritical = () => {
 }
 
 const applyUncritical = () => {
-  loadedStylesToArray().forEach(hydrateStyle)
-  stylesHydrated = true
+  if (!stylesHydrated) {
+    loadedStylesToArray().forEach(hydrateStyle)
+    resolveUncritical && resolveUncritical()
+    stylesHydrated = true
+  }
 }
 
 const registerLoadedStyle = (
@@ -121,7 +128,7 @@ const createUncriticalLink = (ref: StyleRef, index: number) => {
   }
 }
 
-export const resolveUncriticalPromise = () => {
+export const fireUncriticalLoading = () => {
   window.__UNCRITICAL_PROMISE__ = new Promise((resolve) => {
     const {
       __RUNTIME__: { uncriticalStyleRefs },
@@ -131,6 +138,8 @@ export const resolveUncriticalPromise = () => {
     if (!uncriticalStyleRefs || !criticalElement) {
       return resolve()
     }
+
+    resolveUncritical = resolve
 
     const { base = [], overrides = [] } = uncriticalStyleRefs
     const uncriticalStyles = [...base, ...overrides]
@@ -151,7 +160,7 @@ export const resolveUncriticalPromise = () => {
       )
     }
 
-    return resolve()
+    setTimeout(applyUncritical, 10e3)
   })
   return window.__UNCRITICAL_PROMISE__
 }
