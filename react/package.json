@@ -21,7 +21,7 @@
     "eventemitter3": "^3.0.0",
     "eventsource-polyfill": "^0.9.6",
     "exenv": "^1.2.2",
-    "graphql": "^0.13.2",
+    "graphql": "^15.1.0",
     "hoist-non-react-statics": "^2.5.0",
     "js-base64": "^2.4.9",
     "myvtex-sse": "^1.2.0",
