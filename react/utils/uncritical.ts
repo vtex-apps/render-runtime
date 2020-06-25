@@ -15,6 +15,7 @@ const hydrateStyle = (id: string | null) => {
 const clearCritical = async () => {
   const critical = document.querySelector('style#critical')
   if (critical?.parentElement) {
+    console.log('[critical]: cleaning style#critical')
     critical.remove()
   }
 }
