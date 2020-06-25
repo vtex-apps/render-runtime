@@ -42,7 +42,7 @@ const createStepUncritical = () => {
 }
 
 const applyUncritical = () => {
-  Array.from(loadedStyles).forEach(hydrateStyle)
+  Array.from(loadedStyles).sort().forEach(hydrateStyle)
   clearCritical()
   stylesHydrated = true
   console.log('🦄 UnCritical Hydration Finished !', {
