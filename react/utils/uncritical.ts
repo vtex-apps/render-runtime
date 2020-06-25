@@ -57,14 +57,7 @@ const createStepUncritical = () => {
 }
 
 const applyUncritical = () => {
-  loadedStylesToArray()
-    .map((id) => id && document.getElementById(id))
-    .forEach((element) => {
-      if (element) {
-        console.log('[critical]: hydrating', element.id)
-        ;(element as HTMLLinkElement).rel = 'stylesheet'
-      }
-    })
+  loadedStylesToArray().forEach(hydrateStyle)
   clearCritical()
   stylesHydrated = true
   console.log('🦄 UnCritical Hydration Finished !', {
