@@ -170,9 +170,7 @@ function getExistingStyleHrefs() {
       'link[type="text/css"],link[as="style"],style'
     )
   ).reduce<string[]>((hrefs, styleSheet) => {
-    const href =
-      (styleSheet as HTMLLinkElement).href ||
-      styleSheet.getAttribute('data-href')
+    const href = (styleSheet as HTMLLinkElement).href
 
     if (href) {
       hrefs.push(href)
