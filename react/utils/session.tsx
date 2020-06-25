@@ -8,14 +8,14 @@ interface Options {
 }
 
 export const withSession = ({ renderWhileLoading }: Options = {}) => {
-  return function<TOriginalProps>(
+  return function <TOriginalProps>(
     Component: ComponentType<TOriginalProps>
   ): ComponentType<TOriginalProps> {
     class WithSession extends React.Component<TOriginalProps> {
       public static get displayName(): string {
-        return `WithSession(${Component.displayName ||
-          Component.name ||
-          'Component'})`
+        return `WithSession(${
+          Component.displayName || Component.name || 'Component'
+        })`
       }
 
       public static get WrappedComponent() {
