@@ -60,9 +60,6 @@ const createStepUncritical = () => {
 const applyUncritical = () => {
   loadedStylesToArray().forEach(hydrateStyle)
   stylesHydrated = true
-  console.log('🦄 UnCritical Hydration Finished !', {
-    hydrated: totalStylesCount,
-  })
 }
 
 const registerLoadedStyle = (
@@ -84,7 +81,9 @@ const registerLoadedStyle = (
   ) {
     console.log('[critical]: Applying critical for', ...loadedStyles)
     applyUncritical()
-    setTimeout(clearCritical, 0)
+    console.log('🦄 UnCritical Hydration Finished !', {
+      hydrated: totalStylesCount,
+    })
   }
 }
 
