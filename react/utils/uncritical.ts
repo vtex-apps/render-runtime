@@ -84,7 +84,7 @@ const registerLoadedStyle = (
   ) {
     console.log('[critical]: Applying critical for', ...loadedStyles)
     applyUncritical()
-    setTimeout(clearCritical, 1e3)
+    setTimeout(clearCritical, 0)
   }
 }
 
