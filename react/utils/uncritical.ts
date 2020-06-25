@@ -4,10 +4,16 @@ const loadedStyles: Set<string | null> = new Set()
 let totalStylesCount = 0
 let stylesHydrated = false
 
+const log = (...args: any) => {
+  if (debugCriticalCSS) {
+    console.log('[critical]:', ...args)
+  }
+}
+
 const hydrateStyle = (id: string | null) => {
   const element = id && document.getElementById(id)
   if (element) {
-    console.log('[critical]: hydrating', id)
+    log('hydrating', id)
     element.setAttribute('rel', 'stylesheet')
   }
 }
@@ -15,7 +21,7 @@ const hydrateStyle = (id: string | null) => {
 const clearCritical = () => {
   const critical = document.querySelector('style#critical')
   if (critical?.parentElement) {
-    console.log('[critical]: cleaning style#critical')
+    log('cleaning style#critical')
     critical.remove()
   }
 }
@@ -39,19 +45,16 @@ const createStepUncritical = () => {
   let it = 0
   return () => {
     if (it === totalStylesCount) {
-      console.log('Uncritical has finished being applied.')
+      log('Uncritical has finished being applied.')
       return
     }
     const uncritical = loadedStylesToArray()[it]
     if (!uncritical) {
-      console.log('All uncritical styles applied. Cleaning critical styles.')
+      log('All uncritical styles applied. Cleaning critical styles.')
       clearCritical()
       return
     }
-    console.log(
-      '[critical]: Applying uncritical style',
-      document.getElementById(uncritical)
-    )
+    log('Applying uncritical style', document.getElementById(uncritical))
     hydrateStyle(uncritical)
     it++
   }
@@ -73,15 +76,15 @@ const registerLoadedStyle = (
   }
   loadedStyles.add(id)
   if (stylesHydrated === true) {
-    console.log('[critical]: Late hydration', id)
+    log('Late hydration', id)
     hydrateStyle(id)
   } else if (
     loadedStyles.size === totalStylesCount &&
     debugCriticalCSS !== 'manual'
   ) {
-    console.log('[critical]: Applying critical for', ...loadedStyles)
+    log('Applying critical for', ...loadedStyles)
     applyUncritical()
-    console.log('🦄 UnCritical Hydration Finished !', {
+    log('UnCritical Hydration Finished !', {
       hydrated: totalStylesCount,
     })
   }
@@ -137,7 +140,7 @@ export const resolveUncriticalPromise = () => {
       ;(window as any).clearCritical = clearCritical
       ;(window as any).stepUncritical = createStepUncritical()
 
-      console.log(
+      log(
         `Run the following functions on the console to manually apply uncritical CSS:
           - applyUncritical()
           - stepUncritical()
