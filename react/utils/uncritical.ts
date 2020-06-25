@@ -12,7 +12,7 @@ const hydrateStyle = (id: string | null) => {
   }
 }
 
-const clearCritical = () => {
+const clearCritical = async () => {
   const critical = document.querySelector('style#critical')
   if (critical?.parentElement) {
     critical.remove()
