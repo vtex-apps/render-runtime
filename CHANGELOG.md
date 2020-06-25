@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [8.109.0] - 2020-06-25
 ### Changed
 - Make prefetch be opt in by turning on vtex.store setting `enablePrefetch`.
 
