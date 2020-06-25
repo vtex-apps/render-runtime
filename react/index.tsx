@@ -85,10 +85,11 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
       window.addEventListener('DOMContentLoaded', resolve)
     )
 
-    const uncriticalPromise = fireUncriticalLoading()
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
       setTimeout(async () => {
-        await uncriticalPromise
+        if (window.__UNCRITICAL_PROMISE__) {
+          await window.__UNCRITICAL_PROMISE__
+        }
         window?.performance?.mark?.('render-start')
         window.__RENDER_8_RUNTIME__.start()
         window?.performance?.mark?.('render-end')
