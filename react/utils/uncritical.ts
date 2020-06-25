@@ -158,9 +158,9 @@ export const fireUncriticalLoading = () => {
           - clearCritical()
         `
       )
+    } else {
+      setTimeout(applyUncritical, 10e3)
     }
-
-    setTimeout(applyUncritical, 10e3)
   })
   return window.__UNCRITICAL_PROMISE__
 }
