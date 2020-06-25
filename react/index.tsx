@@ -8,7 +8,6 @@ import { prop } from 'ramda'
 import * as runtimeGlobals from './core/main'
 import { createCustomReactApollo } from './utils/reactApollo'
 import { createReactIntl } from './utils/reactIntl'
-import { fireUncriticalLoading } from './utils/uncritical'
 
 window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
 
