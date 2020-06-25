@@ -41,8 +41,21 @@ const createStepUncritical = () => {
   }
 }
 
+const cmp = (id1: string | null, id2: string | null) => {
+  if (!id1) {
+    return -1
+  }
+  if (!id2) {
+    return 1
+  }
+  const replacer = `${UNCRITICAL_ID}_`
+  const a = id1.replace(replacer, '')
+  const b = id2.replace(replacer, '')
+  return Number(a) - Number(b)
+}
+
 const applyUncritical = () => {
-  Array.from(loadedStyles).sort().forEach(hydrateStyle)
+  Array.from(loadedStyles).sort(cmp).forEach(hydrateStyle)
   clearCritical()
   stylesHydrated = true
   console.log('🦄 UnCritical Hydration Finished !', {
