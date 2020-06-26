@@ -86,9 +86,9 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
 
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
       setTimeout(async () => {
-        if (window.__UNCRITICAL_PROMISE__) {
-          await window.__UNCRITICAL_PROMISE__
-        }
+        // if (window.__UNCRITICAL_PROMISE__) {
+        //   await window.__UNCRITICAL_PROMISE__
+        // }
         window?.performance?.mark?.('render-start')
         window.__RENDER_8_RUNTIME__.start()
         window?.performance?.mark?.('render-end')
