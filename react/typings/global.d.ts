@@ -641,6 +641,7 @@ declare global {
     extensions: RenderRuntime['extensions']
     components: RenderRuntime['components']
     messages: RenderRuntime['messages']
+    virtualTrees: RenderRuntime['virtualTrees']
   }
 
   interface ContentResponse {

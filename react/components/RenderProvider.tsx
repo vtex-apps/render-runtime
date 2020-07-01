@@ -711,6 +711,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           preview: false,
           query,
           route: matchingPage,
+          virtualTrees: { ...state.virtualTrees, ...routeData.virtualTrees },
         }),
         () => {
           this.navigationState = { isNavigating: false }

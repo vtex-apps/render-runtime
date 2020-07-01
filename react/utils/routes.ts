@@ -240,7 +240,7 @@ export const getPrefetchForPath = async ({
     path,
     query: {
       ...rawQuery,
-      __pickRuntime: 'page,queryData,contentResponse,route',
+      __pickRuntime: 'page,queryData,contentResponse,route,virtualTrees',
     },
   })
 
@@ -268,6 +268,7 @@ const parseFecthRouteData = (data: PrefetchBlocks): PrefetchRouteData => {
     extensions: JSON.parse(data.extensionsJSON),
     components: JSON.parse(data.componentsJSON),
     messages: parseMessages(data.messages),
+    virtualTrees: data.virtualTrees,
   }
 }
 
@@ -309,6 +310,7 @@ interface PrefetchBlocks {
   extensionsJSON: string
   componentsJSON: string
   messages: KeyedString[]
+  virtualTrees: Record<string, VirtualTree>
 }
 
 export const fetchRouteData = ({

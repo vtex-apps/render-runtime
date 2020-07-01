@@ -6,5 +6,6 @@ query RouteData($routeId: String, $declarer: String, $query: String, $device: Us
       key
       message
     }
+    virtualTrees
   }
 }
