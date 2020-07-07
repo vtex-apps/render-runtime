@@ -567,8 +567,6 @@ declare global {
     __RENDER_8_HOT__: HotEmitterRegistry
     __RENDER_8_RUNTIME__: RuntimeExports
     __RENDER_8_SESSION__: RenderSession
-    __RENDER_LAZY__: boolean
-
     __REQUEST_ID__: string
     __RUNTIME__: RenderRuntime
     __STATE__: NormalizedCacheObject
