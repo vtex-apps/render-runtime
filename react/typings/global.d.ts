@@ -563,6 +563,7 @@ declare global {
       shouldUpdateRuntime: boolean,
       setMessages: (messages: RenderRuntime['messages']) => void
     ) => Promise<void>
+    __ASYNC_READY__: Promise<void>
     __RENDER_8_COMPONENTS__: ComponentsRegistry
     __RENDER_8_HOT__: HotEmitterRegistry
     __RENDER_8_RUNTIME__: RuntimeExports
