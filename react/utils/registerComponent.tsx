@@ -71,7 +71,7 @@ export default (
     implementer = maybeWrapWithHMR(module, evaluatedImplementer)
   }
 
-  locators.forEach(locator => {
+  locators.forEach((locator) => {
     if (window.__RENDER_8_COMPONENTS__[locator]) {
       return
     }
@@ -87,7 +87,7 @@ export default (
           }
 
           const evaluatedImplementer = implementer()
-          locators.forEach(eachLocator => {
+          locators.forEach((eachLocator) => {
             loadedComponents[eachLocator] = {
               implementer: evaluatedImplementer,
             }
