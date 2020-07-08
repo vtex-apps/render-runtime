@@ -1,5 +1,4 @@
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
-import { path } from 'ramda'
 import { canUseDOM } from 'exenv'
 import {
   ASTNode,
@@ -24,7 +23,7 @@ const assetsFromQuery = (query: ASTNode) => {
       if (node.name.value === 'context') {
         const scopeArg =
           node.arguments &&
-          node.arguments.find(argNode => argNode.name.value === 'scope')
+          node.arguments.find((argNode) => argNode.name.value === 'scope')
         if (scopeArg) {
           assets.queryScope = (scopeArg.value as StringValueNode).value
         }
@@ -113,11 +112,14 @@ export const createUriSwitchLink = (
         operation.query,
         cacheHints[hash]
       )
-      const requiresAuthorization = path(
-        ['settings', `vtex.${domain}`, 'requiresAuthorization'],
-        initialRuntime
-      )
-      const customScope = requiresAuthorization ? 'private' : scope
+
+      const requiresAuthorization =
+        initialRuntime.settings?.[`vtex.${domain}`]?.requiresAuthorization
+
+      const isPrivateChannel = initialRuntime.channelPrivacy === 'private'
+
+      const customScope =
+        requiresAuthorization || isPrivateChannel ? 'private' : scope
       const oldMethod = includeQuery ? 'POST' : fetchOptions.method || 'POST'
       const protocol = canUseDOM ? 'https:' : 'http:'
       const method =

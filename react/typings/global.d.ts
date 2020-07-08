@@ -461,6 +461,7 @@ declare global {
     binding?: BindingInfo
     blocks?: Blocks
     blocksTree?: BlockContentTree
+    channelPrivacy?: 'private' | 'public'
     contentMap?: ContentMap
     customRouting?: boolean
     emitter: EventEmitter
