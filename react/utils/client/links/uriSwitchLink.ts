@@ -44,6 +44,7 @@ export interface OperationContext {
     | 'cacheHints'
     | 'components'
     | 'culture'
+    | 'salesChannel'
     | 'extensions'
     | 'messages'
     | 'pages'
@@ -90,6 +91,7 @@ export const createUriSwitchLink = (
           appsEtag,
           cacheHints,
           culture: { locale },
+          salesChannel,
         },
       } = oldContext
       const { extensions } = operation
@@ -130,7 +132,31 @@ export const createUriSwitchLink = (
         provider,
       }
 
-      let query = `?workspace=${workspace}&maxAge=${maxAge}&appsEtag=${appsEtag}&domain=${domain}&locale=${locale}`
+      const queryObj: Record<string, string> = {
+        workspace,
+        maxAge,
+        appsEtag,
+        domain,
+        locale,
+        sc: String(salesChannel),
+      }
+
+      let query = Object.keys(queryObj).reduce(
+        (
+          queryString: string,
+          objKey: string,
+          index: number,
+          queryObjKeys: string[]
+        ) => {
+          let nextKeyPrefix = ''
+          if (index < queryObjKeys.length - 1) {
+            nextKeyPrefix = '&'
+          }
+          return `${queryString}${objKey}=${queryObj[objKey]}${nextKeyPrefix}`
+        },
+        '?'
+      )
+
       if (binding && binding.id) {
         query = appendLocationSearch(query, { __bindingId: binding.id })
       }
