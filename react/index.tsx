@@ -172,12 +172,13 @@ function createUncriticalPromise() {
 
 if (window.__RUNTIME__.start && !window.__ERROR__) {
   if (canUseDOM) {
-    const contentLoadedPromise = new Promise((resolve) =>
+    const contentLoadedPromise = (window as any).contentLoadPromise ?? new Promise((resolve) =>
       window.addEventListener('DOMContentLoaded', resolve)
     )
 
     const resolveUncriticalPromise = createUncriticalPromise()
-    Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
+    const scriptLoadPromise = (window as any).scriptLoadPromise ?? Promise.resolve()
+    Promise.all([contentLoadedPromise, intlPolyfillPromise, scriptLoadPromise]).then(() => {
       setTimeout(() => {
         window?.performance?.mark?.('render-start')
         window.__RENDER_8_RUNTIME__.start()
