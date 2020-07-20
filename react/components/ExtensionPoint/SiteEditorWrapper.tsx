@@ -2,8 +2,15 @@ import ReactDOM from 'react-dom'
 import React from 'react'
 import { getImplementation } from '../../utils/assets'
 import { isSiteEditorIframe } from '../../utils/dom'
+interface Props {
+  component: string | null
+  props: Record<string, any>
+  treePath: string
+  runtime: RenderContext
+  hydration: Hydration
+}
 
-class SiteEditorWrapper extends React.Component<any> {
+class SiteEditorWrapper extends React.Component<Props> {
   public componentDidMount() {
     this.addDataToElementIfEditable()
   }
@@ -17,13 +24,20 @@ class SiteEditorWrapper extends React.Component<any> {
   }
 
   private addDataToElementIfEditable = () => {
-    const ComponentImpl =
-      this.props.component && getImplementation(this.props.component)
+    const {
+      component,
+      treePath,
+      runtime: {
+        extensions: { [treePath]: extension },
+      },
+    } = this.props
+
+    const ComponentImpl = component && getImplementation(component)
 
     const isEditable =
-      ComponentImpl &&
-      (ComponentImpl.hasOwnProperty('schema') ||
-        ComponentImpl.hasOwnProperty('getSchema'))
+      extension?.hasContentSchema ||
+      ComponentImpl?.hasOwnProperty('schema') ||
+      ComponentImpl?.hasOwnProperty('getSchema')
 
     if (!isEditable) {
       return
@@ -33,7 +47,7 @@ class SiteEditorWrapper extends React.Component<any> {
     const element = ReactDOM.findDOMNode(this) as Element
 
     if (element && element.setAttribute) {
-      element.setAttribute('data-extension-point', this.props.treePath)
+      element.setAttribute('data-extension-point', treePath)
     }
   }
 
