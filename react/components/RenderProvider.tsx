@@ -743,6 +743,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             if (
               isConflictingLoadedComponents(components, this.state.components)
             ) {
+              this.scrollTo({ top: 0, left: 0 })
               window.location.reload()
               return new Promise(() => {})
             }
