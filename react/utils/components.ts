@@ -6,6 +6,31 @@ const FILE_EXT_REX = /(\.min)?(\.js|\.css)/ // https://regex101.com/r/8vmjes/1
 
 const uniqAsset = uniqWith<AssetEntry, AssetEntry>((a, b) => a.path === b.path)
 
+const getAppAndVersion = (locator: string) => {
+  const [appAtVersion] = locator.split('/')
+  const [app, version] = appAtVersion.split('@')
+  return { app, version }
+}
+
+export const isConflictingLoadedComponents = (
+  navigatedComponents: Components,
+  loadedComponents: Components
+) => {
+  const loadedVersionByApp = Object.keys(loadedComponents).reduce(
+    (acc, locator) => {
+      const { app, version } = getAppAndVersion(locator)
+      acc[app] = version
+      return acc
+    },
+    {} as Record<string, string>
+  )
+
+  return Object.keys(navigatedComponents).some((locator) => {
+    const { app, version } = getAppAndVersion(locator)
+    return loadedVersionByApp[app] && loadedVersionByApp[app] !== version
+  })
+}
+
 export const fetchComponents = async (
   components: RenderRuntime['components'],
   runtime: RenderRuntime,

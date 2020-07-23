@@ -25,6 +25,7 @@ import {
   traverseComponent,
   traverseListOfComponents,
   fetchComponents,
+  isConflictingLoadedComponents,
 } from '../utils/components'
 import { setCookie } from '../utils/cookie'
 import {
@@ -739,6 +740,13 @@ class RenderProvider extends Component<Props, RenderProviderState> {
             settings,
             queryData,
           }: ParsedServerPageResponse) => {
+            if (
+              isConflictingLoadedComponents(components, this.state.components)
+            ) {
+              window.location.reload()
+              return new Promise(() => {})
+            }
+
             if (queryData) {
               this.hydrateApolloCache(queryData)
             }
