@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [8.111.1] - 2020-07-24
 ### Changed
 - Fallback to server-side navigation when the new page components conflict with the loaded components.
 
