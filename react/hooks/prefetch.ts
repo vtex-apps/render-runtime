@@ -31,13 +31,25 @@ interface PrefetchRequestsArgs {
     routeValid: boolean
   }
   storeSettings: Record<string, any>
+  bindingAddressQuery: string | undefined
 }
 
-const getPageToNavigate = (path: string, query: string) => {
+const getPageToNavigate = (
+  path: string,
+  query: string,
+  bindingAddressQuery: string | undefined
+) => {
+  const queryObj = queryStringToMap(query)
+  if (
+    bindingAddressQuery &&
+    queryObj.__bindingAddress !== bindingAddressQuery
+  ) {
+    queryObj.__bindingAddress = bindingAddressQuery
+  }
   return getPrefetchForPath({
     path: path,
     fetcher: fetch,
-    query: queryStringToMap(query),
+    query: queryObj,
   })
 }
 
@@ -49,6 +61,7 @@ interface MaybeUpdatePathArgs {
     routeValid: boolean
   }
   page?: string
+  bindingAddressQuery?: string
 }
 
 const maybeUpdatePathCache = async ({
@@ -56,6 +69,7 @@ const maybeUpdatePathCache = async ({
   navigationRoute,
   validCache,
   page,
+  bindingAddressQuery,
 }: MaybeUpdatePathArgs) => {
   const { pathsState } = prefetchState
   if (validCache.pathValid) {
@@ -64,7 +78,8 @@ const maybeUpdatePathCache = async ({
 
   const navigationData = await getPageToNavigate(
     navigationRoute.path,
-    navigationRoute.query
+    navigationRoute.query,
+    bindingAddressQuery
   )
 
   const navigationPage = page ?? navigationData?.page
@@ -96,6 +111,7 @@ const prefetchRequests = async ({
   renderMajor,
   validCache,
   storeSettings,
+  bindingAddressQuery,
 }: PrefetchRequestsArgs) => {
   const { pathsState, routesCache, routePromise } = prefetchState
   if (!isPrefetchActive(storeSettings)) {
@@ -107,6 +123,7 @@ const prefetchRequests = async ({
     navigationRoute,
     validCache,
     page,
+    bindingAddressQuery,
   })
 
   pathsState[navigationRoute.path] = { fetching: false, page: navigationPage }
@@ -225,8 +242,10 @@ export const usePrefetchAttempt = ({
     hints,
     renderMajor,
     getSettings,
+    query,
   } = runtime
   const storeSettings = getSettings('vtex.store')
+  const bindingAddressQuery = query?.__bindingAddress
   const attemptPrefetch = useCallback(() => {
     if (!hasTried.current && isPrefetchActive(storeSettings) && canPrefetch) {
       const { pathsState, queue } = prefetchState
@@ -272,6 +291,7 @@ export const usePrefetchAttempt = ({
             renderMajor,
             validCache,
             storeSettings,
+            bindingAddressQuery,
           }),
         { priority }
       )
@@ -288,6 +308,7 @@ export const usePrefetchAttempt = ({
     prefetchState,
     renderMajor,
     storeSettings,
+    bindingAddressQuery,
   ])
 
   useEffect(() => {
