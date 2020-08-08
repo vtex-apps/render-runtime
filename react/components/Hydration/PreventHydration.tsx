@@ -37,7 +37,7 @@ async function verifyComponentImplementation(
 
   if (retries > 0) {
     const timeout = 1100 - retries * 100
-    await new Promise(resolve => setTimeout(resolve, timeout))
+    await new Promise((resolve) => setTimeout(resolve, timeout))
     const result = await verifyComponentImplementation(
       runtime,
       treePath,
@@ -58,80 +58,13 @@ function loadAssets(runtime: RenderRuntime, treePath: string) {
       true
     )
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       fetchAssets(runtime, extensionAssets).then(() => {
         verifyComponentImplementation(runtime, treePath).then(resolve)
       })
     })
   }
   return new Promise(() => {})
-}
-
-/** "Transplants" images elements from elements that will be removed to the
- * elements that will replace them. Used to prevent images from blinking/
- * flickering when the "hydration" happens. */
-const useTransplantImages = (id: string, shouldTransplant?: boolean) => {
-  const transplantedImages = useRef<null | HTMLImageElement[]>(null)
-  const { dehydratedElement } = useDehydratedContent(id)
-  const didTransplantImages = useRef(false)
-
-  /** If it can and should transplant images from the "dehydrated" element
-   * to the "hydrated" one, takes all the images that are inside the server-
-   * side-rendered element and inserts them temporarily at the end of the body */
-  if (
-    shouldTransplant &&
-    dehydratedElement &&
-    !didTransplantImages.current &&
-    transplantedImages.current === null
-  ) {
-    const images = Array.from(dehydratedElement.querySelectorAll('img'))
-    transplantedImages.current = images
-    for (const image of images) {
-      window?.document?.body.appendChild(image)
-    }
-  }
-
-  /** Then, for each of them, look for the corresponding image element
-   * on the hydrated component (via its src), and replace it.
-   * This function is gonna be called by a useLayoutEffect below.
-   */
-  function transplantImages(element: Element, images: HTMLImageElement[]) {
-    images.forEach(image => {
-      const src = image.getAttribute('src') || image.getAttribute('data-src')
-
-      const anchor = element.querySelector(`
-        [data-src="${src}"]:not([data-hydration-transplanted]),
-        [src="${src}"]:not([data-hydration-transplanted])`)
-
-      if (!anchor) {
-        // If couldn't find the corresponding image for some reason, throw it away
-        image.remove()
-        return
-      }
-      anchor.before(image)
-      image.setAttribute('data-hydration-transplanted', 'true')
-      anchor.remove()
-    })
-  }
-
-  useLayoutEffect(() => {
-    if (
-      !shouldTransplant ||
-      didTransplantImages.current ||
-      !transplantedImages.current
-    ) {
-      return
-    }
-
-    const element = document.querySelector(`[data-hydration-id="${id}"]`)
-    if (!element) {
-      return
-    }
-
-    transplantImages(element, transplantedImages.current)
-
-    didTransplantImages.current = true
-  }, [id, didTransplantImages, transplantedImages, shouldTransplant])
 }
 
 const useAssetLoading = (extensionPointId?: string, shouldLoad?: boolean) => {
@@ -152,6 +85,34 @@ const useAssetLoading = (extensionPointId?: string, shouldLoad?: boolean) => {
   return { isLoaded }
 }
 
+/** Prevents images from turning lazy again after re-rendering the component,
+ * to prevent them from flickering. */
+const useEagerImages = (treePath: string, shouldMakeImagesEager?: boolean) => {
+  useLayoutEffect(() => {
+    if (!shouldMakeImagesEager) {
+      return
+    }
+
+    const images = document.querySelectorAll(
+      `[data-hydration-id="${treePath}"] img.lazyload, [data-hydration-id="${treePath}"] img[loading="lazy"]`
+    )
+
+    if (!images) {
+      return
+    }
+
+    // Array.from to make Typescript happy (should work without it tho)
+    for (const image of Array.from(images) as HTMLImageElement[]) {
+      image.classList.remove('lazyload')
+      image.setAttribute('loading', 'eager')
+      const dataSrc = image.getAttribute('data-src')
+      if (!image.src && dataSrc) {
+        image.src = dataSrc
+      }
+    }
+  }, [treePath, shouldMakeImagesEager])
+}
+
 const PreventHydration: FunctionComponent<Props> = ({
   children,
   shouldHydrate,
@@ -169,10 +130,12 @@ const PreventHydration: FunctionComponent<Props> = ({
     treePath,
     shouldRenderImmediately || shouldHydrate
   )
-  const shouldTransplantImages =
+  const shouldMakeImagesEager =
     shouldHydrate && !shouldRenderImmediately && isLoaded
 
-  useTransplantImages(treePath, shouldTransplantImages)
+  /** Prevents images from turning lazy again after re-rendering the component,
+   * to prevent them from flickering. */
+  useEagerImages(treePath, shouldMakeImagesEager)
 
   const containerProps = {
     'data-hydration-id': treePath,
