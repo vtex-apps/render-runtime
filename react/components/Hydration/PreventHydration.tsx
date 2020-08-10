@@ -67,6 +67,27 @@ function loadAssets(runtime: RenderRuntime, treePath: string) {
   return new Promise(() => {})
 }
 
+/** document.querySelector[All] throws if the selector is malformed.
+ * Since we are dealing with dynamic selectors here, it's best to be safe.
+ */
+function safeQuerySelectorAll<T extends Element>(selector: string) {
+  try {
+    return document.querySelectorAll<T>(selector)
+  } catch (e) {
+    console.error(e)
+    return []
+  }
+}
+
+function safeQuerySelector<T extends Element>(selector: string) {
+  try {
+    return document.querySelector<T>(selector)
+  } catch (e) {
+    console.error(e)
+    return null
+  }
+}
+
 const useAssetLoading = (extensionPointId?: string, shouldLoad?: boolean) => {
   const runtime = useRuntime()
   const isSSR = !canUseDOM
@@ -88,21 +109,36 @@ const useAssetLoading = (extensionPointId?: string, shouldLoad?: boolean) => {
 /** Prevents images from turning lazy again after re-rendering the component,
  * to prevent them from flickering. */
 const useEagerImages = (treePath: string, shouldMakeImagesEager?: boolean) => {
+  const alreadyLoadedImages = useRef([] as HTMLImageElement[])
+  if (shouldMakeImagesEager) {
+    /**  Stores which descendant images were already lazyloaded.
+     * Those images will be set to load eagerly down below on the useLayoutEffect hook.
+     * This prevents them from blinking. */
+    const images = safeQuerySelectorAll<HTMLImageElement>(
+      `[data-hydration-id="${treePath}"] img.lazyloaded`
+    )
+
+    alreadyLoadedImages.current = Array.from(images)
+  }
+
   useLayoutEffect(() => {
     if (!shouldMakeImagesEager) {
       return
     }
 
-    const images = document.querySelectorAll(
-      `[data-hydration-id="${treePath}"] img.lazyload, [data-hydration-id="${treePath}"] img[loading="lazy"]`
+    const images = alreadyLoadedImages.current.map((image) =>
+      safeQuerySelector<HTMLImageElement>(`img[data-src="${image.src}"]`)
     )
 
+    // Just a sanity check
     if (!images) {
       return
     }
 
-    // Array.from to make Typescript happy (should work without it tho)
-    for (const image of Array.from(images) as HTMLImageElement[]) {
+    for (const image of images) {
+      if (!image) {
+        return
+      }
       image.classList.remove('lazyload')
       image.setAttribute('loading', 'eager')
       const dataSrc = image.getAttribute('data-src')
