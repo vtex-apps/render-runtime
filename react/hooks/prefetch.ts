@@ -16,7 +16,8 @@ import {
 import { fetchComponents } from '../utils/components'
 import { useRuntime } from '../core/main'
 import { useApolloClient } from 'react-apollo'
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useCallback, MutableRefObject } from 'react'
+import { useOnView } from './viewDetection'
 
 interface PrefetchRequestsArgs {
   client: ApolloClientType
@@ -164,7 +165,7 @@ const prefetchRequests = async ({
 }
 
 interface UsePrefetchArgs {
-  inView: boolean
+  ref: MutableRefObject<HTMLElement | null>
   page?: string
   href: string
   options: NavigateOptions
@@ -196,8 +197,14 @@ const getCacheValidData = (path: string, prefecthState: PrefetchState) => {
 const getPriorityForPage = (page: string | undefined) =>
   page === 'store.product' ? 1 : 0
 
+export const useIsPrefetchActive = () => {
+  const { getSettings } = useRuntime()
+  const storeSettings = getSettings('vtex.store')
+  return isPrefetchActive(storeSettings)
+}
+
 export const usePrefetchAttempt = ({
-  inView,
+  ref,
   page,
   href,
   options,
@@ -207,14 +214,12 @@ export const usePrefetchAttempt = ({
   const prefetchState = usePrefetch()
   const client = useApolloClient() as ApolloClientType
   const hasTried = useRef(false)
-  const [canPrefetch, setCanPrefetch] = useState(() => {
-    return !waitToPrefetch || waitToPrefetch === 0
-  })
+  const canPrefetch = useRef(!waitToPrefetch || waitToPrefetch === 0)
 
   useEffect(() => {
-    if (!canPrefetch) {
+    if (!canPrefetch.current) {
       setTimeout(() => {
-        setCanPrefetch(true)
+        canPrefetch.current = true
       }, waitToPrefetch)
     }
   }, [canPrefetch, waitToPrefetch])
@@ -227,57 +232,63 @@ export const usePrefetchAttempt = ({
     getSettings,
   } = runtime
   const storeSettings = getSettings('vtex.store')
+
   const attemptPrefetch = useCallback(() => {
-    if (!hasTried.current && isPrefetchActive(storeSettings) && canPrefetch) {
-      const { pathsState, queue } = prefetchState
-      if (href && href[0] !== '/') {
-        // Should only work on relative paths
-        return
-      }
-
-      options.modifiers = navigationRouteModifiers
-      const navigationRoute = getNavigationRouteToNavigate(pages, options)
-      navigationRoute.original = options.to
-
-      if (pathsState[navigationRoute.path]?.fetching) {
-        // already fetching, no need to go any further
-        hasTried.current = true
-        return
-      }
-
-      const validCache = getCacheValidData(navigationRoute.path, prefetchState)
-
-      if (validCache.pathValid && validCache.routeValid) {
-        // cache all valid, no need to fetch anything
-        hasTried.current = true
-        return
-      }
-
-      if (!validCache.pathValid) {
-        pathsState[navigationRoute.path] = { fetching: true }
-      }
-
-      const priority = getPriorityForPage(page)
-      hasTried.current = true
-
-      queue.add(
-        async () =>
-          prefetchRequests({
-            client,
-            navigationRoute,
-            page,
-            pages,
-            prefetchState,
-            hints,
-            renderMajor,
-            validCache,
-            storeSettings,
-          }),
-        { priority }
-      )
+    if (
+      hasTried.current ||
+      !isPrefetchActive(storeSettings) ||
+      !canPrefetch.current
+    ) {
+      return
     }
+
+    const { pathsState, queue } = prefetchState
+    if (href && href[0] !== '/') {
+      // Should only work on relative paths
+      return
+    }
+
+    options.modifiers = navigationRouteModifiers
+    const navigationRoute = getNavigationRouteToNavigate(pages, options)
+    navigationRoute.original = options.to
+
+    if (pathsState[navigationRoute.path]?.fetching) {
+      // already fetching, no need to go any further
+      hasTried.current = true
+      return
+    }
+
+    const validCache = getCacheValidData(navigationRoute.path, prefetchState)
+
+    if (validCache.pathValid && validCache.routeValid) {
+      // cache all valid, no need to fetch anything
+      hasTried.current = true
+      return
+    }
+
+    if (!validCache.pathValid) {
+      pathsState[navigationRoute.path] = { fetching: true }
+    }
+
+    const priority = getPriorityForPage(page)
+    hasTried.current = true
+
+    queue.add(
+      async () =>
+        prefetchRequests({
+          client,
+          navigationRoute,
+          page,
+          pages,
+          prefetchState,
+          hints,
+          renderMajor,
+          validCache,
+          storeSettings,
+        }),
+      { priority }
+    )
   }, [
-    canPrefetch,
     client,
     hints,
     href,
@@ -290,11 +301,27 @@ export const usePrefetchAttempt = ({
     storeSettings,
   ])
 
-  useEffect(() => {
-    if (inView && hints.mobile) {
-      attemptPrefetch()
-    }
-  }, [attemptPrefetch, inView, hints.mobile])
+  useOnView({
+    ref,
+    onView: ({ unobserve }) => {
+      /** Uses a setTimeout to prevent creating huge tasks,
+       * if prefetchs accumulate.
+       * Google "Total Blocking Time" for more info.
+       */
+      setTimeout(() => {
+        if (!canPrefetch.current) {
+          /** If canPrefetch is false, might be able to retry
+           * later, so doesn't "unobserve" yet, just return */
+          return
+        }
+
+        attemptPrefetch()
+        unobserve()
+      }, 1)
+    },
+    bailOut: !hints.mobile,
+    threshold: 0.75,
+  })
 
   const executePrefetch = useCallback(() => {
     if (hints.desktop) {
