@@ -130,14 +130,13 @@ const useEagerImages = (treePath: string, shouldMakeImagesEager?: boolean) => {
       safeQuerySelector<HTMLImageElement>(`img[data-src="${image.src}"]`)
     )
 
-    // Just a sanity check
     if (!images) {
       return
     }
 
     for (const image of images) {
       if (!image) {
-        return
+        continue
       }
       image.classList.remove('lazyload')
       image.setAttribute('loading', 'eager')
