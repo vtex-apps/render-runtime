@@ -31,7 +31,6 @@
     "react-amphtml": "^4.0.2",
     "react-apollo": "^3.1.2",
     "react-helmet": "^5.2.0",
-    "react-intersection-observer": "^8.26.1",
     "react-json-view": "^1.19.1",
     "route-parser": "^0.0.5"
   },

@@ -1,8 +1,8 @@
 import React, { MouseEvent, useCallback, useMemo } from 'react'
-import { useInView } from 'react-intersection-observer'
 import { NavigateOptions, pathFromPageName } from '../utils/pages'
 import { useRuntime } from './RenderContext'
-import { usePrefetchAttempt } from '../hooks/prefetch'
+import { useIsPrefetchActive } from '../hooks/prefetch'
+import PrefetchLink from './Prefetch/PrefetchLink'
 
 const isLeftClickEvent = (event: MouseEvent<HTMLAnchorElement>) =>
   event.button === 0
@@ -23,8 +23,6 @@ interface Props extends NavigateOptions {
   className?: string
   target?: string
   waitToPrefetch?: number
-  onMouseOver?: (event: React.MouseEvent) => void
-  onFocus?: (event: React.FocusEvent) => void
 }
 
 const Link: React.FunctionComponent<Props> = ({
@@ -40,8 +38,6 @@ const Link: React.FunctionComponent<Props> = ({
   modifiersOptions,
   target,
   waitToPrefetch,
-  onMouseOver,
-  onFocus,
   ...linkProps
 }) => {
   const {
@@ -49,8 +45,9 @@ const Link: React.FunctionComponent<Props> = ({
     navigate,
     rootPath = '',
     route: { domain },
-    hints,
   } = useRuntime()
+
+  const isPrefetchActive = useIsPrefetchActive()
 
   const options = useMemo(
     () => ({
@@ -131,39 +128,27 @@ const Link: React.FunctionComponent<Props> = ({
       ? href.replace('/admin/app/', '/admin/')
       : href
 
-  const [inViewRef, inView] = useInView({
-    // Triggers the event when the element is 75% visible
-    threshold: 0.75,
-    triggerOnce: true,
-  })
+  const linkElementProps = {
+    target,
+    href: hrefWithoutIframePrefix,
+    ...linkProps,
+    onClick: handleClick,
+  }
 
-  const executePrefetch = usePrefetchAttempt({
-    inView,
-    page,
-    href,
-    options,
-    waitToPrefetch,
-  })
+  if (isPrefetchActive) {
+    return (
+      <PrefetchLink
+        waitToPrefetch={waitToPrefetch}
+        page={page}
+        options={options}
+        {...linkElementProps}
+      >
+        {children}
+      </PrefetchLink>
+    )
+  }
 
-  return (
-    <a
-      ref={inViewRef}
-      target={target}
-      href={hrefWithoutIframePrefix}
-      {...linkProps}
-      onClick={handleClick}
-      onMouseOver={(event) => {
-        onMouseOver && onMouseOver(event)
-        executePrefetch()
-      }}
-      onFocus={(event) => {
-        onFocus && onFocus(event)
-        executePrefetch()
-      }}
-    >
-      {children}
-    </a>
-  )
+  return <a {...linkElementProps}>{children}</a>
 }
 
 export default Link
