@@ -9,73 +9,139 @@ import { createReactIntl } from './utils/reactIntl'
 import { createCustomReactApollo } from './utils/reactApollo'
 import { fetchUncriticalStyles, UncriticalStyle } from './utils/assets'
 
-window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
-
-// compatibility
-window.__RENDER_8_COMPONENTS__ =
-  window.__RENDER_8_COMPONENTS__ || global.__RENDER_8_COMPONENTS__
-window.__RENDER_8_HOT__ = window.__RENDER_8_HOT__ || global.__RENDER_8_HOT__
-global.__RUNTIME__ = window.__RUNTIME__
-
-let intlPolyfillPromise: Promise<void> = Promise.resolve()
-
-if (window.IntlPolyfill) {
-  window.IntlPolyfill.__disableRegExpRestore()
-  if (!window.Intl) {
-    window.Intl = window.IntlPolyfill
+function initJSON() {
+  const scripts = window?.document?.querySelectorAll<HTMLTemplateElement>(
+    'template[data-type="json"]'
+  )
+  if (!scripts || scripts.length === 0) {
+    return Promise.resolve()
   }
-}
-if (
-  window.Intl &&
-  canUseDOM &&
-  (!window.Intl.PluralRules || !window.Intl.RelativeTimeFormat)
-) {
-  intlPolyfillPromise = import('./intl-polyfill').then(prop('default'))
-}
 
-if (module.hot) {
-  module.hot.accept('./core/main', () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const hotGlobals = require('./core/main')
-    window.__RENDER_8_RUNTIME__.ExtensionContainer =
-      hotGlobals.ExtensionContainer
-    window.__RENDER_8_RUNTIME__.ExtensionPoint = hotGlobals.ExtensionPoint
-    window.__RENDER_8_RUNTIME__.LayoutContainer = hotGlobals.LayoutContainer
-    window.__RENDER_8_RUNTIME__.Link = hotGlobals.Link
-    window.__RENDER_8_RUNTIME__.Loading = hotGlobals.Loading
-    window.__RENDER_8_RUNTIME__.buildCacheLocator = hotGlobals.buildCacheLocator
-    runtimeGlobals.start()
+  const promises = Array.from(scripts).map(
+    (script) =>
+      new Promise((resolve) => {
+        setTimeout(() => {
+          let value = ''
+          const childNodes = script.content.childNodes
+          for (let i = 0; i < childNodes.length; i++) {
+            const node = childNodes[i]
+            value += node.nodeValue
+          }
+          setTimeout(() => {
+            ;(window as any)[script.id] = JSON.parse(value)
+            resolve()
+          }, 1)
+        }, 1)
+      })
+  )
+
+  return new Promise((resolve) => {
+    Promise.all(promises).then(() => {
+      window.__RUNTIME__.extensions =
+        window.__RUNTIME_EXTENSIONS__ ?? window.__RUNTIME__.extensions
+      resolve()
+    })
   })
 }
 
-if (!window.__RUNTIME__.amp) {
-  window.ReactAMPHTML = window.ReactAMPHTMLHelpers =
-    typeof Proxy !== 'undefined'
-      ? new Proxy(
-          {},
-          {
-            get: (_, key) => {
-              if (key === '__esModule' || key === 'constructor') {
-                return
-              }
+let intlPolyfillPromise: Promise<void> = Promise.resolve()
 
-              const message = canUseDOM
-                ? 'You can not render AMP components on client-side'
-                : 'You must check runtime.amp to render AMP components'
+function init() {
+  window.__RENDER_8_RUNTIME__ = { ...runtimeGlobals }
 
-              throw new Error(message)
-            },
-          }
+  // compatibility
+  window.__RENDER_8_COMPONENTS__ =
+    window.__RENDER_8_COMPONENTS__ || global.__RENDER_8_COMPONENTS__
+  window.__RENDER_8_HOT__ = window.__RENDER_8_HOT__ || global.__RENDER_8_HOT__
+  global.__RUNTIME__ = window.__RUNTIME__
+
+  if (window.IntlPolyfill) {
+    window.IntlPolyfill.__disableRegExpRestore()
+    if (!window.Intl) {
+      window.Intl = window.IntlPolyfill
+    }
+  }
+  if (
+    window.Intl &&
+    canUseDOM &&
+    (!window.Intl.PluralRules || !window.Intl.RelativeTimeFormat)
+  ) {
+    intlPolyfillPromise = import('./intl-polyfill').then(prop('default'))
+  }
+
+  if (module.hot) {
+    module.hot.accept('./core/main', () => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const hotGlobals = require('./core/main')
+      window.__RENDER_8_RUNTIME__.ExtensionContainer =
+        hotGlobals.ExtensionContainer
+      window.__RENDER_8_RUNTIME__.ExtensionPoint = hotGlobals.ExtensionPoint
+      window.__RENDER_8_RUNTIME__.LayoutContainer = hotGlobals.LayoutContainer
+      window.__RENDER_8_RUNTIME__.Link = hotGlobals.Link
+      window.__RENDER_8_RUNTIME__.Loading = hotGlobals.Loading
+      window.__RENDER_8_RUNTIME__.buildCacheLocator =
+        hotGlobals.buildCacheLocator
+      runtimeGlobals.start()
+    })
+  }
+
+  if (!window.__RUNTIME__.amp) {
+    window.ReactAMPHTML = window.ReactAMPHTMLHelpers =
+      typeof Proxy !== 'undefined'
+        ? new Proxy(
+            {},
+            {
+              get: (_, key) => {
+                if (key === '__esModule' || key === 'constructor') {
+                  return
+                }
+
+                const message = canUseDOM
+                  ? 'You can not render AMP components on client-side'
+                  : 'You must check runtime.amp to render AMP components'
+
+                throw new Error(message)
+              },
+            }
+          )
+        : {} // IE11 users will not have a clear error in this case
+  }
+
+  if (window.ReactApollo) {
+    window.ReactApollo = createCustomReactApollo()
+  }
+
+  if (window.ReactIntl) {
+    window.ReactIntl = createReactIntl()
+  }
+}
+function start() {
+  if (window.__RUNTIME__.start && !window.__ERROR__) {
+    if (canUseDOM) {
+      const contentLoadedPromise =
+        window?.domContentLoadedPromise ??
+        new Promise((resolve) =>
+          window.addEventListener('DOMContentLoaded', resolve)
         )
-      : {} // IE11 users will not have a clear error in this case
-}
 
-if (window.ReactApollo) {
-  window.ReactApollo = createCustomReactApollo()
-}
-
-if (window.ReactIntl) {
-  window.ReactIntl = createReactIntl()
+      const resolveUncriticalPromise = createUncriticalPromise()
+      Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
+        setTimeout(() => {
+          window?.performance?.mark?.('render-start')
+          window.__RENDER_8_RUNTIME__.start()
+          window?.performance?.mark?.('render-end')
+          window?.performance?.measure?.(
+            '[VTEX IO] Rendering/Hydration',
+            'render-start',
+            'render-end'
+          )
+          resolveUncriticalPromise()
+        }, 1)
+      })
+    } else {
+      window.__RENDER_8_RUNTIME__.start()
+    }
+  }
 }
 
 function createUncriticalPromise() {
@@ -170,27 +236,10 @@ function createUncriticalPromise() {
   return resolve
 }
 
-if (window.__RUNTIME__.start && !window.__ERROR__) {
-  if (canUseDOM) {
-    const contentLoadedPromise = new Promise((resolve) =>
-      window.addEventListener('DOMContentLoaded', resolve)
-    )
+init()
 
-    const resolveUncriticalPromise = createUncriticalPromise()
-    Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
-      setTimeout(() => {
-        window?.performance?.mark?.('render-start')
-        window.__RENDER_8_RUNTIME__.start()
-        window?.performance?.mark?.('render-end')
-        window?.performance?.measure?.(
-          '[VTEX IO] Rendering/Hydration',
-          'render-start',
-          'render-end'
-        )
-        resolveUncriticalPromise()
-      }, 1)
-    })
-  } else {
-    window.__RENDER_8_RUNTIME__.start()
-  }
+if (!canUseDOM) {
+  start()
+} else {
+  initJSON().then(() => start())
 }

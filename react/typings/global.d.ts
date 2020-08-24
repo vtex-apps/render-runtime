@@ -572,8 +572,10 @@ declare global {
     __RENDER_8_SESSION__: RenderSession
     __REQUEST_ID__: string
     __RUNTIME__: RenderRuntime
+    __RUNTIME_EXTENSIONS__: RenderRuntime['extensions']
     __STATE__: NormalizedCacheObject
     __UNCRITICAL_PROMISE__: Promise<void> | undefined
+    domContentLoadedPromise?: Promise<any>
     browserHistory: History
     flags: Record<string, boolean>
     hrtime: NodeJS.Process['hrtime']
