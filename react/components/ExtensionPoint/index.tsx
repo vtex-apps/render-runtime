@@ -1,5 +1,5 @@
 import { mergeDeepRight, reduce } from 'ramda'
-import React, { FC, Fragment, Suspense } from 'react'
+import React, { FC, Fragment, Suspense, useMemo } from 'react'
 
 import ComponentLoader from './ComponentLoader'
 import Loading from '../Loading'
@@ -195,20 +195,21 @@ const ExtensionPoint: FC<Props> = (props) => {
     appSettings,
   ])
 
+  const componentChildren = useMemo(() => {
+    const isCompositionChildren =
+      extension && extension.composition === 'children'
+
+    return isCompositionChildren && extension?.blocks
+      ? getChildExtensions(runtime, newTreePath)
+      : children
+  }, [children, extension, newTreePath, runtime])
+
   if (
     /* Stops rendering if the extension is not found. Useful for optional ExtensionPoints */
     !extension
   ) {
     return null
   }
-
-  const isCompositionChildren =
-    extension && extension.composition === 'children'
-
-  const componentChildren =
-    isCompositionChildren && extension.blocks
-      ? getChildExtensions(runtime, newTreePath)
-      : children
 
   const isRootTreePath = newTreePath.indexOf('/') === -1
 
