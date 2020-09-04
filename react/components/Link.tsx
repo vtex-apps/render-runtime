@@ -123,9 +123,9 @@ const Link: React.FunctionComponent<Props> = ({
         !isTelephoneUrl(to) &&
         !isMailToUrl(to)
       ) {
-        return appendWorkspace(rootPath + to, workspace)
+        return rootPath + to
       }
-      return appendWorkspace(to, workspace)
+      return to
     }
     if (page) {
       const path = pathFromPageName(page, pages, params)
@@ -137,7 +137,7 @@ const Link: React.FunctionComponent<Props> = ({
     return '#'
   }
 
-  const href = appendWorkspace(getHref(), workspace) ?? ''
+  const href = getHref()
 
   // Href inside admin iframe should omit the `/app/` path
   const hrefWithoutIframePrefix =
