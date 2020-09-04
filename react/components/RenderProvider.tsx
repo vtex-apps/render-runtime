@@ -616,7 +616,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public onPageChanged = (location: RenderHistoryLocation) => {
     const {
-      runtime: { renderMajor },
+      runtime: { renderMajor, query: queryFromRuntime },
     } = this.props
     const {
       culture: { locale },
@@ -724,11 +724,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       preview: true,
     })
 
+    // If workspace is set via querystring, keep it during navigation
+    const workspaceFromQuery = queryFromRuntime?.workspace
+
     const navigationPromise = isEnabled('RENDER_NAVIGATION')
       ? fetchServerPage({
           fetcher: this.fetcher,
           path: navigationRoute.path,
           query,
+          workspace: workspaceFromQuery,
         }).then(
           async ({
             appsEtag,
@@ -935,7 +939,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
 
   public updateRuntime = async (options?: PageContextOptions) => {
     const {
-      runtime: { renderMajor },
+      runtime: { renderMajor, query: queryFromRuntime },
     } = this.props
     const {
       page,
@@ -948,6 +952,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const declarer = pagesState[page] && pagesState[page].declarer
     const { pathname } = window.location
     const paramsJSON = JSON.stringify(route.params || {})
+
+    // If workspace is set via querystring, keep it during navigation
+    const workspaceFromQuery = queryFromRuntime?.workspace
 
     const {
       appsEtag,
@@ -962,6 +969,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           path: route.path,
           query,
           fetcher: this.fetcher,
+          workspace: workspaceFromQuery,
         })
       : await fetchNavigationPage({
           apolloClient: this.apolloClient,
