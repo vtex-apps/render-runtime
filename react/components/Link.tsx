@@ -137,7 +137,7 @@ const Link: React.FunctionComponent<Props> = ({
     return '#'
   }
 
-  const href = getHref()
+  const href = appendWorkspace(getHref(), workspace) ?? ''
 
   // Href inside admin iframe should omit the `/app/` path
   const hrefWithoutIframePrefix =
