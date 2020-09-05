@@ -119,6 +119,9 @@ function getRelativeURLWithQuery({
   urlObj.search = ''
 
   Object.entries(query).forEach(([key, value]) => {
+    if (typeof value === 'undefined') {
+      return
+    }
     urlObj.searchParams.set(key, value)
   })
 
