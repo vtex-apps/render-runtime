@@ -372,7 +372,10 @@ function parseFilesQueryString(
   return {}
 }
 
-function groupAssetsByApp(assets: string[], assetExtension: string) {
+function groupAssetsByApp(
+  assets: string[],
+  assetExtension: string
+): Record<string, string[]> {
   return assets.reduce((acc: Record<string, string[]>, asset) => {
     if (!asset) {
       return acc
