@@ -72,7 +72,9 @@ function addStyleToPage(href: string) {
   if (isAbsolute(href)) {
     link.crossOrigin = 'anonymous'
   }
-  const overrideLink = document.getElementById('override_link_0')
+  const overrideLink =
+    document.getElementById('styles_bundled') ||
+    document.getElementById('override_link_0')
 
   if (overrideLink) {
     document.head.insertBefore(link, overrideLink)
@@ -199,7 +201,7 @@ function getExistingPrefetchLinks(prefetchType: string[] | string) {
 }
 
 function assetOnList(path: string, assets: string[]) {
-  return assets.some(asset => asset.indexOf(path) !== -1)
+  return assets.some((asset) => asset.indexOf(path) !== -1)
 }
 
 function isScript(path: string) {
@@ -243,15 +245,15 @@ export function fetchUncriticalStyles(
 ): Promise<Array<UncriticalStyle>> {
   return Promise.all(
     refs.map(
-      ref =>
-        new Promise<UncriticalStyle>(resolve => {
+      (ref) =>
+        new Promise<UncriticalStyle>((resolve) => {
           const { path, id, class: className, media = '' } = ref
           fetch(path)
-            .then(async response => {
+            .then(async (response) => {
               const body = await response.text()
               resolve({ href: path, id, className, media, body })
             })
-            .catch(error => {
+            .catch((error) => {
               console.error(`Error loading uncritical style.`, error)
               resolve({ href: path, id, className, media, body: '' })
             })
@@ -308,7 +310,10 @@ function getAssetsToAdd(
 ) {
   const { account, production, rootPath = '' } = runtime
 
-  const existingBundledAssetsByApp = groupAssetsByApp(existingAssets)
+  const existingBundledAssetsByApp = groupAssetsByApp(
+    existingAssets,
+    assetExtension
+  )
 
   return Array.from(
     assets.reduce((acc, asset) => {
@@ -350,20 +355,24 @@ function hasExtension(path: string, fileExtension: string) {
   return getExtension(path) === fileExtension
 }
 
-function parseFilesQueryString(filesQueryString: string) {
-  const hasSemicolon = filesQueryString.indexOf(';') !== -1
+function parseFilesQueryString(
+  filesQueryString: string,
+  assetExtension: string
+) {
+  const [appOrType, ...assets] = filesQueryString.split(',')
+  if (assetExtension === '.js') {
+    return { app: appOrType, assets }
+  }
 
-  if (hasSemicolon) {
-    const [app, joinedPaths] = filesQueryString.split(';')
-    const assets = joinedPaths ? joinedPaths.split(',') : []
-    return { app, assets }
-  } else {
-    const [app, ...assets] = filesQueryString.split(',')
+  if (appOrType.indexOf('react~') === 0) {
+    const [, app] = appOrType.split('~')
     return { app, assets }
   }
+
+  return {}
 }
 
-function groupAssetsByApp(assets: string[]): Record<string, string[]> {
+function groupAssetsByApp(assets: string[], assetExtension: string) {
   return assets.reduce((acc: Record<string, string[]>, asset) => {
     if (!asset) {
       return acc
@@ -382,7 +391,7 @@ function groupAssetsByApp(assets: string[]): Record<string, string[]> {
         return
       }
 
-      const { app, assets } = parseFilesQueryString(files)
+      const { app, assets } = parseFilesQueryString(files, assetExtension)
       if (!app || !assets || assets.length === 0) {
         return
       }
