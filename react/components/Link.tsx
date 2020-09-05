@@ -136,7 +136,7 @@ const Link: React.FunctionComponent<Props> = ({
       const path = pathFromPageName(page, pages, params)
       const qs = query ? `?${query}` : ''
       if (path) {
-        return rootPath + path + qs
+        return appendWorkspace(rootPath + path + qs, workspace)
       }
     }
     return '#'
