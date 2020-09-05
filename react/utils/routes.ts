@@ -140,7 +140,7 @@ export const fetchServerPage = async ({
     path,
     query: {
       ...rawQuery,
-      workspace,
+      ...(workspace ? { workspace } : {}),
       __pickRuntime: runtimeFields,
     },
   })
@@ -240,7 +240,7 @@ export const getPrefetchForPath = async ({
     path,
     query: {
       ...rawQuery,
-      workspace,
+      ...(workspace ? { workspace } : {}),
       __pickRuntime: 'page,queryData,contentResponse,route',
     },
   })
