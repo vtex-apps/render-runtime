@@ -129,15 +129,18 @@ export const fetchServerPage = async ({
   fetcher,
   path,
   query: rawQuery,
+  workspace,
 }: {
   path: string
   query?: Record<string, string>
   fetcher: GlobalFetch['fetch']
+  workspace?: string
 }): Promise<ParsedServerPageResponse> => {
   const url = getRelativeURLWithQuery({
     path,
     query: {
       ...rawQuery,
+      workspace,
       __pickRuntime: runtimeFields,
     },
   })
@@ -226,15 +229,18 @@ export const getPrefetchForPath = async ({
   fetcher,
   path,
   query: rawQuery,
+  workspace,
 }: {
   path: string
   query?: Record<string, string>
   fetcher: GlobalFetch['fetch']
+  workspace?: string
 }): Promise<PrefetchPageResponse | null> => {
   const url = getRelativeURLWithQuery({
     path,
     query: {
       ...rawQuery,
+      workspace,
       __pickRuntime: 'page,queryData,contentResponse,route',
     },
   })
