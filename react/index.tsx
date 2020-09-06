@@ -84,28 +84,27 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
       window.addEventListener('DOMContentLoaded', resolve)
     )
 
-    Promise.all([contentLoadedPromise, intlPolyfillPromise])
-      .then(async () => {
-        if (typeof window.__APPLY_UNCRITICAL__ !== 'function') {
-          return
-        }
+    const uncriticalApplied =
+      (window.__APPLY_UNCRITICAL__?.() && window.__UNCRITICAL_APPLIED__) ||
+      Promise.resolve()
 
-        window.__APPLY_UNCRITICAL__()
-        return window.__UNCRITICAL_APPLIED__
-      })
-      .then(() => {
-        setTimeout(async () => {
-          console.log('[render], Render.start()')
-          window?.performance?.mark?.('render-start')
-          window.__RENDER_8_RUNTIME__.start()
-          window?.performance?.mark?.('render-end')
-          window?.performance?.measure?.(
-            '[VTEX IO] Rendering/Hydration',
-            'render-start',
-            'render-end'
-          )
-        }, 1)
-      })
+    Promise.all([
+      contentLoadedPromise,
+      intlPolyfillPromise,
+      uncriticalApplied,
+    ]).then(() => {
+      setTimeout(async () => {
+        console.log('[render], Render.start()')
+        window?.performance?.mark?.('render-start')
+        window.__RENDER_8_RUNTIME__.start()
+        window?.performance?.mark?.('render-end')
+        window?.performance?.measure?.(
+          '[VTEX IO] Rendering/Hydration',
+          'render-start',
+          'render-end'
+        )
+      }, 1)
+    })
   } else {
     window.__RENDER_8_RUNTIME__.start()
   }
