@@ -51,7 +51,7 @@ const getCorrectUnit = (timeDiff: number) => {
   }
 }
 
-const FormattedRelative: FC<any> = props => {
+const FormattedRelative: FC<any> = (props) => {
   console.warn(
     'FormattedRelative was removed in react-intl@3.x, you are using an approximation. Plase start using FormattedRelativeTime.'
   )
@@ -107,7 +107,7 @@ const renderRuntimeInjectIntl: FC<any> = (
 ) => {
   const intlPropName = (options && options.intlPropName) || 'intl'
   const forwardRef = (options && options.forwardRef) || false
-  const WithRenderRuntimeIntl = injectIntl(props => {
+  const WithRenderRuntimeIntl = injectIntl((props) => {
     const intlObj = props[intlPropName] as any
     if (intlObj) {
       intlObj.formatRelative = renderFormatRelative(intlObj)

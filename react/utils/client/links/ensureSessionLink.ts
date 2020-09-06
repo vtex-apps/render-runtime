@@ -6,7 +6,7 @@ const sessionRequiredForScope = new Set(['segment', 'private'])
 export const ensureSessionLink = (sessionPromise: Promise<any>) => {
   return new ApolloLink(
     (operation: Operation, forward?: NextLink) =>
-      new Observable(observer => {
+      new Observable((observer) => {
         let handle: Subscription | undefined
 
         const { scope } = operation.getContext()

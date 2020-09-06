@@ -60,7 +60,7 @@ class ExtensionManager extends Component<Props, State> {
   }
 
   public render() {
-    return this.state.extensionsToRender.map(el => {
+    return this.state.extensionsToRender.map((el) => {
       return <ExtensionPortal key={el.extensionName} extension={el} />
     })
   }
