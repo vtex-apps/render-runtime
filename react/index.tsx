@@ -176,8 +176,14 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
       window.addEventListener('DOMContentLoaded', resolve)
     )
 
+    const asyncReadyPromise = window.__ASYNC_READY__ || Promise.resolve()
+
     const resolveUncriticalPromise = createUncriticalPromise()
-    Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
+    Promise.all([
+      asyncReadyPromise,
+      contentLoadedPromise,
+      intlPolyfillPromise,
+    ]).then(() => {
       setTimeout(() => {
         window?.performance?.mark?.('render-start')
         window.__RENDER_8_RUNTIME__.start()
