@@ -166,7 +166,7 @@ const useLoadingContext = () => {
 }
 
 const withLoading = <T extends {}>(Component: ComponentType<T>) => {
-  const EnhancedComponent: FunctionComponent<T> = props => {
+  const EnhancedComponent: FunctionComponent<T> = (props) => {
     const isSSR = !canUseDOM
     const { setLoading } = useLoadingContext()
 
@@ -177,9 +177,9 @@ const withLoading = <T extends {}>(Component: ComponentType<T>) => {
     return <Component {...props} setLoading={setLoading} />
   }
 
-  EnhancedComponent.displayName = `WithLoading(${Component.displayName ||
-    Component.name ||
-    'Component'})`
+  EnhancedComponent.displayName = `WithLoading(${
+    Component.displayName || Component.name || 'Component'
+  })`
 
   return EnhancedComponent
 }
