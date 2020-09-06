@@ -590,6 +590,7 @@ declare global {
     rendered: Promise<RenderedSuccess> | RenderedFailure
     requestIdleCallback: (callback: (...args) => any | void) => number
     ReactApollo: any
+    setZeroTimeout: (cb: () => void, ms: number) => void
   }
 
   interface BlockEntry {

@@ -84,12 +84,20 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
       window.addEventListener('DOMContentLoaded', resolve)
     )
 
-    Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
-      setTimeout(async () => {
-        if (typeof window.__APPLY_UNCRITICAL__ === 'function') {
-          window.__APPLY_UNCRITICAL__()
-          await window.__UNCRITICAL_APPLIED__
-        }
+    let uncriticalApplied = Promise.resolve()
+    if (typeof window.__APPLY_UNCRITICAL__ === 'function') {
+      window.__APPLY_UNCRITICAL__()
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      uncriticalApplied = window.__UNCRITICAL_APPLIED__!
+    }
+
+    Promise.all([
+      contentLoadedPromise,
+      intlPolyfillPromise,
+      uncriticalApplied,
+    ]).then(() => {
+      window.setZeroTimeout(async () => {
+        console.log('[render], Render.start()')
         window?.performance?.mark?.('render-start')
         window.__RENDER_8_RUNTIME__.start()
         window?.performance?.mark?.('render-end')
