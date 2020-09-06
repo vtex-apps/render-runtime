@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Fixed
+- Prevents setting querystring values to `undefined`
 - Prevents setting workspace to `undefined`
+- Persists workspace set via querystring
+- Prevents overriding workspaces already set on `Link`s
 
 ## [8.112.1] - 2020-09-05
 ### Fixed
