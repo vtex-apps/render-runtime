@@ -168,11 +168,11 @@ function getExistingScriptSrcs() {
 
 function getExistingStyleHrefs() {
   return Array.from(
-    document.head.querySelectorAll('link[type="text/css"],style')
+    document.head.querySelectorAll(
+      'link[type="text/css"],link[as="style"],style'
+    )
   ).reduce<string[]>((hrefs, styleSheet) => {
-    const href =
-      (styleSheet as HTMLLinkElement).href ||
-      styleSheet.getAttribute('data-href')
+    const href = (styleSheet as HTMLLinkElement).href
 
     if (href) {
       hrefs.push(href)
@@ -266,10 +266,6 @@ export async function fetchAssets(
   runtime: RenderRuntime,
   assets: AssetEntry[]
 ) {
-  if (window.__UNCRITICAL_PROMISE__) {
-    await window.__UNCRITICAL_PROMISE__
-  }
-
   const existingScripts = getExistingScriptSrcs()
   const existingStyles = getExistingStyleHrefs()
 
