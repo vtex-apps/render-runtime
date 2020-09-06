@@ -119,6 +119,9 @@ function getRelativeURLWithQuery({
   urlObj.search = ''
 
   Object.entries(query).forEach(([key, value]) => {
+    if (typeof value === 'undefined') {
+      return
+    }
     urlObj.searchParams.set(key, value)
   })
 
@@ -140,7 +143,7 @@ export const fetchServerPage = async ({
     path,
     query: {
       ...rawQuery,
-      workspace,
+      ...(workspace ? { workspace } : {}),
       __pickRuntime: runtimeFields,
     },
   })
@@ -240,7 +243,7 @@ export const getPrefetchForPath = async ({
     path,
     query: {
       ...rawQuery,
-      workspace,
+      ...(workspace ? { workspace } : {}),
       __pickRuntime: 'page,queryData,contentResponse,route',
     },
   })

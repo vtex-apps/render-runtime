@@ -25,17 +25,23 @@ interface Props extends NavigateOptions {
   waitToPrefetch?: number
 }
 
-const appendWorkspace = (
+const appendWorkspaceToURL = (
   url: string | undefined,
   workspace: string | undefined
 ) => {
-  if (!url || !workspace || workspace === '') {
+  if (
+    url == null ||
+    !workspace ||
+    workspace === '' ||
+    String(url).indexOf('workspace=') > -1
+  ) {
     return url
   }
 
   const separator = String(url).includes('?') ? '&' : '?'
   return url + separator + 'workspace=' + workspace
 }
+
 const Link: React.FunctionComponent<Props> = ({
   page,
   onClick = () => {},
@@ -69,10 +75,10 @@ const Link: React.FunctionComponent<Props> = ({
       fallbackToWindowLocation: false,
       page,
       params,
-      query,
+      query: workspace ? appendWorkspaceToURL(query ?? '', workspace) : query,
       rootPath,
       scrollOptions,
-      to: appendWorkspace(to, workspace),
+      to: appendWorkspaceToURL(to, workspace),
       modifiers,
       replace,
       modifiersOptions,
@@ -81,10 +87,10 @@ const Link: React.FunctionComponent<Props> = ({
       page,
       params,
       query,
+      workspace,
       rootPath,
       scrollOptions,
       to,
-      workspace,
       modifiers,
       replace,
       modifiersOptions,
@@ -131,13 +137,13 @@ const Link: React.FunctionComponent<Props> = ({
       const path = pathFromPageName(page, pages, params)
       const qs = query ? `?${query}` : ''
       if (path) {
-        return rootPath + path + qs
+        return appendWorkspaceToURL(rootPath + path + qs, workspace)
       }
     }
     return '#'
   }
 
-  const href = appendWorkspace(getHref(), workspace) ?? ''
+  const href = appendWorkspaceToURL(getHref(), workspace) ?? ''
 
   // Href inside admin iframe should omit the `/app/` path
   const hrefWithoutIframePrefix =
