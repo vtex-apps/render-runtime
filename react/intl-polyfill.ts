@@ -27,7 +27,7 @@ if (!('RelativeTimeFormat' in Intl) || !canUseDOM) {
 const locale = path<string>(['__RUNTIME__', 'culture', 'locale'], window)
 const [lang] = locale ? locale.split('-') : ['']
 
-myPromise = new Promise(resolve => {
+myPromise = new Promise((resolve) => {
   const hasPolyfilledPlural =
     window.Intl.PluralRules.polyfilled && canUseDOM && lang
   const hasPolyfilledRelative =

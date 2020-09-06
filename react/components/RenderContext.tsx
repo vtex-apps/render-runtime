@@ -31,9 +31,9 @@ export const withRuntimeContext = <TOriginalProps extends {} = {}>(
     const runtime = useRuntime()
     return <Component {...props} runtime={runtime} />
   }
-  WithRuntimeContext.displayName = `withRuntimeContext(${Component.displayName ||
-    Component.name ||
-    'Component'})`
+  WithRuntimeContext.displayName = `withRuntimeContext(${
+    Component.displayName || Component.name || 'Component'
+  })`
   WithRuntimeContext.WrappedComponent = Component
   return hoistNonReactStatics<TOriginalProps, RenderContextProps>(
     WithRuntimeContext,
@@ -48,9 +48,9 @@ export const withEmitter = <TOriginalProps extends {} = {}>(
     const { emitter } = useRuntime()
     return <Component {...props} __emitter={emitter} />
   }
-  WithEmitter.displayName = `withEmitter(${Component.displayName ||
-    Component.name ||
-    'Component'})`
+  WithEmitter.displayName = `withEmitter(${
+    Component.displayName || Component.name || 'Component'
+  })`
   WithEmitter.WrappedComponent = Component
   return hoistNonReactStatics<TOriginalProps, EmitterProps>(
     WithEmitter,
