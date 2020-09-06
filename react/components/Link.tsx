@@ -25,7 +25,7 @@ interface Props extends NavigateOptions {
   waitToPrefetch?: number
 }
 
-const appendWorkspace = (
+const appendWorkspaceToURL = (
   url: string | undefined,
   workspace: string | undefined
 ) => {
@@ -41,6 +41,23 @@ const appendWorkspace = (
   const separator = String(url).includes('?') ? '&' : '?'
   return url + separator + 'workspace=' + workspace
 }
+
+// const addWorkspaceToQueryObject = (
+//   query: any,
+//   workspace: string | undefined
+// ) => {
+//   if (!workspace) {
+//     return query
+//   }
+//   if (!query && workspace) {
+//     return { workspace }
+//   }
+//   return {
+//     ...(query ?? {}),
+//     workspace,
+//   }
+// }
+
 const Link: React.FunctionComponent<Props> = ({
   page,
   onClick = () => {},
@@ -74,10 +91,10 @@ const Link: React.FunctionComponent<Props> = ({
       fallbackToWindowLocation: false,
       page,
       params,
-      query,
+      query: workspace ? appendWorkspaceToURL(query ?? '', workspace) : query,
       rootPath,
       scrollOptions,
-      to: appendWorkspace(to, workspace),
+      to: appendWorkspaceToURL(to, workspace),
       modifiers,
       replace,
       modifiersOptions,
@@ -86,10 +103,10 @@ const Link: React.FunctionComponent<Props> = ({
       page,
       params,
       query,
+      workspace,
       rootPath,
       scrollOptions,
       to,
-      workspace,
       modifiers,
       replace,
       modifiersOptions,
@@ -136,13 +153,13 @@ const Link: React.FunctionComponent<Props> = ({
       const path = pathFromPageName(page, pages, params)
       const qs = query ? `?${query}` : ''
       if (path) {
-        return appendWorkspace(rootPath + path + qs, workspace)
+        return appendWorkspaceToURL(rootPath + path + qs, workspace)
       }
     }
     return '#'
   }
 
-  const href = appendWorkspace(getHref(), workspace) ?? ''
+  const href = appendWorkspaceToURL(getHref(), workspace) ?? ''
 
   // Href inside admin iframe should omit the `/app/` path
   const hrefWithoutIframePrefix =
