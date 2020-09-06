@@ -84,16 +84,19 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
       window.addEventListener('DOMContentLoaded', resolve)
     )
 
-    const uncriticalApplied =
-      (window.__APPLY_UNCRITICAL__?.() && window.__UNCRITICAL_APPLIED__) ||
-      Promise.resolve()
+    let uncriticalApplied = Promise.resolve()
+    if (typeof window.__APPLY_UNCRITICAL__ === 'function') {
+      window.__APPLY_UNCRITICAL__()
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      uncriticalApplied = window.__UNCRITICAL_APPLIED__!
+    }
 
     Promise.all([
       contentLoadedPromise,
       intlPolyfillPromise,
       uncriticalApplied,
     ]).then(() => {
-      setTimeout(async () => {
+      window.setZeroTimeout(async () => {
         console.log('[render], Render.start()')
         window?.performance?.mark?.('render-start')
         window.__RENDER_8_RUNTIME__.start()
