@@ -21,11 +21,12 @@ function start() {
 
   if (window.__RUNTIME__.start && !window.__ERROR__) {
     if (canUseDOM) {
-      const contentLoadedPromise =
-        window?.domContentLoadedPromise ??
-        new Promise((resolve) =>
-          window.addEventListener('DOMContentLoaded', resolve)
-        )
+      const contentLoadedPromise = new Promise((resolve) => {
+        window.addEventListener('DOMContentLoaded', resolve)
+        if (window.__DOM_READY__) {
+          resolve()
+        }
+      })
 
       const resolveUncriticalPromise = createUncriticalPromise(
         window.__RUNTIME__
