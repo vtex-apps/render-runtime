@@ -1131,11 +1131,9 @@ class RenderProvider extends Component<
 
   private updateDevice = debounce(
     async (deviceInfo: DeviceInfo) => {
-      console.log({ deviceInfo })
       if (!deviceInfo) {
         return
       }
-      console.log({ loadedDevices: this.state.loadedDevices })
       if (!this.state.loadedDevices.includes(deviceInfo.type)) {
         /** If resizing from a smaller to a larger device, keeps the current
          * blocks while the new ones are being loaded.
