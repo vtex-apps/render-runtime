@@ -87,8 +87,11 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
     Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
       setTimeout(async () => {
         if (typeof window.__APPLY_UNCRITICAL__ === 'function') {
+          console.log('applying uncritiacal')
           window.__APPLY_UNCRITICAL__()
+          console.log('waiting for uncritical applied')
           await window.__UNCRITICAL_APPLIED__
+          console.log('uncritical applied')
         }
         window?.performance?.mark?.('render-start')
         window.__RENDER_8_RUNTIME__.start()
