@@ -1,10 +1,9 @@
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
-import { parse } from 'graphql'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { equals, forEach, merge, mergeWith } from 'ramda'
+import { equals, merge, mergeWith, difference } from 'ramda'
 import React, { Component, Fragment, ReactElement, Suspense } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -62,6 +61,7 @@ import {
   PrefetchContextProvider,
 } from './Prefetch/PrefetchContext'
 import { hydrateApolloCache } from '../utils/apolloCache'
+import { withDevice, WithDeviceProps, DeviceInfo } from '../utils/withDevice'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -89,6 +89,7 @@ export interface RenderProviderState {
   culture: RenderRuntime['culture']
   defaultExtensions: RenderRuntime['defaultExtensions']
   device: ConfigurationDevice
+  deviceInfo: DeviceInfo
   extensions: RenderRuntime['extensions']
   inspect: RenderRuntime['inspect']
   messages: RenderRuntime['messages']
@@ -99,6 +100,7 @@ export interface RenderProviderState {
   query: RenderRuntime['query']
   settings: RenderRuntime['settings']
   route: RenderRuntime['route']
+  loadedDevices: RenderRuntime['loadedDevices']
   loadedPages: Set<string>
   blocksTree?: RenderRuntime['blocksTree']
   blocks?: RenderRuntime['blocks']
@@ -125,13 +127,10 @@ interface NavigationState {
   lastOptions?: NavigateOptions
 }
 
-interface ComponentPromises {
-  [component: string]: Promise<any>
-}
-
-const componentsPromises: ComponentPromises = {}
-
-class RenderProvider extends Component<Props, RenderProviderState> {
+class RenderProvider extends Component<
+  Props & WithDeviceProps,
+  RenderProviderState
+> {
   navigationState: NavigationState = { isNavigating: false }
   public static childContextTypes = {
     account: PropTypes.string,
@@ -144,7 +143,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     components: PropTypes.object,
     culture: PropTypes.object,
     defaultExtensions: PropTypes.object,
+    // TODO: the prop "device" might be legacy. Figure out if it's still being used.
     device: PropTypes.string,
+    // named "deviceInfo" to avoid conflicts with the possibly legacy "device".
+    deviceInfo: PropTypes.shape({
+      type: PropTypes.oneOf(['desktop', 'tablet', 'phone', 'unknown']),
+      isMobile: PropTypes.bool,
+    }),
+    isMobile: PropTypes.bool,
     emitter: PropTypes.object,
     ensureSession: PropTypes.func,
     extensions: PropTypes.object,
@@ -214,7 +220,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   private navigationModifierOptions: Record<string, NavigationRouteChange>
   private fetcher: GlobalFetch['fetch']
 
-  public constructor(props: Props) {
+  public constructor(props: Props & WithDeviceProps) {
     super(props)
     const {
       appsEtag,
@@ -236,8 +242,9 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       route,
       settings,
       queryData,
+      loadedDevices,
     } = props.runtime
-    const { history, baseURI, cacheControl } = props
+    const { history, baseURI, cacheControl, deviceInfo } = props
     const ignoreCanonicalReplacement = query && query.map
     this.fetcher = fetch
 
@@ -303,6 +310,8 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture,
       defaultExtensions: {},
       device: 'any',
+      loadedDevices: loadedDevices ?? [props.deviceInfo.type],
+      deviceInfo,
       extensions,
       loadedPages: new Set([page]),
       messages,
@@ -349,9 +358,15 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 
   public UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    // If RenderProvider is being re-rendered, the global runtime might have changed
-    // so we must update all extensions.
-    if (this.rendered) {
+    const updatedProps = difference(
+      Object.entries(nextProps),
+      Object.entries(this.props)
+    ).map(([propName]) => propName)
+
+    /** Update all extensions if runtime has changed. */
+    const hasUpdatedRuntime = updatedProps.includes('runtime')
+
+    if (this.rendered && hasUpdatedRuntime) {
       const {
         runtime: { extensions },
       } = nextProps
@@ -388,6 +403,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       preview,
       culture,
       device,
+      deviceInfo,
       route,
       query,
       defaultExtensions,
@@ -417,6 +433,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture,
       defaultExtensions,
       device,
+      deviceInfo,
       emitter,
       ensureSession: this.ensureSession,
       extensions,
@@ -568,6 +585,25 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     return pageNavigate(history, pages, options)
   }
 
+  private updateDeviceBlocks = async (deviceInfo: DeviceInfo) => {
+    const query = queryStringToMap(location.search) as RenderRuntime['query']
+
+    const { components, extensions, messages } = await fetchServerPage({
+      fetcher: this.fetcher,
+      path: this.state.route.path,
+      query,
+      deviceInfo,
+    })
+
+    await this.fetchComponents(components, extensions)
+
+    this.setState((state) => ({
+      extensions: { ...state.extensions, ...extensions },
+      components: { ...state.components, ...components },
+      messages: { ...state.messages, ...messages },
+    }))
+  }
+
   public addNavigationRouteModifier = (modifier: NavigationRouteModifier) => {
     this.navigationRouteModifiers.add(modifier)
   }
@@ -618,12 +654,14 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     const {
       runtime: { renderMajor, query: queryFromRuntime },
     } = this.props
+
     const {
       culture: { locale },
       pages: pagesState,
       production,
       route,
       loadedPages,
+      deviceInfo,
     } = this.state
     const { state } = location
 
@@ -733,6 +771,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           path: navigationRoute.path,
           query,
           workspace: workspaceFromQuery,
+          deviceInfo,
         }).then(
           async ({
             appsEtag,
@@ -764,6 +803,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
                 appsEtag,
                 components: { ...state.components, ...components },
                 extensions: { ...state.extensions, ...extensions },
+                loadedDevices: [deviceInfo.type],
                 loadedPages: loadedPages.add(matchingPage.routeId),
                 messages: { ...state.messages, ...messages },
                 page: matchingPage.routeId,
@@ -948,6 +988,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       culture: { locale },
       route,
       query,
+      deviceInfo,
     } = this.state
     const declarer = pagesState[page] && pagesState[page].declarer
     const { pathname } = window.location
@@ -970,6 +1011,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
           query,
           fetcher: this.fetcher,
           workspace: workspaceFromQuery,
+          deviceInfo,
         })
       : await fetchNavigationPage({
           apolloClient: this.apolloClient,
@@ -1085,6 +1127,48 @@ class RenderProvider extends Component<Props, RenderProviderState> {
     })
 
     await this.sendInfoFromIframe()
+  }
+
+  private updateDevice = debounce(
+    async (deviceInfo: DeviceInfo) => {
+      if (!deviceInfo) {
+        return
+      }
+      if (!this.state.loadedDevices.includes(deviceInfo.type)) {
+        /** If resizing from a smaller to a larger device, keeps the current
+         * blocks while the new ones are being loaded.
+         * If resizing from a larger to a smaller one, can't do this because
+         * the larger blocks would overflow the window and look bad.
+         */
+        const deviceOrder = ['desktop', 'tablet', 'phone']
+        const prevDeviceType = this.state.deviceInfo.type
+        const keepCurrentDevice =
+          deviceOrder.indexOf(deviceInfo.type) <
+          deviceOrder.indexOf(prevDeviceType)
+        if (!keepCurrentDevice) {
+          this.setState({ deviceInfo })
+        }
+
+        this.setState((state) => ({
+          preview: true,
+          loadedDevices: [...state.loadedDevices, deviceInfo.type],
+        }))
+
+        await this.updateDeviceBlocks(deviceInfo)
+      }
+      this.setState({
+        deviceInfo,
+        preview: false,
+      })
+    },
+    200, // debounce timeout
+    false // means "don't call this function immediately, wait for the debounce timeout"
+  )
+
+  public componentDidUpdate() {
+    if (!equals(this.state.deviceInfo, this.props.deviceInfo)) {
+      this.updateDevice(this.props.deviceInfo)
+    }
   }
 
   public render() {
@@ -1207,4 +1291,4 @@ class RenderProvider extends Component<Props, RenderProviderState> {
   }
 }
 
-export default RenderProvider
+export default withDevice<Props>(RenderProvider)
