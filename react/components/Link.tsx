@@ -42,22 +42,6 @@ const appendWorkspaceToURL = (
   return url + separator + 'workspace=' + workspace
 }
 
-// const addWorkspaceToQueryObject = (
-//   query: any,
-//   workspace: string | undefined
-// ) => {
-//   if (!workspace) {
-//     return query
-//   }
-//   if (!query && workspace) {
-//     return { workspace }
-//   }
-//   return {
-//     ...(query ?? {}),
-//     workspace,
-//   }
-// }
-
 const Link: React.FunctionComponent<Props> = ({
   page,
   onClick = () => {},
