@@ -84,15 +84,20 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
       window.addEventListener('DOMContentLoaded', resolve)
     )
 
-    Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
+    let criticalPromise = Promise.resolve()
+
+    if (typeof window.__APPLY_UNCRITICAL__ === 'function') {
+      window.__APPLY_UNCRITICAL__()
+      criticalPromise = window.__UNCRITICAL_APPLIED__ || Promise.resolve()
+    }
+
+    Promise.all([
+      contentLoadedPromise,
+      intlPolyfillPromise,
+      criticalPromise,
+    ]).then(() => {
       setTimeout(async () => {
-        if (typeof window.__APPLY_UNCRITICAL__ === 'function') {
-          console.log('applying uncritiacal')
-          window.__APPLY_UNCRITICAL__()
-          console.log('waiting for uncritical applied')
-          await window.__UNCRITICAL_APPLIED__
-          console.log('uncritical applied')
-        }
+        console.log('[render], Render.start()')
         window?.performance?.mark?.('render-start')
         window.__RENDER_8_RUNTIME__.start()
         window?.performance?.mark?.('render-end')
