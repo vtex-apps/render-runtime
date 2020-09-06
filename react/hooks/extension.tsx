@@ -4,7 +4,7 @@ import { useRuntime } from '../components/RenderContext'
 import { useTreePath } from '../utils/treePath'
 
 function mountTreePath(base: string, children: string[]) {
-  return [base, ...children].filter(id => !!id).join('/')
+  return [base, ...children].filter((id) => !!id).join('/')
 }
 
 interface Options {

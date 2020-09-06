@@ -52,7 +52,7 @@ class ErrorDisplay extends PureComponent<Props, State> {
           <>
             <ul className="f6 list pl0">
               {operationIds &&
-                operationIds.map(operationId => (
+                operationIds.map((operationId) => (
                   <li key={operationId}>
                     <span>Operation ID:</span>{' '}
                     <span className="i">{operationId}</span>

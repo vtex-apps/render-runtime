@@ -19,7 +19,7 @@ describe('#escapeRegex', () => {
   it(`should prefix regex special characters: [ '${specialRegexCharacters.join(
     `', '`
   )}' ] with \\`, () => {
-    specialRegexCharacters.forEach(specialRegexCharacter => {
+    specialRegexCharacters.forEach((specialRegexCharacter) => {
       expect(escapeRegex(specialRegexCharacter)).toEqual(
         `\\${specialRegexCharacter}`
       )
