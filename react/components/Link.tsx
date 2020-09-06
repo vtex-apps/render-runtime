@@ -30,7 +30,7 @@ const appendWorkspaceToURL = (
   workspace: string | undefined
 ) => {
   if (
-    !url ||
+    url == null ||
     !workspace ||
     workspace === '' ||
     String(url).indexOf('workspace=') > -1
