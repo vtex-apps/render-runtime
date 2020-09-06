@@ -1,3 +1,17 @@
+const getValue = (element: HTMLTemplateElement) => {
+  if (typeof element.content === 'undefined') {
+    return element.innerHTML
+  }
+
+  let value = ''
+  const childNodes = element.content.childNodes
+  for (let i = 0; i < childNodes.length; i++) {
+    const node = childNodes[i]
+    value += node.nodeValue
+  }
+  return value
+}
+
 export const loadRuntimeJSONs = () => {
   const scripts = window?.document?.querySelectorAll<HTMLTemplateElement>(
     'template[data-type="json"]'
@@ -10,12 +24,7 @@ export const loadRuntimeJSONs = () => {
     (script) =>
       new Promise((resolve) => {
         setTimeout(() => {
-          let value = ''
-          const childNodes = script.content.childNodes
-          for (let i = 0; i < childNodes.length; i++) {
-            const node = childNodes[i]
-            value += node.nodeValue
-          }
+          const value = getValue(script)
           setTimeout(() => {
             ;(window as any)[script.id] = JSON.parse(value)
             resolve()
