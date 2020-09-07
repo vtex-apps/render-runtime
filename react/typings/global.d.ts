@@ -575,8 +575,9 @@ declare global {
     __RUNTIME_EXTENSIONS__: RenderRuntime['extensions']
     __RUNTIME_QUERYDATA__: RenderRuntime['queryData']
     __STATE__: NormalizedCacheObject
-    __UNCRITICAL_PROMISE__: Promise<void> | undefined
     __DOM_READY__?: boolean
+    __CRITICAL__UNCRITICAL_APPLIED__: Promise<void> | undefined
+    __CRITICAL__APPLY_UNCRITICAL__: () => void | null
     browserHistory: History
     flags: Record<string, boolean>
     hrtime: NodeJS.Process['hrtime']

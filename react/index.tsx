@@ -10,7 +10,9 @@ import { patchLibs } from './start/patchLibs'
 import { registerRuntimeGlobals } from './start/register'
 import { createUncriticalPromise } from './start/uncritical'
 import { loadRuntimeJSONs } from './start/runtime'
+import { hydrateUncriticalStyles } from './start/styles'
 
+const uncriticalStylesPromise = hydrateUncriticalStyles()
 const intlPolyfillPromise = polyfillIntl()
 registerRuntimeGlobals(runtimeGlobals)
 addAMPProxy(window.__RUNTIME__)
@@ -30,7 +32,11 @@ function start() {
       const resolveUncriticalPromise = createUncriticalPromise(
         window.__RUNTIME__
       )
-      Promise.all([contentLoadedPromise, intlPolyfillPromise]).then(() => {
+      Promise.all([
+        contentLoadedPromise,
+        intlPolyfillPromise,
+        uncriticalStylesPromise,
+      ]).then(() => {
         setTimeout(() => {
           window?.performance?.mark?.('render-start')
           window.__RENDER_8_RUNTIME__.start()
