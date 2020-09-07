@@ -13,12 +13,11 @@ import { loadRuntimeJSONs } from './start/runtime'
 
 const intlPolyfillPromise = polyfillIntl()
 registerRuntimeGlobals(runtimeGlobals)
+addAMPProxy(window.__RUNTIME__)
 patchLibs()
 
 function start() {
   global.__RUNTIME__ = window.__RUNTIME__
-  addAMPProxy(window.__RUNTIME__)
-
   if (window.__RUNTIME__.start && !window.__ERROR__) {
     if (canUseDOM) {
       const contentLoadedPromise = new Promise((resolve) => {
