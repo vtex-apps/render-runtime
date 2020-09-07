@@ -1,6 +1,6 @@
 const getValue = (element: HTMLTemplateElement) => {
   if (typeof element.content === 'undefined') {
-    return element.textContent
+    return element.textContent as string
   }
 
   // Using nodeValue instead of innerHTML because it's faster
