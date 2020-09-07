@@ -1,6 +1,6 @@
 const getValue = (element: HTMLTemplateElement) => {
   if (typeof element.content === 'undefined') {
-    return element.innerHTML
+    return element.textContent
   }
 
   // Using nodeValue instead of innerHTML because it's faster
@@ -8,7 +8,7 @@ const getValue = (element: HTMLTemplateElement) => {
   const childNodes = element.content.childNodes
   for (let i = 0; i < childNodes.length; i++) {
     const node = childNodes[i]
-    value += node.nodeValue
+    value += node.textContent
   }
   return value
 }
