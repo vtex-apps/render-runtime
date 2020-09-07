@@ -85,8 +85,8 @@ if (window.__RUNTIME__.start && !window.__ERROR__) {
     )
 
     let uncriticalApplied = Promise.resolve()
-    if (typeof window.__CRITICAL__APPLY_UNCRITICAL__ === 'function') {
-      window.__CRITICAL__APPLY_UNCRITICAL__()
+    if (typeof window.__CRITICAL__RAISE_UNCRITICAL_EVENT__ === 'function') {
+      window.__CRITICAL__RAISE_UNCRITICAL_EVENT__()
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       uncriticalApplied = window.__CRITICAL__UNCRITICAL_APPLIED__!
     }
