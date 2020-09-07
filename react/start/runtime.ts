@@ -26,7 +26,9 @@ export const loadRuntimeJSONs = () => {
         setTimeout(() => {
           const value = getValue(script)
           setTimeout(() => {
-            ;(window as any)[script.id] = JSON.parse(value)
+            if (script.dataset.varname) {
+              ;(window as any)[script.dataset.varname] = JSON.parse(value)
+            }
             resolve()
           }, 1)
         }, 1)
