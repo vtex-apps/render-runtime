@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Fixed
 - Fix lazy JSON parse.
+### Changed
+- Parse queryData separately.
 
 ## [8.115.0] - 2020-09-07
 ### Added
