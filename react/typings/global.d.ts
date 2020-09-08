@@ -573,6 +573,7 @@ declare global {
     __REQUEST_ID__: string
     __RUNTIME__: RenderRuntime
     __RUNTIME_EXTENSIONS__: RenderRuntime['extensions']
+    __RUNTIME_QUERYDATA__: RenderRuntime['queryData']
     __STATE__: NormalizedCacheObject
     __UNCRITICAL_PROMISE__: Promise<void> | undefined
     __DOM_READY__?: boolean

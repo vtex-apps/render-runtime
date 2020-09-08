@@ -1,19 +1,19 @@
 const getValue = (element: HTMLTemplateElement) => {
   if (typeof element.content === 'undefined') {
-    return element.innerHTML
+    return element.textContent as string
   }
 
-  // Using nodeValue instead of innerHTML because it's faster
+  // Using textContent instead of innerHTML because it's faster
   let value = ''
   const childNodes = element.content.childNodes
   for (let i = 0; i < childNodes.length; i++) {
     const node = childNodes[i]
-    value += node.nodeValue
+    value += node.textContent
   }
   return value
 }
 
-export const loadRuntimeJSONs = () => {
+export const loadRuntimeJSONs = (): Promise<void | void[]> => {
   const scripts = window?.document?.querySelectorAll<HTMLTemplateElement>(
     'template[data-type="json"]'
   )
@@ -23,12 +23,18 @@ export const loadRuntimeJSONs = () => {
 
   const promises = Array.from(scripts).map(
     (script) =>
-      new Promise((resolve) => {
+      new Promise<void>((resolve) => {
         setTimeout(() => {
           const value = getValue(script)
           setTimeout(() => {
-            if (script.dataset.varname) {
-              ;(window as any)[script.dataset.varname] = JSON.parse(value)
+            const { varname, field } = script.dataset
+            const windowAsAny = window as any
+            if (varname) {
+              if (field && windowAsAny[varname]) {
+                windowAsAny[varname][field] = JSON.parse(value)
+              } else {
+                windowAsAny[varname] = JSON.parse(value)
+              }
             }
             resolve()
           }, 1)
@@ -36,11 +42,5 @@ export const loadRuntimeJSONs = () => {
       })
   )
 
-  return new Promise((resolve) => {
-    Promise.all(promises).then(() => {
-      window.__RUNTIME__.extensions =
-        window.__RUNTIME_EXTENSIONS__ ?? window.__RUNTIME__.extensions
-      resolve()
-    })
-  })
+  return Promise.all(promises)
 }
