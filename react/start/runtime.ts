@@ -40,6 +40,8 @@ export const loadRuntimeJSONs = () => {
     Promise.all(promises).then(() => {
       window.__RUNTIME__.extensions =
         window.__RUNTIME_EXTENSIONS__ ?? window.__RUNTIME__.extensions
+      window.__RUNTIME__.queryData =
+        window.__RUNTIME_QUERYDATA__ ?? window.__RUNTIME__.queryData
       resolve()
     })
   })
