@@ -3,7 +3,7 @@ const getValue = (element: HTMLTemplateElement) => {
     return element.textContent as string
   }
 
-  // Using nodeValue instead of innerHTML because it's faster
+  // Using textContent instead of innerHTML because it's faster
   let value = ''
   const childNodes = element.content.childNodes
   for (let i = 0; i < childNodes.length; i++) {
