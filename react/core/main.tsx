@@ -57,7 +57,10 @@ import {
 import withHMR from '../utils/withHMR'
 import { generateExtensions } from '../utils/blocks'
 
-import { hydrateApolloCache as importedHydrateApolloCache } from '../utils/apolloCache'
+import {
+  hydrateApolloCache as importedHydrateApolloCache,
+  asyncHydrateApolloCache,
+} from '../utils/apolloCache'
 
 let emitter: EventEmitter | null = null
 
@@ -207,7 +210,16 @@ const render = async (
     return apolloClient
   }
 
-  const hydrateApolloCache = (apolloClient: any) => {
+  const hydrateApolloCache = (apolloClient: any, isAsync = false) => {
+    if (isAsync) {
+      return queryData
+        ? asyncHydrateApolloCache(
+            queryData,
+            apolloClient,
+            "Error writing query from render-server in Apollo's cache"
+          )
+        : Promise.resolve([])
+    }
     if (queryData) {
       importedHydrateApolloCache(
         queryData,
@@ -215,6 +227,7 @@ const render = async (
         "Error writing query from render-server in Apollo's cache"
       )
     }
+    return Promise.resolve([])
   }
 
   const createRoot = (apolloClient: any) => (
@@ -231,19 +244,20 @@ const render = async (
     </RenderProvider>
   )
 
+  Promise.resolve().then(() => {})
   if (canUseDOM) {
     const renderFn = disableSSR || created ? renderDOM : hydrate
 
     return new Promise((resolve) => {
       setTimeout(() => {
         const apolloClient = createApolloClient()
-        hydrateApolloCache(apolloClient)
-
-        setTimeout(() => {
-          resolve(
-            (renderFn(createRoot(apolloClient), elem) as unknown) as Element
-          )
-        }, 1)
+        hydrateApolloCache(apolloClient, true).then(() => {
+          setTimeout(() => {
+            resolve(
+              (renderFn(createRoot(apolloClient), elem) as unknown) as Element
+            )
+          }, 1)
+        })
       }, 1)
     })
   }
