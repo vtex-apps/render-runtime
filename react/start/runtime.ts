@@ -13,7 +13,7 @@ const getValue = (element: HTMLTemplateElement) => {
   return value
 }
 
-export const loadRuntimeJSONs = () => {
+export const loadRuntimeJSONs = (): Promise<void | void[]> => {
   const scripts = window?.document?.querySelectorAll<HTMLTemplateElement>(
     'template[data-type="json"]'
   )
@@ -23,7 +23,7 @@ export const loadRuntimeJSONs = () => {
 
   const promises = Array.from(scripts).map(
     (script) =>
-      new Promise((resolve) => {
+      new Promise<void>((resolve) => {
         setTimeout(() => {
           const value = getValue(script)
           setTimeout(() => {
