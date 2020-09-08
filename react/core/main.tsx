@@ -207,7 +207,7 @@ const render = async (
     return apolloClient
   }
 
-  const hydrateApolloCache = (apolloClient) => {
+  const hydrateApolloCache = (apolloClient: any) => {
     if (queryData) {
       importedHydrateApolloCache(
         queryData,

@@ -243,10 +243,9 @@ class RenderProvider extends Component<
       rootPath = '',
       route,
       settings,
-      queryData,
       loadedDevices,
     } = props.runtime
-    const { history, baseURI, cacheControl, deviceInfo } = props
+    const { history, deviceInfo } = props
     const ignoreCanonicalReplacement = query && query.map
     this.fetcher = fetch
 
