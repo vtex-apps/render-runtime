@@ -8,7 +8,6 @@ import { polyfillIntl } from './start/intl'
 import { addAMPProxy } from './start/amp'
 import { patchLibs } from './start/patchLibs'
 import { registerRuntimeGlobals } from './start/register'
-import { createUncriticalPromise } from './start/uncritical'
 import { loadRuntimeJSONs } from './start/runtime'
 import { hydrateUncriticalStyles } from './start/styles'
 
@@ -29,9 +28,6 @@ function start() {
         }
       })
 
-      const resolveUncriticalPromise = createUncriticalPromise(
-        window.__RUNTIME__
-      )
       Promise.all([
         contentLoadedPromise,
         intlPolyfillPromise,
@@ -46,7 +42,6 @@ function start() {
             'render-start',
             'render-end'
           )
-          resolveUncriticalPromise()
         }, 1)
       })
     } else {
