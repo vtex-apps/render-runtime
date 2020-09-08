@@ -27,8 +27,14 @@ export const loadRuntimeJSONs = () => {
         setTimeout(() => {
           const value = getValue(script)
           setTimeout(() => {
-            if (script.dataset.varname) {
-              ;(window as any)[script.dataset.varname] = JSON.parse(value)
+            const { varname, field } = script.dataset
+            const windowAsAny = window as any
+            if (varname) {
+              if (field && windowAsAny[varname]) {
+                windowAsAny[varname][field] = JSON.parse(value)
+              } else {
+                windowAsAny[varname] = JSON.parse(value)
+              }
             }
             resolve()
           }, 1)
@@ -36,13 +42,5 @@ export const loadRuntimeJSONs = () => {
       })
   )
 
-  return new Promise((resolve) => {
-    Promise.all(promises).then(() => {
-      window.__RUNTIME__.extensions =
-        window.__RUNTIME_EXTENSIONS__ ?? window.__RUNTIME__.extensions
-      window.__RUNTIME__.queryData =
-        window.__RUNTIME_QUERYDATA__ ?? window.__RUNTIME__.queryData
-      resolve()
-    })
-  })
+  return Promise.all(promises)
 }
