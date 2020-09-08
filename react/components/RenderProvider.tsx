@@ -80,6 +80,8 @@ interface Props {
   baseURI: string
   root: string
   runtime: RenderRuntime
+  apolloLinkTest: any
+  apolloClient: any
 }
 
 export interface RenderProviderState {
@@ -286,19 +288,20 @@ class RenderProvider extends Component<
     this.sessionPromise = canUseDOM
       ? window.__RENDER_8_SESSION__.sessionPromise
       : Promise.resolve()
-    const runtimeContextLink = this.createRuntimeContextLink()
-    this.apolloClient = getClient(
-      props.runtime,
-      baseURI,
-      runtimeContextLink,
-      this.sessionPromise,
-      this.fetcher,
-      cacheControl
-    )
+    // const runtimeContextLink = this.createRuntimeContextLink()
+    // this.apolloClient = getClient(
+    //   props.runtime,
+    //   baseURI,
+    //   runtimeContextLink,
+    //   this.sessionPromise,
+    //   this.fetcher,
+    //   cacheControl
+    // )
+    this.apolloClient = this.props.apolloClient
 
-    if (queryData) {
-      this.hydrateApolloCache(queryData)
-    }
+    // if (queryData) {
+    //   this.hydrateApolloCache(queryData)
+    // }
 
     this.state = {
       appsEtag,
@@ -1068,6 +1071,16 @@ class RenderProvider extends Component<
         messages,
         pages,
       } = this.state
+
+      console.log('apollo link?', {
+        appsEtag,
+        cacheHints,
+        components,
+        culture,
+        extensions,
+        messages,
+        pages,
+      })
       operation.setContext(
         (currentContext: OperationContext): OperationContext => {
           return {
@@ -1169,6 +1182,22 @@ class RenderProvider extends Component<
     if (!equals(this.state.deviceInfo, this.props.deviceInfo)) {
       this.updateDevice(this.props.deviceInfo)
     }
+    const a = [
+      'appsEtag',
+      'cacheHints',
+      'components',
+      'culture',
+      'extensions',
+      'messages',
+      'pages',
+    ]
+    a.forEach((item) => {
+      const apolloLinkTest = this.props.apolloLinkTest
+      if (!apolloLinkTest) {
+        return
+      }
+      apolloLinkTest[item] = (this.state as any)[item]
+    })
   }
 
   public render() {

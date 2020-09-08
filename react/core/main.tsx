@@ -5,6 +5,9 @@ import 'apollo-link-persisted-queries'
 import 'apollo-upload-client'
 import 'apollo-utilities'
 import 'classnames'
+import { ApolloLink, NextLink, Operation } from 'apollo-link'
+import { OperationContext } from '../utils/client/links/uriSwitchLink'
+import { getClient } from '../utils/client'
 import * as EventEmitter from 'eventemitter3'
 import { canUseDOM } from 'exenv'
 import 'graphql'
@@ -54,6 +57,8 @@ import {
 import withHMR from '../utils/withHMR'
 import { generateExtensions } from '../utils/blocks'
 
+import { hydrateApolloCache as importedHydrateApolloCache } from '../utils/apolloCache'
+
 let emitter: EventEmitter | null = null
 
 const renderExtension = (
@@ -99,6 +104,47 @@ function renderToStringWithData(
   })
 }
 
+function createRuntimeContextLink(obj: any) {
+  return new ApolloLink((operation: Operation, forward?: NextLink) => {
+    const {
+      appsEtag,
+      cacheHints,
+      components,
+      culture,
+      extensions,
+      messages,
+      pages,
+    } = obj
+
+    console.log('apollo link?', {
+      appsEtag,
+      cacheHints,
+      components,
+      culture,
+      extensions,
+      messages,
+      pages,
+    })
+    operation.setContext(
+      (currentContext: OperationContext): OperationContext => {
+        return {
+          ...currentContext,
+          runtime: {
+            appsEtag,
+            cacheHints,
+            components,
+            culture,
+            extensions,
+            messages,
+            pages,
+          },
+        }
+      }
+    )
+    return forward ? forward(operation) : null
+  })
+}
+
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = async (
   name: string,
@@ -125,13 +171,61 @@ const render = async (
   const elem = element || getContainer()
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
 
-  const root = (
+  const sessionPromise = canUseDOM
+    ? window.__RENDER_8_SESSION__.sessionPromise
+    : Promise.resolve()
+
+  const {
+    appsEtag,
+    cacheHints,
+    components,
+    culture,
+    messages,
+    queryData,
+  } = runtime
+
+  const apolloLinkTest = {
+    appsEtag,
+    cacheHints,
+    components,
+    culture,
+    extensions,
+    messages,
+    pages,
+  }
+
+  const createApolloClient = () => {
+    const runtimeContextLink = createRuntimeContextLink(apolloLinkTest)
+    const apolloClient = getClient(
+      runtime,
+      baseURI,
+      runtimeContextLink,
+      sessionPromise,
+      fetch,
+      cacheControl
+    )
+    return apolloClient
+  }
+
+  const hydrateApolloCache = (apolloClient) => {
+    if (queryData) {
+      importedHydrateApolloCache(
+        queryData,
+        apolloClient,
+        "Error writing query from render-server in Apollo's cache"
+      )
+    }
+  }
+
+  const createRoot = (apolloClient: any) => (
     <RenderProvider
       history={history}
       cacheControl={cacheControl}
       baseURI={baseURI}
       root={name}
       runtime={runtime}
+      apolloLinkTest={apolloLinkTest}
+      apolloClient={apolloClient}
     >
       {!isPage ? <ExtensionPoint id={name} /> : null}
     </RenderProvider>
@@ -140,7 +234,18 @@ const render = async (
   if (canUseDOM) {
     const renderFn = disableSSR || created ? renderDOM : hydrate
 
-    return (renderFn(root, elem) as unknown) as Element
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const apolloClient = createApolloClient()
+        hydrateApolloCache(apolloClient)
+
+        setTimeout(() => {
+          resolve(
+            (renderFn(createRoot(apolloClient), elem) as unknown) as Element
+          )
+        }, 1)
+      }, 1)
+    })
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -157,8 +262,10 @@ const render = async (
       /* webpackMode: "weak" */
       '../AMP'
     ).then(({ setupAMP }) => {
+      const apolloClient = createApolloClient()
+      hydrateApolloCache(apolloClient)
       const { ampRoot, getExtraRenderedData } = setupAMP(
-        root,
+        createRoot(apolloClient),
         renderToStaticMarkup,
         runtime
       )
@@ -175,13 +282,17 @@ const render = async (
     })
   }
 
-  return renderToStringWithData(root, renderToString, disableSSQ).then(
-    ({ markup, renderTimeMetric }) => ({
-      ...commonRenderResult,
-      markups: getMarkups(name, markup),
-      renderTimeMetric,
-    })
-  )
+  const apolloClient = createApolloClient()
+  hydrateApolloCache(apolloClient)
+  return renderToStringWithData(
+    createRoot(apolloClient),
+    renderToString,
+    disableSSQ
+  ).then(({ markup, renderTimeMetric }) => ({
+    ...commonRenderResult,
+    markups: getMarkups(name, markup),
+    renderTimeMetric,
+  }))
 }
 
 function validateRootComponent(rootName: string, extensions: Extensions) {
