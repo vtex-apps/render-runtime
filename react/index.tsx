@@ -28,10 +28,20 @@ function start() {
         }
       })
 
+      const scriptsLoadedPromise = new Promise((resolve) => {
+        const interval = setInterval(() => {
+          if ((window as any).allScriptsLoaded) {
+            resolve()
+            clearInterval(interval)
+          }
+        }, 100)
+      })
+
       Promise.all([
         contentLoadedPromise,
         intlPolyfillPromise,
         uncriticalStylesPromise,
+        scriptsLoadedPromise,
       ]).then(() => {
         setTimeout(() => {
           window?.performance?.mark?.('render-start')
