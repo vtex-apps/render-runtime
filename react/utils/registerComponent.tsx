@@ -65,7 +65,7 @@ export default (
   if (module.hot || !lazy) {
     const implementer = lazy ? InitialImplementer() : InitialImplementer
     const wrappedComponent = maybeWrapWithHMR(module, implementer)
-    componentLocators.forEach(locator => {
+    componentLocators.forEach((locator) => {
       window.__RENDER_8_COMPONENTS__[locator] = wrappedComponent
       loadedComponents[locator] = { implementer: wrappedComponent }
     })
@@ -73,7 +73,7 @@ export default (
     return wrappedComponent
   }
 
-  componentLocators.forEach(locator => {
+  componentLocators.forEach((locator) => {
     Object.defineProperty(window.__RENDER_8_COMPONENTS__, locator, {
       get: () => {
         if (loadedComponents[locator]) {
@@ -81,7 +81,7 @@ export default (
         }
 
         const implementer = InitialImplementer()
-        componentLocators.forEach(eachLocator => {
+        componentLocators.forEach((eachLocator) => {
           loadedComponents[eachLocator] = { implementer }
         })
 

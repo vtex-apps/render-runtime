@@ -1,5 +1,5 @@
 const delay = (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 const RETRY_STATUSES = [
@@ -36,13 +36,13 @@ export const fetchWithRetry = (
     attempt = 0
   ): Promise<{ response: Response; error: any }> =>
     fetcher(url, init)
-      .then(response => {
+      .then((response) => {
         status = response.status
         return ok(status) || isNotFound(status)
           ? { response, error: null }
           : response
               .json()
-              .then(error => ({ response, error }))
+              .then((error) => ({ response, error }))
               .catch(() => ({
                 response,
                 error: { message: 'Unable to parse JSON' },
@@ -54,7 +54,7 @@ export const fetchWithRetry = (
         }
         return { response, error: null }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
 
         if (attempt >= maxRetries || !canRetry(status)) {
