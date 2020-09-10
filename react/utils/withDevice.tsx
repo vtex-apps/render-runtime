@@ -28,8 +28,8 @@ const useDevice = (hints: RenderHints) => {
   /** These screensizes are hardcoded, based on the default
    * Tachyons breakpoints. They should probably be the ones
    * configured via the style.json file, if available. */
-  const isScreenMedium = useMedia({ minWidth: '40rem' })
-  const isScreenLarge = useMedia({ minWidth: '64.1rem' })
+  // const isScreenMedium = useMedia({ minWidth: '40rem' })
+  // const isScreenLarge = useMedia({ minWidth: '64.1rem' })
 
   const serverDevice = {
     type: hints.phone
@@ -40,16 +40,18 @@ const useDevice = (hints: RenderHints) => {
     isMobile: hints.mobile,
   }
 
-  const clientDevice = {
-    type: isScreenLarge
-      ? Device.desktop
-      : isScreenMedium
-      ? Device.tablet
-      : Device.phone,
-    isMobile: !isScreenLarge,
-  }
+  return serverDevice
 
-  return isSSR ? serverDevice : clientDevice
+  // const clientDevice = {
+  //   type: isScreenLarge
+  //     ? Device.desktop
+  //     : isScreenMedium
+  //     ? Device.tablet
+  //     : Device.phone,
+  //   isMobile: !isScreenLarge,
+  // }
+
+  // return isSSR ? serverDevice : clientDevice
 }
 
 export const withDevice = <P extends Props>(
