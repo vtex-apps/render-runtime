@@ -17,8 +17,6 @@ import {
   hotReloadTachyons,
   prefetchAssets,
 } from '../utils/assets'
-import PageCacheControl from '../utils/cacheControl'
-import { getClient } from '../utils/client'
 import { OperationContext } from '../utils/client/links/uriSwitchLink'
 import {
   traverseComponent,
@@ -62,6 +60,7 @@ import {
 } from './Prefetch/PrefetchContext'
 import { hydrateApolloCache } from '../utils/apolloCache'
 import { withDevice, WithDeviceProps, DeviceInfo } from '../utils/withDevice'
+import { ApolloClientResponse } from '../utils/client'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -76,10 +75,10 @@ const InspectorPopover = React.lazy(
 interface Props {
   children: ReactElement<any> | null
   history: History | null
-  cacheControl?: PageCacheControl
-  baseURI: string
   root: string
   runtime: RenderRuntime
+  sessionPromise: Promise<void>
+  getApolloClient: ApolloClientResponse['getApolloClient']
 }
 
 export interface RenderProviderState {
@@ -127,7 +126,7 @@ interface NavigationState {
   lastOptions?: NavigateOptions
 }
 
-class RenderProvider extends Component<
+export class RenderProvider extends Component<
   Props & WithDeviceProps,
   RenderProviderState
 > {
@@ -241,10 +240,9 @@ class RenderProvider extends Component<
       rootPath = '',
       route,
       settings,
-      queryData,
       loadedDevices,
     } = props.runtime
-    const { history, baseURI, cacheControl, deviceInfo } = props
+    const { history, deviceInfo, sessionPromise, getApolloClient } = props
     const ignoreCanonicalReplacement = query && query.map
     this.fetcher = fetch
 
@@ -283,22 +281,8 @@ class RenderProvider extends Component<
     }
 
     // todo: reload window if client-side created a segment different from server-side
-    this.sessionPromise = canUseDOM
-      ? window.__RENDER_8_SESSION__.sessionPromise
-      : Promise.resolve()
-    const runtimeContextLink = this.createRuntimeContextLink()
-    this.apolloClient = getClient(
-      props.runtime,
-      baseURI,
-      runtimeContextLink,
-      this.sessionPromise,
-      this.fetcher,
-      cacheControl
-    )
-
-    if (queryData) {
-      this.hydrateApolloCache(queryData)
-    }
+    this.sessionPromise = sessionPromise
+    this.apolloClient = getApolloClient(this)
 
     this.state = {
       appsEtag,

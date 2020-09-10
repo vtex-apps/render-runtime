@@ -1,3 +1,5 @@
+import { promised } from '../utils/promise'
+
 const getValue = (element: HTMLTemplateElement) => {
   if (typeof element.content === 'undefined') {
     return element.textContent as string
@@ -13,33 +15,44 @@ const getValue = (element: HTMLTemplateElement) => {
   return value
 }
 
+const writeVarToWindow = (template: HTMLTemplateElement, value: string) => {
+  const { varname, field } = template.dataset
+  const windowAsAny = window as any
+  if (!varname) {
+    console.error('Missing data-varname:', template)
+    return
+  }
+
+  if (!field) {
+    windowAsAny[varname] = JSON.parse(value)
+    return
+  }
+
+  if (!windowAsAny[varname]) {
+    console.error(`Global var ${varname} not found to set ${field}`)
+  }
+
+  windowAsAny[varname][field] = JSON.parse(value)
+}
+
 export const loadRuntimeJSONs = (): Promise<void | void[]> => {
-  const scripts = window?.document?.querySelectorAll<HTMLTemplateElement>(
+  const templates = window?.document?.querySelectorAll<HTMLTemplateElement>(
     'template[data-type="json"]'
   )
-  if (!scripts || scripts.length === 0) {
+  if (!templates || templates.length === 0) {
     return Promise.resolve()
   }
 
-  const promises = Array.from(scripts).map(
-    (script) =>
-      new Promise<void>((resolve) => {
-        setTimeout(() => {
-          const value = getValue(script)
-          setTimeout(() => {
-            const { varname, field } = script.dataset
-            const windowAsAny = window as any
-            if (varname) {
-              if (field && windowAsAny[varname]) {
-                windowAsAny[varname][field] = JSON.parse(value)
-              } else {
-                windowAsAny[varname] = JSON.parse(value)
-              }
-            }
-            resolve()
-          }, 1)
-        }, 1)
+  const promises = Array.from(templates).map((template) =>
+    promised<string>((resolve) => {
+      const value = getValue(template)
+      resolve(value)
+    }).then((value) =>
+      promised((resolve) => {
+        writeVarToWindow(template, value)
+        resolve()
       })
+    )
   )
 
   return Promise.all(promises)
