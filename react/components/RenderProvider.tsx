@@ -1041,37 +1041,6 @@ export class RenderProvider extends Component<
     await this.sendInfoFromIframe()
   }
 
-  public createRuntimeContextLink() {
-    return new ApolloLink((operation: Operation, forward?: NextLink) => {
-      const {
-        appsEtag,
-        cacheHints,
-        components,
-        culture,
-        extensions,
-        messages,
-        pages,
-      } = this.state
-      operation.setContext(
-        (currentContext: OperationContext): OperationContext => {
-          return {
-            ...currentContext,
-            runtime: {
-              appsEtag,
-              cacheHints,
-              components,
-              culture,
-              extensions,
-              messages,
-              pages,
-            },
-          }
-        }
-      )
-      return forward ? forward(operation) : null
-    })
-  }
-
   public updateExtension = async (name: string, extension: Extension) => {
     const { extensions } = this.state
 
