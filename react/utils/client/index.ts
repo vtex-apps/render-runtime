@@ -22,7 +22,7 @@ import { omitTypenameLink } from './links/omitVariableTypenameLink'
 import { createUriSwitchLink } from './links/uriSwitchLink'
 import { versionSplitterLink } from './links/versionSplitterLink'
 import { createRuntimeContextLink } from './links/runtimeContextLink'
-import { createHydrationFn } from '../apolloCache'
+import { createHydrationFn, QueryData } from '../apolloCache'
 import { RenderProvider } from '../../components/RenderProvider'
 import { promised } from '../promise'
 
@@ -30,9 +30,9 @@ interface ApolloClientsRegistry {
   [key: string]: ApolloClientType
 }
 
-export interface ApolloClientResponse {
-  getApolloClient: (instance: RenderProvider) => ApolloClientType
-  hydrate: (isAsync: boolean) => Promise<void>
+export interface ApolloClientFunctions {
+  getClient: (instance: RenderProvider) => ApolloClientType
+  hydrate: (queryData: QueryData[] | undefined) => Promise<void>
 }
 
 const buildCacheId = (
@@ -166,7 +166,7 @@ export const createApolloClient = (
   baseURI: string,
   sessionPromise: Promise<void>,
   cacheControl?: PageCacheControl
-): Promise<ApolloClientResponse> => {
+): Promise<ApolloClientFunctions> => {
   return promised((resolve) => {
     const {
       setRenderProviderInstance,
@@ -183,11 +183,11 @@ export const createApolloClient = (
     )
 
     resolve({
-      getApolloClient: (instance: RenderProvider) => {
+      getClient: (instance: RenderProvider) => {
         setRenderProviderInstance(instance)
         return client
       },
-      hydrate: createHydrationFn(runtime.queryData, client),
+      hydrate: createHydrationFn(client),
     })
   })
 }

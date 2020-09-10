@@ -56,9 +56,8 @@ import {
   getPrefetechedData,
   PrefetchContextProvider,
 } from './Prefetch/PrefetchContext'
-import { hydrateApolloCache } from '../utils/apolloCache'
 import { withDevice, WithDeviceProps, DeviceInfo } from '../utils/withDevice'
-import { ApolloClientResponse } from '../utils/client'
+import { ApolloClientFunctions } from '../utils/client'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -76,7 +75,7 @@ interface Props {
   root: string
   runtime: RenderRuntime
   sessionPromise: Promise<void>
-  getApolloClient: ApolloClientResponse['getApolloClient']
+  apollo: ApolloClientFunctions
 }
 
 export interface RenderProviderState {
@@ -212,6 +211,7 @@ export class RenderProvider extends Component<
   private sessionPromise: Promise<void>
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClientType
+  private hydrateApollo: ApolloClientFunctions['hydrate']
   private prefetchRoutes: Set<string>
   public navigationRouteModifiers: Set<NavigationRouteModifier>
   private navigationModifierOptions: Record<string, NavigationRouteChange>
@@ -240,7 +240,7 @@ export class RenderProvider extends Component<
       settings,
       loadedDevices,
     } = props.runtime
-    const { history, deviceInfo, sessionPromise, getApolloClient } = props
+    const { apollo, history, deviceInfo, sessionPromise } = props
     const ignoreCanonicalReplacement = query && query.map
     this.fetcher = fetch
 
@@ -280,7 +280,8 @@ export class RenderProvider extends Component<
 
     // todo: reload window if client-side created a segment different from server-side
     this.sessionPromise = sessionPromise
-    this.apolloClient = getApolloClient(this)
+    this.apolloClient = apollo.getClient(this)
+    this.hydrateApollo = apollo.hydrate
 
     this.state = {
       appsEtag,
@@ -711,29 +712,27 @@ export class RenderProvider extends Component<
         }
       }
 
-      if (prefetchedPathData.queryData) {
-        this.hydrateApolloCache(prefetchedPathData.queryData)
-      }
-
-      this.setState(
-        (state) => ({
-          ...state,
-          components: { ...state.components, ...routeData.components },
-          extensions: { ...state.extensions, ...extensions },
-          loadedPages: loadedPages.add(routeId),
-          messages: { ...state.messages, ...messages },
-          page: routeId,
-          preview: false,
-          query,
-          route: matchingPage,
-        }),
-        () => {
-          this.navigationState = { isNavigating: false }
-          this.replaceRouteClass(routeId)
-          this.sendInfoFromIframe()
-          this.scrollTo(state.scrollOptions)
-        }
-      )
+      this.hydrateApollo(prefetchedPathData.queryData).then(() => {
+        this.setState(
+          (state) => ({
+            ...state,
+            components: { ...state.components, ...routeData.components },
+            extensions: { ...state.extensions, ...extensions },
+            loadedPages: loadedPages.add(routeId),
+            messages: { ...state.messages, ...messages },
+            page: routeId,
+            preview: false,
+            query,
+            route: matchingPage,
+          }),
+          () => {
+            this.navigationState = { isNavigating: false }
+            this.replaceRouteClass(routeId)
+            this.sendInfoFromIframe()
+            this.scrollTo(state.scrollOptions)
+          }
+        )
+      })
 
       return Promise.resolve()
     }
@@ -773,11 +772,10 @@ export class RenderProvider extends Component<
               return new Promise(() => {})
             }
 
-            if (queryData) {
-              this.hydrateApolloCache(queryData)
-            }
-
-            await this.fetchComponents(components, extensions)
+            await Promise.all([
+              this.hydrateApollo(queryData),
+              this.fetchComponents(components, extensions),
+            ])
 
             this.setState(
               (state) => ({
@@ -1178,20 +1176,6 @@ export class RenderProvider extends Component<
           </ApolloProvider>
         </TreePathContextProvider>
       </RenderContextProvider>
-    )
-  }
-
-  private hydrateApolloCache = (
-    queryData: Array<{
-      data: string
-      query: string
-      variables: Record<string, any>
-    }>
-  ) => {
-    hydrateApolloCache(
-      queryData,
-      this.apolloClient,
-      "Error writing query from render-server in Apollo's cache"
     )
   }
 

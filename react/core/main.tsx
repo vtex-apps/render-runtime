@@ -41,7 +41,7 @@ import PageCacheControl from '../utils/cacheControl'
 import {
   getState,
   createApolloClient,
-  ApolloClientResponse,
+  ApolloClientFunctions,
 } from '../utils/client'
 import { buildCacheLocator } from '../utils/client'
 import { ensureContainer, getContainer, getMarkups } from '../utils/dom'
@@ -119,7 +119,7 @@ const createRootElement = (
   name: string,
   runtime: RenderRuntime,
   sessionPromise: Promise<void>,
-  getApolloClient: ApolloClientResponse['getApolloClient']
+  apollo: ApolloClientFunctions
 ) => {
   const { customRouting, pages, extensions } = runtime
   const isPage =
@@ -128,7 +128,7 @@ const createRootElement = (
 
   return (
     <RenderProvider
-      getApolloClient={getApolloClient}
+      apollo={apollo}
       history={history}
       root={name}
       runtime={runtime}
@@ -143,8 +143,7 @@ const prepareRootElement = (
   name: string,
   runtime: RenderRuntime,
   baseURI: string,
-  cacheControl: PageCacheControl | undefined,
-  hydrateAsync = false
+  cacheControl: PageCacheControl | undefined
 ) => {
   const sessionPromise = canUseDOM
     ? window.__RENDER_8_SESSION__.sessionPromise
@@ -155,10 +154,10 @@ const prepareRootElement = (
     baseURI,
     sessionPromise,
     cacheControl
-  ).then(({ hydrate, getApolloClient }) =>
-    hydrate(hydrateAsync).then(() =>
-      createRootElement(name, runtime, sessionPromise, getApolloClient)
-    )
+  ).then((apollo) =>
+    apollo
+      .hydrate(runtime.queryData)
+      .then(() => createRootElement(name, runtime, sessionPromise, apollo))
   )
 }
 
@@ -179,7 +178,7 @@ const render = async (
   if (canUseDOM) {
     const renderFn = disableSSR || created ? renderDOM : hydrate
     return promised((resolve) => {
-      prepareRootElement(name, runtime, baseURI, cacheControl, true)
+      prepareRootElement(name, runtime, baseURI, cacheControl)
         .then((root) => clientRender(renderFn, root, containerElement))
         .then(resolve)
     })
