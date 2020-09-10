@@ -1,4 +1,3 @@
-import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
@@ -17,7 +16,6 @@ import {
   hotReloadTachyons,
   prefetchAssets,
 } from '../utils/assets'
-import { OperationContext } from '../utils/client/links/uriSwitchLink'
 import {
   traverseComponent,
   traverseListOfComponents,
