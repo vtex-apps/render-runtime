@@ -1,5 +1,6 @@
 import React, { useContext, FC } from 'react'
 import styles from './LazyImages.css'
+import { Helmet } from 'react-helmet'
 
 interface LazyImagesContext {
   lazyLoad: boolean
@@ -76,6 +77,27 @@ const MaybeLazyImage: FC<MaybeLazyImageProps> = ({
         break
     }
     return createElement.apply(React, ['img', newImageProps])
+  }
+
+  const isPreloaded = String(imageProps['data-vtex-preload']) === 'true'
+
+  // If it's preloaded, render the image along with a Helmet that adds preload
+  if (isPreloaded) {
+    return (
+      <>
+        <Helmet
+          link={[
+            {
+              rel: 'preload',
+              as: 'image',
+              href: imageProps.src,
+              crossOrigin: imageProps.crossOrigin,
+            },
+          ]}
+        />
+        {createElement.apply(React, ['img', imageProps])}
+      </>
+    )
   }
 
   // Otherwise, just render the image
