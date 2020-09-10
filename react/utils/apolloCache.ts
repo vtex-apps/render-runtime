@@ -1,4 +1,6 @@
 import { parse } from 'graphql'
+import { promised } from './promise'
+import { canUseDOM } from 'exenv'
 
 export interface QueryData {
   data: string
@@ -6,7 +8,21 @@ export interface QueryData {
   variables: Record<string, any>
 }
 
-export const hydrateApolloCache = (
+export const createHydrationFn = (
+  client: ApolloClientType,
+  warningMessage = "Error writing query from render-server in Apollo's cache"
+) => {
+  return async (queryData: QueryData[] | undefined) => {
+    if (!queryData || queryData.length === 0) {
+      return
+    }
+
+    const hydrationFn = canUseDOM ? hydrateApolloCacheAsync : hydrateApolloCache
+    await hydrationFn(queryData, client, warningMessage)
+  }
+}
+
+const hydrateApolloCache = (
   queryData: QueryData[],
   client: ApolloClientType,
   warningMessage?: string
@@ -24,4 +40,29 @@ export const hydrateApolloCache = (
       }
     }
   })
+}
+
+const hydrateApolloCacheAsync = (
+  queryData: QueryData[],
+  client: ApolloClientType,
+  warningMessage?: string
+) => {
+  return Promise.all(
+    queryData.map(({ data, query, variables }) => {
+      return promised((resolve) => {
+        try {
+          client.writeQuery({
+            query: parse(query),
+            data: JSON.parse(data),
+            variables,
+          })
+        } catch (error) {
+          if (warningMessage) {
+            console.warn(warningMessage, error)
+          }
+        }
+        resolve()
+      })
+    })
+  )
 }

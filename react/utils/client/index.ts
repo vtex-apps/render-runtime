@@ -2,7 +2,6 @@ import {
   InMemoryCache,
   IntrospectionFragmentMatcher,
   IntrospectionResultData,
-  NormalizedCacheObject,
 } from 'apollo-cache-inmemory'
 import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
@@ -22,9 +21,18 @@ import { createIOFetchLink } from './links/ioFetchLink'
 import { omitTypenameLink } from './links/omitVariableTypenameLink'
 import { createUriSwitchLink } from './links/uriSwitchLink'
 import { versionSplitterLink } from './links/versionSplitterLink'
+import { createRuntimeContextLink } from './links/runtimeContextLink'
+import { createHydrationFn, QueryData } from '../apolloCache'
+import { RenderProvider } from '../../components/RenderProvider'
+import { promised } from '../promise'
 
 interface ApolloClientsRegistry {
   [key: string]: ApolloClientType
+}
+
+export interface ApolloClientFunctions {
+  getClient: (instance: RenderProvider) => ApolloClientType
+  hydrate: (queryData: QueryData[] | undefined) => Promise<void>
 }
 
 const buildCacheId = (
@@ -67,7 +75,7 @@ export const getState = (runtime: RenderRuntime) => {
   return apolloClient ? apolloClient.cache.extract() : {}
 }
 
-export const getClient = (
+const getOrCreateClient = (
   runtime: RenderRuntime,
   baseURI: string,
   runtimeContextLink: ApolloLink,
@@ -151,4 +159,35 @@ export const getClient = (
   }
 
   return clientsByWorkspace[`${account}/${workspace}`]
+}
+
+export const createApolloClient = (
+  runtime: RenderRuntime,
+  baseURI: string,
+  sessionPromise: Promise<void>,
+  cacheControl?: PageCacheControl
+): Promise<ApolloClientFunctions> => {
+  return promised((resolve) => {
+    const {
+      setRenderProviderInstance,
+      link: runtimeContextLink,
+    } = createRuntimeContextLink(runtime)
+
+    const client = getOrCreateClient(
+      runtime,
+      baseURI,
+      runtimeContextLink,
+      sessionPromise,
+      fetch,
+      cacheControl
+    )
+
+    resolve({
+      getClient: (instance: RenderProvider) => {
+        setRenderProviderInstance(instance)
+        return client
+      },
+      hydrate: createHydrationFn(client),
+    })
+  })
 }

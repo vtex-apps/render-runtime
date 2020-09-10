@@ -1,4 +1,3 @@
-import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
@@ -17,9 +16,6 @@ import {
   hotReloadTachyons,
   prefetchAssets,
 } from '../utils/assets'
-import PageCacheControl from '../utils/cacheControl'
-import { getClient } from '../utils/client'
-import { OperationContext } from '../utils/client/links/uriSwitchLink'
 import {
   traverseComponent,
   traverseListOfComponents,
@@ -60,8 +56,8 @@ import {
   getPrefetechedData,
   PrefetchContextProvider,
 } from './Prefetch/PrefetchContext'
-import { hydrateApolloCache } from '../utils/apolloCache'
 import { withDevice, WithDeviceProps, DeviceInfo } from '../utils/withDevice'
+import { ApolloClientFunctions } from '../utils/client'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -76,10 +72,10 @@ const InspectorPopover = React.lazy(
 interface Props {
   children: ReactElement<any> | null
   history: History | null
-  cacheControl?: PageCacheControl
-  baseURI: string
   root: string
   runtime: RenderRuntime
+  sessionPromise: Promise<void>
+  apollo: ApolloClientFunctions
 }
 
 export interface RenderProviderState {
@@ -127,7 +123,7 @@ interface NavigationState {
   lastOptions?: NavigateOptions
 }
 
-class RenderProvider extends Component<
+export class RenderProvider extends Component<
   Props & WithDeviceProps,
   RenderProviderState
 > {
@@ -215,6 +211,7 @@ class RenderProvider extends Component<
   private sessionPromise: Promise<void>
   private unlisten!: UnregisterCallback | null
   private apolloClient: ApolloClientType
+  private hydrateApollo: ApolloClientFunctions['hydrate']
   private prefetchRoutes: Set<string>
   public navigationRouteModifiers: Set<NavigationRouteModifier>
   private navigationModifierOptions: Record<string, NavigationRouteChange>
@@ -241,10 +238,9 @@ class RenderProvider extends Component<
       rootPath = '',
       route,
       settings,
-      queryData,
       loadedDevices,
     } = props.runtime
-    const { history, baseURI, cacheControl, deviceInfo } = props
+    const { apollo, history, deviceInfo, sessionPromise } = props
     const ignoreCanonicalReplacement = query && query.map
     this.fetcher = fetch
 
@@ -283,22 +279,9 @@ class RenderProvider extends Component<
     }
 
     // todo: reload window if client-side created a segment different from server-side
-    this.sessionPromise = canUseDOM
-      ? window.__RENDER_8_SESSION__.sessionPromise
-      : Promise.resolve()
-    const runtimeContextLink = this.createRuntimeContextLink()
-    this.apolloClient = getClient(
-      props.runtime,
-      baseURI,
-      runtimeContextLink,
-      this.sessionPromise,
-      this.fetcher,
-      cacheControl
-    )
-
-    if (queryData) {
-      this.hydrateApolloCache(queryData)
-    }
+    this.sessionPromise = sessionPromise
+    this.apolloClient = apollo.getClient(this)
+    this.hydrateApollo = apollo.hydrate
 
     this.state = {
       appsEtag,
@@ -729,29 +712,27 @@ class RenderProvider extends Component<
         }
       }
 
-      if (prefetchedPathData.queryData) {
-        this.hydrateApolloCache(prefetchedPathData.queryData)
-      }
-
-      this.setState(
-        (state) => ({
-          ...state,
-          components: { ...state.components, ...routeData.components },
-          extensions: { ...state.extensions, ...extensions },
-          loadedPages: loadedPages.add(routeId),
-          messages: { ...state.messages, ...messages },
-          page: routeId,
-          preview: false,
-          query,
-          route: matchingPage,
-        }),
-        () => {
-          this.navigationState = { isNavigating: false }
-          this.replaceRouteClass(routeId)
-          this.sendInfoFromIframe()
-          this.scrollTo(state.scrollOptions)
-        }
-      )
+      this.hydrateApollo(prefetchedPathData.queryData).then(() => {
+        this.setState(
+          (state) => ({
+            ...state,
+            components: { ...state.components, ...routeData.components },
+            extensions: { ...state.extensions, ...extensions },
+            loadedPages: loadedPages.add(routeId),
+            messages: { ...state.messages, ...messages },
+            page: routeId,
+            preview: false,
+            query,
+            route: matchingPage,
+          }),
+          () => {
+            this.navigationState = { isNavigating: false }
+            this.replaceRouteClass(routeId)
+            this.sendInfoFromIframe()
+            this.scrollTo(state.scrollOptions)
+          }
+        )
+      })
 
       return Promise.resolve()
     }
@@ -791,11 +772,10 @@ class RenderProvider extends Component<
               return new Promise(() => {})
             }
 
-            if (queryData) {
-              this.hydrateApolloCache(queryData)
-            }
-
-            await this.fetchComponents(components, extensions)
+            await Promise.all([
+              this.hydrateApollo(queryData),
+              this.fetchComponents(components, extensions),
+            ])
 
             this.setState(
               (state) => ({
@@ -1057,37 +1037,6 @@ class RenderProvider extends Component<
     await this.sendInfoFromIframe()
   }
 
-  public createRuntimeContextLink() {
-    return new ApolloLink((operation: Operation, forward?: NextLink) => {
-      const {
-        appsEtag,
-        cacheHints,
-        components,
-        culture,
-        extensions,
-        messages,
-        pages,
-      } = this.state
-      operation.setContext(
-        (currentContext: OperationContext): OperationContext => {
-          return {
-            ...currentContext,
-            runtime: {
-              appsEtag,
-              cacheHints,
-              components,
-              culture,
-              extensions,
-              messages,
-              pages,
-            },
-          }
-        }
-      )
-      return forward ? forward(operation) : null
-    })
-  }
-
   public updateExtension = async (name: string, extension: Extension) => {
     const { extensions } = this.state
 
@@ -1227,20 +1176,6 @@ class RenderProvider extends Component<
           </ApolloProvider>
         </TreePathContextProvider>
       </RenderContextProvider>
-    )
-  }
-
-  private hydrateApolloCache = (
-    queryData: Array<{
-      data: string
-      query: string
-      variables: Record<string, any>
-    }>
-  ) => {
-    hydrateApolloCache(
-      queryData,
-      this.apolloClient,
-      "Error writing query from render-server in Apollo's cache"
     )
   }
 

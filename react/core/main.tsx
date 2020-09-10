@@ -12,7 +12,7 @@ import { createBrowserHistory as createHistory } from 'history'
 import queryString from 'query-string'
 import React, { ReactElement } from 'react'
 import { getDataFromTree } from 'react-apollo'
-import { hydrate, render as renderDOM } from 'react-dom'
+import { hydrate, render as renderDOM, Renderer } from 'react-dom'
 import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
 import { isEmpty } from 'ramda'
@@ -38,7 +38,11 @@ import useRuntime from '../components/useRuntime'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
-import { getState } from '../utils/client'
+import {
+  getState,
+  createApolloClient,
+  ApolloClientFunctions,
+} from '../utils/client'
 import { buildCacheLocator } from '../utils/client'
 import { ensureContainer, getContainer, getMarkups } from '../utils/dom'
 import { registerEmitter } from '../utils/events'
@@ -53,6 +57,7 @@ import {
 } from '../utils/vteximg'
 import withHMR from '../utils/withHMR'
 import { generateExtensions } from '../utils/blocks'
+import { promised } from '../utils/promise'
 
 let emitter: EventEmitter | null = null
 
@@ -99,48 +104,84 @@ function renderToStringWithData(
   })
 }
 
+const clientRender = (
+  renderFn: Renderer,
+  root: JSX.Element,
+  elem: Element | null
+): Promise<Element> => {
+  return promised((resolve) => {
+    const rendered = (renderFn(root, elem) as unknown) as Element
+    resolve(rendered)
+  })
+}
+
+const createRootElement = (
+  name: string,
+  runtime: RenderRuntime,
+  sessionPromise: Promise<void>,
+  apollo: ApolloClientFunctions
+) => {
+  const { customRouting, pages, extensions } = runtime
+  const isPage =
+    !!pages[name] && !!pages[name].path && !!extensions[name]?.component
+  const history = canUseDOM && isPage && !customRouting ? createHistory() : null
+
+  return (
+    <RenderProvider
+      apollo={apollo}
+      history={history}
+      root={name}
+      runtime={runtime}
+      sessionPromise={sessionPromise}
+    >
+      {!isPage ? <ExtensionPoint id={name} /> : null}
+    </RenderProvider>
+  )
+}
+
+const prepareRootElement = (
+  name: string,
+  runtime: RenderRuntime,
+  baseURI: string,
+  cacheControl: PageCacheControl | undefined
+) => {
+  const sessionPromise = canUseDOM
+    ? window.__RENDER_8_SESSION__.sessionPromise
+    : Promise.resolve()
+
+  return createApolloClient(
+    runtime,
+    baseURI,
+    sessionPromise,
+    cacheControl
+  ).then((apollo) =>
+    apollo
+      .hydrate(runtime.queryData)
+      .then(() => createRootElement(name, runtime, sessionPromise, apollo))
+  )
+}
+
 // Either renders the root component to a DOM element or returns a {name, markup} promise.
 const render = async (
   name: string,
   runtime: RenderRuntime,
   element?: HTMLElement
 ): Rendered => {
-  const {
-    customRouting,
-    disableSSR,
-    disableSSQ,
-    page,
-    pages,
-    extensions,
-  } = runtime
+  const { disableSSR, disableSSQ, page } = runtime
 
+  const created = !element && ensureContainer(page)
+  const containerElement = element || getContainer()
   const cacheControl = canUseDOM ? undefined : new PageCacheControl()
   const baseURI = getBaseURI(runtime)
-  registerEmitter(runtime, baseURI)
-  emitter = runtime.emitter
-
-  const isPage =
-    !!pages[name] && !!pages[name].path && !!extensions[name]?.component
-  const created = !element && ensureContainer(page)
-  const elem = element || getContainer()
-  const history = canUseDOM && isPage && !customRouting ? createHistory() : null
-
-  const root = (
-    <RenderProvider
-      history={history}
-      cacheControl={cacheControl}
-      baseURI={baseURI}
-      root={name}
-      runtime={runtime}
-    >
-      {!isPage ? <ExtensionPoint id={name} /> : null}
-    </RenderProvider>
-  )
+  emitter = registerEmitter(runtime, baseURI)
 
   if (canUseDOM) {
     const renderFn = disableSSR || created ? renderDOM : hydrate
-
-    return (renderFn(root, elem) as unknown) as Element
+    return promised((resolve) => {
+      prepareRootElement(name, runtime, baseURI, cacheControl)
+        .then((root) => clientRender(renderFn, root, containerElement))
+        .then(resolve)
+    })
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -153,10 +194,13 @@ const render = async (
   }
 
   if (runtime.amp) {
-    return import(
-      /* webpackMode: "weak" */
-      '../AMP'
-    ).then(({ setupAMP }) => {
+    Promise.all([
+      prepareRootElement(name, runtime, baseURI, cacheControl),
+      import(
+        /* webpackMode: "weak" */
+        '../AMP'
+      ),
+    ]).then(([root, { setupAMP }]) => {
       const { ampRoot, getExtraRenderedData } = setupAMP(
         root,
         renderToStaticMarkup,
@@ -175,12 +219,14 @@ const render = async (
     })
   }
 
-  return renderToStringWithData(root, renderToString, disableSSQ).then(
-    ({ markup, renderTimeMetric }) => ({
-      ...commonRenderResult,
-      markups: getMarkups(name, markup),
-      renderTimeMetric,
-    })
+  return prepareRootElement(name, runtime, baseURI, cacheControl).then((root) =>
+    renderToStringWithData(root, renderToString, disableSSQ).then(
+      ({ markup, renderTimeMetric }) => ({
+        ...commonRenderResult,
+        markups: getMarkups(name, markup),
+        renderTimeMetric,
+      })
+    )
   )
 }
 

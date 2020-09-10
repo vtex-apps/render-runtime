@@ -159,7 +159,7 @@ const initSSE = (
 
 export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
   if (!canUseDOM) {
-    return
+    return null
   }
 
   const { account, production, workspace } = runtime
@@ -194,4 +194,6 @@ export const registerEmitter = (runtime: RenderRuntime, baseURI: string) => {
     runtime.emitter = new EventEmitter()
     emittersByWorkspace[`${account}/${workspace}`].push(runtime.emitter)
   }
+
+  return runtime.emitter
 }
