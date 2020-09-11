@@ -46,7 +46,7 @@ const buildCacheId = (
     ? `${vendor}.${app}@${major}.x:${type}:${cacheId}`
     : `${type}:${cacheId}`
 
-const dataIdFromObject = (value: any) => {
+export const dataIdFromObject = (value: any) => {
   const { cacheId, __typename } = value || ({} as any)
   if (value && __typename && cacheId) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
