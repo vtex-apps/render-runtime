@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Async scripts support: wait the execution of the async scripts to start rendering.
 
 ## [8.119.0] - 2020-09-10
 ### Added
