@@ -28,9 +28,21 @@ function start() {
         }
       })
 
+      const scriptsLoadedPromise = new Promise((resolve) => {
+        if (typeof window.__ASYNC_SCRIPTS_READY__ === 'undefined') {
+          return resolve()
+        }
+
+        window.addEventListener('asyncScriptsReady', resolve)
+        if (window.__ASYNC_SCRIPTS_READY__) {
+          resolve()
+        }
+      })
+
       Promise.all([
         contentLoadedPromise,
         intlPolyfillPromise,
+        scriptsLoadedPromise,
         uncriticalStylesPromise,
       ]).then(() => {
         setTimeout(() => {

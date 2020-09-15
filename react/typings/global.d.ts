@@ -576,6 +576,7 @@ declare global {
     __RUNTIME_QUERYDATA__: RenderRuntime['queryData']
     __STATE__: NormalizedCacheObject
     __DOM_READY__?: boolean
+    __ASYNC_SCRIPTS_READY__?: boolean
     __CRITICAL__UNCRITICAL_APPLIED__: Promise<void> | undefined
     __CRITICAL__RAISE_UNCRITICAL_EVENT__: () => void | null
     browserHistory: History
