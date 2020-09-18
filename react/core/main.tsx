@@ -11,8 +11,8 @@ import 'graphql'
 import { createBrowserHistory as createHistory } from 'history'
 import queryString from 'query-string'
 import React, { ReactElement } from 'react'
+import ReactDOM from 'react-dom'
 import { getDataFromTree } from 'react-apollo'
-import { hydrate, render as renderDOM, Renderer } from 'react-dom'
 import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
 import { isEmpty } from 'ramda'
@@ -105,13 +105,14 @@ function renderToStringWithData(
 }
 
 const clientRender = (
-  renderFn: Renderer,
   root: JSX.Element,
-  elem: Element | null
+  elem: Element | null,
+  hydrate: boolean
 ): Promise<Element> => {
   return promised((resolve) => {
-    const rendered = (renderFn(root, elem) as unknown) as Element
-    resolve(rendered)
+    ;(ReactDOM as any).unstable_createRoot(elem, { hydrate }).render(root)
+
+    resolve((undefined as unknown) as Element)
   })
 }
 
@@ -176,10 +177,10 @@ const render = async (
   emitter = registerEmitter(runtime, baseURI)
 
   if (canUseDOM) {
-    const renderFn = disableSSR || created ? renderDOM : hydrate
+    const shouldHydrate = !(disableSSR || created)
     return promised((resolve) => {
       prepareRootElement(name, runtime, baseURI, cacheControl)
-        .then((root) => clientRender(renderFn, root, containerElement))
+        .then((root) => clientRender(root, containerElement, shouldHydrate))
         .then(resolve)
     })
   }
