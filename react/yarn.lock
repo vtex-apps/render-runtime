@@ -6892,15 +6892,14 @@ react-base16-styling@^0.6.0:
     lodash.flow "^3.3.0"
     pure-color "^1.2.0"
 
-react-dom@^16.8.6:
-  version "16.8.6"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.8.6.tgz#71d6303f631e8b0097f56165ef608f051ff6e10f"
-  integrity sha512-1nL7PIq9LTL3fthPqwkvr2zY7phIPjYrT0jp4HjyEQrEROnw4dG41VVwi/wfoCneoleqrNX7iAD+pXebJZwrwA==
+react-dom@0.0.0-experimental-4c8c98ab9:
+  version "0.0.0-experimental-4c8c98ab9"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.0.0-experimental-4c8c98ab9.tgz#adc7613d275ac3ad03bf72c83699264a2aa235af"
+  integrity sha512-HOcYHzwcrm94CZ5YyZsLMNnuJCZA3uN+OTfhNJwVXUs5lXKiWcyiWCe9bwk7l0hPEYot2CI4dhQOQ4XMnCEbSQ==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-    prop-types "^15.6.2"
-    scheduler "^0.13.6"
+    scheduler "0.0.0-experimental-4c8c98ab9"
 
 react-dom@^16.9.0:
   version "16.12.0"
@@ -7017,15 +7016,13 @@ react-textarea-autosize@^6.1.0:
   dependencies:
     prop-types "^15.6.0"
 
-react@^16.8.6:
-  version "16.8.6"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
-  integrity sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw==
+react@0.0.0-experimental-4c8c98ab9:
+  version "0.0.0-experimental-4c8c98ab9"
+  resolved "https://registry.yarnpkg.com/react/-/react-0.0.0-experimental-4c8c98ab9.tgz#b25742c4a9fa2b7da117738c05b29960b660ee97"
+  integrity sha512-pqLXmUgWtpKJD/KM5o+NbEx1UPSaW53wRBgz3XndCahOCY0TwAAxu5CEOgayvgoTIiusLhJGO9z7fD6B/wuthA==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-    prop-types "^15.6.2"
-    scheduler "^0.13.6"
 
 react@^16.9.0:
   version "16.12.0"
@@ -7432,10 +7429,10 @@ sax@^1.2.4:
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
-scheduler@^0.13.6:
-  version "0.13.6"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.13.6.tgz#466a4ec332467b31a91b9bf74e5347072e4cd889"
-  integrity sha512-IWnObHt413ucAYKsD9J1QShUKkbKLQQHdxRyw73sw4FN26iWr3DY/H34xGPe4nmL1DwXyWmSWmMrA9TfQbE/XQ==
+scheduler@0.0.0-experimental-4c8c98ab9:
+  version "0.0.0-experimental-4c8c98ab9"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.0.0-experimental-4c8c98ab9.tgz#d4384017ed8ca55dcba9b296eb1e0898d0e03ca2"
+  integrity sha512-32GW0cUH+xaLuFLbIa2q47p9FrHtQFCzPzFs5Ltf8jHZ1DOLNX6H6LoDdw1oKbTJf/gD4eWCtxAYeIhDs9eEwA==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
