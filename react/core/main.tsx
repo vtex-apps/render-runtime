@@ -49,12 +49,7 @@ import {
   ApolloClientFunctions,
 } from '../utils/client'
 import { buildCacheLocator } from '../utils/client'
-import {
-  ensureContainer,
-  getContainer,
-  getMarkups,
-  getOrCreateContainer,
-} from '../utils/dom'
+import { getMarkups, getOrCreateContainer } from '../utils/dom'
 import { registerEmitter } from '../utils/events'
 import { getBaseURI } from '../utils/host'
 import registerComponent from '../utils/registerComponent'

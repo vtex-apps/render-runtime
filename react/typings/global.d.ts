@@ -419,7 +419,7 @@ declare global {
     components: RenderRuntime['components']
   }
 
-  type Rendered = Promise<void, ClientRendered | NamedServerRendered>
+  type Rendered = Promise<void | ClientRendered | NamedServerRendered>
 
   interface AssetEntry {
     name: string
