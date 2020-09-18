@@ -122,7 +122,8 @@ const clientRender = (
 ): Promise<void> => {
   return promised((resolve) => {
     if (concurrent) {
-      unstable_createRoot(elem, { hydrate }).render(root, resolve)
+      unstable_createRoot(elem, { hydrate }).render(root)
+      resolve()
     } else if (hydrate) {
       hydrateDOM(root, elem, resolve)
     } else {

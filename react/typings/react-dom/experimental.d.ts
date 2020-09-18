@@ -15,10 +15,7 @@ declare module 'react-dom' {
   }
 
   interface Root {
-    render(
-      children: React.ReactChild | React.ReactNodeArray,
-      callback?: () => void
-    ): void
+    render(children: React.ReactChild | React.ReactNodeArray): void
     unmount(callback?: () => void): void
   }
 
