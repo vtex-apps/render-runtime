@@ -49,7 +49,7 @@ const hydrateApolloCacheAsync = (
 ) => {
   return Promise.all(
     queryData.map(({ data, query, variables }) => {
-      return promised((resolve) => {
+      return promised<void>((resolve) => {
         try {
           client.writeQuery({
             query: parse(query),
