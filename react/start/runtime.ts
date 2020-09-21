@@ -48,7 +48,7 @@ export const loadRuntimeJSONs = (): Promise<void | void[]> => {
       const value = getValue(template)
       resolve(value)
     }).then((value) =>
-      promised((resolve) => {
+      promised<void>((resolve) => {
         writeVarToWindow(template, value)
         resolve()
       })

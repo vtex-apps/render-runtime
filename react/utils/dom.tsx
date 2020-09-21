@@ -95,27 +95,22 @@ const checkIsSiteEditorIframe = () => {
 
 export const isSiteEditorIframe = checkIsSiteEditorIframe()
 
-export const getContainer = () => {
-  return canUseDOM
-    ? document.getElementsByClassName(RENDER_CONTAINER_CLASS)[0]
-    : null
-}
-
-export const ensureContainer = (name: string) => {
+export const getOrCreateContainer = () => {
   if (!canUseDOM) {
-    return false
+    throw new Error('Should not try to get container on server side')
   }
 
   const existingContainer = document.getElementsByClassName(
     RENDER_CONTAINER_CLASS
   )[0]
+
   if (existingContainer) {
-    return false
+    return { container: existingContainer, created: false }
   }
 
   const containerDiv = document.createElement('div')
   containerDiv.className = `render-container ${routeClass(name)}`
   containerDiv.style.display = 'none'
   document.body.appendChild(containerDiv)
-  return true
+  return { container: containerDiv, created: true }
 }

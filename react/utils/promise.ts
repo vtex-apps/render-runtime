@@ -1,8 +1,9 @@
 import { canUseDOM } from 'exenv'
 
-interface Resolver<T> {
-  (resolve: (value: T) => void): void
-}
+type Resolver<T> = T extends void
+  ? (resolve: () => void) => void
+  : (resolve: (value: T) => void) => void
+
 export const promised = <T = void>(resolver: Resolver<T>) => {
   return new Promise<T>((resolve) => {
     if (!canUseDOM) {

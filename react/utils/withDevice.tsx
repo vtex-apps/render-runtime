@@ -1,6 +1,6 @@
 import React, { FC, ComponentType } from 'react'
 import { useSSR } from '../components/NoSSR'
-import { useMedia } from 'use-media'
+import { useMediaLayout } from 'use-media'
 
 export interface Props {
   runtime: RenderRuntime
@@ -28,8 +28,8 @@ const useDevice = (hints: RenderHints) => {
   /** These screensizes are hardcoded, based on the default
    * Tachyons breakpoints. They should probably be the ones
    * configured via the style.json file, if available. */
-  const isScreenMedium = useMedia({ minWidth: '40rem' })
-  const isScreenLarge = useMedia({ minWidth: '64.1rem' })
+  const isScreenMedium = useMediaLayout({ minWidth: '40rem' })
+  const isScreenLarge = useMediaLayout({ minWidth: '64.1rem' })
 
   const serverDevice = {
     type: hints.phone

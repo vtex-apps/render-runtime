@@ -12,7 +12,12 @@ import { createBrowserHistory as createHistory } from 'history'
 import queryString from 'query-string'
 import React, { ReactElement } from 'react'
 import { getDataFromTree } from 'react-apollo'
-import { hydrate, render as renderDOM, Renderer } from 'react-dom'
+import {
+  hydrate as hydrateDOM,
+  render as renderDOM,
+  Renderer,
+  unstable_createRoot,
+} from 'react-dom'
 import { Helmet } from 'react-helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
 import { isEmpty } from 'ramda'
@@ -44,7 +49,7 @@ import {
   ApolloClientFunctions,
 } from '../utils/client'
 import { buildCacheLocator } from '../utils/client'
-import { ensureContainer, getContainer, getMarkups } from '../utils/dom'
+import { getMarkups, getOrCreateContainer } from '../utils/dom'
 import { registerEmitter } from '../utils/events'
 import { getBaseURI } from '../utils/host'
 import registerComponent from '../utils/registerComponent'
@@ -105,13 +110,20 @@ function renderToStringWithData(
 }
 
 const clientRender = (
-  renderFn: Renderer,
   root: JSX.Element,
-  elem: Element | null
-): Promise<Element> => {
+  elem: Element,
+  hydrate: boolean,
+  concurrent?: boolean
+): Promise<void> => {
   return promised((resolve) => {
-    const rendered = (renderFn(root, elem) as unknown) as Element
-    resolve(rendered)
+    if (concurrent) {
+      unstable_createRoot(elem, { hydrate }).render(root)
+      resolve()
+    } else if (hydrate) {
+      hydrateDOM(root, elem, resolve)
+    } else {
+      renderDOM(root, elem, resolve)
+    }
   })
 }
 
@@ -167,19 +179,22 @@ const render = async (
   runtime: RenderRuntime,
   element?: HTMLElement
 ): Rendered => {
-  const { disableSSR, disableSSQ, page } = runtime
+  const { concurrentMode, disableSSR, disableSSQ, page } = runtime
 
-  const created = !element && ensureContainer(page)
-  const containerElement = element || getContainer()
   const cacheControl = canUseDOM ? undefined : new PageCacheControl()
   const baseURI = getBaseURI(runtime)
   emitter = registerEmitter(runtime, baseURI)
 
   if (canUseDOM) {
-    const renderFn = disableSSR || created ? renderDOM : hydrate
-    return promised((resolve) => {
+    const { container, created } = element
+      ? { container: element, created: false }
+      : getOrCreateContainer()
+    const shouldHydrate = !(disableSSR || created)
+    return promised<void>((resolve) => {
       prepareRootElement(name, runtime, baseURI, cacheControl)
-        .then((root) => clientRender(renderFn, root, containerElement))
+        .then((root) =>
+          clientRender(root, container, shouldHydrate, concurrentMode)
+        )
         .then(resolve)
     })
   }
@@ -194,7 +209,7 @@ const render = async (
   }
 
   if (runtime.amp) {
-    Promise.all([
+    return Promise.all([
       prepareRootElement(name, runtime, baseURI, cacheControl),
       import(
         /* webpackMode: "weak" */

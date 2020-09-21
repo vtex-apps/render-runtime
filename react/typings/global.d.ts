@@ -419,7 +419,7 @@ declare global {
     components: RenderRuntime['components']
   }
 
-  type Rendered = Promise<ClientRendered | NamedServerRendered>
+  type Rendered = Promise<void | ClientRendered | NamedServerRendered>
 
   interface AssetEntry {
     name: string
@@ -464,6 +464,7 @@ declare global {
     blocks?: Blocks
     blocksTree?: BlockContentTree
     channelPrivacy?: 'private' | 'public'
+    concurrentMode?: boolean
     contentMap?: ContentMap
     customRouting?: boolean
     emitter: EventEmitter

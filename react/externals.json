@@ -20,17 +20,26 @@
       {
         "global": "React",
         "import": "react",
-        "path": "npm:react@16.9.0/umd/react.development.js"
+        "path": "npm:react@16.9.0/umd/react.development.js",
+        "alternative": {
+          "enableConcurrentMode": "npm:react@0.0.0-experimental-94c0244ba/umd/react.development.js"
+        }
       },
       {
         "global": "ReactDOM",
         "import": "react-dom",
-        "path": "npm:react-dom@16.9.0/umd/react-dom.development.js"
+        "path": "npm:react-dom@16.9.0/umd/react-dom.development.js",
+        "alternative": {
+          "enableConcurrentMode": "npm:react-dom@0.0.0-experimental-94c0244ba/umd/react-dom.development.js"
+        }
       },
       {
         "global": "ReactDOMServer",
         "import": "react-dom/server",
-        "path": "npm:react-dom@16.9.0/umd/react-dom-server.browser.development.js"
+        "path": "npm:react-dom@16.9.0/umd/react-dom-server.browser.development.js",
+        "alternative": {
+          "enableConcurrentMode": "npm:react-dom@0.0.0-experimental-94c0244ba/umd/react-dom-server.browser.development.js"
+        }
       },
       {
         "global": "ReactIntl",
@@ -99,17 +108,26 @@
       {
         "global": "React",
         "import": "react",
-        "path": "npm:react@16.9.0/umd/react.production.min.js"
+        "path": "npm:react@16.9.0/umd/react.production.min.js",
+        "alternative": {
+          "enableConcurrentMode": "npm:react@0.0.0-experimental-94c0244ba/umd/react.production.min.js"
+        }
       },
       {
         "global": "ReactDOM",
         "import": "react-dom",
-        "path": "npm:react-dom@16.9.0/umd/react-dom.production.min.js"
+        "path": "npm:react-dom@16.9.0/umd/react-dom.production.min.js",
+        "alternative": {
+          "enableConcurrentMode": "npm:react-dom@0.0.0-experimental-94c0244ba/umd/react-dom.production.min.js"
+        }
       },
       {
         "global": "ReactDOMServer",
         "import": "react-dom/server",
-        "path": "npm:react-dom@16.9.0/umd/react-dom-server.browser.production.min.js"
+        "path": "npm:react-dom@16.9.0/umd/react-dom-server.browser.production.min.js",
+        "alternative": {
+          "enableConcurrentMode": "npm:react-dom@0.0.0-experimental-94c0244ba/umd/react-dom-server.browser.production.min.js"
+        }
       },
       {
         "global": "ReactIntl",
