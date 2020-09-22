@@ -325,16 +325,27 @@ export function navigate(
     fetchPage = true,
     preventRemount,
     skipSetPath = false,
+    setPreview,
   } = options
 
   const navigationRoute = getNavigationRouteToNavigate(pages, options, true)
+
   if (navigationRoute.hash) {
     window.location.hash = navigationRoute.hash
+
     return true
   }
 
   if (navigationRoute == null) {
     return false
+  }
+
+  if (fallbackToWindowLocation) {
+    setPreview && setPreview(true)
+
+    window.location.href = `${navigationRoute.path}${navigationRoute.query}`
+
+    return true
   }
 
   if (history) {
@@ -352,11 +363,6 @@ export function navigate(
     })
     const method = replace ? 'replace' : 'push'
     window.setTimeout(() => history[method](location), 0)
-    return true
-  }
-
-  if (fallbackToWindowLocation) {
-    window.location.href = `${navigationRoute.path}${navigationRoute.query}`
     return true
   }
 
@@ -531,6 +537,7 @@ export interface NavigateOptions {
   modifiers?: Set<NavigationRouteModifier>
   modifiersOptions?: Record<string, any>
   skipSetPath?: boolean
+  setPreview?: (previewValue: boolean) => void
 }
 
 export interface NavigationRouteChange {

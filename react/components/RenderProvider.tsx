@@ -498,6 +498,10 @@ export class RenderProvider extends Component<
     return pageGoBack(history)
   }
 
+  public setPreview = (previewValue: boolean) => {
+    this.setState({ preview: previewValue })
+  }
+
   public setQuery = (
     query: Record<string, any> = {},
     {
@@ -544,14 +548,19 @@ export class RenderProvider extends Component<
       runtime: { rootPath },
     } = this.props
     const { pages } = this.state
-    options.rootPath = rootPath
-    options.modifiers = this.navigationRouteModifiers
 
     this.navigationModifierOptions = {
       ...this.navigationModifierOptions,
       ...options.modifiersOptions,
     }
-    options.modifiersOptions = this.navigationModifierOptions
+
+    options = {
+      ...options,
+      rootPath,
+      modifiers: this.navigationRouteModifiers,
+      modifiersOptions: this.navigationModifierOptions,
+      setPreview: this.setPreview,
+    }
 
     if (this.navigationState.isNavigating) {
       const lastOptions = this.navigationState.lastOptions!
