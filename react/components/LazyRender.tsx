@@ -34,7 +34,6 @@ const LazyRender: FunctionComponent<Props> = ({
 
   return (
     <div
-      ref={ref}
       style={{
         position: 'relative',
         width: '100%',
@@ -43,11 +42,14 @@ const LazyRender: FunctionComponent<Props> = ({
       }}
     >
       <div
+        ref={ref}
         style={{
-          position: 'absolute',
+          position: 'relative',
           width: '100%',
           top: -offset,
-          bottom: -offset,
+          height: '100%',
+          paddingBottom: offset * 2,
+          boxSizing: 'content-box',
           border: debug ? '1px dotted red' : undefined,
         }}
       />
