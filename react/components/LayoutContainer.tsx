@@ -1,14 +1,13 @@
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { FunctionComponent } from 'react'
 import { useTreePath } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 import { useRuntime } from './RenderContext'
 import { LoadingWrapper } from './LoadingContext'
 import { LazyImages } from './LazyImages'
+import LazyRender from './LazyRender'
 
 type Element = string | ElementArray
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface ElementArray extends Array<Element> {}
+type ElementArray = Element[]
 
 interface LayoutContainerProps {
   aboveTheFold?: number
@@ -23,140 +22,79 @@ interface ContainerProps {
   preview?: boolean
 }
 
-interface ContainerState {
-  shouldRenderBelowTheFold: boolean
-}
+const Container: FunctionComponent<ContainerProps> = ({
+  aboveTheFold,
+  elements,
+  isRow,
+  isMobile,
+  preview,
+  children,
+  ...props
+}) => {
+  const className = `flex flex-grow-1 w-100 ${
+    isRow ? 'flex-row' : 'flex-column'
+  }`
 
-const elementPropType = PropTypes.oneOfType([PropTypes.string, PropTypes.array])
-  .isRequired
-
-class Container extends Component<ContainerProps, ContainerState> {
-  public static propTypes = {
-    aboveTheFold: PropTypes.number,
-    elements: elementPropType,
-    isRow: PropTypes.bool,
-    isMobile: PropTypes.bool,
-    preview: PropTypes.bool,
-  }
-
-  public state = {
-    shouldRenderBelowTheFold: false,
-  }
-
-  private hasFold: boolean
-  private foldIndex: number
-  private hasLazyImagesFold: boolean
-  private lazyImagesFoldPosition: number
-
-  constructor(props: ContainerProps) {
-    super(props)
-
-    const { elements, isMobile } = props
-
-    this.foldIndex = elements.indexOf('__fold__')
-    if (this.foldIndex === -1) {
-      this.foldIndex = elements.indexOf(
-        `__fold__.${isMobile ? 'mobile' : 'desktop'}`
-      )
+  if (typeof elements === 'string') {
+    if (elements === '__children__') {
+      return <>{children}</>
     }
-
-    this.hasFold = this.foldIndex > -1
-
-    this.lazyImagesFoldPosition = elements.indexOf(
-      '__fold__.experimentalLazyImages'
-    )
-    this.hasLazyImagesFold = this.lazyImagesFoldPosition > -1
-  }
-
-  private handleScroll = () => {
-    if (!this.state.shouldRenderBelowTheFold) {
-      this.setState({
-        shouldRenderBelowTheFold: true,
-      })
-    }
-
-    window.document.removeEventListener('scroll', this.handleScroll)
-  }
-
-  public componentDidMount() {
-    if (this.hasFold) {
-      window &&
-        window.document &&
-        window.document.addEventListener('scroll', this.handleScroll)
-    }
-  }
-
-  public componentWillUnmount() {
-    if (this.hasFold) {
-      window &&
-        window.document &&
-        window.document.removeEventListener('scroll', this.handleScroll)
-    }
-  }
-
-  public render() {
-    const { isRow, isMobile, elements, children, ...props } = this.props
-
-    const { shouldRenderBelowTheFold } = this.state
-
-    const className = `flex flex-grow-1 w-100 ${
-      isRow ? 'flex-row' : 'flex-column'
-    }`
-    if (typeof elements === 'string') {
-      if (elements === '__children__') {
-        return children
-      }
-      return (
-        <div className={isRow ? '' : className}>
-          <ExtensionPoint id={elements} {...props} />
-        </div>
-      )
-    }
-
-    let elementsToRender = this.props.elements.length
-    if (this.props.preview && this.props.aboveTheFold != null) {
-      elementsToRender = this.props.aboveTheFold
-    }
-
-    if (this.hasFold && !shouldRenderBelowTheFold) {
-      elementsToRender = this.foldIndex
-    }
-
-    const wrappedElements: JSX.Element[] = elements
-      .slice(0, elementsToRender)
-      .map((element: Element, i: number) => {
-        let container = (
-          <Container
-            key={element.toString()}
-            elements={element}
-            isMobile={isMobile}
-            isRow={!isRow}
-            {...props}
-          >
-            {children}
-          </Container>
-        )
-
-        if (this.hasLazyImagesFold && i > this.lazyImagesFoldPosition) {
-          container = (
-            <LazyImages key={element.toString()}>{container}</LazyImages>
-          )
-        }
-
-        return container
-      })
-
     return (
-      <div className={className}>
-        {wrappedElements}
-
-        {/* Forces scrolling if there is below-the-fold content to be rendered */}
-        {this.hasFold && !shouldRenderBelowTheFold && (
-          <div style={{ height: '200vh' }} />
-        )}
+      <div className={isRow ? '' : className}>
+        <ExtensionPoint id={elements} {...props} />
       </div>
     )
   }
+
+  let foldIndex = elements.indexOf('__fold__')
+  if (foldIndex === -1) {
+    foldIndex = elements.indexOf(`__fold__.${isMobile ? 'mobile' : 'desktop'}`)
+  }
+
+  const hasFold = foldIndex > -1
+
+  const lazyImagesFoldPosition = elements.indexOf(
+    '__fold__.experimentalLazyImages'
+  )
+  const hasLazyImagesFold = lazyImagesFoldPosition > -1
+
+  // TODO: Seems to be legacy and unused, might be removed in the future
+  let elementsToRender = elements.length
+  if (preview && aboveTheFold != null) {
+    elementsToRender = aboveTheFold
+  }
+
+  const wrappedElements: JSX.Element[] = elements
+    .slice(0, elementsToRender)
+    .map((element: Element, i: number) => {
+      let container = (
+        <Container
+          key={element.toString()}
+          elements={element}
+          isMobile={isMobile}
+          isRow={!isRow}
+          {...props}
+        >
+          {children}
+        </Container>
+      )
+
+      if (hasLazyImagesFold && i > lazyImagesFoldPosition) {
+        container = (
+          <LazyImages key={element.toString()}>{container}</LazyImages>
+        )
+      }
+
+      if (hasFold && i > foldIndex) {
+        container = (
+          <LazyRender key={element.toString()}>{container}</LazyRender>
+        )
+      }
+
+      return container
+    })
+
+  return <div className={className}>{wrappedElements}</div>
 }
 
 const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = (
