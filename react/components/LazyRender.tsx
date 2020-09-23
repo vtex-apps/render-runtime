@@ -11,7 +11,6 @@ const LazyRender: FunctionComponent<Props> = ({
   children,
   height = 400,
   offset = 300,
-  debug = false,
 }) => {
   const ref = useRef(null)
   const [hasBeenViewed, setHasBeenViewed] = useState(false)
@@ -20,9 +19,6 @@ const LazyRender: FunctionComponent<Props> = ({
     ref,
     onView: () => {
       setHasBeenViewed(true)
-      if (debug) {
-        console.log('ViewDetector has been viewed')
-      }
     },
     once: true,
     initializeOnInteraction: true,
@@ -38,7 +34,6 @@ const LazyRender: FunctionComponent<Props> = ({
         position: 'relative',
         width: '100%',
         height,
-        border: debug ? '1px solid red' : undefined,
       }}
     >
       <div
@@ -50,7 +45,6 @@ const LazyRender: FunctionComponent<Props> = ({
           height: '100%',
           paddingBottom: offset * 2,
           boxSizing: 'content-box',
-          border: debug ? '1px dotted red' : undefined,
         }}
       />
     </div>
