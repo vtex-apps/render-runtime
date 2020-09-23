@@ -9,7 +9,7 @@ interface Props {
 
 const LazyRender: FunctionComponent<Props> = ({
   children,
-  height = 300,
+  height = 400,
   offset = 300,
   debug = false,
 }) => {
