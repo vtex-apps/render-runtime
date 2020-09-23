@@ -43,24 +43,55 @@ class Container extends Component<ContainerProps, ContainerState> {
     shouldRenderBelowTheFold: false,
   }
 
+  private hasFold: boolean
+  private foldIndex: number
+  private hasLazyImagesFold: boolean
+  private lazyImagesFoldPosition: number
+
+  constructor(props: ContainerProps) {
+    super(props)
+
+    const { elements, isMobile } = props
+
+    this.foldIndex = elements.indexOf('__fold__')
+    if (this.foldIndex === -1) {
+      this.foldIndex = elements.indexOf(
+        `__fold__.${isMobile ? 'mobile' : 'desktop'}`
+      )
+    }
+
+    this.hasFold = this.foldIndex > -1
+
+    this.lazyImagesFoldPosition = elements.indexOf(
+      '__fold__.experimentalLazyImages'
+    )
+    this.hasLazyImagesFold = this.lazyImagesFoldPosition > -1
+  }
+
   private handleScroll = () => {
-    this.setState({
-      shouldRenderBelowTheFold: true,
-    })
+    if (!this.state.shouldRenderBelowTheFold) {
+      this.setState({
+        shouldRenderBelowTheFold: true,
+      })
+    }
 
     window.document.removeEventListener('scroll', this.handleScroll)
   }
 
   public componentDidMount() {
-    window &&
-      window.document &&
-      window.document.addEventListener('scroll', this.handleScroll)
+    if (this.hasFold) {
+      window &&
+        window.document &&
+        window.document.addEventListener('scroll', this.handleScroll)
+    }
   }
 
   public componentWillUnmount() {
-    window &&
-      window.document &&
-      window.document.removeEventListener('scroll', this.handleScroll)
+    if (this.hasFold) {
+      window &&
+        window.document &&
+        window.document.removeEventListener('scroll', this.handleScroll)
+    }
   }
 
   public render() {
@@ -87,25 +118,11 @@ class Container extends Component<ContainerProps, ContainerState> {
       elementsToRender = this.props.aboveTheFold
     }
 
-    let foldIndex = elements.indexOf('__fold__')
-    if (foldIndex === -1) {
-      foldIndex = elements.indexOf(
-        `__fold__.${isMobile ? 'mobile' : 'desktop'}`
-      )
+    if (this.hasFold && !shouldRenderBelowTheFold) {
+      elementsToRender = this.foldIndex
     }
 
-    const hasFold = foldIndex > -1
-
-    if (hasFold && !shouldRenderBelowTheFold) {
-      elementsToRender = foldIndex
-    }
-
-    const lazyImagesFoldPosition = elements.indexOf(
-      '__fold__.experimentalLazyImages'
-    )
-    const hasLazyImagesFold = lazyImagesFoldPosition > -1
-
-    const returnValue: JSX.Element[] = elements
+    const wrappedElements: JSX.Element[] = elements
       .slice(0, elementsToRender)
       .map((element: Element, i: number) => {
         let container = (
@@ -120,7 +137,7 @@ class Container extends Component<ContainerProps, ContainerState> {
           </Container>
         )
 
-        if (hasLazyImagesFold && i > lazyImagesFoldPosition) {
+        if (this.hasLazyImagesFold && i > this.lazyImagesFoldPosition) {
           container = (
             <LazyImages key={element.toString()}>{container}</LazyImages>
           )
@@ -130,14 +147,13 @@ class Container extends Component<ContainerProps, ContainerState> {
       })
 
     return (
-      <div
-        className={className}
-        style={{
-          // Forces scrolling if there is below-the-fold content to be rendered
-          minHeight: hasFold && !shouldRenderBelowTheFold ? '101vh' : 'auto',
-        }}
-      >
-        {returnValue}
+      <div className={className}>
+        {wrappedElements}
+
+        {/* Forces scrolling if there is below-the-fold content to be rendered */}
+        {this.hasFold && !shouldRenderBelowTheFold && (
+          <div style={{ height: '200vh' }} />
+        )}
       </div>
     )
   }
