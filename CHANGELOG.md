@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support for lazy rendering the page footer via `enableLazyFooter` setting.
 
 ### Changed
-- Fold inserts an empty div inside the page for spacing, instead of stretching the overall page.
+- Fold inserts empty divs inside the page for spacing, instead of stretching the overall page.
+- Fold uses view detection on each concealed block, instead of showing them all at once on scroll.
 
 ## [8.121.0] - 2020-09-21
 ### Added
