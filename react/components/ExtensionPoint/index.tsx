@@ -10,6 +10,7 @@ import { withErrorBoundary } from '../ErrorBoundary'
 import GenericPreview from '../Preview/GenericPreview'
 import LoadingBar from '../LoadingBar'
 import { LazyImages } from '../LazyImages'
+import LazyRender from '../LazyRender'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectBlockWrapper = React.lazy(
@@ -85,7 +86,9 @@ function withOuterExtensions(
   before: string[],
   treePath: string,
   props: any,
-  element: JSX.Element
+  element: JSX.Element,
+  // TODO: these args are getting ridiculous, maybe group them in an object
+  lazyFooter: boolean
 ) {
   if (before.length === 0 && after.length === 0 && around.length === 0) {
     return element
@@ -113,12 +116,14 @@ function withOuterExtensions(
 
   const isRootTreePath = treePath.indexOf('/') === -1
 
+  const wrappedFooter = <LazyImages>{afterElements}</LazyImages>
+
   const wrapped = (
     <Fragment key={`wrapped-${treePath}`}>
       <LazyImages>{beforeElements}</LazyImages>
       {element}
       {isRootTreePath && <div className="flex flex-grow-1" />}
-      <LazyImages>{afterElements}</LazyImages>
+      {lazyFooter ? <LazyRender>{wrappedFooter}</LazyRender> : wrappedFooter}
     </Fragment>
   )
 
@@ -213,13 +218,7 @@ const ExtensionPoint: FC<Props> = (props) => {
 
   const isRootTreePath = newTreePath.indexOf('/') === -1
 
-  const extensionPointComponent = withOuterExtensions(
-    after,
-    around,
-    before,
-    newTreePath,
-    mergedProps,
-
+  const componentLoader = (
     <ComponentLoader
       component={component}
       props={mergedProps}
@@ -235,6 +234,20 @@ const ExtensionPoint: FC<Props> = (props) => {
         <Loading />
       )}
     </ComponentLoader>
+  )
+
+  const isLazyFooterEnabled = Boolean(
+    getSettings('vtex.store')?.enableLazyFooter
+  )
+
+  const extensionPointComponent = withOuterExtensions(
+    after,
+    around,
+    before,
+    newTreePath,
+    mergedProps,
+    componentLoader,
+    isLazyFooterEnabled
   )
 
   /**

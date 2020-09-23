@@ -1,14 +1,13 @@
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React, { FunctionComponent } from 'react'
 import { useTreePath } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
 import { useRuntime } from './RenderContext'
 import { LoadingWrapper } from './LoadingContext'
 import { LazyImages } from './LazyImages'
+import LazyRender from './LazyRender'
 
 type Element = string | ElementArray
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface ElementArray extends Array<Element> {}
+type ElementArray = Element[]
 
 interface LayoutContainerProps {
   aboveTheFold?: number
@@ -23,124 +22,79 @@ interface ContainerProps {
   preview?: boolean
 }
 
-interface ContainerState {
-  shouldRenderBelowTheFold: boolean
-}
+const Container: FunctionComponent<ContainerProps> = ({
+  aboveTheFold,
+  elements,
+  isRow,
+  isMobile,
+  preview,
+  children,
+  ...props
+}) => {
+  const className = `flex flex-grow-1 w-100 ${
+    isRow ? 'flex-row' : 'flex-column'
+  }`
 
-const elementPropType = PropTypes.oneOfType([PropTypes.string, PropTypes.array])
-  .isRequired
-
-class Container extends Component<ContainerProps, ContainerState> {
-  public static propTypes = {
-    aboveTheFold: PropTypes.number,
-    elements: elementPropType,
-    isRow: PropTypes.bool,
-    isMobile: PropTypes.bool,
-    preview: PropTypes.bool,
-  }
-
-  public state = {
-    shouldRenderBelowTheFold: false,
-  }
-
-  private handleScroll = () => {
-    this.setState({
-      shouldRenderBelowTheFold: true,
-    })
-
-    window.document.removeEventListener('scroll', this.handleScroll)
-  }
-
-  public componentDidMount() {
-    window &&
-      window.document &&
-      window.document.addEventListener('scroll', this.handleScroll)
-  }
-
-  public componentWillUnmount() {
-    window &&
-      window.document &&
-      window.document.removeEventListener('scroll', this.handleScroll)
-  }
-
-  public render() {
-    const { isRow, isMobile, elements, children, ...props } = this.props
-
-    const { shouldRenderBelowTheFold } = this.state
-
-    const className = `flex flex-grow-1 w-100 ${
-      isRow ? 'flex-row' : 'flex-column'
-    }`
-    if (typeof elements === 'string') {
-      if (elements === '__children__') {
-        return children
-      }
-      return (
-        <div className={isRow ? '' : className}>
-          <ExtensionPoint id={elements} {...props} />
-        </div>
-      )
+  if (typeof elements === 'string') {
+    if (elements === '__children__') {
+      return <>{children}</>
     }
-
-    let elementsToRender = this.props.elements.length
-    if (this.props.preview && this.props.aboveTheFold != null) {
-      elementsToRender = this.props.aboveTheFold
-    }
-
-    let foldIndex = elements.indexOf('__fold__')
-    if (foldIndex === -1) {
-      foldIndex = elements.indexOf(
-        `__fold__.${isMobile ? 'mobile' : 'desktop'}`
-      )
-    }
-
-    const hasFold = foldIndex > -1
-
-    if (hasFold && !shouldRenderBelowTheFold) {
-      elementsToRender = foldIndex
-    }
-
-    const lazyImagesFoldPosition = elements.indexOf(
-      '__fold__.experimentalLazyImages'
-    )
-    const hasLazyImagesFold = lazyImagesFoldPosition > -1
-
-    const returnValue: JSX.Element[] = elements
-      .slice(0, elementsToRender)
-      .map((element: Element, i: number) => {
-        let container = (
-          <Container
-            key={element.toString()}
-            elements={element}
-            isMobile={isMobile}
-            isRow={!isRow}
-            {...props}
-          >
-            {children}
-          </Container>
-        )
-
-        if (hasLazyImagesFold && i > lazyImagesFoldPosition) {
-          container = (
-            <LazyImages key={element.toString()}>{container}</LazyImages>
-          )
-        }
-
-        return container
-      })
-
     return (
-      <div
-        className={className}
-        style={{
-          // Forces scrolling if there is below-the-fold content to be rendered
-          minHeight: hasFold && !shouldRenderBelowTheFold ? '101vh' : 'auto',
-        }}
-      >
-        {returnValue}
+      <div className={isRow ? '' : className}>
+        <ExtensionPoint id={elements} {...props} />
       </div>
     )
   }
+
+  let foldIndex = elements.indexOf('__fold__')
+  if (foldIndex === -1) {
+    foldIndex = elements.indexOf(`__fold__.${isMobile ? 'mobile' : 'desktop'}`)
+  }
+
+  const hasFold = foldIndex > -1
+
+  const lazyImagesFoldPosition = elements.indexOf(
+    '__fold__.experimentalLazyImages'
+  )
+  const hasLazyImagesFold = lazyImagesFoldPosition > -1
+
+  // TODO: Seems to be legacy and unused, might be removed in the future
+  let elementsToRender = elements.length
+  if (preview && aboveTheFold != null) {
+    elementsToRender = aboveTheFold
+  }
+
+  const wrappedElements: JSX.Element[] = elements
+    .slice(0, elementsToRender)
+    .map((element: Element, i: number) => {
+      let container = (
+        <Container
+          key={element.toString()}
+          elements={element}
+          isMobile={isMobile}
+          isRow={!isRow}
+          {...props}
+        >
+          {children}
+        </Container>
+      )
+
+      if (hasLazyImagesFold && i > lazyImagesFoldPosition) {
+        container = (
+          <LazyImages key={element.toString()}>{container}</LazyImages>
+        )
+      }
+
+      if (hasFold && i > foldIndex) {
+        container = (
+          <LazyRender key={element.toString()}>{container}</LazyRender>
+        )
+      }
+
+      return container
+    })
+
+  return <div className={className}>{wrappedElements}</div>
 }
 
 const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = (
