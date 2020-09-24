@@ -548,19 +548,15 @@ export class RenderProvider extends Component<
       runtime: { rootPath },
     } = this.props
     const { pages } = this.state
+    options.rootPath = rootPath
+    options.modifiers = this.navigationRouteModifiers
 
     this.navigationModifierOptions = {
       ...this.navigationModifierOptions,
       ...options.modifiersOptions,
     }
-
-    options = {
-      ...options,
-      rootPath,
-      modifiers: this.navigationRouteModifiers,
-      modifiersOptions: this.navigationModifierOptions,
-      setPreview: this.setPreview,
-    }
+    options.modifiersOptions = this.navigationModifierOptions
+    options.setPreview = this.setPreview
 
     if (this.navigationState.isNavigating) {
       const lastOptions = this.navigationState.lastOptions!

@@ -341,7 +341,7 @@ export function navigate(
   }
 
   if (fallbackToWindowLocation) {
-    setPreview && setPreview(true)
+    if (setPreview) setPreview(true)
 
     window.location.href = `${navigationRoute.path}${navigationRoute.query}`
 

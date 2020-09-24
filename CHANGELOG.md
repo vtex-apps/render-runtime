@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
-- Add the loading bar when redirecting to checkout.
+- Add the loading bar when redirecting to the checkout.
 
 ## [8.122.2] - 2020-10-06
 ### Changed
