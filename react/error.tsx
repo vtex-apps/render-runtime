@@ -9,6 +9,7 @@ const ERROR_PAGE_COMPONENT = 'ErrorPage'
 import ErrorImg from './images/error-img.png'
 
 import style from './error.css'
+import { renderReadyPromise } from '.'
 
 const toSplunkLink = (rid: string) =>
   `https://splunk72.vtex.com/en-US/app/vtex_io_apps/search?q=search%20index%3Dvtex_io_logs%20app%3Dvtex.render-server%40*%20data.requestId%3D${rid}&display.page.search.mode=verbose&dispatch.sample_ratio=1&earliest=-5m%40m&latest=now`
@@ -138,7 +139,7 @@ if (window.__ERROR__) {
     window.__RENDER_8_RUNTIME__.render('error', global.__RUNTIME__)
   }
 
-  document.addEventListener('DOMContentLoaded', start)
+  renderReadyPromise.then(start)
 
   if (module.hot) {
     module.hot.accept('./core/main', () => {
