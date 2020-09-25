@@ -17,10 +17,8 @@ registerRuntimeGlobals(runtimeGlobals)
 addAMPProxy(window.__RUNTIME__)
 patchLibs()
 
-function start() {
-  global.__RUNTIME__ = window.__RUNTIME__
-  if (window.__RUNTIME__.start && !window.__ERROR__) {
-    if (canUseDOM) {
+export const renderReadyPromise: Promise<any> = canUseDOM
+  ? (function () {
       const contentLoadedPromise = new Promise((resolve) => {
         window.addEventListener('DOMContentLoaded', resolve)
         if (window.__DOM_READY__) {
@@ -39,12 +37,20 @@ function start() {
         }
       })
 
-      Promise.all([
+      return Promise.all([
         contentLoadedPromise,
         intlPolyfillPromise,
         scriptsLoadedPromise,
         uncriticalStylesPromise,
-      ]).then(() => {
+      ])
+    })()
+  : Promise.resolve()
+
+function start() {
+  global.__RUNTIME__ = window.__RUNTIME__
+  if (window.__RUNTIME__.start && !window.__ERROR__) {
+    if (canUseDOM) {
+      renderReadyPromise.then(() => {
         setTimeout(() => {
           window?.performance?.mark?.('render-start')
           window.__RENDER_8_RUNTIME__.start()
