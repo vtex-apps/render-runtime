@@ -1,4 +1,5 @@
 import { canUseDOM } from 'exenv'
+import { RenderRuntime } from '../typings/runtime'
 
 export const addAMPProxy = (runtime: RenderRuntime) => {
   if (!runtime.amp) {

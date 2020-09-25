@@ -1,3 +1,5 @@
+import { RenderRuntime, Extension, Page, Extensions } from '../typings/runtime'
+
 interface ExtensionResult {
   treePath: string
   extension: Extension
@@ -14,28 +16,28 @@ const createExtensions = (
   extensionPath: string,
   bindingPath: string,
   outerNested: boolean,
-  blocksTree: BlockContentTree,
-  blocksMap: Blocks,
-  contentMap: ContentMap
+  blocksTree: RenderRuntime['blocksTree'],
+  blocksMap: RenderRuntime['blocks'],
+  contentMap: RenderRuntime['contentMap']
 ): ExtensionResult[] => {
   const result: ExtensionResult[] = []
-  if (!blocksTree[blockTreePath]) {
+  if (!blocksTree![blockTreePath]) {
     return result
   }
 
-  const { blockIdMap, contentIdMap } = blocksTree[blockTreePath]
+  const { blockIdMap, contentIdMap } = blocksTree![blockTreePath]
   const mappedBlockId =
     blockIdMap[extensionPath] ||
     blockIdMap[withStar(extensionPath)] ||
     blockIdMap['*']
-  const block = blocksMap[mappedBlockId]
+  const block = blocksMap![mappedBlockId]
   const { blockId, after = [], around = [], before = [], blocks = [] } = block
   const blockContentMapId =
     contentIdMap[bindingPath] || contentIdMap[withStar(bindingPath)] || blockId
   const blockContentId = `${blockContentMapId}+${blockId}`
 
-  const maybeContent = contentMap[blockContentId] ||
-    contentMap[blockContentMapId] || { content: {}, contentIds: [] }
+  const maybeContent = contentMap![blockContentId] ||
+    contentMap![blockContentMapId] || { content: {}, contentIds: [] }
   const content = maybeContent.content || maybeContent
   const contentIds = maybeContent.contentIds || []
 
@@ -113,9 +115,9 @@ const createExtensions = (
 }
 
 export const generateExtensions = (
-  blocksTree: BlockContentTree,
-  blocks: Blocks,
-  contentMap: ContentMap,
+  blocksTree: RenderRuntime['blocksTree'],
+  blocks: RenderRuntime['blocks'],
+  contentMap: RenderRuntime['contentMap'],
   page: Page
 ): Extensions => {
   const extensions: Extensions = {}

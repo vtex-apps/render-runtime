@@ -15,13 +15,15 @@ import SiteEditorWrapper from './SiteEditorWrapper'
 import Hydration from '../Hydration'
 import { LazyImages } from '../LazyImages'
 import { generateSlot } from '../../utils/slots'
+import { RenderContextType } from '../RenderContext'
+import { Extension } from '../../typings/runtime'
 
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
 
 export async function fetchComponent(
   component: string,
-  runtimeFetchComponent: RenderContext['fetchComponent'],
+  runtimeFetchComponent: RenderContextType['fetchComponent'],
   retries = 3
 ): Promise<any> {
   const Component = component && getImplementation(component)
@@ -55,8 +57,8 @@ interface Props {
   component: string | null
   props: Record<string, any>
   treePath: string
-  runtime: RenderContext
-  hydration: Hydration
+  runtime: RenderContextType
+  hydration: Extension['hydration']
 }
 
 const ComponentLoader: FunctionComponent<Props> = (props) => {

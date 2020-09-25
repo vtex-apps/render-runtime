@@ -1,6 +1,7 @@
 import { canUseDOM } from 'exenv'
 import React, { Fragment, ReactElement, ReactPortal } from 'react'
 import { createPortal as reactCreatePortal } from 'react-dom'
+import { NamedMarkup } from '../typings/global'
 
 const portalPattern = /START_SERVER_PORTAL_([^!]+)!((\n|.)+)END_SERVER_PORTAL_\1!/g
 

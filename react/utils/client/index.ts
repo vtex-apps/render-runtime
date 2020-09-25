@@ -25,6 +25,8 @@ import { createRuntimeContextLink } from './links/runtimeContextLink'
 import { createHydrationFn, QueryData } from '../apolloCache'
 import { RenderProvider } from '../../components/RenderProvider'
 import { promised } from '../promise'
+import { ApolloClientType } from '../../typings/global'
+import { RenderRuntime } from '../../typings/runtime'
 
 interface ApolloClientsRegistry {
   [key: string]: ApolloClientType

@@ -1,6 +1,7 @@
 import React, { FC, ComponentType } from 'react'
 import { useSSR } from '../components/NoSSR'
 import { useMediaLayout } from 'use-media'
+import { RenderRuntime } from '../typings/runtime'
 
 export interface Props {
   runtime: RenderRuntime
@@ -22,7 +23,7 @@ export interface DeviceInfo {
   isMobile: boolean
 }
 
-const useDevice = (hints: RenderHints) => {
+const useDevice = (hints: RenderRuntime['hints']) => {
   const isSSR = useSSR()
 
   /** These screensizes are hardcoded, based on the default

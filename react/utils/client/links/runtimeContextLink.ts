@@ -1,6 +1,7 @@
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import { OperationContext } from './uriSwitchLink'
 import { RenderProvider } from '../../../components/RenderProvider'
+import { RenderRuntime } from '../../../typings/runtime'
 
 export function createRuntimeContextLink(initialRuntime: RenderRuntime) {
   let renderProviderInstance: undefined | RenderProvider

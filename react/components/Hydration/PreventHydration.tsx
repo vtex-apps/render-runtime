@@ -10,7 +10,8 @@ import { traverseExtension } from '../../utils/components'
 import { fetchAssets, getImplementation } from '../../utils/assets'
 import { useDehydratedContent } from '../../hooks/hydration'
 import { canUseDOM } from 'exenv'
-import { useRuntime } from '../../core/main'
+import { useRuntime } from '../RenderContext'
+import { RenderRuntime } from '../../typings/runtime'
 
 interface Props {
   shouldHydrate?: boolean

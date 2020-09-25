@@ -1,9 +1,10 @@
 import React, { FunctionComponent } from 'react'
 import HydrateOnView from './HydrateOnView'
+import { Extension } from '../../typings/runtime'
 
 interface Props {
   treePath: string
-  hydration: Hydration
+  hydration: Extension['hydration']
 }
 
 const Hydration: FunctionComponent<Props> = ({

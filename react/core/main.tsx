@@ -5,8 +5,8 @@ import 'apollo-link-persisted-queries'
 import 'apollo-upload-client'
 import 'apollo-utilities'
 import 'classnames'
-import * as EventEmitter from 'eventemitter3'
-import { canUseDOM } from 'exenv'
+import EventEmitter from 'eventemitter3'
+
 import 'graphql'
 import { createBrowserHistory as createHistory } from 'history'
 import queryString from 'query-string'
@@ -15,10 +15,9 @@ import { getDataFromTree } from 'react-apollo'
 import {
   hydrate as hydrateDOM,
   render as renderDOM,
-  Renderer,
   unstable_createRoot,
 } from 'react-dom'
-import { Helmet } from 'react-helmet'
+import Helmet from '../components/Helmet'
 import NoSSR, { useSSR } from '../components/NoSSR'
 import { isEmpty } from 'ramda'
 import Loading from '../components/Loading'
@@ -29,9 +28,11 @@ import {
 } from '../components/LazyImages'
 import { LoadingContextProvider } from '../components/LoadingContext'
 
-import { ChildBlock, useChildBlock } from '../components/ChildBlock'
+import { ChildBlock } from '../components/ChildBlock'
+import { useChildBlock } from '../components/useChildBlock'
 import ExtensionContainer from '../components/ExtensionPoint/ExtensionContainer'
 import ExtensionPoint from '../components/ExtensionPoint'
+import Block from '../components/Block'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/ExtensionPoint/LegacyExtensionContainer'
 import Link from '../components/Link'
@@ -40,6 +41,7 @@ import { RenderContext, withRuntimeContext } from '../components/RenderContext'
  * So `useRuntime` should be imported from `../components/useRuntime` rather than
  * being imported along with the other functions from `RenderContext` */
 import useRuntime from '../components/useRuntime'
+import { canUseDOM } from '../components/canUseDOM'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'
@@ -63,6 +65,14 @@ import {
 import withHMR from '../utils/withHMR'
 import { generateExtensions } from '../utils/blocks'
 import { promised } from '../utils/promise'
+import {
+  RenderedSuccess,
+  NamedServerRendered,
+  Rendered,
+  ServerRendered,
+} from '../typings/global'
+import { RenderRuntime, Extensions } from '../typings/runtime'
+import '../typings/runtime'
 
 let emitter: EventEmitter | null = null
 
@@ -372,7 +382,7 @@ export {
   /** Block is the preferred nomenclature now, ExtensionPoint is kept for
    * backwards compatibility
    */
-  ExtensionPoint as Block,
+  Block,
   ExtensionPoint,
   LayoutContainer,
   LegacyExtensionContainer,

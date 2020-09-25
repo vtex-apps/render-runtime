@@ -14,10 +14,12 @@ import {
   isPrefetchActive,
 } from '../utils/routes'
 import { fetchComponents } from '../utils/components'
-import { useRuntime } from '../core/main'
+import { useRuntime } from '../components/RenderContext'
 import { useApolloClient } from 'react-apollo'
 import { useRef, useEffect, useCallback, MutableRefObject } from 'react'
 import { useOnView } from './viewDetection'
+import { ApolloClientType } from '../typings/global'
+import { RenderRuntime } from '../typings/runtime'
 
 interface PrefetchRequestsArgs {
   client: ApolloClientType

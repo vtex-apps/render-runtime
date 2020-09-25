@@ -3,6 +3,7 @@ import { any, map, append } from 'ramda'
 import React, { Component } from 'react'
 
 import ExtensionPortal from './ExtensionPortal'
+import { RenderRuntime } from '../../typings/runtime'
 
 export interface PortalRenderingRequest {
   extensionName: string

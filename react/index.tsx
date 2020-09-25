@@ -88,3 +88,5 @@ if (!canUseDOM) {
 } else {
   loadRuntimeJSONs().then(() => start())
 }
+
+export * from './core/main'

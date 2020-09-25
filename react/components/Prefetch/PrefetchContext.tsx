@@ -10,9 +10,10 @@ import React, {
 import LRUCache from './LRUCache'
 import PQueue from './PQueue'
 import { History, UnregisterCallback } from 'history'
-import { isEnabled } from '../../utils/flags'
-import { useRuntime } from '../../core/main'
+import { useRuntime } from '../RenderContext'
 import { isPrefetchEnabled } from '../../utils/routes'
+import { RenderRuntime } from '../../typings/runtime'
+import { PrefetchRouteData, ContentResponse } from '../../typings/global'
 
 const MAX_CONCURRENCY = 5
 
@@ -79,7 +80,7 @@ export const usePrefetch = () => useContext(PrefetchContext)
 
 const getTimeout = (isMobile: boolean) => 3500 * (isMobile ? 2 : 1)
 
-export const PrefetchContextProvider: FC<{ history: History | null }> = ({
+export const PrefetchContextProvider: FC<{ history: History<any> | null }> = ({
   children,
   history,
 }) => {

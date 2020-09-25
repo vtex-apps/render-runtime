@@ -1,15 +1,77 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { ComponentType, useContext } from 'react'
+import { History } from 'history'
+import {
+  ConfigurationDevice,
+  RenderHistoryLocation,
+  SetQueryOptions,
+  PageContextOptions,
+} from '../typings/global'
+import { RenderRuntime, Components, Extension } from '../typings/runtime'
+import { NavigationRouteModifier, NavigateOptions } from '../utils/pages'
+
+export interface RenderContextType
+  extends Pick<
+    RenderRuntime,
+    | 'account'
+    | 'amp'
+    | 'binding'
+    | 'components'
+    | 'contentMap'
+    | 'culture'
+    | 'defaultExtensions'
+    | 'deviceInfo'
+    | 'emitter'
+    | 'extensions'
+    | 'hints'
+    | 'inspect'
+    | 'messages'
+    | 'page'
+    | 'pages'
+    | 'platform'
+    | 'preview'
+    | 'production'
+    | 'publicEndpoint'
+    | 'query'
+    | 'renderMajor'
+    | 'rootPath'
+    | 'route'
+    | 'workspace'
+  > {
+  addMessages: (newMessages: RenderRuntime['messages']) => Promise<void>
+  addNavigationRouteModifier: (modifier: NavigationRouteModifier) => void
+  ensureSession: () => Promise<void>
+  fetchComponent: (component: string) => Promise<unknown>
+  fetchComponents: (
+    components: RenderRuntime['components'],
+    extensions?: RenderRuntime['extensions']
+  ) => Promise<void>
+  getSettings: (app: string) => any
+  goBack: () => void
+  device: string
+  history: History | null
+  navigate: (options: NavigateOptions) => boolean
+  onPageChanged: (location: RenderHistoryLocation) => void
+  patchSession: (data?: any) => Promise<void>
+  prefetchDefaultPages: (routeIds: string[]) => Promise<void>
+  prefetchPage: (name: string) => void
+  setDevice: (device: ConfigurationDevice) => void
+  setQuery: (query?: Record<string, any>, options?: SetQueryOptions) => boolean
+  updateComponentAssets: (availableComponents: Components) => void
+  updateExtension: (name: string, extension: Extension) => Promise<void>
+  updateRuntime: (options?: PageContextOptions) => Promise<void>
+  navigationRouteModifiers: Set<NavigationRouteModifier>
+}
 
 export interface RenderContextProps {
-  runtime: RenderContext
+  runtime: RenderContextType
 }
 
 export interface EmitterProps {
-  __emitter: RenderContext['emitter']
+  __emitter: RenderContextType['emitter']
 }
 
-export const RenderContext = React.createContext<RenderContext>({} as any)
+export const RenderContext = React.createContext<RenderContextType>({} as any)
 RenderContext.displayName = 'RenderContext'
 
 export const RenderContextProvider: React.FC<RenderContextProps> = ({
@@ -20,7 +82,7 @@ export const RenderContextProvider: React.FC<RenderContextProps> = ({
 )
 RenderContextProvider.displayName = 'RenderContextProvider'
 
-export const useRuntime = () => {
+export const useRuntime = (): RenderContextType => {
   return useContext(RenderContext)
 }
 

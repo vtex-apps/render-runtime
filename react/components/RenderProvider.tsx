@@ -1,8 +1,8 @@
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
-import { History, UnregisterCallback } from 'history'
-import PropTypes from 'prop-types'
 import { equals, merge, mergeWith, difference } from 'ramda'
+import { History, UnregisterCallback, LocationListener } from 'history'
+import PropTypes from 'prop-types'
 import React, { Component, Fragment, ReactElement, Suspense } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -50,7 +50,7 @@ import { TreePathContextProvider } from '../utils/treePath'
 import BuildStatus from './BuildStatus'
 import ExtensionManager from './ExtensionPoint/ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
-import { RenderContextProvider } from './RenderContext'
+import { RenderContextProvider, RenderContextType } from './RenderContext'
 import RenderPage from './RenderPage'
 import {
   getPrefetechedData,
@@ -58,6 +58,17 @@ import {
 } from './Prefetch/PrefetchContext'
 import { withDevice, WithDeviceProps, DeviceInfo } from '../utils/withDevice'
 import { ApolloClientFunctions } from '../utils/client'
+import {
+  ConfigurationDevice,
+  ApolloClientType,
+  RenderHistoryLocation,
+  SetQueryOptions,
+  RenderScrollOptions,
+  ParsedServerPageResponse,
+  ParsedPageQueryResponse,
+  PageContextOptions,
+} from '../typings/global'
+import { RenderRuntime, Components, Extension } from '../typings/runtime'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -85,7 +96,7 @@ export interface RenderProviderState {
   culture: RenderRuntime['culture']
   defaultExtensions: RenderRuntime['defaultExtensions']
   device: ConfigurationDevice
-  deviceInfo: DeviceInfo
+  deviceInfo: RenderRuntime['deviceInfo']
   extensions: RenderRuntime['extensions']
   inspect: RenderRuntime['inspect']
   messages: RenderRuntime['messages']
@@ -318,7 +329,8 @@ export class RenderProvider extends Component<
     const { history, runtime } = this.props
     const { production, emitter, publicEndpoint } = runtime
 
-    this.unlisten = history && history.listen(this.onPageChanged)
+    this.unlisten =
+      history && history.listen(this.onPageChanged as LocationListener)
     emitter.addListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {
@@ -373,7 +385,7 @@ export class RenderProvider extends Component<
     }
   }
 
-  public getChildContext(): RenderContext {
+  public getChildContext(): RenderContextType {
     const { history, runtime } = this.props
     const {
       components,
@@ -907,7 +919,7 @@ export class RenderProvider extends Component<
     this.sendInfoFromIframe({ shouldUpdateRuntime: true })
   }
 
-  public fetchComponent: RenderContext['fetchComponent'] = (component) => {
+  public fetchComponent: RenderContextType['fetchComponent'] = (component) => {
     if (!canUseDOM) {
       throw new Error('Cannot fetch components during server side rendering.')
     }

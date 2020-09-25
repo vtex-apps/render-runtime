@@ -1,4 +1,5 @@
 import { canUseDOM } from 'exenv'
+import { RenderRuntime } from '../typings/runtime'
 
 const isRenderServedPage = () => {
   const generatorMetaTag = document.querySelector(`meta[name='generator']`)

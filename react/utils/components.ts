@@ -1,5 +1,7 @@
 import { uniqWith } from 'ramda'
 import { hasComponentImplementation, fetchAssets } from './assets'
+import { AssetEntry } from '../typings/global'
+import { RenderRuntime, Extensions, BlockInsertion } from '../typings/runtime'
 
 const FILE_PATH_REX = /([^/]+?)(?:$|\?)/ // https://regex101.com/r/joJ2p7/1
 const FILE_EXT_REX = /(\.min)?(\.js|\.css)/ // https://regex101.com/r/8vmjes/1
@@ -13,8 +15,8 @@ const getAppAndVersion = (locator: string) => {
 }
 
 export const isConflictingLoadedComponents = (
-  navigatedComponents: Components,
-  loadedComponents: Components
+  navigatedComponents: RenderRuntime['components'],
+  loadedComponents: RenderRuntime['components']
 ) => {
   const loadedVersionByApp = Object.keys(loadedComponents).reduce(
     (acc, locator) => {
@@ -74,7 +76,7 @@ export const fetchComponents = async (
 }
 
 export const traverseListOfComponents = (
-  componentsData: Components | Record<string, string[]>,
+  componentsData: RenderRuntime['components'] | Record<string, string[]>,
   componentsToTraverse: string[]
 ) => {
   const allAssets = componentsToTraverse.reduce((acc, component) => {
@@ -87,7 +89,7 @@ export const traverseListOfComponents = (
 }
 
 export const traverseComponent = (
-  components: Components | Record<string, string[]>,
+  components: RenderRuntime['components'] | Record<string, string[]>,
   component: string,
   isRoot = true
 ): AssetEntry[] => {
@@ -117,7 +119,7 @@ export const traverseComponent = (
 
 export const traverseExtension = (
   extensions: Extensions,
-  components: Components,
+  components: RenderRuntime['components'],
   extensionId: string,
   isRoot: boolean
 ): AssetEntry[] => {

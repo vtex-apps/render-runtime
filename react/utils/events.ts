@@ -1,5 +1,6 @@
 import EventEmitter from 'eventemitter3'
 import { canUseDOM } from 'exenv'
+import { RenderRuntime } from '../typings/runtime'
 
 interface IOEvent {
   key: string

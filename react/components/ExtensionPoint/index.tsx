@@ -3,7 +3,7 @@ import React, { FC, Fragment, Suspense, useMemo } from 'react'
 
 import ComponentLoader from './ComponentLoader'
 import Loading from '../Loading'
-import { useRuntime } from '../RenderContext'
+import { useRuntime, RenderContextType } from '../RenderContext'
 import { useTreePath } from '../../utils/treePath'
 import NoSSR from '../NoSSR'
 import { withErrorBoundary } from '../ErrorBoundary'
@@ -42,7 +42,10 @@ function mountTreePath(currentId: string, parentTreePath: string) {
   return parentTreePath || currentId
 }
 
-export function getChildExtensions(runtime: RenderContext, treePath: string) {
+export function getChildExtensions(
+  runtime: RenderContextType,
+  treePath: string
+) {
   const extension = runtime.extensions && runtime.extensions[treePath]
 
   if (!extension || !extension.blocks) {
