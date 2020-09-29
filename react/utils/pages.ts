@@ -151,6 +151,7 @@ function getRouteFromPageName(
 ): NavigationRoute | null {
   const path = pathFromPageName(id, pages, params) || ''
   checkValidParams(id, pages, path, params)
+  console.log('path', path)
   return path ? { id, path, params } : null
 }
 
