@@ -321,12 +321,12 @@ export function navigate(
 ) {
   const {
     scrollOptions,
-    fallbackToWindowLocation = true,
+    fallbackToWindowLocation = false,
     replace,
     fetchPage = true,
     preventRemount,
     skipSetPath = false,
-    setPreview,
+    showPageLoading,
   } = options
 
   const navigationRoute = getNavigationRouteToNavigate(pages, options, true)
@@ -342,7 +342,7 @@ export function navigate(
   }
 
   if (fallbackToWindowLocation) {
-    if (setPreview) setPreview(true)
+    if (showPageLoading) showPageLoading()
 
     window.location.href = `${navigationRoute.path}${navigationRoute.query}`
 
@@ -538,7 +538,7 @@ export interface NavigateOptions {
   modifiers?: Set<NavigationRouteModifier>
   modifiersOptions?: Record<string, any>
   skipSetPath?: boolean
-  setPreview?: (previewValue: boolean) => void
+  showPageLoading?: () => void
 }
 
 export interface NavigationRouteChange {

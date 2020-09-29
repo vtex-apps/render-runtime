@@ -498,8 +498,8 @@ export class RenderProvider extends Component<
     return pageGoBack(history)
   }
 
-  public setPreview = (previewValue: boolean) => {
-    this.setState({ preview: previewValue })
+  public showPageLoading = () => {
+    this.setState({ preview: true })
   }
 
   public setQuery = (
@@ -556,7 +556,7 @@ export class RenderProvider extends Component<
       ...options.modifiersOptions,
     }
     options.modifiersOptions = this.navigationModifierOptions
-    options.setPreview = this.setPreview
+    options.showPageLoading = this.showPageLoading
 
     if (this.navigationState.isNavigating) {
       const lastOptions = this.navigationState.lastOptions!
