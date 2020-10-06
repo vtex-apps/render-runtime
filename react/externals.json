@@ -140,11 +140,6 @@
         "path": "npm:history@4.7.2/umd/history.min.js"
       },
       {
-        "global": "Sentry",
-        "import": "@sentry/browser",
-        "path": "npm:@sentry/browser@4.4.1/build/bundle.min.js"
-      },
-      {
         "global": "R",
         "import": "ramda",
         "path": "npm:ramda@0.26.1/dist/ramda.min.js"
