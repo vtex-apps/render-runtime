@@ -261,4 +261,5 @@ interface ComponentEntry {
   dependencies: string[]
 }
 
+// We need to keep this so this file is kept in type generation
 export default {}
