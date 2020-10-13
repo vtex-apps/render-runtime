@@ -151,6 +151,7 @@ function getRouteFromPageName(
 ): NavigationRoute | null {
   const path = pathFromPageName(id, pages, params) || ''
   checkValidParams(id, pages, path, params)
+
   return path ? { id, path, params } : null
 }
 
@@ -320,21 +321,32 @@ export function navigate(
 ) {
   const {
     scrollOptions,
-    fallbackToWindowLocation = true,
+    fallbackToWindowLocation = false,
     replace,
     fetchPage = true,
     preventRemount,
     skipSetPath = false,
+    showPageLoading,
   } = options
 
   const navigationRoute = getNavigationRouteToNavigate(pages, options, true)
+
   if (navigationRoute.hash) {
     window.location.hash = navigationRoute.hash
+
     return true
   }
 
   if (navigationRoute == null) {
     return false
+  }
+
+  if (fallbackToWindowLocation) {
+    if (showPageLoading) showPageLoading()
+
+    window.location.href = `${navigationRoute.path}${navigationRoute.query}`
+
+    return true
   }
 
   if (history) {
@@ -352,11 +364,6 @@ export function navigate(
     })
     const method = replace ? 'replace' : 'push'
     window.setTimeout(() => history[method](location), 0)
-    return true
-  }
-
-  if (fallbackToWindowLocation) {
-    window.location.href = `${navigationRoute.path}${navigationRoute.query}`
     return true
   }
 
@@ -531,6 +538,7 @@ export interface NavigateOptions {
   modifiers?: Set<NavigationRouteModifier>
   modifiersOptions?: Record<string, any>
   skipSetPath?: boolean
+  showPageLoading?: () => void
 }
 
 export interface NavigationRouteChange {
