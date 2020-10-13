@@ -9,7 +9,7 @@ import { History, Location } from 'history'
 import { HelmetData } from 'react-helmet'
 import { TreePathProps } from '../utils/treePath'
 
-import { RenderContextType } from '../components/RenderContext'
+import type { RenderContext } from '../components/RenderContext'
 
 interface RenderMetric {
   getDataFromTree?: [number, number]
@@ -263,10 +263,10 @@ interface RuntimeExports {
   withHMR: any
   withRuntimeContext: any
   withSession: any
-  RenderContextConsumer: React.Consumer<RenderContextType>
+  RenderContextConsumer: React.Consumer<RenderContext>
   TreePathContextConsumer: React.Consumer<TreePathProps>
   buildCacheLocator: any
-  useRuntime(): RenderContextType
+  useRuntime(): RenderContext
   start(): void
   render(name: string, runtime: RenderRuntime, element?: HTMLElement): Rendered
 }
@@ -284,7 +284,7 @@ declare global {
     __hostname__: string
     __pathname__: string
     __provideRuntime: (
-      runtime: RenderContextType | null,
+      runtime: RenderContext | null,
       messages: Record<string, string>,
       shouldUpdateRuntime: boolean,
       setMessages: (messages: RenderRuntime['messages']) => void

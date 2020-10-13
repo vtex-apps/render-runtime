@@ -10,7 +10,7 @@ import {
 import { RenderRuntime, Components, Extension } from '../typings/runtime'
 import { NavigationRouteModifier, NavigateOptions } from '../utils/pages'
 
-export interface RenderContextType
+export interface RenderContext
   extends Pick<
     RenderRuntime,
     | 'account'
@@ -64,14 +64,14 @@ export interface RenderContextType
 }
 
 export interface RenderContextProps {
-  runtime: RenderContextType
+  runtime: RenderContext
 }
 
 export interface EmitterProps {
-  __emitter: RenderContextType['emitter']
+  __emitter: RenderContext['emitter']
 }
 
-export const RenderContext = React.createContext<RenderContextType>({} as any)
+export const RenderContext = React.createContext<RenderContext>({} as any)
 RenderContext.displayName = 'RenderContext'
 
 export const RenderContextProvider: React.FC<RenderContextProps> = ({
@@ -82,7 +82,7 @@ export const RenderContextProvider: React.FC<RenderContextProps> = ({
 )
 RenderContextProvider.displayName = 'RenderContextProvider'
 
-export const useRuntime = (): RenderContextType => {
+export const useRuntime = (): RenderContext => {
   return useContext(RenderContext)
 }
 

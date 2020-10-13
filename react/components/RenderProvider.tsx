@@ -50,7 +50,8 @@ import { TreePathContextProvider } from '../utils/treePath'
 import BuildStatus from './BuildStatus'
 import ExtensionManager from './ExtensionPoint/ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
-import { RenderContextProvider, RenderContextType } from './RenderContext'
+import { RenderContextProvider } from './RenderContext'
+import type { RenderContext } from './RenderContext'
 import RenderPage from './RenderPage'
 import {
   getPrefetechedData,
@@ -384,7 +385,7 @@ export class RenderProvider extends Component<
     }
   }
 
-  public getChildContext(): RenderContextType {
+  public getChildContext(): RenderContext {
     const { history, runtime } = this.props
     const {
       components,
@@ -918,7 +919,7 @@ export class RenderProvider extends Component<
     this.sendInfoFromIframe({ shouldUpdateRuntime: true })
   }
 
-  public fetchComponent: RenderContextType['fetchComponent'] = (component) => {
+  public fetchComponent: RenderContext['fetchComponent'] = (component) => {
     if (!canUseDOM) {
       throw new Error('Cannot fetch components during server side rendering.')
     }

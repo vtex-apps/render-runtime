@@ -1,9 +1,10 @@
 import React, { ErrorInfo, FunctionComponent } from 'react'
 import ErrorDisplay from './ExtensionPoint/ErrorDisplay'
-import { useRuntime, RenderContextType } from './RenderContext'
+import { useRuntime } from './RenderContext'
+import type { RenderContext } from './RenderContext'
 
 interface Props {
-  runtime: RenderContextType
+  runtime: RenderContext
 }
 
 class ErrorBoundary extends React.Component<Props> {
