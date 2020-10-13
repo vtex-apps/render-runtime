@@ -1,8 +1,8 @@
 import { RenderRuntime } from '../typings/runtime'
-import { useRuntime } from './RenderContext'
+import { useRuntime, RenderContextType } from './RenderContext'
 
 type PublicRuntime = Pick<
-  ReturnType<typeof useRuntime>,
+  RenderContextType,
   | 'account'
   | 'amp'
   | 'binding'

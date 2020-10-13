@@ -24,9 +24,5 @@ export function useChildBlock(childBlock: ChildBlockType): Block | null {
   const extension = useExtension({ children: id })
 
   // We are explicitly not exposing the private API here
-  return extension
-    ? {
-        props: extension.props,
-      }
-    : null
+  return extension ? { props: extension.props } : null
 }

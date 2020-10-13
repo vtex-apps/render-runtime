@@ -220,7 +220,7 @@ export class RenderProvider extends Component<
 
   private rendered!: boolean
   private sessionPromise: Promise<void>
-  private unlisten!: UnregisterCallback | null
+  private unlisten!: UnregisterCallback | undefined
   private apolloClient: ApolloClientType
   private hydrateApollo: ApolloClientFunctions['hydrate']
   private prefetchRoutes: Set<string>
@@ -329,8 +329,7 @@ export class RenderProvider extends Component<
     const { history, runtime } = this.props
     const { production, emitter, publicEndpoint } = runtime
 
-    this.unlisten =
-      history && history.listen(this.onPageChanged as LocationListener)
+    this.unlisten = history?.listen(this.onPageChanged as LocationListener)
     emitter.addListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {

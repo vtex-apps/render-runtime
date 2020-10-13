@@ -72,6 +72,7 @@ import {
   ServerRendered,
 } from '../typings/global'
 import { RenderRuntime, Extensions } from '../typings/runtime'
+// We need to keep this import so the types of this modules are kept in the final bundle by the Builder Hub.
 import '../typings/runtime'
 
 let emitter: EventEmitter | null = null
