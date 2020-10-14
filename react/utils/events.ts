@@ -129,12 +129,12 @@ const initSSE = (
         break
       case 'styles':
         console.log('[styles] Styles changed.')
-        if (updated.indexOf('style.json') > -1) {
+        if (updated.some((filePath) => /style\.json/gi.test(filePath))) {
           emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
             e.emit('styleTachyonsUpdate')
           )
         }
-        if (updated.indexOf('overrides.css') > -1) {
+        if (updated.some((filePath) => /overrides\.css/gi.test(filePath))) {
           emittersByWorkspace[`${account}/${workspace}`].forEach((e) =>
             e.emit('styleOverrides')
           )
