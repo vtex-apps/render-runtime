@@ -344,7 +344,11 @@ export function navigate(
   if (fallbackToWindowLocation) {
     if (showPageLoading) showPageLoading()
 
-    window.location.href = `${navigationRoute.path}?${navigationRoute.query}`
+    if (navigationRoute.query) {
+      window.location.assign(`${navigationRoute.path}?${navigationRoute.query}`)
+    } else {
+      window.location.assign(`${navigationRoute.path}`)
+    }
 
     return true
   }
