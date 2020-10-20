@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Fixed
-- Add the query char before the query params in navigate.
+- Add a query char before the query params in navigate.
 
 ## [8.123.2] - 2020-10-20
 ### Fixed
