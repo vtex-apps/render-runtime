@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Add the query char before the query params in navigate.
+
 ## [8.123.2] - 2020-10-20
 ### Fixed
 - `src` of lazy images not being updated when the `src` prop changes.

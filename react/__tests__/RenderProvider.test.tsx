@@ -158,7 +158,7 @@ it('Calling navigates to redirect to the checkout', async () => {
 
   await wait()
 
-  expect(window.location.assign).toHaveBeenCalledWith('/#/checkout')
+  expect(window.location.assign).toHaveBeenCalledWith('/checkout')
   expect(navigateResult).toBe(true)
 })
 
