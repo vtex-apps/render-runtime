@@ -498,10 +498,6 @@ export class RenderProvider extends Component<
     return pageGoBack(history)
   }
 
-  public showPageLoading = () => {
-    this.setState({ preview: true })
-  }
-
   public setQuery = (
     query: Record<string, any> = {},
     {
@@ -556,7 +552,6 @@ export class RenderProvider extends Component<
       ...options.modifiersOptions,
     }
     options.modifiersOptions = this.navigationModifierOptions
-    options.showPageLoading = this.showPageLoading
 
     if (this.navigationState.isNavigating) {
       const lastOptions = this.navigationState.lastOptions!

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Make new realease without the code introduced by version v8.123.0.
+
 ## [8.123.2] - 2020-10-20
 ### Fixed
 - `src` of lazy images not being updated when the `src` prop changes.
@@ -15,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Look for `hasContentSchema` to check if a block has a content schema.
 
-## [8.123.0] - 2020-10-13
+## [8.123.0] - 2020-10-13 [YANKED]
 
 ### Added
 - Add the loading bar when redirecting to the checkout.
