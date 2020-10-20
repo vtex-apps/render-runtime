@@ -2,7 +2,7 @@ import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
 import { History, UnregisterCallback } from 'history'
 import PropTypes from 'prop-types'
-import { equals, merge, mergeWith, difference } from 'ramda'
+import { equals, difference } from 'ramda'
 import React, { Component, Fragment, ReactElement, Suspense } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -29,7 +29,6 @@ import {
   ROUTE_CLASS_PREFIX,
   routeClass,
 } from '../utils/dom'
-import { isEnabled } from '../utils/flags'
 import { appendLocationSearch } from '../utils/location'
 import {
   goBack as pageGoBack,
@@ -41,11 +40,7 @@ import {
   queryStringToMap,
   scrollTo as pageScrollTo,
 } from '../utils/pages'
-import {
-  fetchDefaultPages,
-  fetchNavigationPage,
-  fetchServerPage,
-} from '../utils/routes'
+import { fetchDefaultPages, fetchServerPage } from '../utils/routes'
 import { TreePathContextProvider } from '../utils/treePath'
 import BuildStatus from './BuildStatus'
 import ExtensionManager from './ExtensionPoint/ExtensionManager'
@@ -751,116 +746,67 @@ export class RenderProvider extends Component<
     // If workspace is set via querystring, keep it during navigation
     const workspaceFromQuery = queryFromRuntime?.workspace
 
-    const navigationPromise = isEnabled('RENDER_NAVIGATION')
-      ? fetchServerPage({
-          fetcher: this.fetcher,
-          path: navigationRoute.path,
-          query,
-          workspace: workspaceFromQuery,
-          deviceInfo,
-        }).then(
-          async ({
-            appsEtag,
-            components,
-            extensions,
-            matchingPage,
-            messages,
-            pages,
-            settings,
-            queryData,
-          }: ParsedServerPageResponse) => {
-            if (
-              isConflictingLoadedComponents(components, this.state.components)
-            ) {
-              this.scrollTo({ top: 0, left: 0 })
-              window.location.reload()
-              return new Promise(() => {})
-            }
-
-            await Promise.all([
-              this.hydrateApollo(queryData),
-              this.fetchComponents(components, extensions),
-            ])
-
-            this.setState(
-              (state) => ({
-                ...state,
-                appsEtag,
-                components: { ...state.components, ...components },
-                extensions: { ...state.extensions, ...extensions },
-                loadedDevices: [deviceInfo.type],
-                loadedPages: loadedPages.add(matchingPage.routeId),
-                messages: { ...state.messages, ...messages },
-                page: matchingPage.routeId,
-                pages,
-                preview: false,
-                query,
-                route: matchingPage,
-                settings,
-              }),
-              () => {
-                this.navigationState = { isNavigating: false }
-                this.replaceRouteClass(matchingPage.routeId)
-                this.sendInfoFromIframe()
-                this.scrollTo(state.scrollOptions)
-              }
-            )
-          }
-        )
-      : fetchNavigationPage({
-          apolloClient,
-          declarer,
-          locale,
-          paramsJSON,
-          production,
-          query: JSON.stringify(query),
-          renderMajor,
-          routeId,
-          skipCache: false,
-        }).then(
-          async ({
-            appsEtag,
-            cacheHints,
-            components,
-            extensions,
-            matchingPage,
-            messages,
-            pages,
-            settings,
-          }: ParsedPageQueryResponse) => {
-            const updatedRoute = { ...transientRoute, ...matchingPage }
-            await this.fetchComponents(components, extensions)
-
-            this.setState(
-              {
-                appsEtag,
-                cacheHints: mergeWith(merge, this.state.cacheHints, cacheHints),
-                components: { ...this.state.components, ...components },
-                extensions: { ...this.state.extensions, ...extensions },
-                loadedPages: loadedPages.add(page),
-                messages: { ...this.state.messages, ...messages },
-                page,
-                pages,
-                preview: false,
-                query,
-                route: updatedRoute,
-                settings,
-              },
-              () => {
-                this.navigationState = { isNavigating: false }
-                this.replaceRouteClass(page)
-                this.sendInfoFromIframe()
-                this.scrollTo(state.scrollOptions)
-              }
-            )
-          }
-        )
-    navigationPromise.finally(() => {
-      if (this.navigationState.isNavigating) {
-        this.navigationState = { isNavigating: false }
-      }
+    return fetchServerPage({
+      fetcher: this.fetcher,
+      path: navigationRoute.path,
+      query,
+      workspace: workspaceFromQuery,
+      deviceInfo,
     })
-    return navigationPromise
+      .then(
+        async ({
+          appsEtag,
+          components,
+          extensions,
+          matchingPage,
+          messages,
+          pages,
+          settings,
+          queryData,
+        }: ParsedServerPageResponse) => {
+          if (
+            isConflictingLoadedComponents(components, this.state.components)
+          ) {
+            this.scrollTo({ top: 0, left: 0 })
+            window.location.reload()
+            return new Promise(() => {})
+          }
+
+          await Promise.all([
+            this.hydrateApollo(queryData),
+            this.fetchComponents(components, extensions),
+          ])
+
+          this.setState(
+            (state) => ({
+              ...state,
+              appsEtag,
+              components: { ...state.components, ...components },
+              extensions: { ...state.extensions, ...extensions },
+              loadedDevices: [deviceInfo.type],
+              loadedPages: loadedPages.add(matchingPage.routeId),
+              messages: { ...state.messages, ...messages },
+              page: matchingPage.routeId,
+              pages,
+              preview: false,
+              query,
+              route: matchingPage,
+              settings,
+            }),
+            () => {
+              this.navigationState = { isNavigating: false }
+              this.replaceRouteClass(matchingPage.routeId)
+              this.sendInfoFromIframe()
+              this.scrollTo(state.scrollOptions)
+            }
+          )
+        }
+      )
+      .finally(() => {
+        if (this.navigationState.isNavigating) {
+          this.navigationState = { isNavigating: false }
+        }
+      })
   }
 
   public prefetchPage = (pageName: string) => {
@@ -962,55 +908,29 @@ export class RenderProvider extends Component<
     }
   }
 
-  public updateRuntime = async (options?: PageContextOptions) => {
+  public updateRuntime = async () => {
     const {
-      runtime: { renderMajor, query: queryFromRuntime },
+      runtime: { query: queryFromRuntime },
     } = this.props
-    const {
-      page,
-      pages: pagesState,
-      production,
-      culture: { locale },
-      route,
-      query,
-      deviceInfo,
-    } = this.state
-    const declarer = pagesState[page] && pagesState[page].declarer
-    const { pathname } = window.location
-    const paramsJSON = JSON.stringify(route.params || {})
+    const { page, route, query, deviceInfo } = this.state
 
     // If workspace is set via querystring, keep it during navigation
     const workspaceFromQuery = queryFromRuntime?.workspace
 
     const {
       appsEtag,
-      cacheHints,
       components,
       extensions,
       messages,
       pages,
       settings,
-    } = isEnabled('RENDER_NAVIGATION')
-      ? await fetchServerPage({
-          path: route.path,
-          query,
-          fetcher: this.fetcher,
-          workspace: workspaceFromQuery,
-          deviceInfo,
-        })
-      : await fetchNavigationPage({
-          apolloClient: this.apolloClient,
-          declarer,
-          locale,
-          paramsJSON,
-          path: pathname,
-          production,
-          query: '',
-          renderMajor,
-          routeId: page,
-          skipCache: true,
-          ...options,
-        })
+    } = await fetchServerPage({
+      path: route.path,
+      query,
+      fetcher: this.fetcher,
+      workspace: workspaceFromQuery,
+      deviceInfo,
+    })
 
     await this.fetchComponents(components, extensions)
 
@@ -1018,9 +938,7 @@ export class RenderProvider extends Component<
       this.setState(
         (state) => ({
           appsEtag,
-          cacheHints: isEnabled('RENDER_NAVIGATION')
-            ? state.cacheHints
-            : cacheHints,
+          cacheHints: state.cacheHints,
           components,
           extensions: {
             ...state.extensions,

@@ -274,18 +274,10 @@ export function getNavigationRouteToNavigate(
   const realHash = is(String, hash) ? `#${hash}` : ''
   let query = inputQuery || realQuery
 
-  let navigationRoute: any = {}
-
-  if (isEnabled('RENDER_NAVIGATION')) {
-    const fallbackPage = { path: to, params: {}, id: '', isRenderPage: false }
-    const routeFromPage = page && getRouteFromPageName(page, pages, params)
-    const routeFromPath = getRouteFromPath(to, pages)
-    navigationRoute = routeFromPage || routeFromPath || fallbackPage
-  } else {
-    navigationRoute = page
-      ? getRouteFromPageName(page, pages, params)
-      : getRouteFromPathOld(to, pages, query, realHash)
-  }
+  const fallbackPage = { path: to, params: {}, id: '', isRenderPage: false }
+  const routeFromPage = page && getRouteFromPageName(page, pages, params)
+  const routeFromPath = getRouteFromPath(to, pages)
+  const navigationRoute: any = routeFromPage || routeFromPath || fallbackPage
 
   if (!navigationRoute) {
     showLogs &&
@@ -506,7 +498,7 @@ function routeIdFromPathAndQueryOld(
 
   // Don't use map segments to match a route when Render
   // navigation is enabled
-  if (mappedSegments.length > 0 && !isEnabled('RENDER_NAVIGATION')) {
+  if (mappedSegments.length > 0) {
     routeMatch = routeMatchForMappedURL(mappedSegments, routes)
   }
 
