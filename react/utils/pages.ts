@@ -277,7 +277,7 @@ export function getNavigationRouteToNavigate(
   let navigationRoute: any = {}
 
   if (isEnabled('RENDER_NAVIGATION')) {
-    const fallbackPage = { path: to, params: {}, id: '' }
+    const fallbackPage = { path: to, params: {}, id: '', isRenderPage: false }
     const routeFromPage = page && getRouteFromPageName(page, pages, params)
     const routeFromPath = getRouteFromPath(to, pages)
     navigationRoute = routeFromPage || routeFromPath || fallbackPage
@@ -341,7 +341,7 @@ export function navigate(
     return false
   }
 
-  if (fallbackToWindowLocation) {
+  if (fallbackToWindowLocation || navigationRoute.isRenderPage === false) {
     if (showPageLoading) showPageLoading()
 
     window.location.href = `${navigationRoute.path}${navigationRoute.query}`
