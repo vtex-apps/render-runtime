@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- `src` of lazy images not being updated when the `src` prop changes.
 
 ## [8.123.1] - 2020-10-14
 ### Fixed

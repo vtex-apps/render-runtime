@@ -67,6 +67,9 @@ const MaybeLazyImage: FC<MaybeLazyImageProps> = ({
          * symbol while the image hasn't been loaded */
         newImageProps = {
           ...imageProps,
+          // explicity key because we need react to re-render the whole img element
+          // in case the src changes (i.e: product-summary + sku)
+          key: imageProps.src,
           className: `lazyload ${imageProps.className ?? ''} ${
             styles.lazyload
           }`,
