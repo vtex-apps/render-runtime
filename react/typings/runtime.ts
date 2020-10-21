@@ -96,11 +96,13 @@ interface RenderHints {
 }
 
 interface Culture {
-  availableLocales: string[]
-  locale: string
-  language: string
   country: string
+  availableLocales: string[]
   currency: string
+  customCurrencyDecimalDigits: number | null
+  customCurrencySymbol: string | null
+  language: string
+  locale: string
 }
 
 export interface Pages {

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Fixed
 - Exported type of `canUseDOM`.
+- Add missing fields to type `culture`.
 
 ## [8.124.0] - 2020-10-21
 ### Fixed
