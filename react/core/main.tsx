@@ -40,7 +40,7 @@ import { RenderContext, withRuntimeContext } from '../components/RenderContext'
  * So `useRuntime` should be imported from `../components/useRuntime` rather than
  * being imported along with the other functions from `RenderContext` */
 import useRuntime from '../components/useRuntime'
-import { canUseDOM } from '../components/canUseDOM'
+import canUseDOM from '../components/canUseDOM'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
 import PageCacheControl from '../utils/cacheControl'

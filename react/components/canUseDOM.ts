@@ -1,1 +1,3 @@
-export { canUseDOM } from 'exenv'
+import { canUseDOM } from 'exenv'
+
+export default canUseDOM
