@@ -2,12 +2,15 @@ import ReactDOM from 'react-dom'
 import React from 'react'
 import { getImplementation } from '../../utils/assets'
 import { isSiteEditorIframe } from '../../utils/dom'
+import type { RenderContext } from '../RenderContext'
+import type { Extension } from '../../typings/runtime'
+
 interface Props {
   component: string | null
   props: Record<string, any>
   treePath: string
   runtime: RenderContext
-  hydration: Hydration
+  hydration: Extension['hydration']
 }
 
 class SiteEditorWrapper extends React.Component<Props> {

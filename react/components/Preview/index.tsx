@@ -5,6 +5,7 @@ import Circle from './Circle'
 import Grid from './Grid'
 import Spinner from './Spinner'
 import Text from './Text'
+import { Extension, PreviewDimension } from '../../typings/runtime'
 
 interface Props {
   extension: Extension

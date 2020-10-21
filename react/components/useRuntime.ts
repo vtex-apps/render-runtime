@@ -1,3 +1,29 @@
 import { useRuntime } from './RenderContext'
+import type { RenderContext } from './RenderContext'
 
-export default useRuntime
+type PublicRuntime = Pick<
+  RenderContext,
+  | 'account'
+  | 'amp'
+  | 'binding'
+  | 'culture'
+  | 'device'
+  | 'getSettings'
+  | 'hints'
+  | 'history'
+  | 'navigate'
+  | 'page'
+  | 'platform'
+  | 'production'
+  | 'publicEndpoint'
+  | 'query'
+  | 'renderMajor'
+  | 'rootPath'
+  | 'route'
+  | 'setQuery'
+  | 'workspace'
+>
+
+const usePublicRuntime = useRuntime as () => PublicRuntime
+
+export default usePublicRuntime

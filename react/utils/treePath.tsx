@@ -1,5 +1,6 @@
 import hoistNonReactStatics from 'hoist-non-react-statics'
 import React, { ComponentType, useContext, FC, useMemo } from 'react'
+import { Extensions } from '../typings/runtime'
 
 const relative = (parent: string, id: string) => id.replace(`${parent}/`, '')
 

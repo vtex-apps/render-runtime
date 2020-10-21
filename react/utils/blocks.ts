@@ -1,3 +1,5 @@
+import { RenderRuntime, Extension, Page, Extensions } from '../typings/runtime'
+
 interface ExtensionResult {
   treePath: string
   extension: Extension
@@ -14,9 +16,9 @@ const createExtensions = (
   extensionPath: string,
   bindingPath: string,
   outerNested: boolean,
-  blocksTree: BlockContentTree,
-  blocksMap: Blocks,
-  contentMap: ContentMap
+  blocksTree: NonNullable<RenderRuntime['blocksTree']>,
+  blocksMap: NonNullable<RenderRuntime['blocks']>,
+  contentMap: NonNullable<RenderRuntime['contentMap']>
 ): ExtensionResult[] => {
   const result: ExtensionResult[] = []
   if (!blocksTree[blockTreePath]) {
@@ -113,9 +115,9 @@ const createExtensions = (
 }
 
 export const generateExtensions = (
-  blocksTree: BlockContentTree,
-  blocks: Blocks,
-  contentMap: ContentMap,
+  blocksTree: NonNullable<RenderRuntime['blocksTree']>,
+  blocks: NonNullable<RenderRuntime['blocks']>,
+  contentMap: NonNullable<RenderRuntime['contentMap']>,
   page: Page
 ): Extensions => {
   const extensions: Extensions = {}

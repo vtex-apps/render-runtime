@@ -10,6 +10,7 @@ import {
 
 import { generateHash } from '../generateHash'
 import { appendLocationSearch } from '../../location'
+import { RenderRuntime, CacheHints } from '../../../typings/runtime'
 
 interface Assets {
   operationType: string

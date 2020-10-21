@@ -1,8 +1,8 @@
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
-import { History, UnregisterCallback } from 'history'
-import PropTypes from 'prop-types'
 import { equals, merge, mergeWith, difference } from 'ramda'
+import { History, UnregisterCallback, LocationListener } from 'history'
+import PropTypes from 'prop-types'
 import React, { Component, Fragment, ReactElement, Suspense } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
@@ -51,6 +51,7 @@ import BuildStatus from './BuildStatus'
 import ExtensionManager from './ExtensionPoint/ExtensionManager'
 import ExtensionPoint from './ExtensionPoint'
 import { RenderContextProvider } from './RenderContext'
+import type { RenderContext } from './RenderContext'
 import RenderPage from './RenderPage'
 import {
   getPrefetechedData,
@@ -58,6 +59,17 @@ import {
 } from './Prefetch/PrefetchContext'
 import { withDevice, WithDeviceProps, DeviceInfo } from '../utils/withDevice'
 import { ApolloClientFunctions } from '../utils/client'
+import {
+  ConfigurationDevice,
+  ApolloClientType,
+  RenderHistoryLocation,
+  SetQueryOptions,
+  RenderScrollOptions,
+  ParsedServerPageResponse,
+  ParsedPageQueryResponse,
+  PageContextOptions,
+} from '../typings/global'
+import { RenderRuntime, Components, Extension } from '../typings/runtime'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -85,7 +97,7 @@ export interface RenderProviderState {
   culture: RenderRuntime['culture']
   defaultExtensions: RenderRuntime['defaultExtensions']
   device: ConfigurationDevice
-  deviceInfo: DeviceInfo
+  deviceInfo: RenderRuntime['deviceInfo']
   extensions: RenderRuntime['extensions']
   inspect: RenderRuntime['inspect']
   messages: RenderRuntime['messages']
@@ -209,7 +221,7 @@ export class RenderProvider extends Component<
 
   private rendered!: boolean
   private sessionPromise: Promise<void>
-  private unlisten!: UnregisterCallback | null
+  private unlisten!: UnregisterCallback | undefined
   private apolloClient: ApolloClientType
   private hydrateApollo: ApolloClientFunctions['hydrate']
   private prefetchRoutes: Set<string>
@@ -318,7 +330,7 @@ export class RenderProvider extends Component<
     const { history, runtime } = this.props
     const { production, emitter, publicEndpoint } = runtime
 
-    this.unlisten = history && history.listen(this.onPageChanged)
+    this.unlisten = history?.listen(this.onPageChanged as LocationListener)
     emitter.addListener('localesChanged', this.onLocaleSelected)
 
     if (!production) {

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import RenderProvider from '../components/RenderProvider'
-import { useRuntime } from '../core/main'
+import { useRuntime } from '../components/RenderContext'
 import { render, wait } from '@vtex/test-tools/react'
 
 const renderFakeProvider = ({ children }: { children: JSX.Element }) => {

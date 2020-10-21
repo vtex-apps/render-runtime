@@ -1,14 +1,15 @@
 import React, { FC, useMemo } from 'react'
 
-import { getChildExtensions } from '../components/ExtensionPoint'
+import { getChildExtensions } from '../components/ExtensionPoint/index'
 import ComponentLoader from '../components/ExtensionPoint/ComponentLoader'
-import { useRuntime } from '../core/main'
+import { useRuntime } from '../components/RenderContext'
+import { Extension } from '../typings/runtime'
 
 interface GenerateSlotArgs {
   treePath: string
   slotName: string
   slotValue: string
-  hydration: Hydration
+  hydration: Extension['hydration']
 }
 
 export function generateSlot({

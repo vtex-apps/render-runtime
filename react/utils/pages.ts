@@ -5,6 +5,12 @@ import { difference, is, isEmpty, keys, startsWith } from 'ramda'
 import RouteParser from 'route-parser'
 
 import { isEnabled } from './flags'
+import {
+  NavigationRoute,
+  RelativeScrollToOptions,
+  RenderScrollOptions,
+} from '../typings/global'
+import { Pages } from '../typings/runtime'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 

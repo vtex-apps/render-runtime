@@ -1,6 +1,7 @@
 import React, { ErrorInfo, FunctionComponent } from 'react'
 import ErrorDisplay from './ExtensionPoint/ErrorDisplay'
 import { useRuntime } from './RenderContext'
+import type { RenderContext } from './RenderContext'
 
 interface Props {
   runtime: RenderContext

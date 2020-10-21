@@ -15,6 +15,8 @@ import SiteEditorWrapper from './SiteEditorWrapper'
 import Hydration from '../Hydration'
 import { LazyImages } from '../LazyImages'
 import { generateSlot } from '../../utils/slots'
+import type { RenderContext } from '../RenderContext'
+import { Extension } from '../../typings/runtime'
 
 const componentPromiseMap: any = {}
 const componentPromiseResolvedMap: any = {}
@@ -56,7 +58,7 @@ interface Props {
   props: Record<string, any>
   treePath: string
   runtime: RenderContext
-  hydration: Hydration
+  hydration: Extension['hydration']
 }
 
 const ComponentLoader: FunctionComponent<Props> = (props) => {

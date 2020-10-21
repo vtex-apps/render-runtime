@@ -1,6 +1,7 @@
 import { parse } from 'graphql'
 import { promised } from './promise'
 import { canUseDOM } from 'exenv'
+import { ApolloClientType } from '../typings/global'
 
 export interface QueryData {
   data: string

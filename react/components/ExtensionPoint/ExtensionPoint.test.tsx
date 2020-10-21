@@ -5,6 +5,7 @@ import ExtensionPoint from './index'
 import { TreePathContextProvider } from '../../utils/treePath'
 import { RenderContextProvider } from '../RenderContext'
 import { TEST_ID as PreviewTestId } from '../Preview'
+import { Extension } from '../../typings/runtime'
 
 afterEach(cleanup)
 

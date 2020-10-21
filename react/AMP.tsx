@@ -7,6 +7,7 @@ import {
   AmpScripts,
   headerBoilerplate,
 } from 'react-amphtml/setup'
+import { RenderRuntime } from './typings/runtime'
 
 export const setupAMP = (
   root: JSX.Element,

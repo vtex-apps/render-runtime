@@ -2,6 +2,7 @@ import React from 'react'
 import { cleanup, render } from '@vtex/test-tools/react'
 import 'jest-dom/extend-expect'
 import MaybeContext from './MaybeContext'
+import { Extension } from '../typings/runtime'
 
 afterEach(cleanup)
 

@@ -1,6 +1,8 @@
 import queryString from 'query-string'
 import { getLoadedComponent } from './registerComponent'
 import { isEnabled } from './flags'
+import { AssetEntry, RenderComponent } from '../typings/global'
+import { RenderRuntime, StyleRef, Extensions } from '../typings/runtime'
 
 const imageHost = isEnabled('VTEX_ASSETS_URL')
   ? 'vtexassets.com'
