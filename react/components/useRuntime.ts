@@ -20,6 +20,7 @@ type PublicRuntime = Pick<
   | 'renderMajor'
   | 'rootPath'
   | 'route'
+  | 'setQuery'
   | 'workspace'
 >
 
