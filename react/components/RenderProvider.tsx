@@ -583,9 +583,11 @@ export class RenderProvider extends Component<
   private updateDeviceBlocks = async (deviceInfo: DeviceInfo) => {
     const query = queryStringToMap(location.search) as RenderRuntime['query']
 
+    const isPortal = this.state.route.path.startsWith('/_v/portal')
+
     const { components, extensions, messages } = await fetchServerPage({
       fetcher: this.fetcher,
-      path: this.state.route.path,
+      path: `${isPortal ? '/api/io/' : ''}${this.state.route.path}`,
       query,
       deviceInfo,
     })
