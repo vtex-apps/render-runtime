@@ -31,6 +31,7 @@ interface Props {
   preview?: boolean
   treePath?: string
   blockProps?: object
+  [key: string]: any
 }
 
 function mountTreePath(currentId: string, parentTreePath: string) {
