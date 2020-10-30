@@ -14,11 +14,11 @@ function isRenderServedPage(): boolean {
   const generatorMetaTag = rootDoc.querySelector(`meta[name='generator']`)
   const generator = generatorMetaTag && generatorMetaTag.getAttribute('content')
 
-  const isRender8 = generator && generator.startsWith('vtex.render-server')
+  const isRender8 = generator?.startsWith('vtex.render-server')
 
-  const isServerdThroughJanus = window.location.pathname.startsWith('/api/io')
+  const isServedThroughJanus = window.location.pathname.startsWith('/api/io')
 
-  return isServerdThroughJanus ? false : !!isRender8
+  return !isServedThroughJanus && Boolean(isRender8)
 }
 
 export function getBaseURI(runtime: RenderRuntime): string {
