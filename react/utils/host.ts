@@ -13,25 +13,24 @@ function isRenderServedPage(): boolean {
   const rootDoc = getRootDocument()
   const generatorMetaTag = rootDoc.querySelector(`meta[name='generator']`)
   const generator = generatorMetaTag && generatorMetaTag.getAttribute('content')
-
-  const isRender8 = generator?.startsWith('vtex.render-server')
-
-  const isServedThroughJanus = window.location.pathname.startsWith('/api/io')
-
-  return !isServedThroughJanus && Boolean(isRender8)
+  return generator ? generator.startsWith('vtex.render-server') : false
 }
 
 export function getBaseURI(runtime: RenderRuntime): string {
   const { account, workspace, publicEndpoint, rootPath = '' } = runtime
   if (!canUseDOM) {
     return `${workspace}--${account}.${publicEndpoint}`
-  } else {
-    const {
-      location: { hostname },
-    } = window
-
-    return hostname.endsWith(`.${publicEndpoint}`) || isRenderServedPage()
-      ? hostname + rootPath
-      : `${hostname}/api/io`
   }
+
+  const {
+    location: { hostname },
+  } = window
+
+  if (runtime.isJanusProxied) {
+    return `${hostname}/api/io`
+  }
+
+  return hostname.endsWith(`.${publicEndpoint}`) || isRenderServedPage()
+    ? hostname + rootPath
+    : `${hostname}/api/io`
 }
