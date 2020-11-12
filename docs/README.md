@@ -6,7 +6,7 @@ This app handles runtime execution of React apps in the VTEX IO Platform and exp
 
 <!-- code_chunk_output -->
 
-- [`useRuntime`](#useruntime)
+- [useRuntime](#useruntime)
 - [Block (alias ExtensionPoint)](#block-alias-extensionpoint)
 - [canUseDOM](#canusedom)
 - [Helmet](#helmet)
@@ -418,7 +418,7 @@ export default MyComponent
 ```
 
 **Example value:**
-`/ar/`
+`/ar`
 
 ### `setQuery`
 
