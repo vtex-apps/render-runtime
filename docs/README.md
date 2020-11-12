@@ -488,7 +488,7 @@ export default MyComponent
 
 ## canUseDOM
 
-A _boolean_ whether the code is running in a browser environment (`true`) or Node/SSR environment (`false`). It may be useful for Components that use DOM related data _(e.g: `document` or `window`)_.
+A _boolean_ whether the code is running in a browser environment (`true`) or Node/SSR environment (`false`). It may be useful for components that use DOM related data _(e.g: `document` or `window`)_.
 
 ```tsx
 import React from 'react'
