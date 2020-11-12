@@ -2,6 +2,8 @@
 
 This app handles runtime execution of React apps in the VTEX IO Platform and exports some helpful React components, React hooks and variable.
 
+> **Tip:** run `vtex setup --typings` to add vtex.render-runtime types in your app. This will provide autocomplete features in VSCode.
+
 <!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=2 orderedList=false} -->
 
 <!-- code_chunk_output -->
