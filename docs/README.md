@@ -19,7 +19,7 @@ This app handles runtime execution of React apps in the VTEX IO Platform and exp
 
 ## useRuntime
 
-A React hook that provides some functions and variables that are useful when creating components.
+A React hook that provides runtime contextual variables and methods to help creating components.
 
 **Usage:**
 
@@ -252,7 +252,7 @@ interface Hints {
 
 ### `history`
 
-A `history` object reexported from history package. 
+A `history` object reexported from the `history` package. 
 
 Docs at: https://github.com/ReactTraining/history/tree/v4/docs
 
@@ -272,7 +272,7 @@ export default MyComponent
 
 ### `navigate`
 
-A _function_ that should be use to make a client-side navigation.
+A _function_ that must be used to make a client-side navigation.
 
 **Usage:**
 ```tsx
@@ -339,7 +339,7 @@ export default MyComponent
 
 ### `production`
 
-A _boolean_ value whether is in a production workspace or not.
+A _boolean_ value representing whether the app is in a production workspace or not.
 
 **Usage:**
 ```tsx
@@ -533,7 +533,7 @@ export default MyComponent
 
 ## Link
 
-A React component that renders an `a` HTML element that, when clicked, navigates the user to the provided route. It has a similar API with the `navigate` method.
+A React component that renders an `a` HTML element that, when clicked, navigates the user to the provided route. It has a similar API to the `navigate` method.
 
 **Usage:**
 ```tsx
