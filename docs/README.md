@@ -533,6 +533,19 @@ export default MyComponent
 
 A React component that renders an `a` HTML element that, when clicked, navigates the user to the provided route. It has a similar API to the `navigate` method.
 
+**Props:**
+
+| Name      | Type          | Description | Default  |
+| :------------- |:-------------| :-----|:-----|
+| `page`     | `string`  | Name of the page that will be redirect to. Maps to a `blocks.json` block. Example: `'store.product'` | |
+| `to`     | `string`    | Alternatively to `page`, you can pass the whole URL directly instead of the page name. Example: `/shirt/p?skuId=1` | |
+| `params` | `object`      | Map of _param_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}` | `{}`|
+| `query` | `string`  | String representation of the query params that will be appended to the path. Example: `skuId=231`. | `''` |
+| `onClick` | `function` | Callback that will be fired when the user click on the Component. Example: `() => alert('Salut')` | |
+| `replace` | `boolean` | If it should call the replace function to navigate or not | |
+
+Other props you pass will be forwarded to the `a` component and can be used for customisation.
+
 **Usage:**
 ```tsx
 import React from 'react'
@@ -544,19 +557,6 @@ function MyComponent() {
 
 export default MyComponent
 ```
-
-*Props:*
-
-| Name      | Type          | Default  | Description |
-| :------------- |:-------------| :-----|:-----|
-| `to`     | `string`    |  --  | Alternatively to `page`, you can pass the whole URL directly instead of the page name (Useful for the `search-result`). Example: `/shirt/p?skuId=1`
-| `page`     | `string`  | --  | Name of the page that will be redirect to. Maps to a `blocks.json` block. Example: `'store.product'`
-| `params` | `object`      |   `{}`  | Map of _param_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}`
-| `query` | `string`  | `''`   | String representation of the query params that will be appended to the path. Example: `skuId=231`.
-| `onClick` | `function` | -- | Callback that will be fired when the user click on the Component. Example: `() => alert('Salut')`
-| `replace` | `boolean` | `undefined` | If it should call the replace function to navigate or not
-
-Other props you pass will be forwarded to the `a` component and can be used for customisation.
 
 ## NoSSR
 
