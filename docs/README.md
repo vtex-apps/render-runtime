@@ -61,6 +61,9 @@ Inside the object `runtime` you can find:
 
 A _string_ with the name of the account.
 
+**Example value:**
+`"storecomponents"`
+
 **Usage:**
 ```tsx
 import React from 'react'
@@ -75,13 +78,25 @@ function MyComponent() {
 export default MyComponent
 ```
 
-**Example value:**
-`"storecomponents"`
-
 ### `binding`
 
-
 An _object_ with the current binding information.
+
+**Example value:**
+```json
+{
+  "id": "aacb06b3-a8fa-4bab-b5bd-2d654d20dcd8",
+  "canonicalBaseAddress": "storetheme.vtex.com/"
+}
+```
+
+**Type:**
+```tsx
+interface BindingInfo {
+  id: string
+  canonicalBaseAddress: string
+}
+```
 
 **Usage:**
 ```tsx
@@ -97,38 +112,21 @@ function MyComponent() {
 export default MyComponent
 ```
 
-**Type:**
-```tsx
-interface BindingInfo {
-  id: string
-  canonicalBaseAddress: string
-}
-```
-
-**Example value:**
-```json
-{
-  "id": "aacb06b3-a8fa-4bab-b5bd-2d654d20dcd8",
-  "canonicalBaseAddress": "storetheme.vtex.com/"
-}
-```
-
 ### `culture`
 
 An _object_ with the culture, currency and locale information.
 
-**Usage:**
-```tsx
-import React from 'react'
-import { useRuntime } from 'vtex.render-runtime'
-
-function MyComponent() {
-  const { culture } = useRuntime()
-
-  return <div>Hello</div>
+**Example value:**
+```json
+{
+  "availableLocales": [],
+  "country": "USA",
+  "currency": "USD",
+  "language": "en",
+  "locale": "en-US",
+  "customCurrencyDecimalDigits": null,
+  "customCurrencySymbol": "$"
 }
-
-export default MyComponent
 ```
 
 **Type:**
@@ -144,22 +142,39 @@ interface Culture {
 }
 ```
 
-**Example value:**
-```json
-{
-  "availableLocales": [],
-  "country": "USA",
-  "currency": "USD",
-  "language": "en",
-  "locale": "en-US",
-  "customCurrencyDecimalDigits": null,
-  "customCurrencySymbol": "$"
+**Usage:**
+```tsx
+import React from 'react'
+import { useRuntime } from 'vtex.render-runtime'
+
+function MyComponent() {
+  const { culture } = useRuntime()
+
+  return <div>Hello</div>
 }
+
+export default MyComponent
 ```
 
 ### `deviceInfo`
 
 An _object_ with information about the user device, whether it's mobile, desktop or tablet. It can change if the user resizes the window.
+
+**Example value:**
+```json
+{
+  "isMobile": false,
+  "type": "desktop"
+}
+```
+
+**Type:**
+```tsx
+interface DeviceInfo {
+  isMobile: boolean
+  type: 'phone' | 'tablet' | 'desktop' | 'unknown'
+}
+```
 
 **Usage:**
 ```tsx
@@ -173,22 +188,6 @@ function MyComponent() {
 }
 
 export default MyComponent
-```
-
-**Type:**
-```tsx
-interface DeviceInfo {
-  isMobile: boolean
-  type: 'phone' | 'tablet' | 'desktop' | 'unknown'
-}
-```
-
-**Example value:**
-```json
-{
-  "isMobile": false,
-  "type": "desktop"
-}
 ```
 
 ### `getSettings`
@@ -214,18 +213,15 @@ export default MyComponent
 
 An _object_ with information about the user device, whether it's mobile, desktop or tablet based on the information provided by the CDN. Different from `deviceInfo` this data is static.
 
-**Usage:**
-```tsx
-import React from 'react'
-import { useRuntime } from 'vtex.render-runtime'
-
-function MyComponent() {
-  const { hints } = useRuntime()
-
-  return <div>Hello</div>
+**Example value:**
+```json
+{
+  "desktop": true,
+  "mobile": false,
+  "tablet": false,
+  "phone": false,
+  "unknown": false,
 }
-
-export default MyComponent
 ```
 
 **Type:**
@@ -239,15 +235,18 @@ interface Hints {
 }
 ```
 
-**Example value:**
-```json
-{
-  "desktop": true,
-  "mobile": false,
-  "tablet": false,
-  "phone": false,
-  "unknown": false,
+**Usage:**
+```tsx
+import React from 'react'
+import { useRuntime } from 'vtex.render-runtime'
+
+function MyComponent() {
+  const { hints } = useRuntime()
+
+  return <div>Hello</div>
 }
+
+export default MyComponent
 ```
 
 ### `history`
@@ -274,27 +273,7 @@ export default MyComponent
 
 A _function_ that must be used to make a client-side navigation.
 
-**Usage:**
-```tsx
-import React from 'react'
-import { useRuntime } from 'vtex.render-runtime'
-
-function MyComponent() {
-  const { navigate } = useRuntime()
-
-  const handleClick = () => {
-    navigate({
-      to: '/other-page'
-    })
-  }
-
-  return <button onClick={handleClick}>Go</button>
-}
-
-export default MyComponent
-```
-
-**Params:**
+**Function param:**
 
 ```tsx
 interface NavigateOptions {
@@ -316,9 +295,32 @@ interface NavigateOptions {
 }
 ```
 
+**Usage:**
+```tsx
+import React from 'react'
+import { useRuntime } from 'vtex.render-runtime'
+
+function MyComponent() {
+  const { navigate } = useRuntime()
+
+  const handleClick = () => {
+    navigate({
+      to: '/other-page'
+    })
+  }
+
+  return <button onClick={handleClick}>Go</button>
+}
+
+export default MyComponent
+```
+
 ### `page`
 
-A _string_ value of the current page.
+A _string_ value of the current page id.
+
+**Example value:**
+`"store.home"`
 
 **Usage:**
 ```tsx
@@ -334,12 +336,12 @@ function MyComponent() {
 export default MyComponent
 ```
 
-**Example value:**
-`"store.home"`
-
 ### `production`
 
 A _boolean_ value representing whether the app is in a production workspace or not.
+
+**Example value:**
+`false`
 
 **Usage:**
 ```tsx
@@ -355,12 +357,12 @@ function MyComponent() {
 export default MyComponent
 ```
 
-**Example value:**
-`false`
-
 ### `query`
 
 An _object_ that stores the query string values in a key-value format.
+
+**Example value:**
+`{ "foo": "bar" }`
 
 **Usage:**
 ```tsx
@@ -376,13 +378,12 @@ function MyComponent() {
 export default MyComponent
 ```
 
-**Example value:**
-`{ "foo": "bar" }`
-
-
 ### `renderMajor`
 
 A _number_ with the major version of Render Runtime.
+
+**Example value:**
+`8`
 
 **Usage:**
 ```tsx
@@ -398,12 +399,12 @@ function MyComponent() {
 export default MyComponent
 ```
 
-**Example value:**
-`8`
-
 ### `rootPath`
 
 A _string_ with the root path of the store. It can be `undefined` if none is set.
+
+**Example value:**
+`/ar`
 
 **Usage:**
 ```tsx
@@ -418,9 +419,6 @@ function MyComponent() {
 
 export default MyComponent
 ```
-
-**Example value:**
-`/ar`
 
 ### `setQuery`
 
@@ -448,6 +446,9 @@ export default MyComponent
 
 A _string_ with the current workspace name.
 
+**Example value:**
+`master`
+
 **Usage:**
 ```tsx
 import React from 'react'
@@ -461,9 +462,6 @@ function MyComponent() {
 
 export default MyComponent
 ```
-
-**Example value:**
-`master`
 
 ## Block (alias ExtensionPoint)
 
@@ -566,6 +564,7 @@ Other props you pass will be forwarded to the `a` component and can be used for 
 
 A React component that avoid its children during Server Side Rendering (SSR). It may be useful for Components that use DOM related data _(e.g: `document` or `window`)_. You can provide an optional prop _onSSR_ with a component to render instead when in SSR mode.
 
+**Usage:**
 ```tsx
 import React from 'react'
 import { NoSSR } from 'vtex.render-runtime'
