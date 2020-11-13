@@ -1,6 +1,6 @@
 # Render Runtime
 
-This app handles runtime execution of React apps in the VTEX IO Platform and exports some helpful React components, React hooks and variable.
+This app handles runtime execution of React apps in the VTEX IO Platform and exports some helpful variables, React components and hooks.
 
 > **Tip:** run `vtex setup --typings` to add `vtex.render-runtime` types in your app. IDEs can use them to provide autocomplete for variables and methods.
 
