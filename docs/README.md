@@ -59,7 +59,7 @@ Inside the object `runtime` you can find:
 
 ### `account`
 
-A _string_ with the name of the account.
+A _string_ with the account name of the store.
 
 **Example value:**
 `"storecomponents"`
@@ -106,7 +106,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { binding } = useRuntime()
 
-  return <div>Hello</div>
+  return <div>Canonical address is "{binding.canonicalBaseAddress}"</div>
 }
 
 export default MyComponent
@@ -150,7 +150,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { culture } = useRuntime()
 
-  return <div>Current active locale is: {culture.locale}</div>
+  return <div>Current active locale is: "{culture.locale}"</div>
 }
 
 export default MyComponent
@@ -184,7 +184,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { deviceInfo } = useRuntime()
 
-  return <div>This page is being rendered on a {deviceInfo.type}</div>
+  return <div>This page is being rendered on a "{deviceInfo.type}"</div>
 }
 
 export default MyComponent
@@ -203,7 +203,7 @@ function MyComponent() {
   const { getSettings } = useRuntime()
   const settings = getSettings('vtex.store')
 
-  return <div>This is the store's name: {settings.storeName}</div>
+  return <div>This is the store's name: "{settings.storeName}"</div>
 }
 
 export default MyComponent
@@ -243,7 +243,11 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { hints } = useRuntime()
 
-  return <div>This {hints.desktop ? 'is' : 'is not'} a desktop</div>
+  if (!hints.desktop) {
+    return <div>This is not a desktop</div>
+  }
+
+  return <div>This is a desktop</div>
 }
 
 export default MyComponent
@@ -263,7 +267,11 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { history } = useRuntime()
 
-  return <div>Hello</div>
+  const handleClick = () => {
+    history.goBack()
+  }
+
+  return <button onClick={handleClick}>Back</button>
 }
 
 export default MyComponent
@@ -330,7 +338,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { page } = useRuntime()
 
-  return <div>This is the current page id: {page}</div>
+  return <div>This is the current page id: "{page}"</div>
 }
 
 export default MyComponent
@@ -351,7 +359,11 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { production } = useRuntime()
 
-  return <div>This {production ? 'is' : 'is not'} a production workspace</div>
+  if (!production) {
+    return <div>This is not a production workspace</div>
+  }
+
+  return <div>This is a production workspace</div>
 }
 
 export default MyComponent
@@ -372,7 +384,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { query } = useRuntime()
 
-  return <div>Hello</div>
+  return <div>The current query strings are {JSON.stringify(query)}</div>
 }
 
 export default MyComponent
@@ -414,7 +426,11 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { rootPath } = useRuntime()
 
-  return <div>Hello</div>
+  if (!rootPath) {
+    return <div>The store doesn't have a rootPath set</div>
+  }
+
+  return <div>The store rootPath is "{rootPath}"</div>
 }
 
 export default MyComponent
