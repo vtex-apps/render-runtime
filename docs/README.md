@@ -72,7 +72,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { account } = useRuntime()
 
-  return <div>Hello</div>
+  return <div>Welcome to {account}</div>
 }
 
 export default MyComponent
@@ -150,7 +150,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { culture } = useRuntime()
 
-  return <div>Hello</div>
+  return <div>Current active locale is: {culture.locale}</div>
 }
 
 export default MyComponent
@@ -184,7 +184,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { deviceInfo } = useRuntime()
 
-  return <div>Hello</div>
+  return <div>This page is being rendered on a {deviceInfo.type}</div>
 }
 
 export default MyComponent
@@ -203,7 +203,7 @@ function MyComponent() {
   const { getSettings } = useRuntime()
   const settings = getSettings('vtex.store')
 
-  return <div>Hello</div>
+  return <div>This is the store's name: {settings.storeName}</div>
 }
 
 export default MyComponent
@@ -243,7 +243,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { hints } = useRuntime()
 
-  return <div>Hello</div>
+  return <div>This {hints.desktop ? 'is' : 'is not'} a desktop</div>
 }
 
 export default MyComponent
@@ -271,7 +271,7 @@ export default MyComponent
 
 ### `navigate`
 
-A _function_ that must be used to make a client-side navigation.
+A _function_ that must be used for client-side navigation.
 
 **Function param:**
 
@@ -330,7 +330,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { page } = useRuntime()
 
-  return <div>Hello</div>
+  return <div>This is the current page id: {page}</div>
 }
 
 export default MyComponent
@@ -351,7 +351,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { production } = useRuntime()
 
-  return <div>Hello</div>
+  return <div>This {production ? 'is' : 'is not'} a production workspace</div>
 }
 
 export default MyComponent
@@ -393,7 +393,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { renderMajor } = useRuntime()
 
-  return <div>Hello</div>
+  return <div>This page is rendered using vtex.render-runtime@{renderMajor}.x</div>
 }
 
 export default MyComponent
@@ -457,7 +457,7 @@ import { useRuntime } from 'vtex.render-runtime'
 function MyComponent() {
   const { workspace } = useRuntime()
 
-  return <div>Hello</div>
+  return <div>This is the {workspace} workspace</div>
 }
 
 export default MyComponent
