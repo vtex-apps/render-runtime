@@ -1,27 +1,47 @@
 # Render Runtime
 
-This app handles runtime execution of React apps in the VTEX IO Platform and exports some helpful variables, React components and hooks.
+The Render Runtime app is responsible for handling runtime execution of React apps in the VTEX IO Platform. Additionally, it exports:
 
-> **Tip:** run `vtex setup --typings` to add `vtex.render-runtime` types in your app. IDEs can use them to provide autocomplete for variables and methods.
+- Helpful variables, such as [`canUseDOM`](#canusedom).
+- Hooks, such as [`useRuntime`](#useruntime).
+- React components, such as [`Block` (alias `ExtensionPoint`)](#block-alias-extensionpoint), [`Helmet`](#helmet), [`Link`](#link), and [`NoSSR`](#nossr).
 
-<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=2 orderedList=false} -->
+> ℹ️ **Tip:** Run vtex setup --typings to add vtex.render-runtime types in your app. This way, IDEs will be able to provide autocomplete for variables and methods.
 
-<!-- code_chunk_output -->
+Check the following sections for more information on the objects exported by the Render Runtime app.
 
-- [useRuntime](#useruntime)
-- [Block (alias ExtensionPoint)](#block-alias-extensionpoint)
-- [canUseDOM](#canusedom)
-- [Helmet](#helmet)
-- [Link](#link)
-- [NoSSR](#nossr)
+# Variables
 
-<!-- /code_chunk_output -->
+## canUseDOM
+
+A *boolean* value that indicates whether the code is running in a browser environment (`true`) or in a Node/SSR environment (`false`). 
+
+> ℹ️ Notice that the `canUseDOM` variable is especially useful in cases the components use DOM related data _(e.g: `document` or `window`)_.
+
+Take the following usage example:
+
+```tsx
+import React from 'react'
+import { canUseDOM } from 'vtex.render-runtime'
+
+function MyComponent() {
+  const data = canUseDOM
+    ? window.localStorage.getItem('foo')
+    : ''
+
+  return <div>Hello</div>
+}
+
+export default MyComponent
+```
+
+# Hooks
 
 ## useRuntime
 
-A React hook that provides runtime contextual variables and methods to help creating components.
+The `useRuntime` React hook is useful when creating components since it provides runtime contextual variables and methods.
 
-**Usage:**
+For an example on its usage, check the following snippet:
 
 ```tsx
 import React from 'react'
@@ -34,37 +54,32 @@ function MyComponent() {
 }
 ```
 
-Inside the object `runtime` you can find:
-<!-- @import "[TOC]" {cmd="toc" depthFrom=3 depthTo=6 orderedList=false} -->
+Inside the `runtime` object you can have access to the following variables:
 
-<!-- code_chunk_output -->
+| Name          | Type   | Description              |
+|:--------------|:-------|:-------------------------|
+|[`account`](#account)     |string  |The VTEX account name, (e.g., `storecomponents`).    |
+|[`binding`](#binding)     |object  |An object containing the `id` and `canonicalBaseAddress` of the store binding. |
+|[`culture`](#culture)      |object  |An object containing culture, currency and locale information. |
+|[`deviceInfo`](#deviceinfo)  |object  |An object specifying the user device type (`phone`, `desktop`, `tablet`, or `unknown`). *This data varies when the user resizes the window.*|
+|[`getSettings`](#getsettings)  |function|A function that, when called, returns the public `settings` of an app.|
+|[`hints`](#hints)      |object  | An object which specifies the user device type (`phone`, `desktop`, `tablet`, or `unknown`) based on the information provided by the CDN. *Different from `deviceInfo` this data is static.*|
+|[`history`](#history)|object  |A `history` object reexported from the `history` package. For further information, check [this link.](https://github.com/ReactTraining/history/tree/v4/docs)|
+|[`navigate`](#navigate)|function|A function used in the client-side to define the navigation behaviour. |
+|[`page`](#page)|string  |The current `page` id (e.g., `store.home`).|
+|[`production`](#production)|boolean |Points if the app is in a production workspace (`true`) or not (`false`). |
+|[`query`](#query)|object  |The URL query string values in a key-value format (e.g., `{ "foo": "bar" }`).|
+|[`renderMajor`](#rendermajor)|number  |The major version of the Render Runtime app.|
+|[`rootPath`](#rootpath)|string  |The store root path (e.g., `/ar`). If not specified, its value is `undefined`.|
+|[`setQuery`](#setquery)|function|A function that can be called to set query string params.|
+|[`workspace`](#workspace)|string  |The current workspace name (e.g., `master`).|
 
-- [`account`](#account)
-- [`binding`](#binding)
-- [`culture`](#culture)
-- [`deviceInfo`](#deviceinfo)
-- [`getSettings`](#getsettings)
-- [`hints`](#hints)
-- [`history`](#history)
-- [`navigate`](#navigate)
-- [`page`](#page)
-- [`production`](#production)
-- [`query`](#query)
-- [`renderMajor`](#rendermajor)
-- [`rootPath`](#rootpath)
-- [`setQuery`](#setquery)
-- [`workspace`](#workspace)
+### Usage examples
 
-<!-- /code_chunk_output -->
+Check the following section for usage examples on how to use the internal `runtime` variables.
 
-### `account`
+#### `account`
 
-A _string_ with the account name of the store.
-
-**Example value:**
-`"storecomponents"`
-
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -78,27 +93,8 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `binding`
+#### `binding`
 
-An _object_ with the current binding information.
-
-**Example value:**
-```json
-{
-  "id": "aacb06b3-a8fa-4bab-b5bd-2d654d20dcd8",
-  "canonicalBaseAddress": "storetheme.vtex.com/"
-}
-```
-
-**Type:**
-```tsx
-interface BindingInfo {
-  id: string
-  canonicalBaseAddress: string
-}
-```
-
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -112,37 +108,27 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `culture`
+*Type:*
 
-An _object_ with the culture, currency and locale information.
+```tsx
+interface BindingInfo {
+  id: string
+  canonicalBaseAddress: string
+}
+```
 
-**Example value:**
+*Example value:*
+
 ```json
 {
-  "availableLocales": [],
-  "country": "USA",
-  "currency": "USD",
-  "language": "en",
-  "locale": "en-US",
-  "customCurrencyDecimalDigits": null,
-  "customCurrencySymbol": "$"
+  "id": "aacb06b3-a8fa-4bab-b5bd-2d654d20dcd8",
+  "canonicalBaseAddress": "storetheme.vtex.com/"
 }
 ```
 
-**Type:**
-```tsx
-interface Culture {
-  availableLocales: string[]
-  country: string
-  currency: string
-  language: string
-  locale: string
-  customCurrencyDecimalDigits: number | null
-  customCurrencySymbol: string | null
-}
-```
+#### `culture`
 
-**Usage:**
+
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -156,27 +142,36 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `deviceInfo`
+*Type:*
 
-An _object_ with information about the user device, whether it's mobile, desktop or tablet. It can change if the user resizes the window.
+```tsx
+interface Culture {
+  availableLocales: string[]
+  country: string
+  currency: string
+  language: string
+  locale: string
+  customCurrencyDecimalDigits: number | null
+  customCurrencySymbol: string | null
+}
+```
 
-**Example value:**
+*Example value:*
+
 ```json
 {
-  "isMobile": false,
-  "type": "desktop"
+  "availableLocales": [],
+  "country": "USA",
+  "currency": "USD",
+  "language": "en",
+  "locale": "en-US",
+  "customCurrencyDecimalDigits": null,
+  "customCurrencySymbol": "$"
 }
 ```
 
-**Type:**
-```tsx
-interface DeviceInfo {
-  isMobile: boolean
-  type: 'phone' | 'tablet' | 'desktop' | 'unknown'
-}
-```
+#### `deviceInfo`
 
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -190,11 +185,24 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `getSettings`
+*Type:*
+```tsx
+interface DeviceInfo {
+  isMobile: boolean
+  type: 'phone' | 'tablet' | 'desktop' | 'unknown'
+}
+```
 
-A _function_ that get the public settings of an app.
+*Example value:*
+```json
+{
+  "isMobile": false,
+  "type": "desktop"
+}
+```
 
-**Usage:**
+#### `getSettings`
+
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -209,33 +217,8 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `hints`
+#### `hints`
 
-An _object_ with information about the user device, whether it's mobile, desktop or tablet based on the information provided by the CDN. Different from `deviceInfo` this data is static.
-
-**Example value:**
-```json
-{
-  "desktop": true,
-  "mobile": false,
-  "tablet": false,
-  "phone": false,
-  "unknown": false,
-}
-```
-
-**Type:**
-```tsx
-interface Hints {
-  desktop: boolean
-  mobile: boolean
-  tablet: boolean
-  phone: boolean
-  unknown: boolean
-}
-```
-
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -253,13 +236,32 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `history`
+*Type:*
 
-A `history` object reexported from the `history` package. 
+```tsx
+interface Hints {
+  desktop: boolean
+  mobile: boolean
+  tablet: boolean
+  phone: boolean
+  unknown: boolean
+}
+```
 
-Docs at: https://github.com/ReactTraining/history/tree/v4/docs
+*Example value:*
 
-**Usage:**
+```json
+{
+  "desktop": true,
+  "mobile": false,
+  "tablet": false,
+  "phone": false,
+  "unknown": false,
+}
+```
+
+#### `history`
+
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -277,11 +279,28 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `navigate`
+#### `navigate`
 
-A _function_ that must be used for client-side navigation.
+```tsx
+import React from 'react'
+import { useRuntime } from 'vtex.render-runtime'
 
-**Function param:**
+function MyComponent() {
+  const { navigate } = useRuntime()
+
+  const handleClick = () => {
+    navigate({
+      to: '/other-page'
+    })
+  }
+
+  return <button onClick={handleClick}>Go</button>
+}
+
+export default MyComponent
+```
+
+*Function param:*
 
 ```tsx
 interface NavigateOptions {
@@ -303,34 +322,8 @@ interface NavigateOptions {
 }
 ```
 
-**Usage:**
-```tsx
-import React from 'react'
-import { useRuntime } from 'vtex.render-runtime'
+#### `page`
 
-function MyComponent() {
-  const { navigate } = useRuntime()
-
-  const handleClick = () => {
-    navigate({
-      to: '/other-page'
-    })
-  }
-
-  return <button onClick={handleClick}>Go</button>
-}
-
-export default MyComponent
-```
-
-### `page`
-
-A _string_ value of the current page id.
-
-**Example value:**
-`"store.home"`
-
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -344,14 +337,8 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `production`
+#### `production`
 
-A _boolean_ value representing whether the app is in a production workspace or not.
-
-**Example value:**
-`false`
-
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -369,14 +356,8 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `query`
+#### `query`
 
-An _object_ that stores the query string values in a key-value format.
-
-**Example value:**
-`{ "foo": "bar" }`
-
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -390,14 +371,8 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `renderMajor`
+#### `renderMajor`
 
-A _number_ with the major version of Render Runtime.
-
-**Example value:**
-`8`
-
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -411,14 +386,8 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `rootPath`
+#### `rootPath`
 
-A _string_ with the root path of the store. It can be `undefined` if none is set.
-
-**Example value:**
-`/ar`
-
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -436,11 +405,8 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `setQuery`
+#### `setQuery`
 
-A _function_ that can be called to set query string params.
-
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -458,14 +424,8 @@ function MyComponent() {
 export default MyComponent
 ```
 
-### `workspace`
+#### `workspace`
 
-A _string_ with the current workspace name.
-
-**Example value:**
-`master`
-
-**Usage:**
 ```tsx
 import React from 'react'
 import { useRuntime } from 'vtex.render-runtime'
@@ -479,9 +439,15 @@ function MyComponent() {
 export default MyComponent
 ```
 
+# Components
+
 ## Block (alias ExtensionPoint)
 
-A React component that is used to create Store Framework blocks that expects a specific block id.
+`Block` is a React component used to create Store Framework blocks. 
+
+For implementation details, take the following example. 
+
+> ℹ️ *Notice that the `Block` component will always expect a specific block `id`.*
 
 ```tsx
 import React from 'react'
@@ -502,31 +468,11 @@ function MyComponent() {
 export default MyComponent
 ```
 
-## canUseDOM
-
-A _boolean_ whether the code is running in a browser environment (`true`) or Node/SSR environment (`false`). It may be useful for components that use DOM related data _(e.g: `document` or `window`)_.
-
-```tsx
-import React from 'react'
-import { canUseDOM } from 'vtex.render-runtime'
-
-function MyComponent() {
-  const data = canUseDOM
-    ? window.localStorage.getItem('foo')
-    : ''
-
-  return <div>Hello</div>
-}
-
-export default MyComponent
-```
-
 ## Helmet
 
-Useful to add HTML tags inside the `<head>` tag of the page.
+`Helmet` is a component used to add HTML tags inside the `<head>` tag of a page. Take the following example:
 
-Reexport of the `Helmet` component from the `react-helmet` library.
-Docs: https://github.com/nfl/react-helmet/tree/release/5.2.0
+> ℹ️ `Helmet` is a reexport of [the `Helmet` component from the `react-helmet` library](https://github.com/nfl/react-helmet/tree/release/5.2.0).
 
 ```tsx
 import React from 'react'
@@ -547,22 +493,23 @@ export default MyComponent
 
 ## Link
 
-A React component that renders an `a` HTML element that, when clicked, navigates the user to the provided route. It has a similar API to the `navigate` method.
+The `Link` React component is responsible for rendering an `a` HTML element that, when clicked, navigates the user to the provided route.
 
-**Props:**
+> ℹ️ Notice that the `Link` component has a similar API to the `navigate` method from the [`useRuntime`](#useruntime) hook.
 
 | Name      | Type          | Description | Default  |
 | :------------- |:-------------| :-----|:-----|
-| `page`     | `string`  | Name of the page that will be redirect to. Maps to a `blocks.json` block. Example: `'store.product'` | |
-| `to`     | `string`    | Alternatively to `page`, you can pass the whole URL directly instead of the page name. Example: `/shirt/p?skuId=1` | |
-| `params` | `object`      | Map of _param_ names in the path for the page and the values that should replace them. Example: `{slug: 'shirt'}` | `{}`|
-| `query` | `string`  | String representation of the query params that will be appended to the path. Example: `skuId=231`. | `''` |
-| `onClick` | `function` | Callback that will be fired when the user click on the Component. Example: `() => alert('Salut')` | |
-| `replace` | `boolean` | If it should call the replace function to navigate or not | |
+| `page`     | `string`  | The name of the page that the user will be redirected to. Maps to a `blocks.json` block (e.g., `'store.product'`)||
+| `to`     | `string`    |The URL of the page that the user will be redirected to (e.g., `/shirt/p?skuId=1`). Notice that `to` is an **alternative** to `page` and it contains the whole URL instead of the page name. | |
+| `params` | `object`      | The `param` values of the page path in a key-value format (e.g, `{slug: 'shirt'}`). | `{}`|
+| `query` | `string`  | The representation of the query params that are appended to the page path (e.g., `skuId=231`.) | `''` |
+| `onClick` | `function` | A callback that is fired when the user clicks on a component (e.g., `() => alert('Salut')`) | |
+| `replace` | `boolean` | The boolean value used to indicate if it should call (`true`) the replace function to navigate or not (`false`) | |
 
-Other props you pass will be forwarded to the `a` component and can be used for customisation.
+Other props you pass will be forwarded to the `a` component and can be used for customization.
 
-**Usage:**
+Take the following usage example:
+
 ```tsx
 import React from 'react'
 import { Link } from 'vtex.render-runtime'
@@ -576,11 +523,14 @@ export default MyComponent
 
 ## NoSSR
 
-> Prefer `canUseDOM` when possible.
+> ⚠️ We always recommend using the [`canUseDOM`](#canusedom) variable when possible.
 
-A React component that avoid its children during Server Side Rendering (SSR). It may be useful for Components that use DOM related data _(e.g: `document` or `window`)_. You can provide an optional prop _onSSR_ with a component to render instead when in SSR mode.
+`NoSSR` is a React component that avoids rendering its children during Server-Side Rendering (SSR).
 
-**Usage:**
+> ℹ️ Notice that the `NoSSR` component is especially useful in cases the components use DOM related data _(e.g: `document` or `window`)_.
+
+Take the following usage example:
+
 ```tsx
 import React from 'react'
 import { NoSSR } from 'vtex.render-runtime'
@@ -595,3 +545,5 @@ function MyComponent() {
   )
 }
 ```
+
+Notice that, when in SSR mode, you can optionally provide the `onSSR` prop together with a component to render instead.
