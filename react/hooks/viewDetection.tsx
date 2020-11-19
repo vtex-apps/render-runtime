@@ -93,6 +93,12 @@ const useOnView = ({
       window?.document?.addEventListener('scroll', handleInteraction)
       window?.document?.addEventListener('mouseover', handleInteraction)
 
+      /** Triggers interaction event if the user has scrolled the
+       * page before JS being initialized */
+      if (window?.scrollY > 0) {
+        handleInteraction()
+      }
+
       return unobserve
     }
 
