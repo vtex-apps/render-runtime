@@ -12,6 +12,7 @@ import GenericPreview from '../Preview/GenericPreview'
 import LoadingBar from '../LoadingBar'
 import { LazyImages } from '../LazyImages'
 import LazyRender from '../LazyRender'
+import FoldableContainer from '../FoldableContainer'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectBlockWrapper = React.lazy(
@@ -65,7 +66,15 @@ export function getChildExtensions(runtime: RenderContext, treePath: string) {
     return isChild && isNotSlot
   })
 
-  return childBlocks.map((child, i) => {
+  /** Rudimentary detection of __fold__ blocks. Shouldn't be a problem
+   * because other types of fold blocks aren't used inside other blocks
+   * anyway. Could be improved if necessary.
+   */
+  const foldIndex = childBlocks.findIndex((child) =>
+    child.extensionPointId.includes('_fold_')
+  )
+
+  const childExtensions = childBlocks.map((child, i) => {
     const childTreePath = mountTreePath(child.extensionPointId, treePath)
 
     const childExtension = runtime?.extensions[childTreePath]
@@ -80,6 +89,15 @@ export function getChildExtensions(runtime: RenderContext, treePath: string) {
       />
     )
   })
+
+  if (foldIndex > -1) {
+    return (
+      <FoldableContainer foldIndex={foldIndex}>
+        {childExtensions}
+      </FoldableContainer>
+    )
+  }
+  return childExtensions
 }
 
 function withOuterExtensions(
