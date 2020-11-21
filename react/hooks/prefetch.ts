@@ -322,6 +322,7 @@ export const usePrefetchAttempt = ({
       }, 1)
     },
     bailOut: !hints.mobile,
+    initializeOnInteraction: true,
     threshold: 0.75,
   })
 
