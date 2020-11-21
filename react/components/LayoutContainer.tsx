@@ -4,7 +4,7 @@ import ExtensionPoint from './ExtensionPoint'
 import { useRuntime } from './RenderContext'
 import { LoadingWrapper } from './LoadingContext'
 import { LazyImages } from './LazyImages'
-import LazyRender from './LazyRender'
+import FoldableContainer from './FoldableContainer'
 
 type Element = string | ElementArray
 type ElementArray = Element[]
@@ -85,16 +85,20 @@ const Container: FunctionComponent<ContainerProps> = ({
         )
       }
 
-      if (hasFold && i > foldIndex) {
-        container = (
-          <LazyRender key={element.toString()}>{container}</LazyRender>
-        )
-      }
-
       return container
     })
 
-  return <div className={className}>{wrappedElements}</div>
+  if (!hasFold) {
+    return <div className={className}>{wrappedElements}</div>
+  }
+
+  return (
+    <div className={className}>
+      <FoldableContainer foldIndex={foldIndex}>
+        {wrappedElements}
+      </FoldableContainer>
+    </div>
+  )
 }
 
 const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = (
