@@ -75,6 +75,7 @@ import { RenderRuntime, Extensions } from '../typings/runtime'
 import '../typings/runtime'
 
 let emitter: EventEmitter | null = null
+const cssClasses = new Set<string>()
 
 const renderExtension = (
   extensionName: string,
@@ -303,6 +304,17 @@ function start() {
     const ReactCreateElement = React.createElement
     const vtexImgHost = getVTEXImgHost(runtime.account)
     React.createElement = function patchedCreateElement(type: any, props: any) {
+      if (
+        !canUseDOM &&
+        typeof type === 'string' &&
+        type[0].toLowerCase() === type[0] &&
+        props &&
+        props.className
+      ) {
+        const classnames: string[] = props.className.trim().split(/\s+/)
+        classnames.forEach((classname) => cssClasses.add(classname))
+      }
+
       if (type === 'a' && props) {
         if (props.target && !props.href) {
           props.target = undefined
@@ -350,6 +362,7 @@ function start() {
       window.rendered = (maybeRenderPromise as Promise<
         NamedServerRendered
       >).then(({ markups, maxAge, page, renderTimeMetric, ...rendered }) => ({
+        cssClasses: Array.from(cssClasses).sort(),
         extensions: markups.reduce<RenderedSuccess['extensions']>(
           (acc, { name, markup }) => ((acc[name] = markup), acc),
           {}
