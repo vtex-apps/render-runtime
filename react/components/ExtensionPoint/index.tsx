@@ -124,26 +124,33 @@ function withOuterExtensions(
     />
   ))
 
-  const afterElements = after.map((afterId) => (
-    <ExtensionPoint
-      id={afterId}
-      key={afterId}
-      treePath={treePath}
-      params={props.params}
-      query={props.query}
-    />
-  ))
+  const afterElements = after.map((afterId) => {
+    const extension = (
+      <ExtensionPoint
+        id={afterId}
+        key={afterId}
+        treePath={treePath}
+        params={props.params}
+        query={props.query}
+      />
+    )
+
+    const shouldLazyRender = lazyFooter && afterId === '$after_footer'
+    return shouldLazyRender ? (
+      <LazyRender key={afterId}>{extension}</LazyRender>
+    ) : (
+      extension
+    )
+  })
 
   const isRootTreePath = treePath.indexOf('/') === -1
-
-  const wrappedFooter = <LazyImages>{afterElements}</LazyImages>
 
   const wrapped = (
     <Fragment key={`wrapped-${treePath}`}>
       <LazyImages>{beforeElements}</LazyImages>
       {element}
       {isRootTreePath && <div className="flex flex-grow-1" />}
-      {lazyFooter ? <LazyRender>{wrappedFooter}</LazyRender> : wrappedFooter}
+      <LazyImages>{afterElements}</LazyImages>
     </Fragment>
   )
 
