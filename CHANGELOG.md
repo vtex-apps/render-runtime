@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `deviceInfo` to `useRuntime` types.
+- Documentation of render-runtime exports.
+
+### Removed
+- `amp`, `device`, `platform`, `publicEndpoint`, and `route` from `useRuntime` types.
 
 ## [8.125.1] - 2020-11-23
 ### Fixed
