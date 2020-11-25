@@ -27,8 +27,8 @@ import {
 } from '../components/LazyImages'
 import { LoadingContextProvider } from '../components/LoadingContext'
 
-import { ChildBlock } from '../components/ChildBlock'
-import { useChildBlock } from '../components/useChildBlock'
+import ChildBlock from '../components/ChildBlock'
+import useChildBlock from '../components/useChildBlock'
 import ExtensionContainer from '../components/ExtensionPoint/ExtensionContainer'
 import ExtensionPoint from '../components/ExtensionPoint'
 import Block from '../components/Block'

@@ -4,11 +4,11 @@ export interface ChildBlockType {
   id: string
 }
 
-/** Placeholder for possible block data in the future */
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Block {}
+export interface Block {
+  props: Record<string, any>
+}
 
-export function useChildBlock(childBlock: ChildBlockType): Block | null {
+function useChildBlock(childBlock: ChildBlockType): Block | null {
   if (typeof childBlock === 'string') {
     throw new Error(
       `You are passing a string as a parameter to useChildBlock ("${childBlock}"). You should pass an object like {id: "${childBlock}"}.`
@@ -26,3 +26,5 @@ export function useChildBlock(childBlock: ChildBlockType): Block | null {
   // We are explicitly not exposing the private API here
   return extension ? { props: extension.props } : null
 }
+
+export default useChildBlock
