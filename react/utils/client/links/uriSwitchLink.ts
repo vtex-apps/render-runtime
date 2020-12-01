@@ -51,7 +51,7 @@ export interface OperationContext {
   >
 }
 
-const extractHints = (query: ASTNode, meta: CacheHints) => {
+const extractHints = (query: ASTNode, meta?: CacheHints) => {
   const { operationType, queryScope } = assetsFromQuery(query)
 
   let hints
@@ -109,9 +109,10 @@ export const createUriSwitchLink = (
       }
 
       const includeQuery = (oldContext as any).http?.includeQuery || !hash
+
       const { maxAge, scope, version, provider, sender } = extractHints(
         operation.query,
-        cacheHints[hash]
+        operation.operationName === 'orderForm' ? undefined : cacheHints[hash]
       )
 
       const requiresAuthorization =
