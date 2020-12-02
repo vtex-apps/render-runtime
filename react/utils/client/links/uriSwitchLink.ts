@@ -63,7 +63,7 @@ const extractHints = (query: ASTNode, meta: CacheHints) => {
 
   const {
     maxAge = 'long',
-    scope = 'public',
+    scope = 'private',
     version = 1,
     provider,
     sender,
