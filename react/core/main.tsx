@@ -297,9 +297,7 @@ function start() {
       window.__RUNTIME__.query = { ...serverQuery, ...browserQuery }
     }
 
-    const runtime: RenderRuntime = window.__RUNTIME__
-    runtime.isJanusProxied =
-      canUseDOM && window.location.pathname.startsWith('/api/io/')
+    const runtime = window.__RUNTIME__
     const rootName = runtime.page
     validateRootComponent(rootName, runtime.extensions)
 
