@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [8.126.2] - 2020-12-02
+## [8.126.2] - 2020-12-02 [YANKED]
 ### Fixed
 - GraphQL client link for pages served through Janus.
 

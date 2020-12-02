@@ -243,7 +243,6 @@ export class RenderProvider extends Component<
       components,
       exposeBindingAddress,
       extensions,
-      isJanusProxied,
       pages,
       page,
       query,
@@ -254,7 +253,7 @@ export class RenderProvider extends Component<
       loadedDevices,
     } = props.runtime
     const { apollo, history, deviceInfo, sessionPromise } = props
-    const ignoreCanonicalReplacement = isJanusProxied || (query && query.map)
+    const ignoreCanonicalReplacement = query && query.map
     this.fetcher = fetch
 
     if (binding && canUseDOM) {
@@ -582,21 +581,13 @@ export class RenderProvider extends Component<
   }
 
   private updateDeviceBlocks = async (deviceInfo: DeviceInfo) => {
-    const {
-      runtime: { isJanusProxied },
-    } = this.props
-
-    const {
-      route: { path },
-    } = this.state
-
     const query = queryStringToMap(location.search) as RenderRuntime['query']
+
     const { components, extensions, messages } = await fetchServerPage({
       fetcher: this.fetcher,
-      path,
+      path: this.state.route.path,
       query,
       deviceInfo,
-      isJanusProxied,
     })
 
     await this.fetchComponents(components, extensions)
@@ -656,7 +647,7 @@ export class RenderProvider extends Component<
 
   public onPageChanged = (location: RenderHistoryLocation) => {
     const {
-      runtime: { renderMajor, query: queryFromRuntime, isJanusProxied },
+      runtime: { renderMajor, query: queryFromRuntime },
     } = this.props
 
     const {
@@ -774,7 +765,6 @@ export class RenderProvider extends Component<
           query,
           workspace: workspaceFromQuery,
           deviceInfo,
-          isJanusProxied,
         }).then(
           async ({
             appsEtag,
@@ -981,7 +971,7 @@ export class RenderProvider extends Component<
 
   public updateRuntime = async (options?: PageContextOptions) => {
     const {
-      runtime: { renderMajor, query: queryFromRuntime, isJanusProxied },
+      runtime: { renderMajor, query: queryFromRuntime },
     } = this.props
     const {
       page,
@@ -1014,7 +1004,6 @@ export class RenderProvider extends Component<
           fetcher: this.fetcher,
           workspace: workspaceFromQuery,
           deviceInfo,
-          isJanusProxied,
         })
       : await fetchNavigationPage({
           apolloClient: this.apolloClient,

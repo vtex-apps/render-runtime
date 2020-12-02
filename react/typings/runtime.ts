@@ -59,7 +59,6 @@ export interface RenderRuntime {
     data: string
   }>
   uncriticalStyleRefs?: StyleRefs
-  isJanusProxied?: boolean
 }
 
 interface Route {
