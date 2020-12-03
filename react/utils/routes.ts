@@ -105,6 +105,16 @@ const parseDefaultPagesQueryResponse = (
   }
 }
 
+function prependIOProxy(path: string) {
+  if (!path) {
+    return '/api/io'
+  }
+
+  const joiner = path.startsWith('/') ? '' : '/'
+
+  return `/api/io${joiner}${path}`
+}
+
 const runtimeFields = [
   'appsEtag',
   'blocks',
@@ -148,17 +158,20 @@ function getRelativeURLWithQuery({
 
 export const fetchServerPage = async ({
   fetcher,
-  path,
+  path: rawPath,
   query: rawQuery,
   workspace,
   deviceInfo,
+  isJanusProxied,
 }: {
   path: string
   query?: Record<string, string>
   fetcher: GlobalFetch['fetch']
   workspace?: string
   deviceInfo?: DeviceInfo
+  isJanusProxied?: boolean
 }): Promise<ParsedServerPageResponse> => {
+  const path = isJanusProxied ? prependIOProxy(rawPath) : rawPath
   const url = getRelativeURLWithQuery({
     path,
     query: {
@@ -191,7 +204,9 @@ export const fetchServerPage = async ({
     queryData,
   } = page
   if (routeId === 'redirect') {
-    window.location.href = route.path
+    window.location.href = isJanusProxied
+      ? prependIOProxy(route.path)
+      : route.path
   }
 
   const queryString = stringify(rawQuery || {})
