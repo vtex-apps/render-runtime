@@ -3,7 +3,7 @@
     "dev": [
       {
         "clientOnly": true,
-        "path": "npm:vtex-render-session@1.9.1/dist/index.js"
+        "path": "npm:vtex-render-session@1.9.2/dist/index.js"
       },
       {
         "path": "npm:bluebird@3.5.1/js/browser/bluebird.js",
@@ -91,7 +91,7 @@
     "prod": [
       {
         "clientOnly": true,
-        "path": "npm:vtex-render-session@1.9.1/dist/index.min.js"
+        "path": "npm:vtex-render-session@1.9.2/dist/index.min.js"
       },
       {
         "path": "npm:bluebird@3.5.1/js/browser/bluebird.min.js",
