@@ -105,17 +105,25 @@ export const PrefetchContextProvider: FC<{ history: History<any> | null }> = ({
     if (history) {
       unlistenRef.current = history.listen(onPageChanged)
     }
-    window.addEventListener(
-      'load',
-      () => {
-        if (isPrefetchEnabled(storeSettings)) {
-          setTimeout(() => {
-            state.queue.start()
-          }, getTimeout(hints.mobile))
-        }
-      },
-      { once: true }
-    )
+
+    if (isPrefetchEnabled(storeSettings)) {
+      if (window?.document?.readyState === 'complete') {
+        setTimeout(() => {
+          state.queue.start()
+        }, getTimeout(hints.mobile))
+      } else {
+        window?.document?.addEventListener(
+          'load',
+          () => {
+            setTimeout(() => {
+              state.queue.start()
+            }, getTimeout(hints.mobile))
+          },
+          { once: true }
+        )
+      }
+    }
+
     return () => {
       if (unlistenRef.current) {
         unlistenRef.current()
