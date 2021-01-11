@@ -18,18 +18,26 @@ export const isConflictingLoadedComponents = (
   navigatedComponents: RenderRuntime['components'],
   loadedComponents: RenderRuntime['components']
 ) => {
-  const loadedVersionByApp = Object.keys(loadedComponents).reduce(
+  const loadedVersionsByApp = Object.keys(loadedComponents).reduce(
     (acc, locator) => {
       const { app, version } = getAppAndVersion(locator)
-      acc[app] = version
+      const [major] = version.split('.')
+      if (!acc[app]) {
+        acc[app] = { [major]: version }
+      } else {
+        acc[app][major] = version
+      }
       return acc
     },
-    {} as Record<string, string>
+    {} as Record<string, Record<string, string>>
   )
 
   return Object.keys(navigatedComponents).some((locator) => {
     const { app, version } = getAppAndVersion(locator)
-    return loadedVersionByApp[app] && loadedVersionByApp[app] !== version
+    const [major] = version.split('.')
+    const loadedVersion = loadedVersionsByApp[app]?.[major]
+
+    return loadedVersion && loadedVersion !== version
   })
 }
 
