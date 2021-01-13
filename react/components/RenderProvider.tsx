@@ -1,6 +1,6 @@
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
-import { equals, merge, mergeWith, difference } from 'ramda'
+import { equals, merge, mergeWith, difference, path } from 'ramda'
 import { History, UnregisterCallback, LocationListener } from 'history'
 import PropTypes from 'prop-types'
 import React, { Component, Fragment, ReactElement, Suspense } from 'react'
@@ -128,6 +128,15 @@ const areOptionsDifferent = (a: NavigateOptions, b: NavigateOptions) => {
     a.rootPath !== b.rootPath ||
     !equals(a.params, b.params)
   )
+}
+
+const prependRootPath = (path: string, rootPath?: string) => {
+  if (!rootPath) {
+    return path
+  }
+
+  const maybeSlash = path.startsWith('/') ? '' : '/'
+  return `${rootPath}${maybeSlash}${path}`
 }
 
 interface NavigationState {
@@ -583,7 +592,7 @@ export class RenderProvider extends Component<
 
   private updateDeviceBlocks = async (deviceInfo: DeviceInfo) => {
     const {
-      runtime: { isJanusProxied },
+      runtime: { isJanusProxied, rootPath },
     } = this.props
 
     const {
@@ -594,7 +603,7 @@ export class RenderProvider extends Component<
 
     const { components, extensions, messages } = await fetchServerPage({
       fetcher: this.fetcher,
-      path,
+      path: prependRootPath(path, rootPath),
       query,
       deviceInfo,
       isJanusProxied,
