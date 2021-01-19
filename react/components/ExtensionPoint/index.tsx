@@ -13,6 +13,8 @@ import LoadingBar from '../LoadingBar'
 import { LazyImages } from '../LazyImages'
 import LazyRender from '../LazyRender'
 import FoldableContainer from '../FoldableContainer'
+import { isSiteEditorIframe } from '../../utils/dom'
+import canUseDOM from '../canUseDOM'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectBlockWrapper = React.lazy(
@@ -90,7 +92,11 @@ export function getChildExtensions(runtime: RenderContext, treePath: string) {
     )
   })
 
-  if (foldIndex > -1) {
+  if (!canUseDOM) {
+    return childExtensions
+  }
+
+  if (foldIndex > -1 && !isSiteEditorIframe) {
     return (
       <FoldableContainer foldIndex={foldIndex}>
         {childExtensions}

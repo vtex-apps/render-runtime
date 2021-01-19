@@ -5,6 +5,8 @@ import { useRuntime } from './RenderContext'
 import { LoadingWrapper } from './LoadingContext'
 import { LazyImages } from './LazyImages'
 import FoldableContainer from './FoldableContainer'
+import { isSiteEditorIframe } from '../utils/dom'
+import { canUseDOM } from '..'
 
 type Element = string | ElementArray
 type ElementArray = Element[]
@@ -88,7 +90,7 @@ const Container: FunctionComponent<ContainerProps> = ({
       return container
     })
 
-  if (!hasFold) {
+  if (!hasFold || (canUseDOM && isSiteEditorIframe)) {
     return <div className={className}>{wrappedElements}</div>
   }
 
