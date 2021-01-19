@@ -657,7 +657,7 @@ class RenderProvider extends Component<Props, RenderProviderState> {
       <RenderContext.Provider value={context}>
         <TreePathContext.Provider value={{ treePath: '' }}>
           <ApolloProvider client={this.apolloClient}>
-            <IntlProvider locale={locale} messages={mergedMessages}>
+            <IntlProvider key={locale} locale={locale} messages={mergedMessages}>
               <Fragment>
                 {!production && !isStorefrontIframe && <BuildStatus />}
                 {component}
