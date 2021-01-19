@@ -240,15 +240,15 @@ export const usePrefetchAttempt = ({
   }, [canPrefetch, waitToPrefetch])
 
   const {
-    binding,
     pages,
     navigationRouteModifiers,
     hints,
+    query,
     renderMajor,
     getSettings,
   } = runtime
 
-  const canonicalBaseAddress = binding?.canonicalBaseAddress
+  const canonicalBaseAddress = query?.__bindingAddress
   const storeSettings = getSettings('vtex.store')
 
   const attemptPrefetch = useCallback(() => {
