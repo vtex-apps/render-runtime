@@ -22,6 +22,7 @@ import { ApolloClientType } from '../typings/global'
 import { RenderRuntime } from '../typings/runtime'
 
 interface PrefetchRequestsArgs {
+  canonicalBaseAddress?: string
   client: ApolloClientType
   navigationRoute: any
   page?: string
@@ -36,15 +37,23 @@ interface PrefetchRequestsArgs {
   storeSettings: Record<string, any>
 }
 
-const getPageToNavigate = (path: string, query: string) => {
+const getPageToNavigate = (
+  path: string,
+  query: string,
+  canonicalBaseAddress?: string
+) => {
   return getPrefetchForPath({
     path: path,
     fetcher: fetch,
-    query: queryStringToMap(query),
+    query: {
+      ...queryStringToMap(query),
+      ...(canonicalBaseAddress && { __bindingAddress: canonicalBaseAddress }),
+    },
   })
 }
 
 interface MaybeUpdatePathArgs {
+  canonicalBaseAddress?: string
   prefetchState: PrefetchState
   navigationRoute: any
   validCache: {
@@ -55,6 +64,7 @@ interface MaybeUpdatePathArgs {
 }
 
 const maybeUpdatePathCache = async ({
+  canonicalBaseAddress,
   prefetchState,
   navigationRoute,
   validCache,
@@ -67,7 +77,8 @@ const maybeUpdatePathCache = async ({
 
   const navigationData = await getPageToNavigate(
     navigationRoute.path,
-    navigationRoute.query
+    navigationRoute.query,
+    canonicalBaseAddress
   )
 
   const navigationPage = page ?? navigationData?.page
@@ -90,6 +101,7 @@ const maybeUpdatePathCache = async ({
 }
 
 const prefetchRequests = async ({
+  canonicalBaseAddress,
   client,
   navigationRoute,
   page,
@@ -106,6 +118,7 @@ const prefetchRequests = async ({
   }
 
   const navigationPage = await maybeUpdatePathCache({
+    canonicalBaseAddress,
     prefetchState,
     navigationRoute,
     validCache,
@@ -227,12 +240,15 @@ export const usePrefetchAttempt = ({
   }, [canPrefetch, waitToPrefetch])
 
   const {
+    binding,
     pages,
     navigationRouteModifiers,
     hints,
     renderMajor,
     getSettings,
   } = runtime
+
+  const canonicalBaseAddress = binding?.canonicalBaseAddress
   const storeSettings = getSettings('vtex.store')
 
   const attemptPrefetch = useCallback(() => {
@@ -278,6 +294,7 @@ export const usePrefetchAttempt = ({
     queue.add(
       async () =>
         prefetchRequests({
+          canonicalBaseAddress,
           client,
           navigationRoute,
           page,
@@ -291,6 +308,7 @@ export const usePrefetchAttempt = ({
       { priority }
     )
   }, [
+    canonicalBaseAddress,
     client,
     hints,
     href,
