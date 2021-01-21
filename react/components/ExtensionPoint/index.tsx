@@ -14,7 +14,7 @@ import { LazyImages } from '../LazyImages'
 import LazyRender from '../LazyRender'
 import FoldableContainer from '../FoldableContainer'
 import { isSiteEditorIframe } from '../../utils/dom'
-import canUseDOM from '../canUseDOM'
+import { Route } from '../../typings/runtime'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectBlockWrapper = React.lazy(
@@ -114,7 +114,8 @@ function withOuterExtensions(
   props: any,
   element: JSX.Element,
   // TODO: these args are getting ridiculous, maybe group them in an object
-  lazyFooter: boolean
+  lazyFooter: boolean,
+  route: Route
 ) {
   if (before.length === 0 && after.length === 0 && around.length === 0) {
     return element
@@ -141,7 +142,11 @@ function withOuterExtensions(
       />
     )
 
-    const shouldLazyRender = lazyFooter && afterId === '$after_footer'
+    const shouldLazyRender =
+      lazyFooter &&
+      afterId === '$after_footer' &&
+      !route?.path.includes('__siteEditor')
+
     return shouldLazyRender ? (
       <LazyRender key={afterId}>{extension}</LazyRender>
     ) : (
@@ -280,7 +285,8 @@ const ExtensionPoint: FC<Props> = (props) => {
     newTreePath,
     mergedProps,
     componentLoader,
-    isLazyFooterEnabled
+    isLazyFooterEnabled,
+    runtime?.route
   )
 
   /**
