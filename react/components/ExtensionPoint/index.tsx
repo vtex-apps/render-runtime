@@ -92,7 +92,8 @@ export function getChildExtensions(runtime: RenderContext, treePath: string) {
     )
   })
 
-  if (!canUseDOM) {
+  if (runtime?.route?.path.includes('__siteEditor')) {
+    console.log('SERVER OR CLIENT')
     return childExtensions
   }
 
