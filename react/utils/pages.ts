@@ -222,7 +222,7 @@ export function getRouteFromPathOld(
 }
 
 const mergePersistingQueries = (currentQuery: string, query: string) => {
-  const KEYS = ['disableUserLand', '__bindingAddress']
+  const KEYS = ['disableUserLand', '__bindingAddress', '__siteEditor']
   const current = queryStringToMap(currentQuery)
   const next = queryStringToMap(query)
   const has = (value?: string) => !!value || value === null
