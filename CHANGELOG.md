@@ -318,6 +318,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [8.95.1] - 2020-03-11
 
 ## [8.95.0] - 2020-03-10
+### Fixed
+- Site editor is not rendering some blocks due to the fold block.
 ### Removed
 - Removes sentry from externals.json so this asset isn't rendered to the browser
 

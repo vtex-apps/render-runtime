@@ -5,6 +5,8 @@ import { useRuntime } from './RenderContext'
 import { LoadingWrapper } from './LoadingContext'
 import { LazyImages } from './LazyImages'
 import FoldableContainer from './FoldableContainer'
+import { isSiteEditorIframe } from '../utils/dom'
+import { Route } from '../typings/runtime'
 
 type Element = string | ElementArray
 type ElementArray = Element[]
@@ -20,6 +22,7 @@ interface ContainerProps {
   isRow: boolean
   isMobile?: boolean
   preview?: boolean
+  route?: Route
 }
 
 const Container: FunctionComponent<ContainerProps> = ({
@@ -29,6 +32,7 @@ const Container: FunctionComponent<ContainerProps> = ({
   isMobile,
   preview,
   children,
+  route,
   ...props
 }) => {
   const className = `flex flex-grow-1 w-100 ${
@@ -88,7 +92,7 @@ const Container: FunctionComponent<ContainerProps> = ({
       return container
     })
 
-  if (!hasFold) {
+  if (!hasFold || isSiteEditorIframe || route?.path?.includes('__siteEditor')) {
     return <div className={className}>{wrappedElements}</div>
   }
 
@@ -104,7 +108,7 @@ const Container: FunctionComponent<ContainerProps> = ({
 const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = (
   props
 ) => {
-  const { extensions, preview, hints } = useRuntime()
+  const { extensions, preview, hints, route } = useRuntime()
   const { treePath } = useTreePath()
 
   const extension = extensions[treePath]
@@ -119,6 +123,7 @@ const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = (
       preview={preview}
       isRow={false}
       isMobile={hints.mobile}
+      route={route}
     />
   )
 

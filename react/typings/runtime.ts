@@ -62,7 +62,7 @@ export interface RenderRuntime {
   isJanusProxied?: boolean
 }
 
-interface Route {
+export interface Route {
   domain: string
   blockId: string
   canonicalPath?: string
