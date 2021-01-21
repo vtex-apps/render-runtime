@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.126.9] - 2021-01-21
+
 ## [8.126.8] - 2021-01-21
 ### Fixed
 - Fix wrong binding content being loaded with prefetch enabled.
