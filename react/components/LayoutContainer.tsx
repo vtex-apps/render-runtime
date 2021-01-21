@@ -6,7 +6,9 @@ import { LoadingWrapper } from './LoadingContext'
 import { LazyImages } from './LazyImages'
 import FoldableContainer from './FoldableContainer'
 import { isSiteEditorIframe } from '../utils/dom'
-import { canUseDOM } from '..'
+import canUseDOM from './canUseDOM'
+
+canUseDOM
 
 type Element = string | ElementArray
 type ElementArray = Element[]
