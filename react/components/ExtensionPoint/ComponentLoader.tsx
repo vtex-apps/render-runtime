@@ -129,8 +129,10 @@ const ComponentLoader: FunctionComponent<Props> = (props) => {
     <AsyncComponent {...asyncComponentProps}>{children}</AsyncComponent>
   )
 
-  const shouldHydrate =
-    hydration ||
+  const isSiteEditor = !runtime?.route?.path.includes('__siteEditor')
+
+  const shouldLazyHydrate =
+    !hydration ||
     hydration === 'always' ||
     /** TODO: Currently it only applies partial hydration on top level components
      * Nested partial hydration should be supported in the future */
@@ -138,7 +140,7 @@ const ComponentLoader: FunctionComponent<Props> = (props) => {
      * https://jsperf.com/js-regex-match-vs-substring) */
     treePath?.substring(treePath?.indexOf('/') + 1).indexOf('/') > -1
 
-  if (!runtime?.route?.path.includes('__siteEditor') && shouldHydrate) {
+  if (!isSiteEditor && !shouldLazyHydrate) {
     content = (
       <LazyImages>
         <Hydration treePath={treePath} hydration={hydration}>
