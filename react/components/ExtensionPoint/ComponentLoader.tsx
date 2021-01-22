@@ -138,7 +138,11 @@ const ComponentLoader: FunctionComponent<Props> = (props) => {
      * https://jsperf.com/js-regex-match-vs-substring) */
     treePath?.substring(treePath?.indexOf('/') + 1).indexOf('/') > -1
 
-  if (!runtime?.route?.path.includes('__siteEditor') || !shouldHydrate) {
+  if (
+    !runtime?.route?.path.includes('__siteEditor') ||
+    !shouldHydrate ||
+    !isSiteEditorIframe
+  ) {
     content = (
       <LazyImages>
         <Hydration treePath={treePath} hydration={hydration}>
