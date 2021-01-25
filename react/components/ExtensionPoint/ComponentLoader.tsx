@@ -129,7 +129,7 @@ const ComponentLoader: FunctionComponent<Props> = (props) => {
     <AsyncComponent {...asyncComponentProps}>{children}</AsyncComponent>
   )
 
-  const isSiteEditor = !runtime?.route?.path.includes('__siteEditor')
+  const isSiteEditor = runtime?.route?.path.includes('__siteEditor')
 
   const shouldLazyHydrate =
     !hydration ||
