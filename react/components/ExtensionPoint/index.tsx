@@ -13,7 +13,6 @@ import LoadingBar from '../LoadingBar'
 import { LazyImages } from '../LazyImages'
 import LazyRender from '../LazyRender'
 import FoldableContainer from '../FoldableContainer'
-import { isSiteEditorIframe } from '../../utils/dom'
 import { Route } from '../../typings/runtime'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
@@ -92,11 +91,11 @@ export function getChildExtensions(runtime: RenderContext, treePath: string) {
     )
   })
 
-  if (runtime?.route?.path.includes('__siteEditor')) {
+  if (runtime?.route?.queryString?.__siteEditor) {
     return childExtensions
   }
 
-  if (foldIndex > -1 && !isSiteEditorIframe) {
+  if (foldIndex > -1) {
     return (
       <FoldableContainer foldIndex={foldIndex}>
         {childExtensions}
