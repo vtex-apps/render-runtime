@@ -129,9 +129,9 @@ const ComponentLoader: FunctionComponent<Props> = (props) => {
     <AsyncComponent {...asyncComponentProps}>{children}</AsyncComponent>
   )
 
-  const isSiteEditor =
-    runtime?.route?.queryString &&
-    Object.keys(runtime.route.queryString).includes('__siteEditor')
+  const queryString = runtime?.route?.queryString ?? {}
+
+  const isSiteEditor = Object.keys(queryString).includes('__siteEditor')
 
   const shouldHydrateEagerly =
     !hydration ||

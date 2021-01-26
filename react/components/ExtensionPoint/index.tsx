@@ -91,10 +91,9 @@ export function getChildExtensions(runtime: RenderContext, treePath: string) {
     )
   })
 
-  if (
-    runtime?.route?.queryString &&
-    Object.keys(runtime.route.queryString).includes('__siteEditor')
-  ) {
+  const queryString = runtime?.route?.queryString ?? {}
+
+  if (Object.keys(queryString).includes('__siteEditor')) {
     return childExtensions
   }
 
