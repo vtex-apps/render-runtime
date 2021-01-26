@@ -174,6 +174,7 @@ interface MatchingServerPage {
   title?: string
   routeId: string
   params: Record<string, string>
+  queryString?: Record<string, any>
   id: string
   path: string
   domain: string

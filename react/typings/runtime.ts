@@ -70,6 +70,7 @@ export interface Route {
   metaTags?: RouteMetaTags
   pageContext: PageDataContext
   params: Record<string, any>
+  queryString?: Record<string, any>
   path: string
   title?: string
 }

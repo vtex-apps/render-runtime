@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Disable hydrate-on-view in the site editor. 
+
 ## [8.126.9] - 2021-01-21
+### Fixed
+- Disable folding in the site editor. 
 
 ## [8.126.8] - 2021-01-21
 ### Fixed
