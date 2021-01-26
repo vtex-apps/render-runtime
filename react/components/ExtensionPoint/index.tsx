@@ -90,10 +90,6 @@ export function getChildExtensions(runtime: RenderContext, treePath: string) {
       />
     )
   })
-  console.log(
-    '🚀 ~ file: index.tsx ~ line 98 ~ getChildExtensions ~ runtime?.route?.queryString',
-    runtime?.route?.queryString
-  )
 
   if (
     runtime?.route?.queryString &&
