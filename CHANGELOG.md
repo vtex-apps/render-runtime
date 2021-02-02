@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.126.11] - 2021-02-02
+
 ### Fixed
 - Use props `children` in slots if slot children is empty.
 
