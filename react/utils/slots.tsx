@@ -52,7 +52,11 @@ export function generateSlot({
         runtime={runtime}
         hydration={hydration}
       >
-        {slotChildren}
+        {Array.isArray(slotChildren) &&
+        slotChildren.length === 0 &&
+        componentLoaderPropsWithContent.children
+          ? componentLoaderPropsWithContent.children
+          : slotChildren}
       </ComponentLoader>
     )
   }
