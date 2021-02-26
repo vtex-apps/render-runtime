@@ -964,14 +964,9 @@ export class RenderProvider extends Component<
     return assetsPromise
   }
 
-  public onLocaleSelected = (
-    locale: string,
-    domain?: string,
-    callback?: () => unknown
-  ) => {
+  public onLocaleSelected = (locale: string, domain?: string) => {
     if (locale !== this.state.culture.locale) {
       const sessionData = { public: {} }
-
       if (domain && domain === 'admin') {
         sessionData.public = {
           admin_cultureInfo: {
@@ -985,20 +980,13 @@ export class RenderProvider extends Component<
           },
         }
       }
-
-      return this.patchSession(sessionData)
-        .then(() => {
-          if (callback) return callback()
-
-          return window.location.reload()
-        })
+      this.patchSession(sessionData)
+        .then(() => window.location.reload())
         .catch((e) => {
           console.log('Failed to fetch new locale file.')
           console.error(e)
         })
     }
-
-    return undefined
   }
 
   public updateRuntime = async (options?: PageContextOptions) => {
