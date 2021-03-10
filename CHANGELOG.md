@@ -28,9 +28,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - `RenderContext` and `withRuntimeContext` exported types definition.
 
-### Fixed
-- CSS conflicts after a hot reaload.
-
 ## [8.126.11] - 2021-02-02
 
 ### Fixed
