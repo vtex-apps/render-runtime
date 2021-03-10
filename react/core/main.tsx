@@ -35,11 +35,13 @@ import Block from '../components/Block'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/ExtensionPoint/LegacyExtensionContainer'
 import Link from '../components/Link'
-import { RenderContext, withRuntimeContext } from '../components/RenderContext'
+import RenderContext from '../components/RenderContext'
 /** Important: Builder-Hub will only export types of functions imported from individual files.
- * So `useRuntime` should be imported from `../components/useRuntime` rather than
- * being imported along with the other functions from `RenderContext` */
+ * So `useRuntime` should be imported from `../components/useRuntime`
+ * and `withRuntimeContext` from `../components/withRuntimeContext` rather than being imported
+ * along with the other functions from `RenderContext` */
 import useRuntime from '../components/useRuntime'
+import withRuntimeContext from '../components/withRuntimeContext'
 import canUseDOM from '../components/canUseDOM'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'

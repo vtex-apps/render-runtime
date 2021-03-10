@@ -4,7 +4,7 @@ The Render Runtime app is responsible for handling runtime execution of React ap
 
 - Helpful variables, such as [`canUseDOM`](#canusedom).
 - Hooks, such as [`useRuntime`](#useruntime).
-- React components, such as [`Block` (alias `ExtensionPoint`)](#block-alias-extensionpoint), [`Helmet`](#helmet), [`Link`](#link), and [`NoSSR`](#nossr).
+- React components, such as [`Block` (alias `ExtensionPoint`)](#block-alias-extensionpoint), [`Helmet`](#helmet), [`Link`](#link), [`NoSSR`](#nossr) and [`withRuntimeContext`](#withruntimecontext-high-order-component).
 
 > ℹ️ **Tip:** Run vtex setup --typings to add vtex.render-runtime types in your app. This way, IDEs will be able to provide autocomplete for variables and methods.
 
@@ -67,6 +67,8 @@ Inside the `runtime` object you can have access to the following variables:
 |[`history`](#history)|object  |A `history` object reexported from the `history` package. For further information, check [this link.](https://github.com/ReactTraining/history/tree/v4/docs)|
 |[`navigate`](#navigate)|function|A function used in the client-side to define the navigation behaviour. |
 |[`page`](#page)|string  |The current `page` id (e.g., `store.home`).|
+|[`pages`](#pages)|object  |Object containing all `pages`. The keys are the pages ids (e.g., `store.home`).|
+|[`route`](#route)|object  |Object containing data related to the current route, such as `id`, `path`, `blockId` and others.|
 |[`production`](#production)|boolean |Points if the app is in a production workspace (`true`) or not (`false`). |
 |[`query`](#query)|object  |The URL query string values in a key-value format (e.g., `{ "foo": "bar" }`).|
 |[`renderMajor`](#rendermajor)|number  |The major version of the Render Runtime app.|
@@ -337,6 +339,124 @@ function MyComponent() {
 export default MyComponent
 ```
 
+#### `pages`
+
+```tsx
+import React from 'react'
+import { useRuntime } from 'vtex.render-runtime'
+
+function MyComponent() {
+  const { pages, page } = useRuntime()
+
+  return <div>This is the current page declarer: "{pages[page].declarer}"</div>
+}
+
+export default MyComponent
+```
+
+*Example value:*
+
+```json
+{
+  "allowConditions": true,
+  "context": null,
+  "declarer": "vtex.store@2.x",
+  "path": "/",
+  "routeId": "store.home",
+  "blockId": "vtex.store-theme@4.x:store.home",
+  "map": []
+}
+
+```
+
+#### `route`
+
+```tsx
+import React from 'react'
+import { useRuntime } from 'vtex.render-runtime'
+
+function MyComponent() {
+  const { route } = useRuntime()
+
+  return <div>This is the current route full path: "{route.path}"</div>
+}
+
+export default MyComponent
+```
+
+*Example value:*
+
+```json
+{
+  "domain": "store",
+  "id": "store.home",
+  "pageContext": {
+    "id": "store.home",
+    "type": "route"
+  },
+  "params": {},
+  "path": "/",
+  "pathId": "/",
+  "queryString": {},
+  "breakpointStyles": [
+    {
+      "path": "/_v/public/vtex.styles-graphql/v1/style/vtex.store-theme@4.3.0$style.common.min.css",
+      "mediaQuery": "",
+      "type": "common"
+    },
+    {
+      "path": "/_v/public/vtex.styles-graphql/v1/style/vtex.store-theme@4.3.0$style.small.min.css",
+      "mediaQuery": "screen and (min-width: 20em)",
+      "type": "small"
+    },
+    {
+      "path": "/_v/public/vtex.styles-graphql/v1/style/vtex.store-theme@4.3.0$style.notsmall.min.css",
+      "mediaQuery": "screen and (min-width: 40em)",
+      "type": "notsmall"
+    },
+    {
+      "path": "/_v/public/vtex.styles-graphql/v1/style/vtex.store-theme@4.3.0$style.large.min.css",
+      "mediaQuery": "screen and (min-width: 64em)",
+      "type": "large"
+    },
+    {
+      "path": "/_v/public/vtex.styles-graphql/v1/style/vtex.store-theme@4.3.0$style.xlarge.min.css",
+      "mediaQuery": "screen and (min-width: 80em)",
+      "type": "xlarge"
+    }
+  ],
+  "fonts": "/_v/public/vtex.styles-graphql/v1/fonts/7ead87572b7446c1ca01c45f5065665fc8cfd256",
+  "overrides": [
+    "/_v/public/vtex.styles-graphql/v1/overrides/vtex.product-list@0.28.2$overrides.css",
+    "/_v/public/vtex.styles-graphql/v1/overrides/vtex.minicart@2.56.0$overrides.css",
+    "/_v/public/vtex.styles-graphql/v1/overrides/vtex.store-theme@4.3.0$overrides.css"
+  ],
+  "rootName": "store.home",
+  "ssr": true,
+  "styleMeta": {
+    "fontsHash": "7ead87572b7446c1ca01c45f5065665fc8cfd256",
+    "overridesIds": [
+      {
+        "id": "vtex.product-list@0.28.2$overrides.css"
+      },
+      {
+        "id": "vtex.minicart@2.56.0$overrides.css"
+      },
+      {
+        "id": "vtex.store-theme@4.3.0$overrides.css"
+      }
+    ],
+    "themeId": "vtex.store-theme@4.3.0$style.min.css"
+  },
+  "blockId": "vtex.store-theme@4.x:store.home",
+  "canonicalPath": "/",
+  "metaTags": null,
+  "routeId": "store.home",
+  "title": null,
+  "varyContentById": false
+}
+```
+
 #### `production`
 
 ```tsx
@@ -544,6 +664,27 @@ function MyComponent() {
     </NoSSR>
   )
 }
+```
+
+## withRuntimeContext (High Order Component)
+
+`withRuntimeContext` is a React High Order Component (HOC) that allows class components to access the runtime context.
+
+> ℹ️ When using function components, you can use [`useRuntimeContext`](#useruntimecontext) hook instead.
+
+Take the following usage example:
+
+```tsx
+import React from 'react'
+import { withRuntimeContext, RenderContext } from 'vtex.render-runtime'
+
+class MyComponent extends React.Component<{ runtime: RenderContext }>{
+  render({ runtime }) {
+    return <div>This is the current page id: "{runtime.page}"</div>
+  }
+}
+
+const MyComponentWithRuntime = withRuntimeContext(MyComponent)
 ```
 
 Notice that, when in SSR mode, you can optionally provide the `onSSR` prop together with a component to render instead.

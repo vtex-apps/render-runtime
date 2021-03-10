@@ -119,3 +119,5 @@ export const withEmitter = <TOriginalProps extends {} = {}>(
     Component
   )
 }
+
+export default RenderContext
