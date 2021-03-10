@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.127.0] - 2021-03-10
+
 ### Added
 - `pages` and `route` to `useRuntime` types definition.
 
