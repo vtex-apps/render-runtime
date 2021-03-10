@@ -12,6 +12,8 @@ type PublicRuntime = Pick<
   | 'history'
   | 'navigate'
   | 'page'
+  | 'pages'
+  | 'route'
   | 'production'
   | 'query'
   | 'renderMajor'

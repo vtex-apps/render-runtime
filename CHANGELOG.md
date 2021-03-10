@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- `pages` and `route` to `useRuntime` types definition.
+
+### Fixed
+- `RenderContext` and `withRuntimeContext` exported types definition.
+
 ## [8.126.11] - 2021-02-02
 
 ### Fixed
