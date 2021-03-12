@@ -109,9 +109,9 @@ const updateHref = (linkElement: HTMLLinkElement) => {
           nextElementSibling.id.indexOf(idPrefix) > -1
         ) {
           linkElement.parentNode.removeChild(nextElementSibling)
-
-          linkElement.disabled = true
         }
+
+        linkElement.disabled = true
       })
     }
 
