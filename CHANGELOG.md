@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.128.1] - 2021-03-17
+
 ### Fixed
 - Prefetch does not work when the document has already been loaded.
 
