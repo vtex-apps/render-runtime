@@ -85,7 +85,7 @@ function addStyleToPage(href: string) {
   }
 }
 
-const updateHref = (linkElement: Element) => {
+const updateHref = (linkElement: HTMLLinkElement) => {
   const href = linkElement && linkElement.getAttribute('href')
 
   if (href) {
@@ -110,6 +110,8 @@ const updateHref = (linkElement: Element) => {
         ) {
           linkElement.parentNode.removeChild(nextElementSibling)
         }
+
+        linkElement.disabled = true
       })
     }
 
@@ -120,12 +122,16 @@ const updateHref = (linkElement: Element) => {
 }
 
 export const hotReloadOverrides = () => {
-  const linkElements = Array.from(document.querySelectorAll('.override_link'))
+  const linkElements: HTMLLinkElement[] = Array.from(
+    document.querySelectorAll('.override_link')
+  )
   linkElements.forEach(updateHref)
 }
 
 export const hotReloadTachyons = () => {
-  const linkElements = Array.from(document.querySelectorAll('.style_link'))
+  const linkElements: HTMLLinkElement[] = Array.from(
+    document.querySelectorAll('.style_link')
+  )
   linkElements.forEach(updateHref)
 }
 
