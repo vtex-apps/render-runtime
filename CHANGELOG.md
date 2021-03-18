@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.128.2] - 2021-03-18
+
 ### Fixed
 - CSS conflicts after a hot reload. 
 
