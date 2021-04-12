@@ -768,11 +768,13 @@ export class RenderProvider extends Component<
       return Promise.resolve()
     }
 
-    // Sets the preloading state, which currently displays
-    // a loading bar at the top of the page
-    this.setState({
-      preview: true,
-    })
+    if (route.domain === 'store') {
+      // Sets the preloading state, which currently displays
+      // a loading bar at the top of the page
+      this.setState({
+        preview: true,
+      })
+    }
 
     // If workspace is set via querystring, keep it during navigation
     const workspaceFromQuery = queryFromRuntime?.workspace
