@@ -235,6 +235,15 @@ const mergePersistingQueries = (currentQuery: string, query: string) => {
   return mapToQueryString({ ...persisting, ...next })
 }
 
+export const formatPathParameters = (params: Record<string, string>) => {
+  const obj: Record<string, string> = {}
+  for (const key in params) {
+    obj[key] = decodeURI(params[key])
+  }
+
+  return obj
+}
+
 export function getNavigationRouteToNavigate(
   pages: Pages,
   options: NavigateOptions,
@@ -279,16 +288,19 @@ export function getNavigationRouteToNavigate(
   const realHash = is(String, hash) ? `#${hash}` : ''
   let query = inputQuery || realQuery
 
+  const decodedParams = formatPathParameters(params)
+
   let navigationRoute: any = {}
 
   if (isEnabled('RENDER_NAVIGATION')) {
     const fallbackPage = { path: to, params: {}, id: '' }
-    const routeFromPage = page && getRouteFromPageName(page, pages, params)
+    const routeFromPage =
+      page && getRouteFromPageName(page, pages, decodedParams)
     const routeFromPath = getRouteFromPath(to, pages)
     navigationRoute = routeFromPage || routeFromPath || fallbackPage
   } else {
     navigationRoute = page
-      ? getRouteFromPageName(page, pages, params)
+      ? getRouteFromPageName(page, pages, decodedParams)
       : getRouteFromPathOld(to, pages, query, realHash)
   }
 
