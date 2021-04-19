@@ -967,7 +967,7 @@ export class RenderProvider extends Component<
   public onLocaleSelected = (
     locale: string,
     domain?: string,
-    callback?: () => unknown
+    callback?: (locale: string) => unknown
   ) => {
     if (locale !== this.state.culture.locale) {
       const sessionData = { public: {} }
@@ -988,7 +988,7 @@ export class RenderProvider extends Component<
 
       return this.patchSession(sessionData)
         .then(() => {
-          if (callback) return callback()
+          if (callback) return callback(locale)
 
           return window.location.reload()
         })
