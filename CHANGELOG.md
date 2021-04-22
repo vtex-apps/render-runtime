@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.128.4] - 2021-04-22
+
 ## [8.128.3] - 2021-04-19
 ### Fixed
 - Double encoding while generating paths
