@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Changed
-- React version from v16.4.2 to v16.14.0
+- React version from v16.4.2 to v16.9.0
 
 ## [7.42.1] - 2021-01-19
 ### Fixed
