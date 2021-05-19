@@ -11,7 +11,7 @@
       {
         "global": "PropTypes",
         "import": "prop-types",
-        "path": "https://unpkg.com/prop-types@15.6.1/prop-types.js"
+        "path": "https://unpkg.com/prop-types@15.7.2/prop-types.js"
       },
       {
         "global": "React",
@@ -58,7 +58,7 @@
       {
         "global": "PropTypes",
         "import": "prop-types",
-        "path": "https://unpkg.com/prop-types@15.6.1/prop-types.min.js"
+        "path": "https://unpkg.com/prop-types@15.7.2/prop-types.min.js"
       },
       {
         "global": "React",

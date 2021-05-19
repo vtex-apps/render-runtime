@@ -25,7 +25,7 @@
     "isbot": "^2.2.1",
     "js-base64": "^2.4.9",
     "myvtex-sse": "^1.2.0",
-    "prop-types": "^15.6.0",
+    "prop-types": "^15.7.2",
     "qs": "^6.5.1",
     "react": "^16.9.0",
     "react-apollo": "^2.1.6",
