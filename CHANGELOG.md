@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- React version from v16.4.2 to v16.9.0
+- `prop-types` package version from v15.6.1 to 15.7.2.
 
 ## [7.42.1] - 2021-01-19
 ### Fixed
