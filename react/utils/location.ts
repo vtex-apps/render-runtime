@@ -6,7 +6,7 @@ export const appendLocationSearch = (
   params: Record<string, string>
 ) => {
   if (!search) {
-    return `?${queryString.stringify(params, { encode: false })}`
+    return `?${queryString.stringify(params, { encode: true })}`
   }
 
   const included = queryString.parse(search)
@@ -15,7 +15,7 @@ export const appendLocationSearch = (
     params
   ) as Record<string, string>
   const additionalSearch = queryString.stringify(filteredParams, {
-    encode: false,
+    encode: true,
   })
   if (!additionalSearch) {
     return search

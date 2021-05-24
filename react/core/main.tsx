@@ -296,7 +296,15 @@ function start() {
         ? queryString.parse(window.location.search)
         : {}
       const serverQuery = window.__RUNTIME__.serverQuery ?? {}
-      window.__RUNTIME__.query = { ...serverQuery, ...browserQuery }
+      window.__RUNTIME__.query = Object.fromEntries(
+        Object.entries({
+          ...serverQuery,
+          ...browserQuery,
+        }).map(([key, value]) => [
+          key,
+          typeof value !== 'string' ? value : decodeURIComponent(value),
+        ])
+      )
     }
 
     const runtime: RenderRuntime = window.__RUNTIME__
