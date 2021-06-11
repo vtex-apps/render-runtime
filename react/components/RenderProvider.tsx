@@ -654,6 +654,19 @@ export class RenderProvider extends Component<
     }
   }
 
+  private mergeRouteParams<T extends { params: any }>(
+    matchingPage: T,
+    transientRoute: { params: any }
+  ): T {
+    return {
+      ...matchingPage,
+      params: {
+        ...transientRoute.params,
+        ...matchingPage.params,
+      },
+    }
+  }
+
   public afterPageChanged = (
     route: string,
     scrollOptions?: RenderScrollOptions
@@ -754,7 +767,7 @@ export class RenderProvider extends Component<
             page: routeId,
             preview: false,
             query,
-            route: matchingPage,
+            route: this.mergeRouteParams(matchingPage, transientRoute),
           }),
           () => {
             this.navigationState = { isNavigating: false }
@@ -822,7 +835,7 @@ export class RenderProvider extends Component<
                 pages,
                 preview: false,
                 query,
-                route: matchingPage,
+                route: this.mergeRouteParams(matchingPage, transientRoute),
                 settings,
               }),
               () => {
@@ -870,7 +883,7 @@ export class RenderProvider extends Component<
                 pages,
                 preview: false,
                 query,
-                route: updatedRoute,
+                route: this.mergeRouteParams(updatedRoute, transientRoute),
                 settings,
               },
               () => {
