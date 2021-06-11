@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Link `params` that starts with `__` are no longer considered during path transformations. They can be used as alternatives to query params.
 
 ## [8.128.4] - 2021-04-22
 

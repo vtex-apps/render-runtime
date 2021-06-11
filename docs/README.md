@@ -621,7 +621,7 @@ The `Link` React component is responsible for rendering an `a` HTML element that
 | :------------- |:-------------| :-----|:-----|
 | `page`     | `string`  | The name of the page that the user will be redirected to. Maps to a `blocks.json` block (e.g., `'store.product'`)||
 | `to`     | `string`    |The URL of the page that the user will be redirected to (e.g., `/shirt/p?skuId=1`). Notice that `to` is an **alternative** to `page` and it contains the whole URL instead of the page name. | |
-| `params` | `object`      | The `param` values of the page path in a key-value format (e.g, `{slug: 'shirt'}`). | `{}`|
+| `params` | `object`      | The `param` values of the page path in a key-value format (e.g, `{slug: 'shirt'}`). Params that starts with `__` are not considered on path transformations, and can be generaly be used as an alternative to query params | `{}`|
 | `query` | `string`  | The representation of the query params that are appended to the page path (e.g., `skuId=231`.) | `''` |
 | `onClick` | `function` | A callback that is fired when the user clicks on a component (e.g., `() => alert('Salut')`) | |
 | `replace` | `boolean` | The boolean value used to indicate if it should call (`true`) the replace function to navigate or not (`false`) | |
