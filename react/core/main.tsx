@@ -379,6 +379,9 @@ function start() {
       }))
     } else {
       setLazyCookie(runtime.workspaceCookie)
+      maybeRenderPromise.then(() => {
+        ;(window as any).__HAS_HYDRATED__ = true
+      })
       console.log(
         'Welcome to Render! Want to look under the hood? https://careers.vtex.com'
       )
