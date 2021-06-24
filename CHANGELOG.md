@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [8.129.0] - 2021-06-24
 ### Added
 - `window.__HAS_HYDRATED__` flag, intended for lazy pixels, but which can be used elsewhere.
 
