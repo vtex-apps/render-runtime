@@ -67,7 +67,7 @@ export const createUriSwitchLink = (baseURI: string, workspace: string, locale: 
 
       const includeQuery = (oldContext as any).http?.includeQuery || !hash
       const oldMethod = includeQuery ? 'POST' : (fetchOptions.method || 'POST')
-      const protocol = canUseDOM ? 'https:' : 'http:'
+      const protocol = canUseDOM && !window.location.host.startsWith('localhost') ? 'https:' : 'http:'
       const {maxAge, scope, version, operationType} = extractHints(operation.query, cacheHints[hash])
       const method = (equals(scope, 'private') && equals(operationType, 'query')) ? 'POST' : oldMethod
       return {

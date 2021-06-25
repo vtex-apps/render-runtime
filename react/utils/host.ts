@@ -25,15 +25,15 @@ export const getBaseURI = (runtime: RenderRuntime) => {
     return `${workspace}--${account}.${publicEndpoint}`
   } else {
     const {
-      location: { hostname },
+      location: { host },
     } = window
 
     /* todo: find a better way to detect if we need '/api/io' proxy or not
      * currently we are proxying those requests under /checkout page
      * even for IO stores
      */
-    return hostname.endsWith(`.${publicEndpoint}`) || isRenderServedPage()
-      ? hostname + rootPath
-      : `${hostname}${rootPath}/api/io`
+    return host.endsWith(`.${publicEndpoint}`) || isRenderServedPage()
+      ? host + rootPath
+      : `${host}${rootPath}/api/io`
   }
 }
