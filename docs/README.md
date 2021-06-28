@@ -628,7 +628,7 @@ The `Link` React component is responsible for rendering an `a` HTML element that
 
 Other props you pass will be forwarded to the `a` component and can be used for customization.
 
-Take the following usage example:
+Take the following usage examples:
 
 ```tsx
 import React from 'react'
@@ -636,6 +636,23 @@ import { Link } from 'vtex.render-runtime'
 
 function MyComponent() {
   return <Link to="/otherpage" classname="c-on-base">Hello</Link>
+}
+
+export default MyComponent
+```
+
+```tsx
+import React from 'react'
+import { Link } from 'vtex.render-runtime'
+
+function MyComponent() {
+  const params = {
+    slug: PRODUCT_SLUG, // Considered on path transformations (/{slug}/p)
+    __listName: 'List of products' // Ignored on path transformations
+    __yourProductPageParam: YOUR_PARAM // Ignored on path transformations
+  }
+
+  return <Link to="/productpage" params={params}>Hello</Link>
 }
 
 export default MyComponent
