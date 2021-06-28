@@ -155,8 +155,16 @@ function getRouteFromPageName(
   pages: Pages,
   params: any
 ): NavigationRoute | null {
-  const path = pathFromPageName(id, pages, params) || ''
-  checkValidParams(id, pages, path, params)
+  const pathParams = Object.keys(params)
+    .filter((key) => !key.startsWith('__'))
+    .reduce((acc, key) => {
+      acc[key] = params[key]
+      return acc
+    }, {} as any)
+
+  const path = pathFromPageName(id, pages, pathParams) || ''
+  checkValidParams(id, pages, path, pathParams)
+
   return path ? { id, path, params } : null
 }
 

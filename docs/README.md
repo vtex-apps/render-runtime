@@ -621,14 +621,14 @@ The `Link` React component is responsible for rendering an `a` HTML element that
 | :------------- |:-------------| :-----|:-----|
 | `page`     | `string`  | The name of the page that the user will be redirected to. Maps to a `blocks.json` block (e.g., `'store.product'`)||
 | `to`     | `string`    |The URL of the page that the user will be redirected to (e.g., `/shirt/p?skuId=1`). Notice that `to` is an **alternative** to `page` and it contains the whole URL instead of the page name. | |
-| `params` | `object`      | The `param` values of the page path in a key-value format (e.g, `{slug: 'shirt'}`). | `{}`|
+| `params` | `object`      | The `param` values of the page path in a key-value format (e.g, `{slug: 'shirt'}`). Params that starts with `__` are not considered on path transformations, and can be generaly be used as an alternative to query params | `{}`|
 | `query` | `string`  | The representation of the query params that are appended to the page path (e.g., `skuId=231`.) | `''` |
 | `onClick` | `function` | A callback that is fired when the user clicks on a component (e.g., `() => alert('Salut')`) | |
 | `replace` | `boolean` | The boolean value used to indicate if it should call (`true`) the replace function to navigate or not (`false`) | |
 
 Other props you pass will be forwarded to the `a` component and can be used for customization.
 
-Take the following usage example:
+Take the following usage examples:
 
 ```tsx
 import React from 'react'
@@ -636,6 +636,23 @@ import { Link } from 'vtex.render-runtime'
 
 function MyComponent() {
   return <Link to="/otherpage" classname="c-on-base">Hello</Link>
+}
+
+export default MyComponent
+```
+
+```tsx
+import React from 'react'
+import { Link } from 'vtex.render-runtime'
+
+function MyComponent() {
+  const params = {
+    slug: PRODUCT_SLUG, // Considered on path transformations (/{slug}/p)
+    __listName: 'List of products' // Ignored on path transformations
+    __yourProductPageParam: YOUR_PARAM // Ignored on path transformations
+  }
+
+  return <Link to="/productpage" params={params}>Hello</Link>
 }
 
 export default MyComponent
