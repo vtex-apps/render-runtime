@@ -314,6 +314,7 @@ interface RenderComponent<P={}, S={}> {
     canUseDOM: boolean
     withHMR: any
     withRuntimeContext: any
+    useRuntime(): RenderContext
     withSession: any
     RenderContextConsumer: React.Consumer<RenderContext>
     TreePathContextConsumer: React.Consumer<TreePathProps>
