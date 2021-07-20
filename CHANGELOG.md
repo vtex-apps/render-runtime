@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-- `rel` prop for better SEO
+- `rel` prop to `Link` component for better SEO.
 
 ## [8.128.4] - 2021-04-22
 
