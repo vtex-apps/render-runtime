@@ -23,6 +23,7 @@ interface Props extends NavigateOptions {
   className?: string
   target?: string
   waitToPrefetch?: number
+  rel?: HTMLAnchorElement['rel']
 }
 
 const appendWorkspaceToURL = (
@@ -55,6 +56,7 @@ const Link: React.FunctionComponent<Props> = ({
   modifiersOptions,
   target,
   waitToPrefetch,
+  rel,
   ...linkProps
 }) => {
   const {
