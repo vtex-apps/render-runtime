@@ -156,6 +156,7 @@ const Link: React.FunctionComponent<Props> = ({
   const linkElementProps = {
     target,
     href: hrefWithoutIframePrefix,
+    rel,
     ...linkProps,
     onClick: handleClick,
   }
