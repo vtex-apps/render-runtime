@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Fixed
-- `rel` prop passed down in the `return` statement
+-  `rel` prop received by `Link` component not being added to the rendered `<a>` tags.
 
 ## [8.131.0] - 2021-08-02
 ### Added
