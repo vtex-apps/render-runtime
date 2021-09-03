@@ -56,7 +56,6 @@ const Link: React.FunctionComponent<Props> = ({
   modifiersOptions,
   target,
   waitToPrefetch,
-  rel,
   ...linkProps
 }) => {
   const {
