@@ -139,6 +139,17 @@ const prependRootPath = (path: string, rootPath?: string) => {
   return `${rootPath}${maybeSlash}${path}`
 }
 
+/** performance.measure throws an error if the markers don't exist.
+ * This function makes its usage more ergonomic.
+*/
+function performanceMeasure(...args: Parameters<typeof window.performance.measure>) {
+  try {
+    return window?.performance?.measure?.(...args)
+  } catch (e) {
+    return null
+  }
+}
+
 interface NavigationState {
   isNavigating: boolean
   lastOptions?: NavigateOptions
@@ -1176,7 +1187,21 @@ export class RenderProvider extends Component<
     if (!equals(this.state.deviceInfo, this.props.deviceInfo)) {
       this.updateDevice(this.props.deviceInfo)
     }
+
+    window?.performance?.mark?.(`RenderProvider-render-${this.renderTick}`)
+
+    if (this.renderTick === 0) {
+      performanceMeasure('Script initialization', 'initRunScript', 'asyncScriptsReady')
+      performanceMeasure('Render start interval', 'asyncScriptsReady', 'render-start')
+      performanceMeasure('First render', 'render-start', 'RenderProvider-render-0')
+      performanceMeasure('From script initialization to first render', 'initRunScript', 'RenderProvider-render-0')
+      performanceMeasure('From initJS to first render', 'initJS', 'RenderProvider-render-0')
+    }
+
+    this.renderTick++
   }
+
+  private renderTick = 0
 
   public render() {
     const { children } = this.props
