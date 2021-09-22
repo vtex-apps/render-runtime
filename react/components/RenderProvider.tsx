@@ -146,10 +146,32 @@ const prependRootPath = (path: string, rootPath?: string) => {
 */
 function performanceMeasure(...args: Parameters<typeof window.performance.measure>): PerformanceMeasure | null | undefined | void {
   try {
-    return window?.performance?.measure?.(...args)
+    const measure = window?.performance?.measure?.(...args)
+    if (measure) {
+      return measure
+    }
+    // Fix for Firefox. Performance.measure doesn't return anything it seems,
+    // but you can still get it via getEntriesByName and the like.
+    const [name] = args ?? []
+    if (typeof name !== 'string') {
+      return null
+    }
+    const entriesByName = window?.performance?.getEntriesByName?.(name)
+    const [firstEntry] = entriesByName ?? []
+    if (!isPerformanceMeasure(firstEntry)) {
+      return null
+    }
+    return firstEntry
   } catch (e) {
     return null
   }
+}
+
+function isPerformanceMeasure(value: any): value is PerformanceMeasure {
+  if (value?.entryType === 'measure') {
+    return true
+  }
+  return false
 }
 
 function logMeasures({ measures, account, device, page }: {
