@@ -57,7 +57,7 @@ import {
   getPrefetechedData,
   PrefetchContextProvider,
 } from './Prefetch/PrefetchContext'
-import { withDevice, WithDeviceProps, DeviceInfo } from '../utils/withDevice'
+import { withDevice, WithDeviceProps, DeviceInfo, Device } from '../utils/withDevice'
 import { ApolloClientFunctions } from '../utils/client'
 import {
   ConfigurationDevice,
@@ -80,6 +80,18 @@ const InspectorPopover = React.lazy(
       })
     })
 )
+
+import SplunkEvents from 'splunk-events'
+
+const SPLUNK_ENDPOINT = 'https://splunk72-heavyforwarder-public.vtex.com:8088'
+const SPLUNK_TOKEN = 'cce4a8e7-6e7a-40a0-aafb-ac45b0e271ba'
+const splunkLogger = new SplunkEvents()
+
+splunkLogger.config({
+  endpoint: SPLUNK_ENDPOINT,
+  token: SPLUNK_TOKEN,
+  source: 'log',
+})
 
 interface Props {
   children: ReactElement<any> | null
@@ -142,12 +154,43 @@ const prependRootPath = (path: string, rootPath?: string) => {
 /** performance.measure throws an error if the markers don't exist.
  * This function makes its usage more ergonomic.
 */
-function performanceMeasure(...args: Parameters<typeof window.performance.measure>) {
+function performanceMeasure(...args: Parameters<typeof window.performance.measure>): PerformanceMeasure | null | undefined | void {
   try {
     return window?.performance?.measure?.(...args)
   } catch (e) {
     return null
   }
+}
+
+function logMeasures({ measures, account, device, page }: {
+  measures: ReturnType<typeof performanceMeasure>[],
+  account: string,
+  device: Device,
+  page: string
+}) {
+  if (Math.random() > 0.01 && false) {
+    return
+  }
+
+  const measuresData:Record<string, number> = {}
+
+  let hasValidMeasures = false
+  for (const measure of measures) {
+    if (!measure) {
+      continue
+    }
+    hasValidMeasures = true
+    if (measure.startTime > 0) {
+      measuresData[`${measure.name}-start`] = measure.startTime
+    }
+    measuresData[`${measure.name}-duration`] = measure.duration
+  }
+
+  if (!hasValidMeasures) {
+    return
+  }
+
+  splunkLogger.logEvent('Debug', 'Info', 'render', 'render-performance', {...measuresData, device, page}, account)
 }
 
 interface NavigationState {
@@ -1191,11 +1234,24 @@ export class RenderProvider extends Component<
     window?.performance?.mark?.(`RenderProvider-render-${this.renderTick}`)
 
     if (this.renderTick === 0) {
-      performanceMeasure('Script initialization', 'initRunScript', 'asyncScriptsReady')
-      performanceMeasure('Render start interval', 'asyncScriptsReady', 'render-start')
-      performanceMeasure('First render', 'render-start', 'RenderProvider-render-0')
-      performanceMeasure('From script initialization to first render', 'initRunScript', 'RenderProvider-render-0')
-      performanceMeasure('From initJS to first render', 'initJS', 'RenderProvider-render-0')
+      const measures = [
+        performanceMeasure('from-start-to-first-render', undefined, 'RenderProvider-render-0'),
+        performanceMeasure('intl-polyfill', 'intl-polyfill-start', 'intl-polyfill-end'),
+        performanceMeasure('uncritical-styles', 'uncritical-styles-start', 'uncritical-styles-end'),
+        performanceMeasure('content-loaded', undefined, 'content-loaded-promise-resolved'),
+        performanceMeasure('from-init-inline-js-to-first-render', 'init-inline-js', 'RenderProvider-render-0'),
+        performanceMeasure('from-script-start-to-first-render', 'init-runScript', 'RenderProvider-render-0'),
+        performanceMeasure('script-init', 'init-runScript', 'asyncScriptsReady-fired'),
+        performanceMeasure('render-start-interval', 'asyncScriptsReady-fired', 'render-start'),
+        performanceMeasure('first-render', 'render-start', 'RenderProvider-render-0'),
+      ]
+
+      logMeasures({
+        measures,
+        account: this.props.runtime.account,
+        device: this.props.deviceInfo.type,
+        page: this.props.runtime.page,
+      })
     }
 
     this.renderTick++

@@ -11,8 +11,25 @@ import { registerRuntimeGlobals } from './start/register'
 import { loadRuntimeJSONs } from './start/runtime'
 import { hydrateUncriticalStyles } from './start/styles'
 
+function performanceMark(...args: Parameters<typeof window.performance.mark>) {
+  if (typeof window === 'undefined' || !(typeof window?.performance?.mark === 'function')) {
+    return
+  }
+  window.performance.mark(...args)
+}
+
 const uncriticalStylesPromise = hydrateUncriticalStyles()
+performanceMark('uncritical-styles-start')
+uncriticalStylesPromise.then(() => {
+  performanceMark('uncritical-styles-end')
+})
+
+performanceMark('intl-polyfill-start')
 const intlPolyfillPromise = polyfillIntl()
+intlPolyfillPromise.then(() => {
+  performanceMark('intl-polyfill-end')
+})
+
 registerRuntimeGlobals(runtimeGlobals)
 addAMPProxy(window.__RUNTIME__)
 patchLibs()
@@ -25,6 +42,11 @@ export const renderReadyPromise: Promise<any> = canUseDOM
           resolve()
         }
       })
+
+      contentLoadedPromise.then(() => {
+        performanceMark('content-loaded-promise-resolved')
+      })
+
 
       const scriptsLoadedPromise = new Promise((resolve) => {
         if (typeof window.__ASYNC_SCRIPTS_READY__ === 'undefined') {
@@ -52,9 +74,9 @@ function start() {
     if (canUseDOM) {
       renderReadyPromise.then(() => {
         setTimeout(() => {
-          window?.performance?.mark?.('render-start')
+          performanceMark('render-start')
           window.__RENDER_8_RUNTIME__.start()
-          window?.performance?.mark?.('render-end')
+          performanceMark('render-end')
           window?.performance?.measure?.(
             '[VTEX IO] Rendering/Hydration',
             'render-start',
