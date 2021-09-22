@@ -159,7 +159,7 @@ function logMeasures({ measures, account, device, page }: {
   page: string
 }) {
   // Log 0.5% of the views, for now
-  if (Math.random() > 0.005) {
+  if (Math.random() > 0.005 && !(window?.location?.search?.includes?.('__debugLogMeasures'))) {
     return
   }
 
