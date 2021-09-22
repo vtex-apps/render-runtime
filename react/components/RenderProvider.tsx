@@ -71,6 +71,8 @@ import {
 } from '../typings/global'
 import { RenderRuntime, Components, Extension } from '../typings/runtime'
 
+import { logEvent } from '../utils/splunkLogger'
+
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
   () =>
@@ -80,18 +82,6 @@ const InspectorPopover = React.lazy(
       })
     })
 )
-
-import SplunkEvents from 'splunk-events'
-
-const SPLUNK_ENDPOINT = 'https://splunk72-heavyforwarder-public.vtex.com:8088'
-const SPLUNK_TOKEN = 'cce4a8e7-6e7a-40a0-aafb-ac45b0e271ba'
-const splunkLogger = new SplunkEvents()
-
-splunkLogger.config({
-  endpoint: SPLUNK_ENDPOINT,
-  token: SPLUNK_TOKEN,
-  source: 'log',
-})
 
 interface Props {
   children: ReactElement<any> | null
@@ -190,7 +180,9 @@ function logMeasures({ measures, account, device, page }: {
     return
   }
 
-  splunkLogger.logEvent('Debug', 'Info', 'render', 'render-performance', {...measuresData, device, page}, account)
+  const data = { ...measuresData, device, page}
+
+  logEvent('Debug', 'Info', 'render', 'render-performance', data, account)
 }
 
 interface NavigationState {
