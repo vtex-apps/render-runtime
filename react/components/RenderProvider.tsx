@@ -147,7 +147,7 @@ const prependRootPath = (path: string, rootPath?: string) => {
 function performanceMeasure(...args: Parameters<typeof window.performance.measure>): PerformanceMeasure | null | undefined | void {
   try {
     const measure = window?.performance?.measure?.(...args)
-    if (measure) {
+    if (measure as PerformanceMeasure | undefined) {
       return measure
     }
     // Fix for Firefox. Performance.measure doesn't return anything it seems,
