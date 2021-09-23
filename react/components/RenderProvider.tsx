@@ -57,7 +57,7 @@ import {
   getPrefetechedData,
   PrefetchContextProvider,
 } from './Prefetch/PrefetchContext'
-import { withDevice, WithDeviceProps, DeviceInfo } from '../utils/withDevice'
+import { withDevice, WithDeviceProps, DeviceInfo, Device } from '../utils/withDevice'
 import { ApolloClientFunctions } from '../utils/client'
 import {
   ConfigurationDevice,
@@ -70,6 +70,8 @@ import {
   PageContextOptions,
 } from '../typings/global'
 import { RenderRuntime, Components, Extension } from '../typings/runtime'
+
+import { logEvent } from '../utils/splunkLogger'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -137,6 +139,73 @@ const prependRootPath = (path: string, rootPath?: string) => {
 
   const maybeSlash = path.startsWith('/') ? '' : '/'
   return `${rootPath}${maybeSlash}${path}`
+}
+
+/** performance.measure throws an error if the markers don't exist.
+ * This function makes its usage more ergonomic.
+*/
+function performanceMeasure(...args: Parameters<typeof window.performance.measure>): PerformanceMeasure | null | undefined | void {
+  try {
+    const measure = window?.performance?.measure?.(...args)
+    if (measure as PerformanceMeasure | undefined) {
+      return measure
+    }
+    // Fix for Firefox. Performance.measure doesn't return anything it seems,
+    // but you can still get it via getEntriesByName and the like.
+    const [name] = args ?? []
+    if (typeof name !== 'string') {
+      return null
+    }
+    const entriesByName = window?.performance?.getEntriesByName?.(name)
+    const [firstEntry] = entriesByName ?? []
+    if (!isPerformanceMeasure(firstEntry)) {
+      return null
+    }
+    return firstEntry
+  } catch (e) {
+    return null
+  }
+}
+
+function isPerformanceMeasure(value: any): value is PerformanceMeasure {
+  if (value?.entryType === 'measure') {
+    return true
+  }
+  return false
+}
+
+function logMeasures({ measures, account, device, page }: {
+  measures: ReturnType<typeof performanceMeasure>[],
+  account: string,
+  device: Device,
+  page: string
+}) {
+  // Log 0.5% of the views, for now
+  if (Math.random() > 0.005 && !(window?.location?.search?.includes?.('__debugLogMeasures'))) {
+    return
+  }
+
+  const measuresData:Record<string, number> = {}
+
+  let hasValidMeasures = false
+  for (const measure of measures) {
+    if (!measure) {
+      continue
+    }
+    hasValidMeasures = true
+    if (measure.startTime > 0) {
+      measuresData[`${measure.name}-start`] = measure.startTime
+    }
+    measuresData[`${measure.name}-duration`] = measure.duration
+  }
+
+  if (!hasValidMeasures) {
+    return
+  }
+
+  const data = { ...measuresData, device, page}
+
+  logEvent('Debug', 'Info', 'render', 'render-performance', data, account)
 }
 
 interface NavigationState {
@@ -1176,7 +1245,34 @@ export class RenderProvider extends Component<
     if (!equals(this.state.deviceInfo, this.props.deviceInfo)) {
       this.updateDevice(this.props.deviceInfo)
     }
+
+    window?.performance?.mark?.(`RenderProvider-render-${this.renderTick}`)
+
+    if (this.renderTick === 0) {
+      const measures = [
+        performanceMeasure('from-start-to-first-render', undefined, 'RenderProvider-render-0'),
+        performanceMeasure('intl-polyfill', 'intl-polyfill-start', 'intl-polyfill-end'),
+        performanceMeasure('uncritical-styles', 'uncritical-styles-start', 'uncritical-styles-end'),
+        performanceMeasure('content-loaded', undefined, 'content-loaded-promise-resolved'),
+        performanceMeasure('from-init-inline-js-to-first-render', 'init-inline-js', 'RenderProvider-render-0'),
+        performanceMeasure('from-script-start-to-first-render', 'init-runScript', 'RenderProvider-render-0'),
+        performanceMeasure('script-init', 'init-runScript', 'asyncScriptsReady-fired'),
+        performanceMeasure('render-start-interval', 'asyncScriptsReady-fired', 'render-start'),
+        performanceMeasure('first-render', 'render-start', 'RenderProvider-render-0'),
+      ]
+
+      logMeasures({
+        measures,
+        account: this.props.runtime.account,
+        device: this.props.deviceInfo.type,
+        page: this.props.runtime.page,
+      })
+    }
+
+    this.renderTick++
   }
+
+  private renderTick = 0
 
   public render() {
     const { children } = this.props
