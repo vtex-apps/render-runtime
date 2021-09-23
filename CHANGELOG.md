@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-- Performance measurements on Splunk for 0.05% of views.
+- Performance measurements on Splunk for 0.5% of views.
 
 ## [8.131.1] - 2021-09-06
 ### Fixed
