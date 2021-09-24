@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Changed
-- Increase the performance measurement sampling to 1%.
+- Increase the default performance measurement sampling to 1%, and for specific accounts and pages to 4%.
 
 ## [8.132.0] - 2021-09-23
 ### Added
