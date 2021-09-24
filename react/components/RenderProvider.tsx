@@ -174,14 +174,37 @@ function isPerformanceMeasure(value: any): value is PerformanceMeasure {
   return false
 }
 
-function logMeasures({ measures, account, device, page }: {
+function shouldLogPerformanceMeasures({ account, page, domain }: { account: string, page: string, domain: string }) {
+  if (domain !== 'store') {
+    return
+  }
+  const shouldDebugLogMeasures = window?.location?.search?.includes?.('__debugLogMeasures')
+  if (shouldDebugLogMeasures) {
+    return true
+  }
+
+  const DEFAULT_LOG_SAMPLING_RATE = 0.01
+  // Allows increasing the log rate of certain accounts and pages for closer analysis
+  const HIGHLIGHT_LOG_SAMPLING_RATE = 0.04
+  const HIGHLIGHT_ACCOUNTS = ['carrefourbr']
+  const HIGHLIGHT_PAGES = ['store.home']
+
+  const shouldIncreaseLogRate = HIGHLIGHT_ACCOUNTS.includes(account) && HIGHLIGHT_PAGES.includes(page)
+
+  const logRate = shouldIncreaseLogRate ? HIGHLIGHT_LOG_SAMPLING_RATE : DEFAULT_LOG_SAMPLING_RATE
+
+  return Math.random() <= logRate
+}
+
+function logPerformanceMeasures({ measures, account, device, page, domain }: {
   measures: ReturnType<typeof performanceMeasure>[],
   account: string,
   device: Device,
-  page: string
+  page: string,
+  domain: string,
 }) {
   // Log 1% of the views, or if __debugLogMeasures is present on the querystring
-  if (Math.random() > 0.01 && !(window?.location?.search?.includes?.('__debugLogMeasures'))) {
+  if (!shouldLogPerformanceMeasures({ account, page, domain })) {
     return
   }
 
@@ -1261,11 +1284,12 @@ export class RenderProvider extends Component<
         performanceMeasure('first-render', 'render-start', 'RenderProvider-render-0'),
       ]
 
-      logMeasures({
+      logPerformanceMeasures({
         measures,
         account: this.props.runtime.account,
         device: this.props.deviceInfo.type,
         page: this.props.runtime.page,
+        domain: this.props.runtime.route.domain,
       })
     }
 
