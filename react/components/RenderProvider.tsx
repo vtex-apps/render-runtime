@@ -57,7 +57,12 @@ import {
   getPrefetechedData,
   PrefetchContextProvider,
 } from './Prefetch/PrefetchContext'
-import { withDevice, WithDeviceProps, DeviceInfo, Device } from '../utils/withDevice'
+import {
+  withDevice,
+  WithDeviceProps,
+  DeviceInfo,
+  Device,
+} from '../utils/withDevice'
 import { ApolloClientFunctions } from '../utils/client'
 import {
   ConfigurationDevice,
@@ -143,8 +148,10 @@ const prependRootPath = (path: string, rootPath?: string) => {
 
 /** performance.measure throws an error if the markers don't exist.
  * This function makes its usage more ergonomic.
-*/
-function performanceMeasure(...args: Parameters<typeof window.performance.measure>): PerformanceMeasure | null | undefined | void {
+ */
+function performanceMeasure(
+  ...args: Parameters<typeof window.performance.measure>
+): PerformanceMeasure | null | undefined | void {
   try {
     const measure = window?.performance?.measure?.(...args)
     if (measure as PerformanceMeasure | undefined) {
@@ -174,11 +181,21 @@ function isPerformanceMeasure(value: any): value is PerformanceMeasure {
   return false
 }
 
-function shouldLogPerformanceMeasures({ account, page, domain }: { account: string, page: string, domain: string }) {
+function shouldLogPerformanceMeasures({
+  account,
+  page,
+  domain,
+}: {
+  account: string
+  page: string
+  domain: string
+}) {
   if (domain !== 'store') {
     return
   }
-  const shouldDebugLogMeasures = window?.location?.search?.includes?.('__debugLogMeasures')
+  const shouldDebugLogMeasures = window?.location?.search?.includes?.(
+    '__debugLogMeasures'
+  )
   if (shouldDebugLogMeasures) {
     return true
   }
@@ -189,26 +206,34 @@ function shouldLogPerformanceMeasures({ account, page, domain }: { account: stri
   const HIGHLIGHT_ACCOUNTS = ['carrefourbr']
   const HIGHLIGHT_PAGES = ['store.home']
 
-  const shouldIncreaseLogRate = HIGHLIGHT_ACCOUNTS.includes(account) && HIGHLIGHT_PAGES.includes(page)
+  const shouldIncreaseLogRate =
+    HIGHLIGHT_ACCOUNTS.includes(account) && HIGHLIGHT_PAGES.includes(page)
 
-  const logRate = shouldIncreaseLogRate ? HIGHLIGHT_LOG_SAMPLING_RATE : DEFAULT_LOG_SAMPLING_RATE
+  const logRate = shouldIncreaseLogRate
+    ? HIGHLIGHT_LOG_SAMPLING_RATE
+    : DEFAULT_LOG_SAMPLING_RATE
 
   return Math.random() <= logRate
 }
 
-function logPerformanceMeasures({ measures, account, device, page, domain }: {
-  measures: ReturnType<typeof performanceMeasure>[],
-  account: string,
-  device: Device,
-  page: string,
-  domain: string,
+function logPerformanceMeasures({
+  measures,
+  account,
+  device,
+  page,
+  domain,
+}: {
+  measures: ReturnType<typeof performanceMeasure>[]
+  account: string
+  device: Device
+  page: string
+  domain: string
 }) {
-  // Log 1% of the views, or if __debugLogMeasures is present on the querystring
   if (!shouldLogPerformanceMeasures({ account, page, domain })) {
     return
   }
 
-  const measuresData:Record<string, number> = {}
+  const measuresData: Record<string, number> = {}
 
   let hasValidMeasures = false
   for (const measure of measures) {
@@ -226,7 +251,7 @@ function logPerformanceMeasures({ measures, account, device, page, domain }: {
     return
   }
 
-  const data = { ...measuresData, device, page}
+  const data = { ...measuresData, device, page }
 
   logEvent('Debug', 'Info', 'render', 'render-performance', data, account)
 }
@@ -1273,15 +1298,51 @@ export class RenderProvider extends Component<
 
     if (this.renderTick === 0) {
       const measures = [
-        performanceMeasure('from-start-to-first-render', undefined, 'RenderProvider-render-0'),
-        performanceMeasure('intl-polyfill', 'intl-polyfill-start', 'intl-polyfill-end'),
-        performanceMeasure('uncritical-styles', 'uncritical-styles-start', 'uncritical-styles-end'),
-        performanceMeasure('content-loaded', undefined, 'content-loaded-promise-resolved'),
-        performanceMeasure('from-init-inline-js-to-first-render', 'init-inline-js', 'RenderProvider-render-0'),
-        performanceMeasure('from-script-start-to-first-render', 'init-runScript', 'RenderProvider-render-0'),
-        performanceMeasure('script-init', 'init-runScript', 'asyncScriptsReady-fired'),
-        performanceMeasure('render-start-interval', 'asyncScriptsReady-fired', 'render-start'),
-        performanceMeasure('first-render', 'render-start', 'RenderProvider-render-0'),
+        performanceMeasure(
+          'from-start-to-first-render',
+          undefined,
+          'RenderProvider-render-0'
+        ),
+        performanceMeasure(
+          'intl-polyfill',
+          'intl-polyfill-start',
+          'intl-polyfill-end'
+        ),
+        performanceMeasure(
+          'uncritical-styles',
+          'uncritical-styles-start',
+          'uncritical-styles-end'
+        ),
+        performanceMeasure(
+          'content-loaded',
+          undefined,
+          'content-loaded-promise-resolved'
+        ),
+        performanceMeasure(
+          'from-init-inline-js-to-first-render',
+          'init-inline-js',
+          'RenderProvider-render-0'
+        ),
+        performanceMeasure(
+          'from-script-start-to-first-render',
+          'init-runScript',
+          'RenderProvider-render-0'
+        ),
+        performanceMeasure(
+          'script-init',
+          'init-runScript',
+          'asyncScriptsReady-fired'
+        ),
+        performanceMeasure(
+          'render-start-interval',
+          'asyncScriptsReady-fired',
+          'render-start'
+        ),
+        performanceMeasure(
+          'first-render',
+          'render-start',
+          'RenderProvider-render-0'
+        ),
       ]
 
       logPerformanceMeasures({
