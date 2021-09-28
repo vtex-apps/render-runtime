@@ -1,5 +1,12 @@
-import React, { useEffect, useState, ComponentType } from 'react'
-import { Device } from '../utils/withDevice'
+import React, {
+  useEffect,
+  useState,
+  ComponentType,
+  PropsWithChildren,
+} from 'react'
+import { Device, DeviceInfo } from '../utils/withDevice'
+
+import { RenderRuntime } from '../typings/runtime'
 
 import SplunkEvents from 'splunk-events'
 
@@ -101,10 +108,13 @@ function shouldLogPerformanceMeasures({
   page,
   domain,
 }: {
-  account: string
-  page: string
-  domain: string
+  account?: string
+  page?: string
+  domain?: string
 }) {
+  if (!account) {
+    return
+  }
   if (domain !== 'store') {
     return
   }
@@ -122,7 +132,9 @@ function shouldLogPerformanceMeasures({
   const HIGHLIGHT_PAGES = ['store.home']
 
   const shouldIncreaseLogRate =
-    HIGHLIGHT_ACCOUNTS.includes(account) && HIGHLIGHT_PAGES.includes(page)
+    HIGHLIGHT_ACCOUNTS.includes(account) &&
+    page &&
+    HIGHLIGHT_PAGES.includes(page)
 
   const logRate = shouldIncreaseLogRate
     ? HIGHLIGHT_LOG_SAMPLING_RATE
@@ -139,10 +151,10 @@ function logPerformanceMeasures({
   domain,
 }: {
   measures: ReturnType<typeof performanceMeasure>[]
-  account: string
-  device: Device
-  page: string
-  domain: string
+  account?: string
+  device?: Device
+  page?: string
+  domain?: string
 }) {
   if (!shouldLogPerformanceMeasures({ account, page, domain })) {
     return
@@ -171,17 +183,26 @@ function logPerformanceMeasures({
     return
   }
 
-  const data = { ...measuresData, device, page }
+  const data = {
+    ...measuresData,
+    device: device ?? 'unknown',
+    page: page ?? 'unknown',
+  }
 
   logEvent('Debug', 'Info', 'render', 'render-performance', data, account)
 }
 
-const withPerformanceMeasures = <Props extends {}>(
-  Component: ComponentType<Props>
+type Props = PropsWithChildren<{
+  runtime: RenderRuntime
+  deviceInfo: DeviceInfo
+}>
+
+const withPerformanceMeasures = <P extends Props>(
+  Component: ComponentType<P>
 ) => {
   const MemoizedComponent = React.memo(Component)
 
-  const WithPerformanceMeasures = ({ ...props }) => {
+  const WithPerformanceMeasures = ({ ...props }: P) => {
     const [hasHydrated, setHasHydrated] = useState(false)
 
     useEffect(() => {
@@ -210,7 +231,9 @@ const withPerformanceMeasures = <Props extends {}>(
       }, 1)
     }
 
-    return <MemoizedComponent {...(props as Props)} />
+    // eslint-disable-next-line
+    // @ts-ignore
+    return <MemoizedComponent {...(props as P)} />
   }
 
   return WithPerformanceMeasures
