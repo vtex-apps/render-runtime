@@ -57,23 +57,20 @@ const useDevice = (hints: RenderRuntime['hints']) => {
 export const withDevice = <P extends Props>(
   Component: ComponentType<P & WithDeviceProps>
 ): FC<P> => {
-  const WithDeviceMemo = React.memo(
-    ({ type, isMobile, ...props }: { type: any; isMobile: any }) => (
-      <Component
-        deviceInfo={{ type, isMobile }}
-        {...((props as unknown) as P)}
-      />
+  const MemoizedWithDevice = React.memo(
+    ({ type, isMobile, ...props }: DeviceInfo & Props) => (
+      <Component deviceInfo={{ type, isMobile }} {...(props as P)} />
     )
   )
 
-  WithDeviceMemo.displayName = 'WithDeviceMemo'
+  MemoizedWithDevice.displayName = 'MemoizedWithDevice'
 
   const WithDevice = ({ ...props }: P) => {
     const hints = props.runtime.hints
     const deviceInfo = useDevice(hints)
 
     return (
-      <WithDeviceMemo
+      <MemoizedWithDevice
         type={deviceInfo.type}
         isMobile={deviceInfo.isMobile}
         {...props}
