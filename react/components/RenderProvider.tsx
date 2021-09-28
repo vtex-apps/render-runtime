@@ -1,17 +1,9 @@
 import debounce from 'debounce'
 import { canUseDOM } from 'exenv'
-import { equals, merge, mergeWith, difference, path } from 'ramda'
+import { equals, merge, mergeWith, difference } from 'ramda'
 import { History, UnregisterCallback, LocationListener } from 'history'
 import PropTypes from 'prop-types'
-import React, {
-  Component,
-  Fragment,
-  ReactElement,
-  Suspense,
-  ComponentType,
-  useEffect,
-  useState,
-} from 'react'
+import React, { Component, Fragment, ReactElement, Suspense } from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Helmet } from 'react-helmet'
 import { IntlProvider } from 'react-intl'
@@ -65,12 +57,7 @@ import {
   getPrefetechedData,
   PrefetchContextProvider,
 } from './Prefetch/PrefetchContext'
-import {
-  withDevice,
-  WithDeviceProps,
-  DeviceInfo,
-  Device,
-} from '../utils/withDevice'
+import { withDevice, WithDeviceProps, DeviceInfo } from '../utils/withDevice'
 import { ApolloClientFunctions } from '../utils/client'
 import {
   ConfigurationDevice,
@@ -1298,4 +1285,6 @@ export class RenderProvider extends Component<
   }
 }
 
-export default withDevice<Props>(withPerformanceMeasures(RenderProvider))
+export default withDevice<Props>(
+  withPerformanceMeasures<Props & WithDeviceProps>(RenderProvider)
+)
