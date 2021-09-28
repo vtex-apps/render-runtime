@@ -2,7 +2,7 @@ import React, {
   useEffect,
   useState,
   ComponentType,
-  PropsWithChildren,
+  FunctionComponent,
 } from 'react'
 import { Device, DeviceInfo } from '../utils/withDevice'
 
@@ -192,15 +192,22 @@ function logPerformanceMeasures({
   logEvent('Debug', 'Info', 'render', 'render-performance', data, account)
 }
 
-type Props = PropsWithChildren<{
+type Props = {
   runtime: RenderRuntime
   deviceInfo: DeviceInfo
-}>
+}
 
 const withPerformanceMeasures = <P extends Props>(
   Component: ComponentType<P>
 ) => {
-  const MemoizedComponent = React.memo(Component)
+  // There seems to be a weird issue around the type of React.memo that happens
+  // during build, but not locally. The type of `P` ends up mismatching the
+  // type of `...props` below, even though both are `P`.
+  // I suspect it might be due to some issue on the specific @types/react version.
+  // Anyway, converting the type to FunctionComponent<P> fixes the issue for now.
+  const MemoizedComponent = (React.memo(
+    Component
+  ) as unknown) as FunctionComponent<P>
 
   const WithPerformanceMeasures = ({ ...props }: P) => {
     const [hasHydrated, setHasHydrated] = useState(false)
@@ -231,8 +238,6 @@ const withPerformanceMeasures = <P extends Props>(
       }, 1)
     }
 
-    // eslint-disable-next-line
-    // @ts-ignore
     return <MemoizedComponent {...(props as P)} />
   }
 
