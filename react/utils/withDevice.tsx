@@ -29,6 +29,7 @@ const useDevice = (hints: RenderRuntime['hints']) => {
   /** These screensizes are hardcoded, based on the default
    * Tachyons breakpoints. They should probably be the ones
    * configured via the style.json file, if available. */
+
   const isScreenMedium = useMediaLayout({ minWidth: '40rem' })
   const isScreenLarge = useMediaLayout({ minWidth: '64.1rem' })
 
@@ -56,11 +57,25 @@ const useDevice = (hints: RenderRuntime['hints']) => {
 export const withDevice = <P extends Props>(
   Component: ComponentType<P & WithDeviceProps>
 ): FC<P> => {
+  const MemoizedWithDevice = React.memo(
+    ({ type, isMobile, ...props }: DeviceInfo & Props) => (
+      <Component deviceInfo={{ type, isMobile }} {...(props as P)} />
+    )
+  )
+
+  MemoizedWithDevice.displayName = 'MemoizedWithDevice'
+
   const WithDevice = ({ ...props }: P) => {
     const hints = props.runtime.hints
     const deviceInfo = useDevice(hints)
 
-    return <Component deviceInfo={deviceInfo} {...(props as P)} />
+    return (
+      <MemoizedWithDevice
+        type={deviceInfo.type}
+        isMobile={deviceInfo.isMobile}
+        {...props}
+      />
+    )
   }
 
   return WithDevice
