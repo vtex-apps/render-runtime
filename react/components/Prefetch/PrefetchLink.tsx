@@ -1,11 +1,9 @@
-import React, { FunctionComponent, useRef } from 'react'
+import React, { FunctionComponent, useRef, AnchorHTMLAttributes } from 'react'
 import { usePrefetchAttempt } from '../../hooks/prefetch'
 import { NavigateOptions } from '../../utils/pages'
 
-interface Props {
+interface Props extends AnchorHTMLAttributes<HTMLAnchorElement> {
   waitToPrefetch?: number
-  onMouseOver?: (event: React.MouseEvent) => void
-  onFocus?: (event: React.FocusEvent) => void
   href: string
   page?: string
   options: NavigateOptions

@@ -1,4 +1,9 @@
-import React, { MouseEvent, useCallback, useMemo } from 'react'
+import React, {
+  MouseEvent,
+  useCallback,
+  useMemo,
+  AnchorHTMLAttributes,
+} from 'react'
 import { NavigateOptions, pathFromPageName } from '../utils/pages'
 import { useRuntime } from './RenderContext'
 import { useIsPrefetchActive } from '../hooks/prefetch'
@@ -18,12 +23,13 @@ const isAbsoluteUrl = (url: string) => absoluteRegex.test(url)
 const isTelephoneUrl = (url: string) => telephoneRegex.test(url)
 const isMailToUrl = (url: string) => mailToRegex.test(url)
 
-interface Props extends NavigateOptions {
+interface Props
+  extends NavigateOptions,
+    Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   onClick?: (event: React.MouseEvent) => void
   className?: string
   target?: string
   waitToPrefetch?: number
-  rel?: HTMLAnchorElement['rel']
 }
 
 const appendWorkspaceToURL = (
