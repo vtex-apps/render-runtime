@@ -10,7 +10,7 @@ import EventEmitter from 'eventemitter3'
 import { createBrowserHistory as createHistory } from 'history'
 import queryString from 'query-string'
 import React, { ReactElement } from 'react'
-import { getDataFromTree } from 'react-apollo'
+import { renderToStringWithData } from 'react-apollo'
 import {
   hydrate as hydrateDOM,
   render as renderDOM,
@@ -35,13 +35,11 @@ import Block from '../components/Block'
 import LayoutContainer from '../components/LayoutContainer'
 import LegacyExtensionContainer from '../components/ExtensionPoint/LegacyExtensionContainer'
 import Link from '../components/Link'
-import RenderContext from '../components/RenderContext'
+import { RenderContext, withRuntimeContext } from '../components/RenderContext'
 /** Important: Builder-Hub will only export types of functions imported from individual files.
- * So `useRuntime` should be imported from `../components/useRuntime`
- * and `withRuntimeContext` from `../components/withRuntimeContext` rather than being imported
- * along with the other functions from `RenderContext` */
+ * So `useRuntime` should be imported from `../components/useRuntime` rather than
+ * being imported along with the other functions from `RenderContext` */
 import useRuntime from '../components/useRuntime'
-import withRuntimeContext from '../components/withRuntimeContext'
 import canUseDOM from '../components/canUseDOM'
 import RenderProvider from '../components/RenderProvider'
 import { getVTEXImgHost } from '../utils/assets'
@@ -95,28 +93,19 @@ const renderExtension = (
   }
 }
 
-function renderToStringWithData(
+function renderToStringProperly(
   component: ReactElement<any>,
-  renderFn: (root: ReactElement) => string,
-  skipQuery = false
+  _: (root: ReactElement) => string,
+  __ = false
 ): Promise<ServerRendered> {
-  const getDataFn = (): Promise<string | void> => {
-    if (skipQuery) return Promise.resolve()
-    return getDataFromTree(component)
-  }
-
   const startGetDataFromTree = window.hrtime()
-  return getDataFn().then(() => {
-    const endGetDataFromTree = window.hrtime(startGetDataFromTree)
-
-    const startRenderToString = window.hrtime()
-    const markup = renderFn(component)
-    const endRenderToString = window.hrtime(startRenderToString)
+  const startRenderToString = window.hrtime()
+  return renderToStringWithData(component).then((markup) => {
     return {
       markup,
       renderTimeMetric: {
-        getDataFromTree: endGetDataFromTree,
-        renderToString: endRenderToString,
+        getDataFromTree: window.hrtime(startGetDataFromTree),
+        renderToString: window.hrtime(startRenderToString),
       },
     }
   })
@@ -234,7 +223,7 @@ const render = async (
         renderToStaticMarkup,
         runtime
       )
-      return renderToStringWithData(
+      return renderToStringProperly(
         ampRoot,
         renderToStaticMarkup,
         disableSSQ
@@ -248,7 +237,7 @@ const render = async (
   }
 
   return prepareRootElement(name, runtime, baseURI, cacheControl).then((root) =>
-    renderToStringWithData(root, renderToString, disableSSQ).then(
+    renderToStringProperly(root, renderToString, disableSSQ).then(
       ({ markup, renderTimeMetric }) => ({
         ...commonRenderResult,
         markups: getMarkups(name, markup),
