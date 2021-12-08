@@ -3,7 +3,7 @@ import {canUseDOM} from 'exenv'
 
 if (canUseDOM && window.__RUNTIME__.production) {
   const { config = null, version = '' } = window.__RUNTIME__.runtimeMeta || {}
-  const shouldDisableSentry = window?.vtex?.disableSentry
+  const shouldDisableSentry = Boolean(window?.vtex?.disableSentry)
   // If dsn is omitted, no data is sent to Sentry
   const dsn = shouldDisableSentry ? undefined : (config && config.sentryDSN)
   Sentry.init({
