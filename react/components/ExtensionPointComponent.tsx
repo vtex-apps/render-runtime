@@ -106,7 +106,7 @@ class ExtensionPointComponent extends PureComponent<
 
     console.error('Failed to render extension point', path, component)
     // Only log 10 percent of the errors so we dont exceed our quota
-    if (production && Math.random() < 0.1) {
+    if (production && Math.random() < 0.1 && !(window?.vtex?.disableSentry)) {
       Sentry.configureScope(scope => {
         scope.setExtra('runtime', runtime)
         scope.setExtra('treePath', path)
