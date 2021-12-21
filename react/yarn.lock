@@ -10,54 +10,6 @@
     core-js "^2.5.7"
     regenerator-runtime "^0.12.0"
 
-"@sentry/browser@^4.0.6":
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-4.0.6.tgz#6a9183371c9d6c2c1905f14af17ad68e305ce918"
-  integrity sha512-tYXqJQOL+pYud8ICSLkxF7aMn3aLqqSq+H8tF4GPOtTEwmVZH1PEy8T+o2SOhHohJMvWEkEepElKGot71pu+NQ==
-  dependencies:
-    "@sentry/core" "4.0.6"
-    "@sentry/types" "4.0.6"
-    "@sentry/utils" "4.0.6"
-    md5 "2.2.1"
-
-"@sentry/core@4.0.6":
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-4.0.6.tgz#8e59445dde27e639ffcac23b4e40529cda4c9df7"
-  integrity sha512-xqUI59SSjA0f7ec6xy0RzZUJTxYP2smtHy3to+rvyyz5N4QBtL87yw9P0FngvBxNFEjfHYEO1V5gM9mA/5UByg==
-  dependencies:
-    "@sentry/hub" "4.0.6"
-    "@sentry/minimal" "4.0.6"
-    "@sentry/types" "4.0.6"
-    "@sentry/utils" "4.0.6"
-
-"@sentry/hub@4.0.6":
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/@sentry/hub/-/hub-4.0.6.tgz#ab86bd50d12234a0699857452e925069311f54d1"
-  integrity sha512-7oQKnunDPo8JHzCcOC0CRcPm4Zl3apF0fFYL/nLe7XhCBGoaA2XubwoTx02iOtoNiyPp7QqT75KSXd0eMNq5KA==
-  dependencies:
-    "@sentry/types" "4.0.6"
-    "@sentry/utils" "4.0.6"
-
-"@sentry/minimal@4.0.6":
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/@sentry/minimal/-/minimal-4.0.6.tgz#494d725f2d7c343724c47bbb0cd99302b6124e7d"
-  integrity sha512-xnMRx/EkC5YGP2qSJSvAksg4KM8LhIt9GwcNX9ZkInKy2LmWSgtHUYnHyGl1sP+xMirvsYO5HMrLKujjDaYNvQ==
-  dependencies:
-    "@sentry/hub" "4.0.6"
-    "@sentry/types" "4.0.6"
-
-"@sentry/types@4.0.6":
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-4.0.6.tgz#421478df17415802baa4d5e2d3db246e559a0fad"
-  integrity sha512-8TYqM+cRkGIXWYQVSJO3eJnnxi/GUUZVFpvlwNQvnxNZLVg8xyn08WYTRMAbKKBq27yb02NpJJTj04KvrUTc9g==
-
-"@sentry/utils@4.0.6":
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-4.0.6.tgz#77ca73fb7d2c436914d2dd84fa975dd5b618246d"
-  integrity sha512-m+6r+qMhOXBhw06bPpdha1Bg5KzK46/FMb9tyiA0KCGFR3/vNgKneXwoZJ5GDGTVaz3J189bXoXRHHlHXcH+4w==
-  dependencies:
-    "@sentry/types" "4.0.6"
-
 "@types/apollo-upload-client@^8.1.0":
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/@types/apollo-upload-client/-/apollo-upload-client-8.1.0.tgz#688fd68d15da59aacbd56951dedfa9a3ab5302cf"
@@ -371,11 +323,6 @@ chalk@^2.3.0:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
-charenc@~0.0.1:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/charenc/-/charenc-0.0.2.tgz#c0a1d2f3a7092e03774bfa83f14c0fc5790a8667"
-  integrity sha1-wKHS86cJLgN3S/qD8UwPxXkKhmc=
-
 classnames@^2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
@@ -417,11 +364,6 @@ core-js@^2.5.7:
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
   integrity sha512-RszJCAxg/PP6uzXVXL6BsxSXx/B05oJAQ2vkJRjyjrEcNVycaqOmNb5OTxZPE3xa5gwZduqza6L9JOCenh/Ecw==
-
-crypt@~0.0.1:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
-  integrity sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=
 
 csstype@^3.0.2:
   version "3.0.8"
@@ -676,11 +618,6 @@ invariant@^2.2.2:
   dependencies:
     loose-envify "^1.0.0"
 
-is-buffer@~1.1.1:
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
-  integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
-
 is-stream@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/is-stream/-/is-stream-1.1.0.tgz#12d4a3dd4e68e0b79ceb8dbc84173ae80d91ca44"
@@ -758,15 +695,6 @@ loose-envify@^1.4.0:
   integrity sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
-
-md5@2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/md5/-/md5-2.2.1.tgz#53ab38d5fe3c8891ba465329ea23fac0540126f9"
-  integrity sha1-U6s41f48iJG6RlMp6iP6wFQBJvk=
-  dependencies:
-    charenc "~0.0.1"
-    crypt "~0.0.1"
-    is-buffer "~1.1.1"
 
 min-document@^2.19.0:
   version "2.19.0"

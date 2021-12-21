@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/browser'
 import PropTypes from 'prop-types'
 import React, { ErrorInfo, PureComponent } from 'react'
 
@@ -98,26 +97,10 @@ class ExtensionPointComponent extends PureComponent<
     const {
       component,
       props,
-      runtime: {production, account, workspace},
-      runtime,
       treePath: path,
     } = this.props
-    const {children, __errorInstance, __clearError, ...componentProps} = props
 
     console.error('Failed to render extension point', path, component)
-    // Only log 10 percent of the errors so we dont exceed our quota
-    if (production && Math.random() < 0.1) {
-      Sentry.configureScope(scope => {
-        scope.setExtra('runtime', runtime)
-        scope.setExtra('treePath', path)
-        scope.setExtra('props', componentProps)
-
-        scope.setTag('account', account)
-        scope.setTag('workspace', workspace)
-        scope.setTag('component', component || '')
-      })
-      Sentry.captureException(error)
-    }
 
     this.setState({
       error,
