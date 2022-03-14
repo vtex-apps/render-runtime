@@ -62,11 +62,11 @@
       },
       {
         "clientOnly": true,
-        "path": "npm:lazysizes@5.2.2/plugins/unveilhooks/ls.unveilhooks.min.js"
+        "path": "npm:lazysizes@5.3.2/plugins/unveilhooks/ls.unveilhooks.min.js"
       },
       {
         "clientOnly": true,
-        "path": "npm:lazysizes@5.2.2/lazysizes.min.js"
+        "path": "npm:lazysizes@5.3.2/lazysizes.min.js"
       },
       {
         "clientOnly": true,
@@ -150,11 +150,11 @@
       },
       {
         "clientOnly": true,
-        "path": "npm:lazysizes@5.2.2/plugins/unveilhooks/ls.unveilhooks.min.js"
+        "path": "npm:lazysizes@5.3.2/plugins/unveilhooks/ls.unveilhooks.min.js"
       },
       {
         "clientOnly": true,
-        "path": "npm:lazysizes@5.2.2/lazysizes.min.js"
+        "path": "npm:lazysizes@5.3.2/lazysizes.min.js"
       },
       {
         "clientOnly": true,
