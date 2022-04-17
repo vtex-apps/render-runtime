@@ -30,8 +30,8 @@ const useDevice = (hints: RenderRuntime['hints']) => {
    * Tachyons breakpoints. They should probably be the ones
    * configured via the style.json file, if available. */
 
-  const isScreenMedium = useMediaLayout({ minWidth: '40rem' })
-  const isScreenLarge = useMediaLayout({ minWidth: '64.1rem' })
+  const isTabletScreen = useMediaLayout({ minWidth: '40rem' })
+  const isMobileScreen = useMediaLayout({ maxWidth: '64rem' })
 
   const serverDevice = {
     type: hints.phone
@@ -43,12 +43,12 @@ const useDevice = (hints: RenderRuntime['hints']) => {
   }
 
   const clientDevice = {
-    type: isScreenLarge
-      ? Device.desktop
-      : isScreenMedium
-      ? Device.tablet
-      : Device.phone,
-    isMobile: !isScreenLarge,
+    type: isMobileScreen
+      ? isTabletScreen
+        ? Device.tablet
+        : Device.phone
+      : Device.desktop,
+    isMobile: isMobileScreen,
   }
 
   return isSSR ? serverDevice : clientDevice
