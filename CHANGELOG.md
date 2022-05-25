@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+- Update react version to `17.0.2`.
+
 ## [8.132.4] - 2022-03-17
 ### Changed
 - Updated lazysizes library
