@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.132.5] - 2022-05-26
+
 ### Changed
 - Update react version to `17.0.2`.
 
