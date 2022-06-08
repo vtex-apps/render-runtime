@@ -5,9 +5,7 @@ interface Module {
 declare const module: Module
 
 declare module '*.graphql' {
-  import { DocumentNode } from 'graphql'
-
-  const value: DocumentNode
+  const value: any
   export default value
 }
 

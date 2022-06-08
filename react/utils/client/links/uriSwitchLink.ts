@@ -1,12 +1,7 @@
 import { ApolloLink, NextLink, Operation } from 'apollo-link'
 import { canUseDOM } from 'exenv'
-import {
-  ASTNode,
-  DirectiveNode,
-  OperationDefinitionNode,
-  StringValueNode,
-  visit,
-} from 'graphql'
+
+import { visit } from 'graphql/language/visitor'
 
 import { generateHash } from '../generateHash'
 import { appendLocationSearch } from '../../location'
@@ -17,20 +12,23 @@ interface Assets {
   queryScope?: string
 }
 
-const assetsFromQuery = (query: ASTNode) => {
+const assetsFromQuery = (query: any) => {
   const assets: Assets = { operationType: 'mutation' }
   visit(query, {
-    Directive(node: DirectiveNode) {
+    Directive(node: any) {
       if (node.name.value === 'context') {
         const scopeArg =
           node.arguments &&
-          node.arguments.find((argNode) => argNode.name.value === 'scope')
+          node.arguments.find(
+            (argNode: { name: { value: string } }) =>
+              argNode.name.value === 'scope'
+          )
         if (scopeArg) {
-          assets.queryScope = (scopeArg.value as StringValueNode).value
+          assets.queryScope = (scopeArg.value as any).value
         }
       }
     },
-    OperationDefinition(node: OperationDefinitionNode) {
+    OperationDefinition(node: any) {
       assets.operationType = node.operation
     },
   })
@@ -51,7 +49,7 @@ export interface OperationContext {
   >
 }
 
-const extractHints = (query: ASTNode, meta: CacheHints) => {
+const extractHints = (query: any, meta: CacheHints) => {
   const { operationType, queryScope } = assetsFromQuery(query)
 
   let hints

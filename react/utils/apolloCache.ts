@@ -1,4 +1,4 @@
-import { parse } from 'graphql'
+import { parse } from 'graphql/language/parser'
 import { promised } from './promise'
 import { canUseDOM } from 'exenv'
 import { ApolloClientType } from '../typings/global'

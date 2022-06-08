@@ -11,58 +11,45 @@ import {
   transformOperation,
   validateOperation,
 } from 'apollo-link/lib/linkUtils'
-import {
-  BREAK,
-  DirectiveNode,
-  DocumentNode,
-  OperationDefinitionNode,
-  parse,
-  print,
-  SelectionNode,
-  VariableDefinitionNode,
-  VariableNode,
-  visit,
-} from 'graphql'
+import { BREAK, visit } from 'graphql/language/visitor'
+import { print } from 'graphql/language/printer'
+import { parse } from 'graphql/language/parser'
 
 interface Variables {
-  [name: string]: VariableDefinitionNode
+  [name: string]: any
 }
 
 interface Node {
-  selection: SelectionNode
+  selection: any
   usedVariables: Variables
 }
 
-const pickAvailableVariables = (query: DocumentNode) => {
+const pickAvailableVariables = (query: any) => {
   const availableVariables: Variables = {}
   visit(query, {
-    VariableDefinition(node: VariableDefinitionNode) {
+    VariableDefinition(node: any) {
       availableVariables[node.variable.name.value] = node
     },
   })
   return availableVariables
 }
 
-const isRuntimeMetaDirective = (node: DirectiveNode) =>
-  node.name.value === 'runtimeMeta'
+const isRuntimeMetaDirective = (node: any) => node.name.value === 'runtimeMeta'
 
-const pickUsedVariables = (
-  selection: SelectionNode,
-  availableVariables: Variables
-) => {
+const pickUsedVariables = (selection: any, availableVariables: Variables) => {
   const usedVariables: Variables = {}
   visit(selection, {
-    Variable(varNode: VariableNode) {
+    Variable(varNode: any) {
       usedVariables[varNode.name.value] = availableVariables[varNode.name.value]
     },
   })
   return usedVariables
 }
 
-const pickFields = (query: DocumentNode, availableVariables: Variables) => {
+const pickFields = (query: any, availableVariables: Variables) => {
   const nodes: Node[] = []
   visit(query, {
-    Field(selection: SelectionNode) {
+    Field(selection: any) {
       if (
         selection.directives &&
         selection.directives.find(isRuntimeMetaDirective)
@@ -79,9 +66,9 @@ const pickFields = (query: DocumentNode, availableVariables: Variables) => {
 
 const operationWhiteList = ['query', 'mutation', 'subscription']
 
-const queryFromNodeCreator = (query: DocumentNode) => (node: Node) =>
+const queryFromNodeCreator = (query: any) => (node: Node) =>
   visit(parse(print(query)), {
-    OperationDefinition(opNode: OperationDefinitionNode) {
+    OperationDefinition(opNode: any) {
       if (operationWhiteList.includes(opNode.operation)) {
         return {
           ...opNode,
@@ -95,12 +82,12 @@ const queryFromNodeCreator = (query: DocumentNode) => (node: Node) =>
 
       return null
     },
-  }) as DocumentNode
+  }) as any
 
-const isTypeQuery = (docNode: DocumentNode) => {
+const isTypeQuery = (docNode: any) => {
   const asset = { isQuery: false }
   visit(docNode, {
-    OperationDefinition(node: OperationDefinitionNode) {
+    OperationDefinition(node: any) {
       if (node.operation === 'query') {
         asset.isQuery = true
         return BREAK
@@ -110,11 +97,9 @@ const isTypeQuery = (docNode: DocumentNode) => {
   return asset.isQuery
 }
 
-const assertSingleOperation = (query: DocumentNode) => {
-  const ops = query.definitions.filter((definition) =>
-    operationWhiteList.includes(
-      (definition as OperationDefinitionNode).operation
-    )
+const assertSingleOperation = (query: any) => {
+  const ops = query.definitions.filter((definition: any) =>
+    operationWhiteList.includes((definition as any).operation)
   )
 
   if (ops.length > 1) {
@@ -124,7 +109,7 @@ const assertSingleOperation = (query: DocumentNode) => {
   }
 }
 
-const queriesByRuntimeMetaDirective = (query: DocumentNode) => {
+const queriesByRuntimeMetaDirective = (query: any) => {
   const availableVariables: Variables = pickAvailableVariables(query)
   const nodes: Node[] = pickFields(query, availableVariables)
 
@@ -147,9 +132,7 @@ const mergeRecursively = (accumulator: any, value: any) => {
   return accumulator
 }
 
-const createOperationForQuery = (operation: Operation) => (
-  query: DocumentNode
-) => {
+const createOperationForQuery = (operation: Operation) => (query: any) => {
   const graphQLRequest: GraphQLRequest = {
     ...operation,
     query,
