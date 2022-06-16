@@ -5,17 +5,23 @@ import { visit } from 'graphql/language/visitor'
 
 import { generateHash } from '../generateHash'
 import { appendLocationSearch } from '../../location'
-import { RenderRuntime, CacheHints } from '../../../typings/runtime'
+import type { RenderRuntime, CacheHints } from '../../../typings/runtime'
+import type {
+  ASTNode,
+  DirectiveNode,
+  OperationDefinitionNode,
+  StringValueNode,
+} from 'graphql/language/ast'
 
 interface Assets {
   operationType: string
   queryScope?: string
 }
 
-const assetsFromQuery = (query: any) => {
+const assetsFromQuery = (query: ASTNode) => {
   const assets: Assets = { operationType: 'mutation' }
   visit(query, {
-    Directive(node: any) {
+    Directive(node: DirectiveNode) {
       if (node.name.value === 'context') {
         const scopeArg =
           node.arguments &&
@@ -24,11 +30,11 @@ const assetsFromQuery = (query: any) => {
               argNode.name.value === 'scope'
           )
         if (scopeArg) {
-          assets.queryScope = (scopeArg.value as any).value
+          assets.queryScope = (scopeArg.value as StringValueNode).value
         }
       }
     },
-    OperationDefinition(node: any) {
+    OperationDefinition(node: OperationDefinitionNode) {
       assets.operationType = node.operation
     },
   })
@@ -49,7 +55,7 @@ export interface OperationContext {
   >
 }
 
-const extractHints = (query: any, meta: CacheHints) => {
+const extractHints = (query: ASTNode, meta: CacheHints) => {
   const { operationType, queryScope } = assetsFromQuery(query)
 
   let hints

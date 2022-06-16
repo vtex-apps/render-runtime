@@ -1,4 +1,6 @@
-export interface ExtendedGraphQLError {
+import { GraphQLError } from 'graphql/error/GraphQLError'
+
+export interface ExtendedGraphQLError extends GraphQLError {
   operationId: string
   extensions: {
     code: string
@@ -10,7 +12,7 @@ export interface ExtendedGraphQLError {
 }
 
 export function isExtendedGraphQLError(
-  error: any
+  error: GraphQLError
 ): error is ExtendedGraphQLError {
   return 'operationId' in error
 }
@@ -24,7 +26,7 @@ const ignoredErrorTypes = [
 class GraphQLErrorsStore {
   private operationIds: string[] = []
 
-  public addOperationIds(errors: readonly any[]) {
+  public addOperationIds(errors: readonly GraphQLError[]) {
     const operationIds = errors.reduce<string[]>((acc, error) => {
       if (
         isExtendedGraphQLError(error) &&

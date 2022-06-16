@@ -14,42 +14,54 @@ import {
 import { BREAK, visit } from 'graphql/language/visitor'
 import { print } from 'graphql/language/printer'
 import { parse } from 'graphql/language/parser'
+import type {
+  DirectiveNode,
+  DocumentNode,
+  OperationDefinitionNode,
+  SelectionNode,
+  VariableDefinitionNode,
+  VariableNode,
+} from 'graphql/language/ast'
 
 interface Variables {
-  [name: string]: any
+  [name: string]: VariableDefinitionNode
 }
 
 interface Node {
-  selection: any
+  selection: SelectionNode
   usedVariables: Variables
 }
 
-const pickAvailableVariables = (query: any) => {
+const pickAvailableVariables = (query: DocumentNode) => {
   const availableVariables: Variables = {}
   visit(query, {
-    VariableDefinition(node: any) {
+    VariableDefinition(node: VariableDefinitionNode) {
       availableVariables[node.variable.name.value] = node
     },
   })
   return availableVariables
 }
 
-const isRuntimeMetaDirective = (node: any) => node.name.value === 'runtimeMeta'
+const isRuntimeMetaDirective = (node: DirectiveNode) =>
+  node.name.value === 'runtimeMeta'
 
-const pickUsedVariables = (selection: any, availableVariables: Variables) => {
+const pickUsedVariables = (
+  selection: SelectionNode,
+  availableVariables: Variables
+) => {
   const usedVariables: Variables = {}
   visit(selection, {
-    Variable(varNode: any) {
+    Variable(varNode: VariableNode) {
       usedVariables[varNode.name.value] = availableVariables[varNode.name.value]
     },
   })
   return usedVariables
 }
 
-const pickFields = (query: any, availableVariables: Variables) => {
+const pickFields = (query: DocumentNode, availableVariables: Variables) => {
   const nodes: Node[] = []
   visit(query, {
-    Field(selection: any) {
+    Field(selection: SelectionNode) {
       if (
         selection.directives &&
         selection.directives.find(isRuntimeMetaDirective)
@@ -66,9 +78,9 @@ const pickFields = (query: any, availableVariables: Variables) => {
 
 const operationWhiteList = ['query', 'mutation', 'subscription']
 
-const queryFromNodeCreator = (query: any) => (node: Node) =>
+const queryFromNodeCreator = (query: DocumentNode) => (node: Node) =>
   visit(parse(print(query)), {
-    OperationDefinition(opNode: any) {
+    OperationDefinition(opNode: OperationDefinitionNode) {
       if (operationWhiteList.includes(opNode.operation)) {
         return {
           ...opNode,
@@ -82,12 +94,12 @@ const queryFromNodeCreator = (query: any) => (node: Node) =>
 
       return null
     },
-  }) as any
+  }) as DocumentNode
 
-const isTypeQuery = (docNode: any) => {
+const isTypeQuery = (docNode: DocumentNode) => {
   const asset = { isQuery: false }
   visit(docNode, {
-    OperationDefinition(node: any) {
+    OperationDefinition(node: OperationDefinitionNode) {
       if (node.operation === 'query') {
         asset.isQuery = true
         return BREAK
@@ -97,9 +109,11 @@ const isTypeQuery = (docNode: any) => {
   return asset.isQuery
 }
 
-const assertSingleOperation = (query: any) => {
-  const ops = query.definitions.filter((definition: any) =>
-    operationWhiteList.includes((definition as any).operation)
+const assertSingleOperation = (query: DocumentNode) => {
+  const ops = query.definitions.filter((definition) =>
+    operationWhiteList.includes(
+      (definition as OperationDefinitionNode).operation
+    )
   )
 
   if (ops.length > 1) {
@@ -109,7 +123,7 @@ const assertSingleOperation = (query: any) => {
   }
 }
 
-const queriesByRuntimeMetaDirective = (query: any) => {
+const queriesByRuntimeMetaDirective = (query: DocumentNode) => {
   const availableVariables: Variables = pickAvailableVariables(query)
   const nodes: Node[] = pickFields(query, availableVariables)
 
@@ -132,7 +146,9 @@ const mergeRecursively = (accumulator: any, value: any) => {
   return accumulator
 }
 
-const createOperationForQuery = (operation: Operation) => (query: any) => {
+const createOperationForQuery = (operation: Operation) => (
+  query: DocumentNode
+) => {
   const graphQLRequest: GraphQLRequest = {
     ...operation,
     query,
