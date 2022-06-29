@@ -51,7 +51,7 @@ const MaybeLazyImage: FC<MaybeLazyImageProps> = ({
 }) => {
   const { lazyLoad, method } = useLazyImagesContext()
 
-  if (lazyLoad) {
+  if (lazyLoad && imageProps.loading !== 'eager') {
     let newImageProps = imageProps
 
     switch (method) {
