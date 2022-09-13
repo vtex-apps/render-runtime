@@ -11,6 +11,7 @@ import {
   RenderScrollOptions,
 } from '../typings/global'
 import { Pages } from '../typings/runtime'
+import { decodeReservedChars, encodeReservedChars } from './alternativeEncoding'
 
 const EMPTY_OBJECT = (Object.freeze && Object.freeze({})) || {}
 
@@ -294,7 +295,7 @@ export function getNavigationRouteToNavigate(
     : ''
   ).split('#')
   const realHash = is(String, hash) ? `#${hash}` : ''
-  let query = inputQuery || realQuery
+  let query = encodeReservedChars(inputQuery || realQuery)
 
   const decodedParams = formatPathParameters(params)
 
@@ -371,7 +372,7 @@ export function navigate(
     const location = createLocationDescriptor(navigationRoute, {
       fetchPage,
       preventRemount,
-      query: nextQuery,
+      query: decodeReservedChars(nextQuery),
       scrollOptions,
       hash: navigationRoute.realHash,
       skipSetPath,
