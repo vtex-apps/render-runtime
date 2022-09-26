@@ -107,12 +107,12 @@ const parseDefaultPagesQueryResponse = (
 
 function prependIOProxy(path: string) {
   if (!path) {
-    return '/api/io'
+    return '/auth--temadmin/api/io'
   }
 
   const joiner = path.startsWith('/') ? '' : '/'
 
-  return `/api/io${joiner}${path}`
+  return `/auth--teamadmin/api/io${joiner}${path}`
 }
 
 const runtimeFields = [

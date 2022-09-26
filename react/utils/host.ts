@@ -26,10 +26,10 @@ export function getBaseURI(runtime: RenderRuntime) {
   } = window
 
   if (isJanusProxied) {
-    return `${hostname}/api/io`
+    return `${hostname}/auth--teamadmin/api/io`
   }
 
   return hostname.endsWith(`.${publicEndpoint}`) || isRenderServedPage()
     ? hostname + rootPath
-    : `${hostname}/api/io`
+    : `${hostname}/auth--teamadmin/api/io`
 }

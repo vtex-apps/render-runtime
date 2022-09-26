@@ -144,7 +144,7 @@ export const createUriSwitchLink = (
         },
         scope: customScope,
         fetchOptions: { ...fetchOptions, method },
-        uri: `${protocol}//${baseURI}/_v/${customScope}/graphql/v${version}${query}`,
+        uri: `${protocol}//${baseURI}/auth--teamadmin/_v/${customScope}/graphql/v${version}${query}`,
       }
     })
     return forward ? forward(operation) : null
