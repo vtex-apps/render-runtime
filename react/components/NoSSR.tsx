@@ -20,6 +20,7 @@ const useSSR = () => {
 
 interface Props {
   onSSR?: React.ReactNode
+  children?: React.ReactNode
 }
 
 const NoSSR: FunctionComponent<Props> = ({ children, onSSR }) => {
