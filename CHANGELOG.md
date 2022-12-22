@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Added new tachyons className for wrapped component.
+
 ## [8.132.6] - 2022-06-06
 
 ## Reverted
