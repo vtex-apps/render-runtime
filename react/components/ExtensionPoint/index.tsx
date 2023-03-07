@@ -161,7 +161,7 @@ function withOuterExtensions(
     <Fragment key={`wrapped-${treePath}`}>
       <LazyImages>{beforeElements}</LazyImages>
       {element}
-      {isRootTreePath && <div className="flex flex-grow-1 below-element" />}
+      {isRootTreePath && <div className="flex flex-grow-1 bg-below-element" />}
       <LazyImages>{afterElements}</LazyImages>
     </Fragment>
   )
