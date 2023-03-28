@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## Fixed
+- CLS on layout container
+
 ## [8.133.0] - 2022-12-22
 
 - Added new tachyons className for wrapped component.
