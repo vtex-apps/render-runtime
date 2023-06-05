@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Removed
 - `withPerformanceMeasures` function due to splunk usage.
+- Splunk link in error page.
 
 ## [8.133.1] - 2023-03-30
 
