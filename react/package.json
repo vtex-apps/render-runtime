@@ -33,7 +33,6 @@
     "react-helmet": "^5.2.0",
     "react-json-view": "^1.19.1",
     "route-parser": "^0.0.5",
-    "splunk-events": "^1.6.1-beta",
     "use-media": "^1.4.0"
   },
   "devDependencies": {

@@ -11,9 +11,6 @@ import ErrorImg from './images/error-img.png'
 import style from './error.css'
 import { renderReadyPromise } from '.'
 
-const toSplunkLink = (rid: string) =>
-  `https://splunk72.vtex.com/en-US/app/vtex_io_apps/search?q=search%20index%3Dvtex_io_logs%20app%3Dvtex.render-server%40*%20data.requestId%3D${rid}&display.page.search.mode=verbose&dispatch.sample_ratio=1&earliest=-5m%40m&latest=now`
-
 class ErrorPage extends Component {
   public state = { enabled: false }
   private splunk = 0
@@ -71,11 +68,8 @@ class ErrorPage extends Component {
           </div>
         </div>
         <div>
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
           <img
             src={ErrorImg}
-            onKeyDown={(e) => e.key === 'Enter' && this.handleImageClick()}
-            onClick={this.handleImageClick}
             className={`${style.imgHeight} pb6 pb0-ns`}
             alt=""
           />
@@ -106,15 +100,6 @@ class ErrorPage extends Component {
         </div>
       </div>
     )
-  }
-
-  private handleImageClick = () => {
-    if (this.splunk < 2) {
-      this.splunk = this.splunk + 1
-    } else {
-      window.open(toSplunkLink(window.__REQUEST_ID__), '_blank')
-      this.splunk = 0
-    }
   }
 }
 
