@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Return to previous scroll position during back button navigation
+
 ## [8.134.0] - 2023-08-10
 
 ## [8.133.2] - 2023-06-07

@@ -680,6 +680,7 @@ export class RenderProvider extends Component<
   public onPageChanged = (location: RenderHistoryLocation) => {
     const {
       runtime: { renderMajor, query: queryFromRuntime, isJanusProxied },
+      history,
     } = this.props
 
     const {
@@ -839,10 +840,13 @@ export class RenderProvider extends Component<
                 settings,
               }),
               () => {
+                const scrollOptions =
+                  history?.action === 'POP' ? false : state.scrollOptions
+
                 this.navigationState = { isNavigating: false }
                 this.replaceRouteClass(matchingPage.routeId)
                 this.sendInfoFromIframe()
-                this.scrollTo(state.scrollOptions)
+                this.scrollTo(scrollOptions)
               }
             )
           }
