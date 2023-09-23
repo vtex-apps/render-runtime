@@ -35,6 +35,7 @@ const LazyRender: FunctionComponent<Props> = ({
         width: '100%',
         height,
       }}
+      className="vtex-render__lazy-container"
     >
       <div
         ref={ref}
