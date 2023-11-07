@@ -35,7 +35,7 @@ const Container: FunctionComponent<ContainerProps> = ({
   route,
   ...props
 }) => {
-  const className = `flex flex-grow-1 w-100 ${
+  const className = `flex flex-grow-1 w-100 vh-100 ${
     isRow ? 'flex-row' : 'flex-column'
   }`
 
