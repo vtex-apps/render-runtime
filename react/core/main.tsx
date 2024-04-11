@@ -347,6 +347,7 @@ function start() {
           {
             createElement: ReactCreateElement,
             imageProps: props,
+            lazyType: props.loading,
           },
         ])
       }
