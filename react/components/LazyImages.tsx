@@ -43,17 +43,17 @@ const useLazyImagesContext = () => {
 interface MaybeLazyImageProps {
   createElement: typeof React.createElement
   imageProps: Record<string, any>
-  lazyType: string
+  loadingType: string
 }
 
 const MaybeLazyImage: FC<MaybeLazyImageProps> = ({
   createElement = React.createElement,
   imageProps,
-  lazyType,
+  loadingType,
 }) => {
   const { lazyLoad, method } = useLazyImagesContext()
 
-  if (lazyLoad && lazyType !== 'eager') {
+  if (lazyLoad && loadingType !== 'eager') {
     let newImageProps = imageProps
 
     switch (method) {
