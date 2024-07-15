@@ -10,9 +10,13 @@ import { patchLibs } from './start/patchLibs'
 import { registerRuntimeGlobals } from './start/register'
 import { loadRuntimeJSONs } from './start/runtime'
 import { hydrateUncriticalStyles } from './start/styles'
+import { startTracing } from './tracing'
 
 function performanceMark(...args: Parameters<typeof window.performance.mark>) {
-  if (typeof window === 'undefined' || !(typeof window?.performance?.mark === 'function')) {
+  if (
+    typeof window === 'undefined' ||
+    !(typeof window?.performance?.mark === 'function')
+  ) {
     return
   }
   window.performance.mark(...args)
@@ -46,7 +50,6 @@ export const renderReadyPromise: Promise<any> = canUseDOM
       contentLoadedPromise.then(() => {
         performanceMark('content-loaded-promise-resolved')
       })
-
 
       const scriptsLoadedPromise = new Promise((resolve) => {
         if (typeof window.__ASYNC_SCRIPTS_READY__ === 'undefined') {
@@ -108,6 +111,7 @@ if (module.hot) {
 if (!canUseDOM) {
   start()
 } else {
+  startTracing()
   loadRuntimeJSONs().then(() => start())
 }
 

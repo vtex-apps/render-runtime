@@ -13,7 +13,6 @@ import { renderReadyPromise } from '.'
 
 class ErrorPage extends Component {
   public state = { enabled: false }
-  private splunk = 0
 
   public componentDidMount() {
     window.setTimeout(() => {
