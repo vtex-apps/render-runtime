@@ -151,11 +151,6 @@ const createRootElement = (
     !!pages[name] && !!pages[name].path && !!extensions[name]?.component
   const history = canUseDOM && isPage && !customRouting ? createHistory() : null
 
-  // This code only executes on the Admin
-  if (runtime?.route?.domain === 'admin') {
-    // TODO: Add breakpoint
-  }
-
   return (
     <RenderProvider
       apollo={apollo}
