@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Instrument Admin environment (all Render Admin Apps included) with Sentry.
+
 ## [8.134.2] - 2023-09-26
 
 ### Added
@@ -1238,7 +1242,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Add experimental features `useChildBlock__unstable` and `Unstable__ChildBlock`. It allows checking whether a child block was included or not.
+- Add experimental features `useChildBlock__unstable` and `Unstable__ChildBlock`. It allows checking whether a child block was included or not.Add Sentry
 
 ## [8.15.0] - 2019-03-21
 ### Added
