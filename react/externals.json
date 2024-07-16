@@ -86,10 +86,6 @@
       {
         "path": "runtime:intl-polyfill",
         "serverOnly": true
-      },
-      {
-        "clientOnly": true,
-        "path": "npm:@sentry/react@7.116.0"
       }
     ],
     "prod": [

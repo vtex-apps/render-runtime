@@ -1,6 +1,7 @@
 /* global module */
 import React, { Component, Fragment } from 'react'
 import ReactJson from 'react-json-view'
+import { captureException } from '@sentry/react'
 
 require('myvtex-sse')
 
@@ -10,15 +11,27 @@ import ErrorImg from './images/error-img.png'
 
 import style from './error.css'
 import { renderReadyPromise } from '.'
+import { isAdmin } from './utils/isAdmin'
 
 class ErrorPage extends Component {
   public state = { enabled: false }
-  private splunk = 0
 
   public componentDidMount() {
     window.setTimeout(() => {
       this.setState({ enabled: true })
     }, 5000)
+
+    if (isAdmin()) {
+      if (window.__ERROR__) {
+        captureException(window.__ERROR__)
+      } else if (window.__REQUEST_ID__) {
+        captureException(window.__REQUEST_ID__)
+      } else {
+        captureException(
+          'Render Runtime renderered an error page and there is no error or request id available'
+        )
+      }
+    }
   }
 
   public render() {
