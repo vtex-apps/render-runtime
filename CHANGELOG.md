@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Added a ID to DIV elements to map in the css elements not rendered by FOLD functionality, so it's possible to create CSS to prevent potential CLS
+
 ## [8.134.2] - 2023-09-26
 
 ### Added

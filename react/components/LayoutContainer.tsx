@@ -7,6 +7,7 @@ import { LazyImages } from './LazyImages'
 import FoldableContainer from './FoldableContainer'
 import { isSiteEditorIframe } from '../utils/dom'
 import { Route } from '../typings/runtime'
+import { Buffer } from 'buffer'
 
 type Element = string | ElementArray
 type ElementArray = Element[]
@@ -43,8 +44,9 @@ const Container: FunctionComponent<ContainerProps> = ({
     if (elements === '__children__') {
       return <>{children}</>
     }
+    const id = Buffer.from(elements, 'binary').toString('base64')
     return (
-      <div className={isRow ? '' : className}>
+      <div id={id} className={isRow ? '' : className}>
         <ExtensionPoint id={elements} {...props} />
       </div>
     )
