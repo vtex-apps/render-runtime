@@ -10,14 +10,18 @@ export function isAdmin() {
 
     const domain = host.match(/(?<=\.)([^.]+\.[^.]+$)/)?.[0]
 
-    if (
-      domain === 'myvtex.com' &&
-      (window.location.pathname.startsWith('/admin') ||
-        // Let's consider the Admin Login page as an Admin App even though it's technically not
-        window.location.pathname.startsWith('/_v/segment/admin-login/v1/login'))
-    ) {
-      return true
+    if (domain !== 'myvtex.com') {
+      return false
     }
+
+    const adminPathnames = [
+      '/admin',
+      '/_v/segment/admin-login/v1/login', // Let's consider the Admin Login page as an Admin App even though it's technically not.
+    ]
+
+    const { pathname } = window.location
+
+    return adminPathnames.some((path) => pathname.startsWith(path))
   }
 
   return false
