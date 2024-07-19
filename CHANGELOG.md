@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Manully bump Render Runtime to an unreleased beta version.
+
 ## [8.134.3-beta] - 2024-07-19
 
 ### Added
