@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.134.4-beta] - 2024-07-19
+
 ### Changed
 
 - Manully bump Render Runtime to an unreleased beta version.
@@ -1638,5 +1640,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix sorting direct children with numeric values.
 
 
-[Unreleased]: https://github.com/vtex-apps/render-runtime/compare/v8.134.3-beta...HEAD
+[Unreleased]: https://github.com/vtex-apps/render-runtime/compare/v8.134.4-beta...HEAD
+[8.134.4-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.3-beta...v8.134.4-beta
 [8.134.3-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.2...v8.134.3-beta
