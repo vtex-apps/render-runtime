@@ -21,16 +21,21 @@ class ErrorPage extends Component {
       this.setState({ enabled: true })
     }, 5000)
 
-    if (isAdmin()) {
-      if (window.__ERROR__) {
-        captureException(window.__ERROR__)
-      } else if (window.__REQUEST_ID__) {
-        captureException(window.__REQUEST_ID__)
-      } else {
-        captureException(
-          'Render Runtime renderered an error page and there is no error or request id available'
-        )
-      }
+    if (!isAdmin()) {
+      return
+    }
+
+    const error = window?.__ERROR__
+    const requestId = window?.__REQUEST_ID__
+    const defaultError =
+      'Render Runtime renderered an error page and there is no error or request id available'
+
+    if (error) {
+      captureException(error)
+    } else if (requestId) {
+      captureException(requestId)
+    } else {
+      captureException(defaultError)
     }
   }
 
