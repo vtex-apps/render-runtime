@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.134.4-beta] - 2024-07-19
+
+### Changed
+
+- Manully bump Render Runtime to an unreleased beta version.
+
+## [8.134.3-beta] - 2024-07-19
+
+### Added
+
+- Instrument Admin environment (all Render Admin Apps included) with Sentry.
+
 ## [8.134.2] - 2023-09-26
 
 ### Added
@@ -1626,3 +1638,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [7.11.2] - 2018-6-21
 ### Fixed
 - Fix sorting direct children with numeric values.
+
+
+[Unreleased]: https://github.com/vtex-apps/render-runtime/compare/v8.134.4-beta...HEAD
+[8.134.4-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.3-beta...v8.134.4-beta
+[8.134.3-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.2...v8.134.3-beta
