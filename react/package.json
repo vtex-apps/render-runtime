@@ -80,7 +80,9 @@
     "react-no-ssr": "^1.1.0",
     "regenerator-runtime": "^0.13.1",
     "ts-jest": "^24.0.1",
-    "typescript": "3.9.7"
+    "typescript": "3.9.7",
+    "vtex.pages-graphql": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.pages-graphql@2.115.3/public/@types/vtex.pages-graphql",
+    "vtex.render-runtime": "https://iespinoza--koestore.myvtex.com/_v/private/typings/linked/v1/vtex.render-runtime@8.133.1+build1680286767/public/@types/vtex.render-runtime"
   },
   "husky": {
     "hooks": {
