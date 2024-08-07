@@ -11,9 +11,9 @@ export function isAdmin() {
 
   const { host } = window.location
 
-  const domain = host.match(/(?<=\.)([^.]+\.[^.]+$)/)?.[0]
+  const isMyvtexDomain = host.includes('myvtex.com')
 
-  if (domain !== 'myvtex.com') {
+  if (!isMyvtexDomain) {
     return false
   }
 
