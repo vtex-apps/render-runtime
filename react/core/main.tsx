@@ -75,6 +75,7 @@ import {
 import { RenderRuntime, Extensions } from '../typings/runtime'
 // We need to keep this import so the types of this modules are kept in the final bundle by the Builder Hub.
 import '../typings/runtime'
+import Sentry from '../components/Sentry'
 
 let emitter: EventEmitter | null = null
 const cssClasses = new Set<string>()
@@ -386,9 +387,6 @@ function start() {
         .catch((error) => {
           console.error('Error during hydration', error)
         })
-      console.log(
-        'Welcome to Render! Want to look under the hood? https://careers.vtex.com'
-      )
     }
   } catch (error) {
     console.error('Unexpected error rendering:', error)
@@ -411,6 +409,7 @@ export {
   LayoutContainer,
   LegacyExtensionContainer,
   Helmet,
+  Sentry,
   Link,
   NoSSR,
   useSSR,
