@@ -1,7 +1,7 @@
 /* global module */
 import React, { Component, Fragment } from 'react'
 import ReactJson from 'react-json-view'
-import { captureException } from '@sentry/react'
+import { captureException, getCurrentScope } from '@sentry/react'
 
 require('myvtex-sse')
 
@@ -17,25 +17,51 @@ class ErrorPage extends Component {
   public state = { enabled: false }
 
   public componentDidMount() {
-    window.setTimeout(() => {
-      this.setState({ enabled: true })
-    }, 5000)
+    try {
+      const error = window?.__ERROR__
+      const requestId = window?.__REQUEST_ID__
+      const defaultError =
+        'Render Runtime renderered an error page and there is no error or request id available'
 
-    if (!isAdmin()) {
-      return
-    }
+      const runtime = window?.global?.__RUNTIME__ ?? {}
 
-    const error = window?.__ERROR__
-    const requestId = window?.__REQUEST_ID__
-    const defaultError =
-      'Render Runtime renderered an error page and there is no error or request id available'
+      const {
+        account = 'N/A',
+        workspace = 'N/A',
+        culture: { locale } = { locale: 'N/A' },
+        route: { path } = { path: 'N/A' },
+        loadedDevices = ['N/A'],
+        production = 'N/A',
+      } = runtime
 
-    if (error) {
-      captureException(error)
-    } else if (requestId) {
-      captureException(requestId)
-    } else {
-      captureException(defaultError)
+      const errorInfo = {
+        account,
+        workspace,
+        locale,
+        path,
+        device: loadedDevices[0],
+        production,
+      }
+
+      getCurrentScope().setExtras(errorInfo)
+
+      window.setTimeout(() => {
+        this.setState({ enabled: true })
+      }, 5000)
+
+      if (!isAdmin() || production === false) {
+        return
+      }
+
+      if (error) {
+        captureException(error)
+      } else if (requestId) {
+        captureException(requestId)
+      } else {
+        captureException(defaultError)
+      }
+    } catch (e) {
+      captureException(e)
     }
   }
 
