@@ -17,6 +17,10 @@ class ErrorPage extends Component {
   public state = { enabled: false }
 
   public componentDidMount() {
+    window.setTimeout(() => {
+      this.setState({ enabled: true })
+    }, 5000)
+
     try {
       const error = window?.__ERROR__
       const requestId = window?.__REQUEST_ID__
@@ -24,34 +28,13 @@ class ErrorPage extends Component {
         'Render Runtime renderered an error page and there is no error or request id available'
 
       const runtime = window?.global?.__RUNTIME__ ?? {}
+      const errorInfo = this.extractErrorInfo(runtime)
 
-      const {
-        account = 'N/A',
-        workspace = 'N/A',
-        culture: { locale } = { locale: 'N/A' },
-        route: { path } = { path: 'N/A' },
-        loadedDevices = ['N/A'],
-        production = 'N/A',
-      } = runtime
-
-      const errorInfo = {
-        account,
-        workspace,
-        locale,
-        path,
-        device: loadedDevices[0],
-        production,
-      }
-
-      getCurrentScope().setExtras(errorInfo)
-
-      window.setTimeout(() => {
-        this.setState({ enabled: true })
-      }, 5000)
-
-      if (!isAdmin() || production === false) {
+      if (!isAdmin() || errorInfo.admin_production === false) {
         return
       }
+
+      getCurrentScope().setTags(errorInfo)
 
       if (error) {
         captureException(error)
@@ -63,6 +46,28 @@ class ErrorPage extends Component {
     } catch (e) {
       captureException(e)
     }
+  }
+
+  private extractErrorInfo(runtime: any): any {
+    const {
+      account = null,
+      workspace = null,
+      culture: { locale } = { locale: null },
+      route: { path } = { path: null },
+      loadedDevices = [null],
+      production = null,
+    } = runtime
+
+    const errorInfo = {
+      admin_account: account,
+      admin_workspace: workspace,
+      admin_locale: locale,
+      admin_path: path,
+      admin_device: loadedDevices[0],
+      admin_production: production,
+    }
+
+    return errorInfo
   }
 
   public render() {
