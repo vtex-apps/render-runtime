@@ -21,6 +21,8 @@ class ErrorPage extends Component {
       this.setState({ enabled: true })
     }, 5000)
 
+    if (!isAdmin()) return
+
     try {
       const error = window?.__ERROR__
       const requestId = window?.__REQUEST_ID__
@@ -30,9 +32,7 @@ class ErrorPage extends Component {
       const runtime = window?.global?.__RUNTIME__ ?? {}
       const errorInfo = this.extractErrorInfo(runtime)
 
-      if (!isAdmin() || errorInfo.admin_production === false) {
-        return
-      }
+      if (errorInfo.admin_production === false) return
 
       getCurrentScope().setTags(errorInfo)
 
@@ -58,7 +58,7 @@ class ErrorPage extends Component {
       production = null,
     } = runtime
 
-    const errorInfo = {
+    return {
       admin_account: account,
       admin_workspace: workspace,
       admin_locale: locale,
@@ -66,8 +66,6 @@ class ErrorPage extends Component {
       admin_device: loadedDevices[0],
       admin_production: production,
     }
-
-    return errorInfo
   }
 
   public render() {

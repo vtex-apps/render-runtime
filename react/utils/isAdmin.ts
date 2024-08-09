@@ -9,7 +9,7 @@ export function isAdmin() {
     return false
   }
 
-  const { host } = window.location
+  const { host = '' } = window.location
 
   const isMyvtexDomain = host.includes('myvtex.com')
 
@@ -22,7 +22,7 @@ export function isAdmin() {
     '/_v/segment/admin-login/v1/login', // Let's consider the Admin Login page as an Admin App even though it's technically not.
   ]
 
-  const { pathname } = window.location
+  const { pathname = '' } = window.location
 
   return adminPathnames.some((path) => pathname.startsWith(path))
 }
