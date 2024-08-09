@@ -11,6 +11,7 @@ import { patchLibs } from './start/patchLibs'
 import { registerRuntimeGlobals } from './start/register'
 import { loadRuntimeJSONs } from './start/runtime'
 import { hydrateUncriticalStyles } from './start/styles'
+import { startTracing } from './tracing'
 
 function performanceMark(...args: Parameters<typeof window.performance.mark>) {
   if (
@@ -111,6 +112,7 @@ if (module.hot) {
 if (!canUseDOM) {
   start()
 } else {
+  startTracing()
   loadRuntimeJSONs().then(() => start())
 }
 
