@@ -1,5 +1,6 @@
 /* global module */
 import './o11y/instrument'
+import './o11y/tracing'
 import 'core-js/es6/symbol'
 import 'core-js/fn/symbol/iterator'
 import { canUseDOM } from 'exenv'
