@@ -11,7 +11,7 @@ export function startTracing() {
   const sdk = new BetterOpenTelemetryWebSDK({
     // To send direct to Honeycomb, set API Key and comment out endpoint
     // apiKey: 'api-key',
-    endpoint: 'https://http-collector-beta.vtex.systems',
+    endpoint: 'https://traces-http-frontend.telemetry.vtex.com',
     serviceName: `${vendor}.${name}@${version}`,
     debug: true,
     skipOptionsValidation: true,
