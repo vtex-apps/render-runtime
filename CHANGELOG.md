@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.134.5-beta] - 2024-08-12
+
 ## [8.134.4] - 2024-07-25
 
 ## [8.134.4-beta] - 2024-07-19
@@ -1642,6 +1644,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix sorting direct children with numeric values.
 
 
-[Unreleased]: https://github.com/vtex-apps/render-runtime/compare/v8.134.4-beta...HEAD
+[Unreleased]: https://github.com/vtex-apps/render-runtime/compare/v8.134.5-beta...HEAD
 [8.134.4-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.3-beta...v8.134.4-beta
 [8.134.3-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.2...v8.134.3-beta
+[8.134.5-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.4...v8.134.5-beta
