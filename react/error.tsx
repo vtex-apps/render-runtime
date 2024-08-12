@@ -1,7 +1,7 @@
 /* global module */
 import React, { Component, Fragment } from 'react'
 import ReactJson from 'react-json-view'
-import { captureException } from '@sentry/react'
+import { captureException, getCurrentScope } from '@sentry/react'
 
 require('myvtex-sse')
 
@@ -21,21 +21,50 @@ class ErrorPage extends Component {
       this.setState({ enabled: true })
     }, 5000)
 
-    if (!isAdmin()) {
-      return
+    if (!isAdmin()) return
+
+    try {
+      const error = window?.__ERROR__
+      const requestId = window?.__REQUEST_ID__
+      const defaultError =
+        'Render Runtime renderered an error page and there is no error or request id available'
+
+      const runtime = window?.global?.__RUNTIME__ ?? {}
+      const errorInfo = this.extractErrorInfo(runtime)
+
+      if (errorInfo.admin_production === false) return
+
+      getCurrentScope().setTags(errorInfo)
+
+      if (error) {
+        captureException(error)
+      } else if (requestId) {
+        captureException(requestId)
+      } else {
+        captureException(defaultError)
+      }
+    } catch (e) {
+      captureException(e)
     }
+  }
 
-    const error = window?.__ERROR__
-    const requestId = window?.__REQUEST_ID__
-    const defaultError =
-      'Render Runtime renderered an error page and there is no error or request id available'
+  private extractErrorInfo(runtime: any): any {
+    const {
+      account = null,
+      workspace = null,
+      culture: { locale } = { locale: null },
+      route: { path } = { path: null },
+      loadedDevices = [null],
+      production = null,
+    } = runtime
 
-    if (error) {
-      captureException(error)
-    } else if (requestId) {
-      captureException(requestId)
-    } else {
-      captureException(defaultError)
+    return {
+      admin_account: account,
+      admin_workspace: workspace,
+      admin_locale: locale,
+      admin_path: path,
+      admin_device: loadedDevices[0],
+      admin_production: production,
     }
   }
 
