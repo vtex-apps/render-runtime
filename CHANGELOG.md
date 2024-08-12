@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Admin information to the sentry capture exception events.
+
+### Fixed 
+
+- `isAdmin` invalid regular expression for Safari version 15.6 or less.
+
 ## [8.134.5-beta] - 2024-08-12
 
 ## [8.134.4] - 2024-07-25
