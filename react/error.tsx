@@ -40,6 +40,7 @@ class ErrorPage extends Component {
 
       const errorInfo = this.extractErrorInfo()
 
+      // Change this condition to true while testing
       if (errorInfo.admin_production === false) return
 
       getCurrentScope().setTags(errorInfo)
@@ -126,10 +127,14 @@ class ErrorPage extends Component {
 
     const { pathname } = window.location
 
+    const locale =
+      navigator?.language ?? Intl.DateTimeFormat().resolvedOptions().locale
+
     return {
       account,
       workspace,
       route: { path: pathname },
+      culture: { locale },
     }
   }
 
