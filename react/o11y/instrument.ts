@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/react'
 import { isAdmin } from '../utils/isAdmin'
+import { getExtraArgs } from './extraArgs'
 
 if (isAdmin()) {
   Sentry.init({
@@ -21,5 +22,11 @@ if (isAdmin()) {
     // plus for 50% of sessions with an error
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: 0.5,
+
+    beforeSend: (event, hint) => {
+      const extraArgs = getExtraArgs()
+
+      return { ...event, ...extraArgs, ...hint }
+    },
   })
 }

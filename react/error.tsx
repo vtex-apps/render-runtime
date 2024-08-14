@@ -12,15 +12,7 @@ import ErrorImg from './images/error-img.png'
 import style from './error.css'
 import { renderReadyPromise } from '.'
 import { isAdmin } from './utils/isAdmin'
-
-interface RuntimeInfo {
-  account: string | null
-  workspace: string | null
-  route: { path: string | null }
-  culture: { locale: string | null }
-  production: boolean | null
-  loadedDevices: Array<string | null>
-}
+import { getExtraArgs } from './o11y/extraArgs'
 
 class ErrorPage extends Component {
   public state = { enabled: false }
@@ -38,7 +30,7 @@ class ErrorPage extends Component {
       const defaultError =
         'Render Runtime renderered an error page and there is no error or request id available'
 
-      const errorInfo = this.extractErrorInfo()
+      const errorInfo = getExtraArgs()
 
       // Change this condition to true while testing
       if (errorInfo.admin_production === false) return
@@ -54,87 +46,6 @@ class ErrorPage extends Component {
       }
     } catch (e) {
       captureException(e)
-    }
-  }
-
-  private extractErrorInfo() {
-    const {
-      account = null,
-      workspace = null,
-      culture: { locale } = { locale: null },
-      route: { path } = { path: null },
-      loadedDevices = null,
-      production = null,
-      runtimeAvailable,
-    } = this.getRuntimeInfo()
-
-    return {
-      admin_account: account,
-      admin_workspace: workspace,
-      admin_locale: locale,
-      admin_path: path,
-      admin_device: Array.isArray(loadedDevices)
-        ? loadedDevices[0]
-        : loadedDevices,
-      admin_production: production,
-      admin_runtime_available: runtimeAvailable,
-    }
-  }
-
-  /**
-   * Gets the Runtime information from the global __RUNTIME__ object
-   * injected by Render Server, if available, otherwise infer the runtime
-   * information from the window.location.
-   */
-  private getRuntimeInfo = (): RuntimeInfo & { runtimeAvailable: boolean } => {
-    const runtime = window?.global?.__RUNTIME__ ?? this.inferRuntimeInfo()
-
-    const {
-      account = null,
-      workspace = null,
-      culture: { locale } = { locale: null },
-      route: { path } = { path: null },
-      loadedDevices = [null],
-      production = null,
-    } = runtime
-
-    return {
-      account,
-      workspace,
-      culture: { locale },
-      route: { path },
-      loadedDevices,
-      production,
-      runtimeAvailable: !!window?.global?.__RUNTIME__,
-    }
-  }
-
-  /**
-   * Infer the runtime information from the window.location object.
-   */
-  private inferRuntimeInfo(): Partial<RuntimeInfo> {
-    const { host = '' } = window.location
-    let account = ''
-    let workspace = ''
-
-    if (!host.includes('--')) {
-      account = host.split('.')[0]
-      workspace = 'master'
-    } else {
-      workspace = host.split('--')[0]
-      account = host.split('--')[1].split('.')[0]
-    }
-
-    const { pathname } = window.location
-
-    const locale =
-      navigator?.language ?? Intl.DateTimeFormat().resolvedOptions().locale
-
-    return {
-      account,
-      workspace,
-      route: { path: pathname },
-      culture: { locale },
     }
   }
 
