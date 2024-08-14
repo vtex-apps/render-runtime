@@ -1,7 +1,7 @@
 interface RuntimeInfo {
   account: string | null
   workspace: string | null
-  route: { path: string | null }
+  route: { path: string | null; blockId: string | null }
   culture: { locale: string | null }
   production: boolean | null
   loadedDevices: Array<string | null>
@@ -31,7 +31,7 @@ export function inferRuntimeInfo(): Partial<RuntimeInfo> {
   return {
     account,
     workspace,
-    route: { path: pathname },
+    route: { path: pathname, blockId: null },
     culture: { locale },
   }
 }
@@ -42,13 +42,13 @@ export function inferRuntimeInfo(): Partial<RuntimeInfo> {
  * information from the window.location.
  */
 export function getRuntimeInfo(): RuntimeInfo & { runtimeAvailable: boolean } {
-  const runtime = window?.global?.__RUNTIME__ ?? inferRuntimeInfo()
+  const runtime = window?.__RUNTIME__ ?? inferRuntimeInfo()
 
   const {
     account = null,
     workspace = null,
     culture: { locale } = { locale: null },
-    route: { path } = { path: null },
+    route: { path, blockId } = { path: null, blockId: null },
     loadedDevices = [null],
     production = null,
   } = runtime
@@ -57,19 +57,23 @@ export function getRuntimeInfo(): RuntimeInfo & { runtimeAvailable: boolean } {
     account,
     workspace,
     culture: { locale },
-    route: { path },
+    route: { path, blockId },
     loadedDevices,
     production,
-    runtimeAvailable: !!window?.global?.__RUNTIME__,
+    runtimeAvailable: !!window?.__RUNTIME__,
   }
 }
 
-export function getExtraArgs() {
+/**
+ * Retrieves VTEX IO context and adapt it to format expected
+ * on Sentry.
+ */
+export function getIOContext() {
   const {
     account = null,
     workspace = null,
     culture: { locale } = { locale: null },
-    route: { path } = { path: null },
+    route: { path, blockId } = { path: null, blockId: null },
     loadedDevices = null,
     production = null,
     runtimeAvailable,
@@ -80,6 +84,7 @@ export function getExtraArgs() {
     admin_workspace: workspace,
     admin_locale: locale,
     admin_path: path,
+    admin_app_block: blockId, // ex. "vtex.admin-home@3.x:admin.app.home"
     admin_device: Array.isArray(loadedDevices)
       ? loadedDevices[0]
       : loadedDevices,

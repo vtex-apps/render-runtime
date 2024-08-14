@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react'
 import { isAdmin } from '../utils/isAdmin'
-import { getExtraArgs } from './extraArgs'
+import { getIOContext } from './extraArgs'
 
 if (isAdmin()) {
   Sentry.init({
@@ -23,10 +23,19 @@ if (isAdmin()) {
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: 0.5,
 
-    beforeSend: (event, hint) => {
-      const extraArgs = getExtraArgs()
+    beforeSend: (event) => {
+      const ctx = getIOContext()
 
-      return { ...event, ...extraArgs, ...hint }
+      // Must check with false, otherwise default null's
+      // value leads to data mistakenly not sent to Sentry,
+      // which can occur if somehow we can't infer whether
+      // the apps are running under a production or development
+      // environment.
+      if (ctx.admin_production === false) {
+        return null
+      }
+
+      return { ...event, ...ctx }
     },
   })
 }

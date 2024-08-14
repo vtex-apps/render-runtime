@@ -1,7 +1,7 @@
 /* global module */
 import React, { Component, Fragment } from 'react'
 import ReactJson from 'react-json-view'
-import { captureException, getCurrentScope } from '@sentry/react'
+import { captureException } from '@sentry/react'
 
 require('myvtex-sse')
 
@@ -12,7 +12,6 @@ import ErrorImg from './images/error-img.png'
 import style from './error.css'
 import { renderReadyPromise } from '.'
 import { isAdmin } from './utils/isAdmin'
-import { getExtraArgs } from './o11y/extraArgs'
 
 class ErrorPage extends Component {
   public state = { enabled: false }
@@ -29,13 +28,6 @@ class ErrorPage extends Component {
       const requestId = window?.__REQUEST_ID__
       const defaultError =
         'Render Runtime renderered an error page and there is no error or request id available'
-
-      const errorInfo = getExtraArgs()
-
-      // Change this condition to true while testing
-      if (errorInfo.admin_production === false) return
-
-      getCurrentScope().setTags(errorInfo)
 
       if (error) {
         captureException(error)
