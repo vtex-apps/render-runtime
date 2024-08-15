@@ -51,7 +51,7 @@ function makeEventWithCtx(event: any, ctx: any) {
   const eventWithCtx = {
     ...event,
     tags: {
-      ...event.tags,
+      ...event?.tags,
       ...ctx,
     },
   }
