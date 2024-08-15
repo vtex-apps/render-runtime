@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Mechanism to programatically log events to Sentry via query string (`?forceLogs=true`).
+
+### Changed
+
+- Moved all runtime information retrieval from the error page to the Sentry `beforeSend` middleware.
+
 ## [8.134.6] - 2024-08-13
 
 ### Added

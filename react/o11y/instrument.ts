@@ -32,10 +32,29 @@ if (isAdmin()) {
       // the apps are running under a production or development
       // environment.
       if (ctx.admin_production === false) {
+        const params = new URL(document?.location?.toString())?.searchParams
+        const shouldLog = params.get('forceLogs')
+
+        if (shouldLog === 'true') {
+          return makeEventWithCtx(event, ctx)
+        }
+
         return null
       }
 
-      return { ...event, ...ctx }
+      return makeEventWithCtx(event, ctx)
     },
   })
+}
+
+function makeEventWithCtx(event: any, ctx: any) {
+  const eventWithCtx = {
+    ...event,
+    tags: {
+      ...event.tags,
+      ...ctx,
+    },
+  }
+
+  return eventWithCtx
 }
