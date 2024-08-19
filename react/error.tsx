@@ -14,6 +14,20 @@ import { renderReadyPromise } from '.'
 import { isAdmin } from './utils/isAdmin'
 import { CustomAdminTags } from './o11y/types'
 
+/**
+ * The ErrorPage component is rendered when there is an error on the Render Framework server-side lifecycle.
+ *
+ * Errors that occur on the client-side are caught by the ErrorBoundary component (see react/components/ErrorBoundary.tsx).
+ *
+ * @warning
+ * Updates to this component must be followed by changes to Render Server, specifically the node/middlewares/error.ts file.
+ *
+ * This is required to ensure that the error page rendered during errors on the server-side lifecycle is always up-to-date, as
+ * depending on the error, the Render Server may not be able to fetch the latest version of the ErrorPage component from the
+ * Render Runtime, thus falling back to a hardcoded version that must be always up to date.
+ *
+ * Use this PR as a reference on how to update the Render Server accordingly: https://github.com/vtex/render-server/pull/800.
+ */
 class ErrorPage extends Component {
   public state = { enabled: false }
 
