@@ -2,6 +2,9 @@ import React, { ErrorInfo, FunctionComponent } from 'react'
 import ErrorDisplay from './ExtensionPoint/ErrorDisplay'
 import { useRuntime } from './RenderContext'
 import type { RenderContext } from './RenderContext'
+import { isAdmin } from '../utils/isAdmin'
+import { captureException } from '@sentry/react'
+import { CustomAdminTags } from '../o11y/types'
 
 interface Props {
   runtime: RenderContext
@@ -18,6 +21,14 @@ class ErrorBoundary extends React.Component<Props> {
       error,
       errorInfo,
     })
+
+    if (!isAdmin()) return
+
+    const tags: CustomAdminTags = {
+      admin_render_runtime_page: 'ErrorBoundary',
+    }
+
+    captureException(this.state, { tags })
   }
 
   public render() {

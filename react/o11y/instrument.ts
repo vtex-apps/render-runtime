@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react'
 import { isAdmin } from '../utils/isAdmin'
-import { getIOContext } from './extraArgs'
+import { getIOContext } from './ctx'
 
 if (isAdmin()) {
   Sentry.init({

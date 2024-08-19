@@ -1,3 +1,5 @@
+import { AdminTags } from './types'
+
 interface RuntimeInfo {
   account: string | null
   workspace: string | null
@@ -49,7 +51,7 @@ export function getRuntimeInfo(): RuntimeInfo & { runtimeAvailable: boolean } {
     workspace = null,
     culture: { locale } = { locale: null },
     route: { path, blockId } = { path: null, blockId: null },
-    loadedDevices = [null],
+    loadedDevices = null,
     production = null,
   } = runtime
 
@@ -66,9 +68,11 @@ export function getRuntimeInfo(): RuntimeInfo & { runtimeAvailable: boolean } {
 
 /**
  * Retrieves VTEX IO context and adapt it to format expected
- * on Sentry.
+ * by Sentry for the Admin.
  */
-export function getIOContext() {
+export function getIOContext(): AdminTags {
+  const runtime = window?.__RUNTIME__ ?? inferRuntimeInfo()
+
   const {
     account = null,
     workspace = null,
@@ -76,8 +80,7 @@ export function getIOContext() {
     route: { path, blockId } = { path: null, blockId: null },
     loadedDevices = null,
     production = null,
-    runtimeAvailable,
-  } = getRuntimeInfo()
+  } = runtime
 
   return {
     admin_account: account,
@@ -89,6 +92,6 @@ export function getIOContext() {
       ? loadedDevices[0]
       : loadedDevices,
     admin_production: production,
-    admin_runtime_available: runtimeAvailable,
+    admin_runtime_available: !!window?.__RUNTIME__,
   }
 }

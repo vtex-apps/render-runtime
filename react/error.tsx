@@ -12,6 +12,7 @@ import ErrorImg from './images/error-img.png'
 import style from './error.css'
 import { renderReadyPromise } from '.'
 import { isAdmin } from './utils/isAdmin'
+import { CustomAdminTags } from './o11y/types'
 
 class ErrorPage extends Component {
   public state = { enabled: false }
@@ -23,6 +24,10 @@ class ErrorPage extends Component {
 
     if (!isAdmin()) return
 
+    const tags: CustomAdminTags = {
+      admin_render_runtime_page: ERROR_PAGE_COMPONENT,
+    }
+
     try {
       const error = window?.__ERROR__
       const requestId = window?.__REQUEST_ID__
@@ -30,14 +35,14 @@ class ErrorPage extends Component {
         'Render Runtime renderered an error page and there is no error or request id available'
 
       if (error) {
-        captureException(error)
+        captureException(error, { tags })
       } else if (requestId) {
-        captureException(requestId)
+        captureException(requestId, { tags })
       } else {
-        captureException(defaultError)
+        captureException(defaultError, { tags })
       }
     } catch (e) {
-      captureException(e)
+      captureException(e, { tags })
     }
   }
 
