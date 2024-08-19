@@ -1,7 +1,7 @@
 /* global module */
 import React, { Component, Fragment } from 'react'
 import ReactJson from 'react-json-view'
-import { captureException, getCurrentScope } from '@sentry/react'
+import { captureException } from '@sentry/react'
 
 require('myvtex-sse')
 
@@ -12,16 +12,22 @@ import ErrorImg from './images/error-img.png'
 import style from './error.css'
 import { renderReadyPromise } from '.'
 import { isAdmin } from './utils/isAdmin'
+import { CustomAdminTags } from './o11y/types'
 
-interface RuntimeInfo {
-  account: string | null
-  workspace: string | null
-  route: { path: string | null }
-  culture: { locale: string | null }
-  production: boolean | null
-  loadedDevices: Array<string | null>
-}
-
+/**
+ * The ErrorPage component is rendered when there is an error on the Render Framework server-side lifecycle.
+ *
+ * Errors that occur on the client-side are caught by the ErrorBoundary component (see react/components/ErrorBoundary.tsx).
+ *
+ * @warning
+ * Updates to this component must be followed by changes to Render Server, specifically the node/middlewares/error.ts file.
+ *
+ * This is required to ensure that the error page rendered during errors on the server-side lifecycle is always up-to-date, as
+ * depending on the error, the Render Server may not be able to fetch the latest version of the ErrorPage component from the
+ * Render Runtime, thus falling back to a hardcoded version that must be always up to date.
+ *
+ * Use this PR as a reference on how to update the Render Server accordingly: https://github.com/vtex/render-server/pull/800.
+ */
 class ErrorPage extends Component {
   public state = { enabled: false }
 
@@ -32,109 +38,25 @@ class ErrorPage extends Component {
 
     if (!isAdmin()) return
 
+    const tags: CustomAdminTags = {
+      admin_render_runtime_page: ERROR_PAGE_COMPONENT,
+    }
+
     try {
       const error = window?.__ERROR__
       const requestId = window?.__REQUEST_ID__
       const defaultError =
         'Render Runtime renderered an error page and there is no error or request id available'
 
-      const errorInfo = this.extractErrorInfo()
-
-      // Change this condition to true while testing
-      if (errorInfo.admin_production === false) return
-
-      getCurrentScope().setTags(errorInfo)
-
       if (error) {
-        captureException(error)
+        captureException(error, { tags })
       } else if (requestId) {
-        captureException(requestId)
+        captureException(requestId, { tags })
       } else {
-        captureException(defaultError)
+        captureException(defaultError, { tags })
       }
     } catch (e) {
-      captureException(e)
-    }
-  }
-
-  private extractErrorInfo() {
-    const {
-      account = null,
-      workspace = null,
-      culture: { locale } = { locale: null },
-      route: { path } = { path: null },
-      loadedDevices = null,
-      production = null,
-      runtimeAvailable,
-    } = this.getRuntimeInfo()
-
-    return {
-      admin_account: account,
-      admin_workspace: workspace,
-      admin_locale: locale,
-      admin_path: path,
-      admin_device: Array.isArray(loadedDevices)
-        ? loadedDevices[0]
-        : loadedDevices,
-      admin_production: production,
-      admin_runtime_available: runtimeAvailable,
-    }
-  }
-
-  /**
-   * Gets the Runtime information from the global __RUNTIME__ object
-   * injected by Render Server, if available, otherwise infer the runtime
-   * information from the window.location.
-   */
-  private getRuntimeInfo = (): RuntimeInfo & { runtimeAvailable: boolean } => {
-    const runtime = window?.global?.__RUNTIME__ ?? this.inferRuntimeInfo()
-
-    const {
-      account = null,
-      workspace = null,
-      culture: { locale } = { locale: null },
-      route: { path } = { path: null },
-      loadedDevices = [null],
-      production = null,
-    } = runtime
-
-    return {
-      account,
-      workspace,
-      culture: { locale },
-      route: { path },
-      loadedDevices,
-      production,
-      runtimeAvailable: !!window?.global?.__RUNTIME__,
-    }
-  }
-
-  /**
-   * Infer the runtime information from the window.location object.
-   */
-  private inferRuntimeInfo(): Partial<RuntimeInfo> {
-    const { host = '' } = window.location
-    let account = ''
-    let workspace = ''
-
-    if (!host.includes('--')) {
-      account = host.split('.')[0]
-      workspace = 'master'
-    } else {
-      workspace = host.split('--')[0]
-      account = host.split('--')[1].split('.')[0]
-    }
-
-    const { pathname } = window.location
-
-    const locale =
-      navigator?.language ?? Intl.DateTimeFormat().resolvedOptions().locale
-
-    return {
-      account,
-      workspace,
-      route: { path: pathname },
-      culture: { locale },
+      captureException(e, { tags })
     }
   }
 
