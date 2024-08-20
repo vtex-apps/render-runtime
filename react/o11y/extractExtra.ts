@@ -50,6 +50,7 @@ function iterate(
       } else {
         if (typeof err[key] !== 'function') {
           const value = err[key]
+          const tagKey = `admin_extra_${toSnakeCase(key)}${iterationNumber}`
 
           // Split values that are too long into as many parts as necessary to fit
           // Sentry's limit of 200 characters per value
@@ -60,12 +61,10 @@ function iterate(
             }
 
             for (let chunk = 0; chunk < chunks.length; chunk++) {
-              extra[
-                `admin_extra_level_${iterationNumber}_` + key + '_' + chunk
-              ] = chunks[chunk]
+              extra[`${tagKey}_` + chunk] = chunks[chunk]
             }
           } else {
-            extra[`admin_extra_level_${iterationNumber}_` + key] = err[key]
+            extra[tagKey] = value
           }
         }
       }
@@ -77,4 +76,8 @@ function iterate(
   }
 
   return extra
+}
+
+function toSnakeCase(str: string) {
+  return str.replace(/-/g, '_').toLowerCase().trim()
 }
