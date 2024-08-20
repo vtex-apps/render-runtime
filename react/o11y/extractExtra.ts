@@ -49,7 +49,24 @@ function iterate(
         extra = { ...extra, ...updatedExtra }
       } else {
         if (typeof err[key] !== 'function') {
-          extra[`admin_extra_level_${iterationNumber}_` + key] = err[key]
+          const value = err[key]
+
+          // Split values that are too long into as many parts as necessary to fit
+          // Sentry's limit of 200 characters per value
+          if (value.length >= 200) {
+            const chunks = []
+            for (let chunk = 0; chunk < value.length; chunk += 199) {
+              chunks.push(value.substr(chunk, 199))
+            }
+
+            for (let chunk = 0; chunk < chunks.length; chunk++) {
+              extra[
+                `admin_extra_level_${iterationNumber}_` + key + '_' + chunk
+              ] = chunks[chunk]
+            }
+          } else {
+            extra[`admin_extra_level_${iterationNumber}_` + key] = err[key]
+          }
         }
       }
 
