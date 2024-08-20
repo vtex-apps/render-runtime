@@ -50,7 +50,13 @@ function iterate(
       } else {
         if (typeof err[key] !== 'function') {
           const value = err[key]
-          const tagKey = `admin_extra_${toSnakeCase(key)}${iterationNumber}`
+          const tagKey = `admin_extra_${standardizeKey(key)}${iterationNumber}`
+
+          if (tagKey.length >= 32) {
+            // Skip. Sentry doesn't allow keys longer than 32 characters.
+            // The keys that matter the most are shortened on the standardizeKey function.
+            continue
+          }
 
           // Split values that are too long into as many parts as necessary to fit
           // Sentry's limit of 200 characters per value
@@ -78,6 +84,18 @@ function iterate(
   return extra
 }
 
-function toSnakeCase(str: string) {
-  return str.replace(/-/g, '_').toLowerCase().trim()
+/**
+ * This function standardizes the keys extracted from the error object
+ * to the format required by Sentry (snake_case, lowercase, short).
+ */
+function standardizeKey(str: string) {
+  return str
+    .replace(/-/g, '_')
+    .toLowerCase()
+    .trim()
+    .replace('graphql', 'gql')
+    .replace('message', 'msg')
+    .replace('request', 'req')
+    .replace('response', 'res')
+    .replace('isaxioserror', 'axios')
 }

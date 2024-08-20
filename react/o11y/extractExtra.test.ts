@@ -60,8 +60,8 @@ describe('extractExtra', () => {
 
     const result = extractExtra(err)
     expect(result).toEqual({
-      admin_extra_graphqlerrors1: '[Array]',
-      admin_extra_message1: 'messages',
+      admin_extra_gqlerrors1: '[Array]',
+      admin_extra_msg1: 'messages',
       admin_extra_name1: 'Error',
       admin_extra_stack0_0:
         'Error: messages\n    at throwOnGraphQLErrors (/usr/local/app/node_modules/@vtex/api/lib/HttpClient/GraphQLClient.js:10:15)\n    at /usr/local/app/node_modules/@vtex/api/lib/HttpClient/GraphQLClient.js:',
@@ -96,10 +96,10 @@ describe('extractExtra', () => {
     const result = extractExtra(err)
     expect(result).toEqual({
       admin_extra_code1: 'ECONNABORTED',
-      admin_extra_isaxioserror1: true,
-      admin_extra_message1: 'timeout of 4000ms exceeded',
+      admin_extra_axios1: true,
+      admin_extra_msg1: 'timeout of 4000ms exceeded',
       admin_extra_name1: 'Error',
-      admin_extra_request1: '[Object]',
+      admin_extra_req1: '[Object]',
       admin_extra_config1: '[Object]',
       admin_extra_stack0_0:
         'Error: timeout of 4000ms exceeded\n    at createError (/usr/local/app/node_modules/axios/lib/core/createError.js:16:15)\n    at ClientRequest.handleRequestTimeout (/usr/local/app/node_modules/axios/lib',
@@ -138,11 +138,11 @@ describe('extractExtra', () => {
     const result = extractExtra(err)
     expect(result).toEqual({
       admin_extra_code1: 'E_HTTP_500',
-      admin_extra_isaxioserror1: true,
-      admin_extra_message1: 'Request failed with status code 500',
+      admin_extra_axios1: true,
+      admin_extra_msg1: 'Request failed with status code 500',
       admin_extra_name1: 'Error',
-      admin_extra_request1: '[Object]',
-      admin_extra_response1: '[Object]',
+      admin_extra_req1: '[Object]',
+      admin_extra_res1: '[Object]',
       admin_extra_config1: '[Object]',
       admin_extra_stack0_0:
         'Error: Request failed with status code 500\n    at createError (/usr/local/app/node_modules/axios/lib/core/createError.js:16:15)\n    at settle (/usr/local/app/node_modules/axios/lib/core/settle.js:17:',
@@ -200,5 +200,21 @@ describe('extractExtra', () => {
 
     const result = extractExtra(model)
     expect(result).toEqual({})
+  })
+
+  test('should not grab 32+ character key-value pairs', () => {
+    const err = {
+      superlongkeythathasmorethanthirtytwocharacters: 'value1',
+      b: 'value2',
+      nested: {
+        c: 'value3',
+        anothersuperlongkeythathasmorethanthirtytwocharacters: 'value4',
+      },
+    }
+    const result = extractExtra(err)
+    expect(result).toEqual({
+      admin_extra_b0: 'value2',
+      admin_extra_c1: 'value3',
+    })
   })
 })
