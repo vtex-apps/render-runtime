@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.134.8-beta] - 2024-08-20
+
 ### Added
 
 - Method to extract keys from error objects recursively so we can index them on Sentry.
@@ -1690,10 +1692,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix sorting direct children with numeric values.
 
 
-[Unreleased]: https://github.com/vtex-apps/render-runtime/compare/v8.134.7-beta...HEAD
+[Unreleased]: https://github.com/vtex-apps/render-runtime/compare/v8.134.8-beta...HEAD
 [8.134.4-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.3-beta...v8.134.4-beta
 [8.134.3-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.2...v8.134.3-beta
 [8.134.5-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.4...v8.134.5-beta
 
 [8.134.6-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.5...v8.134.6-beta
 [8.134.7-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.6...v8.134.7-beta
+[8.134.8-beta]: https://github.com/vtex-apps/render-runtime/compare/v8.134.7...v8.134.8-beta
