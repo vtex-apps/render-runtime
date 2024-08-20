@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Method to extract keys from error objects recursively so we can index them on Sentry.
+
 ## [8.134.7] - 2024-08-19
 
 ### Added
