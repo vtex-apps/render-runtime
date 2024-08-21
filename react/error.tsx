@@ -13,6 +13,7 @@ import style from './error.css'
 import { renderReadyPromise } from '.'
 import { isAdmin } from './utils/isAdmin'
 import { CustomAdminTags } from './o11y/types'
+import { extractExtra } from './o11y/extractExtra'
 
 /**
  * The ErrorPage component is rendered when there is an error on the Render Framework server-side lifecycle.
@@ -49,7 +50,7 @@ class ErrorPage extends Component {
         'Render Runtime renderered an error page and there is no error or request id available'
 
       if (error) {
-        captureException(error, { tags })
+        captureException(error, { tags: { ...tags, ...extractExtra(error) } })
       } else if (requestId) {
         captureException(requestId, { tags })
       } else {
