@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import styles from './error-page.module.css'
 
 const EXPIRATION_TIME = 10 * 60 * 1000 // 10 minutes in milliseconds
@@ -6,27 +6,26 @@ const EXPIRATION_TIME = 10 * 60 * 1000 // 10 minutes in milliseconds
 function RefreshCounter() {
   const [counter, setCounter] = useState(10)
 
-  const hasRefreshed = localStorage.getItem('hasRefreshed')
-  const lastRefreshTime = (localStorage.getItem('lastRefreshTime') ||
-    0) as number
-  const currentTime = new Date().getTime()
-
-  const shouldRefresh =
-    !hasRefreshed ||
-    (lastRefreshTime && currentTime - lastRefreshTime > EXPIRATION_TIME)
+  const lastRefreshTime = useMemo(
+    () => (localStorage.getItem('lastRefreshTime') || 0) as number,
+    []
+  )
+  const currentTime = useMemo(() => new Date().getTime(), [])
+  const shouldRefresh = useMemo(
+    () => !lastRefreshTime || currentTime - lastRefreshTime > EXPIRATION_TIME,
+    [currentTime, lastRefreshTime]
+  )
 
   useEffect(() => {
     if (counter > 0) {
       const timer = setInterval(() => setCounter(counter - 1), 1000)
       return () => clearInterval(timer)
     } else if (shouldRefresh) {
-      localStorage.setItem('hasRefreshed', 'true')
       localStorage.setItem(
         'lastRefreshTime',
         (currentTime as unknown) as string
       )
 
-      console.log('there was reload')
       window.location.reload()
     }
     return

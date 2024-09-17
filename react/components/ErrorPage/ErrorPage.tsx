@@ -7,7 +7,6 @@ import RefreshCounter from './RefreshCounter'
 
 export default function ErrorPage({ errorCode }: { errorCode?: string }) {
   const date = new Date()
-  console.log('versao 2')
 
   return (
     <div className={styles.layout}>
@@ -17,7 +16,7 @@ export default function ErrorPage({ errorCode }: { errorCode?: string }) {
           Something went wrong
         </div>
         <div data-sl-text data-variant="body" className={styles.description}>
-          We couldn&apost connect to the server. If the problem persists, please
+          We {"couldn't"} connect to the server. If the problem persists, please
           contact VTEX support.
         </div>
         {errorCode ? (
