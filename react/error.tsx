@@ -55,6 +55,8 @@ class ErrorPage extends Component {
   public render() {
     if (window.__ERROR__) console.error(window.__ERROR__)
 
+    console.log('Error server side')
+
     return <ErrorDisplay errorCode={window.__REQUEST_ID__} />
   }
 }
