@@ -5,6 +5,7 @@ import type { RenderContext } from './RenderContext'
 import { isAdmin } from '../utils/isAdmin'
 import { captureException } from '@sentry/react'
 import { CustomAdminTags } from '../o11y/types'
+import ErrorPage from './ErrorPage/ErrorPage'
 
 interface Props {
   runtime: RenderContext
@@ -39,7 +40,7 @@ class ErrorBoundary extends React.Component<Props> {
       if (!production) {
         return <ErrorDisplay error={error} errorInfo={errorInfo} />
       }
-      return null
+      return <ErrorPage />
     }
 
     return this.props.children
