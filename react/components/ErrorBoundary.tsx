@@ -40,7 +40,12 @@ class ErrorBoundary extends React.Component<Props> {
       if (!production) {
         return <ErrorDisplay error={error} errorInfo={errorInfo} />
       }
-      return <ErrorPage />
+
+      if (isAdmin()) {
+        return <ErrorPage />
+      }
+
+      return null
     }
 
     return this.props.children

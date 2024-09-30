@@ -19,7 +19,7 @@ function RefreshCounter() {
   useEffect(() => {
     if (counter > 0) {
       const timer = setInterval(
-        (prevCounter: number) => setCounter(prevCounter - 1),
+        () => setCounter((prevCounter) => prevCounter - 1),
         1000
       )
       return () => clearInterval(timer)
