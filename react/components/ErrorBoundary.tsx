@@ -37,20 +37,14 @@ class ErrorBoundary extends React.Component<Props> {
 
     const { error, errorInfo } = this.state
     if (error) {
-      console.log('Client side error')
-
       if (!production) {
-        console.log('Not production, old stack trace')
         return <ErrorDisplay error={error} errorInfo={errorInfo} />
       }
 
       if (isAdmin()) {
-        console.log('Is admin, production, new error page')
         return <ErrorPage />
       }
 
-      console.log('Is production, storefront')
-      console.log('Returned null')
       return null
     }
 

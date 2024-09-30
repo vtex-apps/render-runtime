@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Admin error page showing up on client side errors on storefront.
+- Refresh page counter taking too long.
+
 ## [8.134.9] - 2024-09-25
 
 ### Added
