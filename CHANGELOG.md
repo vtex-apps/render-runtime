@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.134.11] - 2024-09-30
+
 ### Fixed
 
 - Admin error page showing up on client side errors on storefront.
