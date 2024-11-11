@@ -70,6 +70,7 @@ import {
   PageContextOptions,
 } from '../typings/global'
 import { RenderRuntime, Components, Extension } from '../typings/runtime'
+import { getMessages as getErrorPageMessages } from './ErrorPage/messages'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectorPopover = React.lazy(
@@ -1193,8 +1194,11 @@ export class RenderProvider extends Component<
       production,
       inspect,
     } = this.state
+
     const customMessages = this.getCustomMessages(locale)
+    const errorMessages = getErrorPageMessages(locale)
     const mergedMessages = {
+      ...errorMessages,
       ...messages,
       ...customMessages,
     }

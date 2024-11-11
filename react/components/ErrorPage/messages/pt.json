@@ -1,0 +1,5 @@
+{
+  "render-runtime.error.title": "Algo deu errado",
+  "render-runtime.error.error-date": "Data",
+  "render-runtime.error.action.retry": "Tente novamente"
+}

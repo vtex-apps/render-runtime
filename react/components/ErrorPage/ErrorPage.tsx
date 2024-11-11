@@ -4,8 +4,10 @@ import './shoreline.css'
 import styles from './error-page.module.css'
 import ErrorIcon from './ErrorIcon'
 import RefreshCounter from './RefreshCounter'
+import { useIntl } from 'react-intl'
 
 export default function ErrorPage({ errorCode }: { errorCode?: string }) {
+  const { formatMessage, formatDate } = useIntl()
   const date = new Date()
 
   return (
@@ -13,11 +15,10 @@ export default function ErrorPage({ errorCode }: { errorCode?: string }) {
       <div className={styles.errorDetailsLayout}>
         <ErrorIcon />
         <div data-sl-text data-variant="display1" className={styles.title}>
-          Something went wrong
+          {formatMessage({ id: 'render-runtime.error.title' })}
         </div>
         <div data-sl-text data-variant="body" className={styles.description}>
-          We {"couldn't"} connect to the server. If the problem persists, please
-          contact VTEX support.
+          {formatMessage({ id: 'render-runtime.error.description' })}
         </div>
         {errorCode ? (
           <div
@@ -25,9 +26,18 @@ export default function ErrorPage({ errorCode }: { errorCode?: string }) {
             data-variant="caption2"
             className={styles.errorCode}
           >
-            ID: {errorCode}
+            {formatMessage({ id: 'render-runtime.error.error-id' })}:{' '}
+            {errorCode}
             <br />
-            Date: {date.toUTCString()}
+            {formatMessage({ id: 'render-runtime.error.error-date' })}:{' '}
+            {formatDate(date, {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              timeZoneName: 'short',
+            })}
           </div>
         ) : null}
         <button
@@ -37,7 +47,7 @@ export default function ErrorPage({ errorCode }: { errorCode?: string }) {
           className={styles.retryButton}
           onClick={() => window.location.reload()}
         >
-          Try again
+          {formatMessage({ id: 'render-runtime.error.action.retry' })}
         </button>
         <RefreshCounter />
       </div>
