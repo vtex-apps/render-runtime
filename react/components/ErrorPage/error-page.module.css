@@ -1,0 +1,48 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* mobile media query */
+@media only screen and (max-width: 768px) {
+  .layout {
+    padding: var(--sl-space-0) var(--sl-space-5);
+  }
+}
+
+.errorDetailsLayout {
+  max-width: 26.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  margin-top: var(--sl-space-10);
+}
+
+.description {
+  margin-top: var(--sl-space-3);
+}
+
+.errorCode {
+  margin-top: var(--sl-space-10);
+  color: var(--sl-fg-base-soft);
+}
+
+.retryButton {
+  margin-top: var(--sl-space-12);
+  width: 7.5rem;
+}
+
+.counter {
+  display: flex;
+  gap: var(--sl-space-3);
+  margin-top: var(--sl-space-24);
+  color: var(--sl-fg-informational);
+}

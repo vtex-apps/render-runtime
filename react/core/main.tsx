@@ -386,9 +386,6 @@ function start() {
         .catch((error) => {
           console.error('Error during hydration', error)
         })
-      console.log(
-        'Welcome to Render! Want to look under the hood? https://careers.vtex.com'
-      )
     }
   } catch (error) {
     console.error('Unexpected error rendering:', error)
