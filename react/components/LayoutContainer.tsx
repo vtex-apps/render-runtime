@@ -1,12 +1,13 @@
+import { Buffer } from 'buffer'
 import React, { FunctionComponent } from 'react'
+import { Route } from '../typings/runtime'
+import { isSiteEditorIframe } from '../utils/dom'
 import { useTreePath } from '../utils/treePath'
 import ExtensionPoint from './ExtensionPoint'
-import { useRuntime } from './RenderContext'
-import { LoadingWrapper } from './LoadingContext'
-import { LazyImages } from './LazyImages'
 import FoldableContainer from './FoldableContainer'
-import { isSiteEditorIframe } from '../utils/dom'
-import { Route } from '../typings/runtime'
+import { LazyImages } from './LazyImages'
+import { LoadingWrapper } from './LoadingContext'
+import { useRuntime } from './RenderContext'
 
 type Element = string | ElementArray
 type ElementArray = Element[]
@@ -43,8 +44,11 @@ const Container: FunctionComponent<ContainerProps> = ({
     if (elements === '__children__') {
       return <>{children}</>
     }
+    const id = Buffer.from(elements, 'binary').toString('base64')
+    const classNameWithId = `${isRow ? '' : className + ' '}id-${id}`
+
     return (
-      <div className={isRow ? '' : className}>
+      <div className={classNameWithId}>
         <ExtensionPoint id={elements} {...props} />
       </div>
     )
