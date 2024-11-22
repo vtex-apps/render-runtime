@@ -1,8 +1,8 @@
 {
-  "render-runtime.error.title": "Algo deu errado",
-  "render-runtime.error.description": "Não conseguimos conexão com o servidor. Se o problema persistir, entre em contato com o suporte da VTEX.",
-  "render-runtime.error.error-id": "ID",
-  "render-runtime.error.error-date": "Data",
-  "render-runtime.error.action.retry": "Tentar novamente",
-  "render-runtime.error.counter": "Nova tentativa em {counter}..."
+  "render-runtime.error.title": "Нещо се обърка",
+  "render-runtime.error.description": "Не успяхме да се свържем със сървъра. Ако проблемът продължава, се свържете с поддръжката на VTEX.",
+  "render-runtime.error.error-id": "ИД",
+  "render-runtime.error.error-date": "Дата",
+  "render-runtime.error.action.retry": "Опитайте отново",
+  "render-runtime.error.counter": "Автоматичен опит за повтаряне на действието след {counter}..."
 }
