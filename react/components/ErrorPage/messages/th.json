@@ -1,1 +1,8 @@
-{}
+{
+  "render-runtime.error.title": "มีบางอย่างผิดปกติ",
+  "render-runtime.error.description": "เราไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ หากยังคงมีปัญหา โปรดติดต่อ VTEX Support",
+  "render-runtime.error.error-id": "รหัส",
+  "render-runtime.error.error-date": "วันที่",
+  "render-runtime.error.action.retry": "ลองอีกครั้ง",
+  "render-runtime.error.counter": "ลองอีกครั้งโดยอัตโนมัติใน {counter}..."
+}

@@ -1,1 +1,8 @@
-{}
+{
+  "render-runtime.error.title": "Etwas ist schief gelaufen",
+  "render-runtime.error.description": "Wir konnten keine Verbindung zum Server herstellen. Wenn das Problem weiterhin besteht, kontaktieren Sie VTEX-Support.",
+  "render-runtime.error.error-id": "ID",
+  "render-runtime.error.error-date": "Datum",
+  "render-runtime.error.action.retry": "Erneut versuchen",
+  "render-runtime.error.counter": "Automatische Wiederholung in {counter}..."
+}

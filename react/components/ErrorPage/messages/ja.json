@@ -1,1 +1,8 @@
-{}
+{
+  "render-runtime.error.title": "エラーあり",
+  "render-runtime.error.description": "サーバーに接続できませんでした。問題が解決しない場合、VTEX サポートにお問い合わせください。",
+  "render-runtime.error.error-id": "ID",
+  "render-runtime.error.error-date": "日付",
+  "render-runtime.error.action.retry": "もう一度やり直す",
+  "render-runtime.error.counter": "{counter} で自動的にリトライ…"
+}

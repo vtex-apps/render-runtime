@@ -1,1 +1,8 @@
-{}
+{
+  "render-runtime.error.title": "Si è verificato un errore",
+  "render-runtime.error.description": "Non è stato possibile connettersi al server. Se il problema persiste, contatta l'assistenza VTEX.",
+  "render-runtime.error.error-id": "ID",
+  "render-runtime.error.error-date": "Data",
+  "render-runtime.error.action.retry": "Prova di nuovo",
+  "render-runtime.error.counter": "Nuovo tentativo automatico in {counter}..."
+}
