@@ -1,6 +1,6 @@
-import React, { useContext, FC } from 'react'
-import styles from './LazyImages.css'
+import React, { FC, useContext } from 'react'
 import { Helmet } from 'react-helmet'
+import styles from './LazyImages.css'
 
 interface LazyImagesContext {
   lazyLoad: boolean
@@ -75,7 +75,7 @@ const MaybeLazyImage: FC<MaybeLazyImageProps> = ({
           }`,
           src: undefined,
           'data-src': imageProps.src,
-          loading: 'lazy',
+          loading: newImageProps.loading ?? 'lazy',
         }
         break
     }
