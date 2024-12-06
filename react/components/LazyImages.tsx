@@ -65,18 +65,21 @@ const MaybeLazyImage: FC<MaybeLazyImageProps> = ({
         /** adds `lazyload` class to enable lazysizes, and moves the image URI
          * from src to data-src. `styles.lazyload` is used to hide the "broken image"
          * symbol while the image hasn't been loaded */
-        newImageProps = {
-          ...imageProps,
-          // explicity key because we need react to re-render the whole img element
-          // in case the src changes (i.e: product-summary + sku)
-          key: imageProps.src,
-          className: `lazyload ${imageProps.className ?? ''} ${
-            styles.lazyload
-          }`,
-          src: undefined,
-          'data-src': imageProps.src,
-          loading: newImageProps.loading ?? 'lazy',
+        if (newImageProps.loading !== 'eager') {
+          newImageProps = {
+            ...imageProps,
+            // explicity key because we need react to re-render the whole img element
+            // in case the src changes (i.e: product-summary + sku)
+            key: imageProps.src,
+            className: `lazyload ${imageProps.className ?? ''} ${
+              styles.lazyload
+            }`,
+            src: undefined,
+            'data-src': imageProps.src,
+            loading: 'lazy',
+          }
         }
+
         break
     }
     return createElement.apply(React, ['img', newImageProps])
