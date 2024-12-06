@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Added a conditional to check if the property already exist on images before applying the lazy load property
+
 ## [8.134.11] - 2024-09-30
 
 ### Fixed
