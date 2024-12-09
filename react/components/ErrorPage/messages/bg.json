@@ -1,0 +1,8 @@
+{
+  "render-runtime.error.title": "Нещо се обърка",
+  "render-runtime.error.description": "Не успяхме да се свържем със сървъра. Ако проблемът продължава, се свържете с поддръжката на VTEX.",
+  "render-runtime.error.error-id": "ИД",
+  "render-runtime.error.error-date": "Дата",
+  "render-runtime.error.action.retry": "Опитайте отново",
+  "render-runtime.error.counter": "Автоматичен опит за повтаряне на действието след {counter}..."
+}

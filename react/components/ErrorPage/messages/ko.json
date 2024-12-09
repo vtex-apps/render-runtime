@@ -1,0 +1,8 @@
+{
+  "render-runtime.error.title": "문제 발생",
+  "render-runtime.error.description": "서버에 연결할 수 없습니다. 문제가 지속되면 VTEX 지원팀에 문의하세요.",
+  "render-runtime.error.error-id": "아이디",
+  "render-runtime.error.error-date": "날짜",
+  "render-runtime.error.action.retry": "다시 시도",
+  "render-runtime.error.counter": "{counter}에서 자동 재시도..."
+}

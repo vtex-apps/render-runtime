@@ -1,0 +1,8 @@
+{
+  "render-runtime.error.title": "Ceva nu a mers bine",
+  "render-runtime.error.description": "Nu ne-am putut conecta la server. Dacă problema persistă, contactează Asistența VTEX.",
+  "render-runtime.error.error-id": "ID",
+  "render-runtime.error.error-date": "Dată",
+  "render-runtime.error.action.retry": "Încearcă din nou",
+  "render-runtime.error.counter": "Reîncercare automată în {counter}..."
+}

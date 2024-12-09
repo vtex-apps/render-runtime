@@ -1,0 +1,8 @@
+{
+  "render-runtime.error.title": "Er is iets fout gegaan",
+  "render-runtime.error.description": "We konden geen verbinding maken met de server. Als het probleem zich blijft voordoen, neem dan contact op met VTEX Support.",
+  "render-runtime.error.error-id": "Id",
+  "render-runtime.error.error-date": "Datum",
+  "render-runtime.error.action.retry": "Probeer opnieuw",
+  "render-runtime.error.counter": "Automatisch opnieuw proberen in {counter}..."
+}

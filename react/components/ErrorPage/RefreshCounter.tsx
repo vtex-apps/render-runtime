@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import styles from './error-page.module.css'
+import { useIntl } from 'react-intl'
 
 const EXPIRATION_TIME = 10 * 60 * 1000 // 10 minutes in milliseconds
 
 function RefreshCounter() {
   const [counter, setCounter] = useState<number>(10)
+  const { formatMessage } = useIntl()
 
   const lastRefreshTime = useMemo(
     () => (localStorage.getItem('lastRefreshTime') || 0) as number,
@@ -43,7 +45,8 @@ function RefreshCounter() {
           <circle cx={25} cy={25} r={20} />
         </svg>
       </div>
-      Automatic retry in {counter}...
+
+      {formatMessage({ id: 'render-runtime.error.counter' }, { counter })}
     </div>
   )
 }

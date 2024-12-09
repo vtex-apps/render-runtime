@@ -1,0 +1,8 @@
+{
+  "render-runtime.error.title": "Something went wrong",
+  "render-runtime.error.description": "We couldn't connect to the server. If the problem persists, contact VTEX Support.",
+  "render-runtime.error.error-id": "ID",
+  "render-runtime.error.error-date": "Date",
+  "render-runtime.error.action.retry": "Try again",
+  "render-runtime.error.counter": "Automatic retry in {counter}..."
+}

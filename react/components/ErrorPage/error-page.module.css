@@ -37,7 +37,7 @@
 
 .retryButton {
   margin-top: var(--sl-space-12);
-  width: 7.5rem;
+  min-width: 7.5rem;
 }
 
 .counter {
