@@ -43,8 +43,14 @@ const Container: FunctionComponent<ContainerProps> = ({
     if (elements === '__children__') {
       return <>{children}</>
     }
+
+    const elementIdRegex = /#(.*)/
+    const elementId = elements.match(elementIdRegex)
+    const containerClass = !elements.includes('fold')
+      ? `vtex-render__container-id-${elementId ? elementId[1] : elements}`
+      : ''
     return (
-      <div className={isRow ? '' : className}>
+      <div className={isRow ? containerClass : className}>
         <ExtensionPoint id={elements} {...props} />
       </div>
     )
