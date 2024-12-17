@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Class to `<div>` elements in `LayoutContainer` to manipulate those sections
+
 ## [8.135.0] - 2024-12-09
 
 ## [8.134.11] - 2024-09-30
