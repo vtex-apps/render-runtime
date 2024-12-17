@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import React, { FunctionComponent } from 'react'
 import { Route } from '../typings/runtime'
 import { isSiteEditorIframe } from '../utils/dom'
@@ -44,11 +43,15 @@ const Container: FunctionComponent<ContainerProps> = ({
     if (elements === '__children__') {
       return <>{children}</>
     }
-    const id = Buffer.from(elements, 'binary').toString('base64')
-    const classNameWithId = `${isRow ? '' : className + ' '}id-${id}`
+    const elementIdRegex = /#(.*)/
+    const elementId = elements.match(elementIdRegex)
+    const containerClass =
+      isRow && !elements.includes('fold')
+        ? `vtex-render__container-id-${elementId ? elementId[1] : elements}`
+        : ''
 
     return (
-      <div className={classNameWithId}>
+      <div className={containerClass}>
         <ExtensionPoint id={elements} {...props} />
       </div>
     )
@@ -109,16 +112,14 @@ const Container: FunctionComponent<ContainerProps> = ({
   )
 }
 
-const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = (
-  props
-) => {
+const LayoutContainer: React.FunctionComponent<LayoutContainerProps> = props => {
   const { extensions, preview, hints, route } = useRuntime()
   const { treePath } = useTreePath()
 
   const extension = extensions[treePath]
 
   const elements =
-    extension?.blocks?.map?.((insertion) => insertion.extensionPointId) ?? []
+    extension?.blocks?.map?.(insertion => insertion.extensionPointId) ?? []
   const containerProps = { ...props, elements }
 
   const container = (

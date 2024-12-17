@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Added a class to `<div>` elements to map in the CSS elements not rendered by __FOLD__ functionality, so it's possible to create CSS to prevent potential CLS
+- Class to `<div>` elements in `LayoutContainer` to manipulate those sections
 
 ## [8.134.11] - 2024-09-30
 

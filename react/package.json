@@ -80,7 +80,9 @@
     "react-no-ssr": "^1.1.0",
     "regenerator-runtime": "^0.13.1",
     "ts-jest": "^24.0.1",
-    "typescript": "3.9.7"
+    "typescript": "3.9.7",
+    "vtex.pages-graphql": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.pages-graphql@2.121.3-beta.prod2/public/@types/vtex.pages-graphql",
+    "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.135.0/public/@types/vtex.render-runtime"
   },
   "husky": {
     "hooks": {
