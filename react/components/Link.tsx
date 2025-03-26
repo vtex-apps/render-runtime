@@ -70,10 +70,13 @@ const Link: React.FunctionComponent<Props> = ({
     rootPath = '',
     route: { domain },
     query: queryFromRuntime,
+    getSettings,
   } = useRuntime()
 
   // If workspace is set via querystring, keep it
   const workspace = queryFromRuntime?.workspace
+
+  const storeSettings = getSettings('vtex.store')
 
   const isPrefetchActive = useIsPrefetchActive()
 
@@ -109,7 +112,8 @@ const Link: React.FunctionComponent<Props> = ({
       if (
         isModifiedEvent(event) ||
         !isLeftClickEvent(event) ||
-        (to && (isAbsoluteUrl(to) || isTelephoneUrl(to) || isMailToUrl(to)))
+        (to && (isAbsoluteUrl(to) || isTelephoneUrl(to) || isMailToUrl(to))) ||
+        storeSettings?.useDefaultBrowserNavigation
       ) {
         return
       }
@@ -122,7 +126,14 @@ const Link: React.FunctionComponent<Props> = ({
         event.preventDefault()
       }
     },
-    [to, onClick, navigate, target, options]
+    [
+      to,
+      storeSettings.useDefaultBrowserNavigation,
+      onClick,
+      target,
+      navigate,
+      options,
+    ]
   )
 
   const getHref = () => {
