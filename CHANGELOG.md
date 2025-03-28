@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.136.1] - 2025-03-28
+
 ### Fixed
 
 - Add missing optional chaining to `useDefaultBrowserNavigation` prop
