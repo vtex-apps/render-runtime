@@ -128,7 +128,7 @@ const Link: React.FunctionComponent<Props> = ({
     },
     [
       to,
-      storeSettings.useDefaultBrowserNavigation,
+      storeSettings?.useDefaultBrowserNavigation,
       onClick,
       target,
       navigate,
