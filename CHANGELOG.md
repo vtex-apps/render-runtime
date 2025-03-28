@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Revert to browser native navigation based on feature flag `useDefaultBrowserNavigation`
+
 ## [8.135.1] - 2024-12-17
 
 ### Added
