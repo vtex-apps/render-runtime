@@ -59,7 +59,9 @@ Use `useRuntime()` hook (not `RenderContext` directly) for runtime state:
 ```tsx
 const { account, workspace, culture, navigate, getSettings } = useRuntime()
 ```
-Available properties: `account`, `workspace`, `pages`, `extensions`, `route`, `culture`, `production`, `query`, `deviceInfo`, `hints`, `navigate`, etc.
+Available properties: `account`, `workspace`, `pages`, `extensions`, `route`, `culture`, `production`, `query`, `deviceInfo`, `hints`, `navigate`, `getSettings`, etc.
+
+**Navigation behavior**: By default, `navigate()` and `Link` use client-side routing. The `useDefaultBrowserNavigation` feature flag (in store settings) allows reverting to browser-native navigation when needed.
 
 ### 4. Apollo Client Architecture
 Custom Apollo links handle VTEX IO's multi-workspace architecture:
@@ -80,12 +82,20 @@ The runtime loads these dynamically based on extension definitions.
 - **Sentry integration** for Admin apps only (see `react/o11y/instrument.ts`)
 - Uses `isAdmin()` check - only initializes in `myvtex.com/admin` paths
 - Tags errors with VTEX IO context: account, workspace, locale, app block ID
+- Development errors can be force-logged to Sentry using `?forceLogs=true` query param
+
+### 7. Error Handling
+- **ErrorBoundary**: Top-level error catcher that wraps all components (see `react/components/ErrorBoundary.tsx`)
+- **ErrorPage**: User-facing error UI with retry functionality and error tracking (see `react/components/ErrorPage/`)
+- Errors in production are automatically sent to Sentry with full VTEX IO context
+- Use `withErrorBoundary` HOC to wrap individual components needing isolated error boundaries
 
 ## File Structure Guide
 
 - **`react/core/main.tsx`**: Main exports - `render()`, `start()`, all public APIs
-- **`react/components/RenderProvider.tsx`**: Top-level provider - manages navigation, Apollo, page loading
+- **`react/components/RenderProvider.tsx`**: Top-level provider - manages navigation, Apollo, page loading, error boundaries
 - **`react/components/ExtensionPoint/`**: Block rendering logic
+- **`react/components/ErrorPage/`**: Error UI and handling
 - **`react/utils/blocks.ts`**: Extension tree generation from blocks metadata
 - **`react/utils/client/`**: Apollo setup with VTEX-specific links
 - **`react/o11y/`**: Observability (Sentry instrumentation)
@@ -108,6 +118,7 @@ window.__RENDER_8_COMPONENTS__ = { componentName: MockComponent }
 ❌ Importing from `react/components/RenderContext` instead of using `useRuntime()` hook  
 ❌ Mutating `runtime` object - it should be treated as immutable  
 ❌ Adding async operations in render without `<Suspense>` or `<NoSSR>` wrappers  
+❌ Removing or bypassing ErrorBoundary - errors should be caught and reported to Sentry  
 
 ## Key Dependencies
 
