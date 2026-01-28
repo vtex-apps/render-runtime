@@ -88,7 +88,7 @@ The runtime loads these dynamically based on extension definitions.
 - **ErrorBoundary**: Top-level error catcher that wraps all components (see `react/components/ErrorBoundary.tsx`)
 - **ErrorPage**: User-facing error UI with retry functionality and error tracking (see `react/components/ErrorPage/`)
 - Errors in production are automatically sent to Sentry with full VTEX IO context
-- Use `withErrorBoundary` HOC to wrap individual components needing isolated error boundaries
+- ExtensionPoint components are automatically wrapped with error boundaries for isolation
 
 ## File Structure Guide
 
