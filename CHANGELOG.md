@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.136.2] - 2026-03-02
+
 ### Added
 
 - Make eager prop work again for Image and skip lazy load if prop isEager
