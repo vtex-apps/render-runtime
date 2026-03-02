@@ -1,19 +1,19 @@
 import { mergeDeepRight, reduce } from 'ramda'
 import React, { FC, Fragment, Suspense, useMemo } from 'react'
 
-import ComponentLoader from './ComponentLoader'
-import Loading from '../Loading'
-import { useRuntime } from '../RenderContext'
-import type { RenderContext } from '../RenderContext'
+import { Route } from '../../typings/runtime'
 import { useTreePath } from '../../utils/treePath'
-import NoSSR from '../NoSSR'
 import { withErrorBoundary } from '../ErrorBoundary'
-import GenericPreview from '../Preview/GenericPreview'
-import LoadingBar from '../LoadingBar'
+import FoldableContainer from '../FoldableContainer'
 import { LazyImages } from '../LazyImages'
 import LazyRender from '../LazyRender'
-import FoldableContainer from '../FoldableContainer'
-import { Route } from '../../typings/runtime'
+import Loading from '../Loading'
+import LoadingBar from '../LoadingBar'
+import NoSSR from '../NoSSR'
+import GenericPreview from '../Preview/GenericPreview'
+import type { RenderContext } from '../RenderContext'
+import { useRuntime } from '../RenderContext'
+import ComponentLoader from './ComponentLoader'
 
 // TODO: Export components separately on @vtex/blocks-inspector, so this import can be simplified
 const InspectBlockWrapper = React.lazy(
@@ -225,8 +225,8 @@ const ExtensionPoint: FC<Props> = (props) => {
       /** Props from the blockProps prop, used when the user wants to prevent overriding
        * the native ExtensionPoint props (such as `id`)
        */
-      blockProps || {},
       content,
+      blockProps || {},
       { params, query },
     ])
   }, [
