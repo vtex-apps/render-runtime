@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useRef, useState } from 'react'
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react'
 import { useOnView } from '../hooks/viewDetection'
 
 interface Props {
@@ -15,6 +15,33 @@ const LazyRender: FunctionComponent<Props> = ({
   const ref = useRef(null)
   const [hasBeenViewed, setHasBeenViewed] = useState(false)
 
+  // When enableAsyncScripts is active, window.__ASYNC_SCRIPTS_READY__ starts as
+  // false and flips to true (dispatching "asyncScriptsReady") only after every
+  // bundle in the async queue has run. If we let the IntersectionObserver fire
+  // while bundles are still executing, lazy components may try to require()
+  // modules whose webpack chunk hasn't been registered yet, causing
+  // "Object(...) is not a function" / React error #130.
+  const [asyncReady, setAsyncReady] = useState(() => {
+    if (typeof window === 'undefined') return true
+    if (typeof window.__ASYNC_SCRIPTS_READY__ === 'undefined') return true
+    return window.__ASYNC_SCRIPTS_READY__ === true
+  })
+
+  useEffect(() => {
+    if (asyncReady) return
+
+    const onReady = () => setAsyncReady(true)
+
+    window.addEventListener('asyncScriptsReady', onReady)
+
+    // Guard against the event having fired between the render and this effect
+    if (window.__ASYNC_SCRIPTS_READY__) {
+      setAsyncReady(true)
+    }
+
+    return () => window.removeEventListener('asyncScriptsReady', onReady)
+  }, [asyncReady])
+
   useOnView({
     ref,
     onView: () => {
@@ -22,6 +49,7 @@ const LazyRender: FunctionComponent<Props> = ({
     },
     once: true,
     initializeOnInteraction: true,
+    bailOut: !asyncReady,
   })
 
   if (hasBeenViewed) {
