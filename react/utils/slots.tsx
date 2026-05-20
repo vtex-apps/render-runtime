@@ -1,7 +1,7 @@
 import React, { FC, useMemo } from 'react'
 
-import { getChildExtensions } from '../components/ExtensionPoint/index'
 import ComponentLoader from '../components/ExtensionPoint/ComponentLoader'
+import { getChildExtensions } from '../components/ExtensionPoint/index'
 import { useRuntime } from '../components/RenderContext'
 import { Extension } from '../typings/runtime'
 
@@ -30,12 +30,12 @@ export function generateSlot({
 
     const componentLoaderPropsWithContent = useMemo(
       () => ({
-        // Props received by the slot being used directly as a component
-        ...props,
         // Props received by the block referenced by slotValue in a user's theme
         ...componentProps,
         // Content saved in the CMS for this treePath
         ...extensionContent,
+        // Props received by the slot being used directly as a component
+        ...props,
       }),
       [componentProps, extensionContent, props]
     )
