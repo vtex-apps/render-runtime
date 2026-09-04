@@ -5,7 +5,7 @@ import ComponentLoader from './ComponentLoader'
 import Loading from '../Loading'
 import { useRuntime } from '../RenderContext'
 import type { RenderContext } from '../RenderContext'
-import { useTreePath } from '../../utils/treePath'
+import { useTreePath, TreePathContextProvider } from '../../utils/treePath'
 import NoSSR from '../NoSSR'
 import { withErrorBoundary } from '../ErrorBoundary'
 import GenericPreview from '../Preview/GenericPreview'
@@ -300,7 +300,21 @@ const ExtensionPoint: FC<Props> = (props) => {
     <Fragment>
       {runtime.preview && isRootTreePath && <LoadingBar />}
       {renderStrategy === 'client' && !runtime.amp ? (
-        <NoSSR onSSR={<Loading />}>{extensionPointComponent}</NoSSR>
+        <NoSSR
+          onSSR={
+            /** Loading resolves its extension from the tree path in context, so it has
+             * to be given this block's own path. Rendered bare it would read the
+             * parent's path instead and draw the parent's preview -- a page-level
+             * block declaring a 1400px preview would have every "client" child
+             * reserve 1400px on the server and collapse to its real height on
+             * hydration. */
+            <TreePathContextProvider treePath={newTreePath}>
+              <Loading />
+            </TreePathContextProvider>
+          }
+        >
+          {extensionPointComponent}
+        </NoSSR>
       ) : (
         extensionPointComponent
       )}

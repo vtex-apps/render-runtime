@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Give `ExtensionPoint`'s SSR loading placeholder its own tree-path context, so it no longer inherits and renders the parent block's preview size. Fixes a layout-shift bug where a page-level block with a large declared preview (e.g. a 1400px box) caused every `client`-rendered child with no preview of its own to reserve that same oversized placeholder on SSR, then collapse to its real height on hydration.
+
 ### Changed
 
 - Update DK Catalog platform-flow-id
