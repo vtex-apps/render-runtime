@@ -22,12 +22,21 @@ function makeEventWithCtx(event: any, ctx: any) {
  * Lazily loads the Sentry SDK. It is only ever invoked from admin-gated
  * call sites (see isAdmin() checks in error.tsx/ErrorBoundary.tsx), so
  * storefront (non-admin) bundles never pay for the dynamic chunk.
+ *
+ * If the dynamic import fails (network blip, ad-blocker filtering
+ * `sentry.js`, a chunk hash mismatch right after a deploy, etc.) the
+ * cached promise is cleared so the *next* call gets a fresh retry instead
+ * of permanently reusing a rejected promise for the rest of the page
+ * session.
  */
 function loadSentry(): Promise<SentryModule> {
   if (!sentryModulePromise) {
     sentryModulePromise = import(
       /* webpackChunkName: "sentry" */ '@sentry/react'
-    )
+    ).catch((error) => {
+      sentryModulePromise = null
+      throw error
+    })
   }
 
   return sentryModulePromise
@@ -37,6 +46,17 @@ async function ensureInitialized(Sentry: SentryModule) {
   if (initialized) return
   initialized = true
 
+  try {
+    doInit(Sentry)
+  } catch (error) {
+    // Allow a later call to retry `Sentry.init` instead of permanently
+    // treating the SDK as initialized when it actually threw.
+    initialized = false
+    throw error
+  }
+}
+
+function doInit(Sentry: SentryModule) {
   Sentry.init({
     dsn:
       'https://2fac72ea180d48ae9bf1dbb3104b4000@o191317.ingest.us.sentry.io/1292015',
@@ -82,24 +102,49 @@ async function ensureInitialized(Sentry: SentryModule) {
 }
 
 /**
- * Ensures Sentry is loaded and initialized. Safe to call multiple times.
- * No-ops outside admin, so it should only be called from admin-gated code.
+ * Ensures Sentry is loaded and initialized. Safe to call multiple times,
+ * and safe to call without awaiting/catching: failures (e.g. the chunk
+ * failing to load) are caught here and logged instead of becoming an
+ * unhandled promise rejection. No-ops outside admin, so it should only be
+ * called from admin-gated code.
  */
 export async function initSentry() {
   if (!isAdmin()) return
-  const Sentry = await loadSentry()
-  await ensureInitialized(Sentry)
+
+  try {
+    const Sentry = await loadSentry()
+    await ensureInitialized(Sentry)
+  } catch (error) {
+    // A failure to load/initialize the SDK must never surface as an
+    // unhandled rejection on admin pages.
+    // eslint-disable-next-line no-console
+    console.error('[render-runtime] failed to load/init Sentry', error)
+  }
 }
 
 /**
  * Drop-in async replacement for `captureException` from '@sentry/react'.
- * Lazily loads + initializes the SDK on first use.
+ * Lazily loads + initializes the SDK on first use. Safe to call without
+ * awaiting/catching (see `initSentry` above for the failure-handling
+ * rationale): a failure to load/init/report never throws back at the
+ * caller, so it can never mask or interrupt the caller's own error
+ * handling.
  */
 export async function captureException(exception: any, captureContext?: any) {
   if (!isAdmin()) return
 
-  const Sentry = await loadSentry()
-  await ensureInitialized(Sentry)
+  try {
+    const Sentry = await loadSentry()
+    await ensureInitialized(Sentry)
 
-  return Sentry.captureException(exception, captureContext)
+    return Sentry.captureException(exception, captureContext)
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(
+      '[render-runtime] failed to report exception to Sentry',
+      error
+    )
+
+    return undefined
+  }
 }
