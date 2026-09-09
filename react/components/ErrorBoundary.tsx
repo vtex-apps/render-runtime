@@ -3,7 +3,7 @@ import ErrorDisplay from './ExtensionPoint/ErrorDisplay'
 import { useRuntime } from './RenderContext'
 import type { RenderContext } from './RenderContext'
 import { isAdmin } from '../utils/isAdmin'
-import { captureException } from '@sentry/react'
+import { captureException } from '../o11y/sentry'
 import { CustomAdminTags } from '../o11y/types'
 import ErrorPage from './ErrorPage/ErrorPage'
 

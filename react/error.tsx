@@ -1,6 +1,6 @@
 /* global module */
 import React, { Component } from 'react'
-import { captureException } from '@sentry/react'
+import { captureException } from './o11y/sentry'
 
 require('myvtex-sse')
 
