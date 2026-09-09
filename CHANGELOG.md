@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [8.136.3] - 2026-09-09
+
 ### Changed
 
 - Update DK Catalog platform-flow-id
