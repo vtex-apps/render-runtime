@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- De-duplicate identical `<script src>` tags declared via `Helmet` on the client, so multiple independently-mounted component instances that request the same external script (e.g. reCAPTCHA) no longer trigger repeated network requests for it. SSR output is left untouched.
+
 ## [8.136.4] - 2026-09-10 [YANKED]
 
 ## [8.136.3] - 2026-09-09
