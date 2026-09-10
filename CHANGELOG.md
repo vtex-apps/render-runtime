@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update DK Catalog platform-flow-id
 - Lazy-load the Sentry SDK via dynamic import so it's only ever downloaded on admin pages, keeping it out of the storefront bundle
 
+### Fixed
+
+- Load the minified regenerator runtime in production
+
 ## [8.136.2] - 2026-03-02
 
 ### Added
