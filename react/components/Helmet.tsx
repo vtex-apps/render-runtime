@@ -25,6 +25,8 @@ import { Helmet as ReactHelmet, HelmetProps } from 'react-helmet'
  * This wrapper drops exact-duplicate `<script src>` entries (from either
  * the `script` prop or JSX children) before they ever reach `react-helmet`,
  * so only the first request for a given URL is ever rendered into the DOM.
+ * It also adopts the scripts `react-helmet` already emitted server-side, so
+ * hydration can't re-request them -- see `adoptServerRenderedScripts` below.
  *
  * This is intentionally client-only. Registering "already requested"
  * state at module scope would leak across unrelated requests during
@@ -54,6 +56,75 @@ const isClient = !!(
 )
 
 const requestedScriptSrcs: Set<string> | null = isClient ? new Set() : null
+
+/**
+ * Adopts the `<script src>` tags that `react-helmet` already emitted into
+ * the server-rendered HTML, so the client never re-requests them.
+ *
+ * This handles a duplication that the in-render de-duplication above
+ * cannot see, because the two copies never coexist in a single render
+ * pass -- they're separated in *time*:
+ *
+ *  1. The server renders `<script src="...">` into `<head>`. The browser
+ *     requests and executes it while parsing the document.
+ *  2. On the first client commit, the component that declared that script
+ *     may not have mounted yet (it commonly lives behind a lazily-loaded
+ *     chunk). `react-helmet` therefore sees a tag of its own in the DOM
+ *     that nothing in the current tree claims, and removes it.
+ *  3. A commit later the component mounts, `react-helmet` no longer finds
+ *     the tag it just removed, and appends a brand-new -- byte-identical
+ *     -- one. A freshly inserted `<script>` element *always* executes, so
+ *     the external script runs a second time.
+ *
+ * A script running twice is not just a wasted request (the second one is
+ * usually served from cache anyway): it's a second full parse/execute of
+ * the payload, and for anything that registers global state on load it
+ * also means a duplicated instance. reCAPTCHA is the pathological case --
+ * every extra execution of its loader registers another widget, each of
+ * which pulls its own ~340 KiB of Google-internal code and keeps polling
+ * the main thread for the rest of the page's life.
+ *
+ * Because the registry lives at module scope, seeding it here (before
+ * `react-helmet` has had a chance to run its first DOM sync) is enough to
+ * make step 3 a no-op: by the time the component finally mounts, its
+ * `src` is already known to have been requested, so it never reaches
+ * `react-helmet` and no new tag is ever created.
+ *
+ * We also drop `data-react-helmet` from the adopted tags. That attribute
+ * is how `react-helmet` recognizes the tags it owns, so removing it makes
+ * it ignore them entirely -- meaning step 2 doesn't happen either and the
+ * tag simply stays in the DOM exactly where the server put it, instead of
+ * being removed and never restored.
+ *
+ * Note this runs at module load, which on the client happens while the
+ * runtime bundle evaluates -- the bundle's `<script>` tags sit at the end
+ * of `<body>`, so the whole `<head>` (and with it every server-rendered
+ * `react-helmet` tag) is already parsed and present by then.
+ */
+function adoptServerRenderedScripts() {
+  if (!requestedScriptSrcs) {
+    return
+  }
+
+  const serverRendered = document.querySelectorAll(
+    'script[data-react-helmet][src]'
+  )
+
+  for (let i = 0; i < serverRendered.length; i++) {
+    const script = serverRendered[i]
+    // The raw attribute (rather than the resolved `.src` property) is what
+    // we want here: it's the same string the app authored, which is what
+    // the incoming props will be compared against.
+    const src = script.getAttribute('src')
+
+    if (src) {
+      requestedScriptSrcs.add(src)
+      script.removeAttribute('data-react-helmet')
+    }
+  }
+}
+
+adoptServerRenderedScripts()
 
 function hasSrc(value: unknown): value is { src: string } {
   return (

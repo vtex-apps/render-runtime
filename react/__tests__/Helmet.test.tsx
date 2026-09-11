@@ -42,8 +42,17 @@ const renderedChildScriptSrcs = () =>
     )
     .map((child: any) => (child as any).props.src)
 
+// Simulates the head `react-helmet` leaves behind after a server render:
+// its tags are marked with `data-react-helmet` and, for scripts with a
+// `src`, the browser has already requested and executed them by the time
+// the runtime bundle evaluates.
+const givenServerRenderedHead = (html: string) => {
+  document.head.innerHTML = html
+}
+
 beforeEach(() => {
   lastRenderedProps = null
+  document.head.innerHTML = ''
 })
 
 afterEach(() => {
@@ -153,6 +162,97 @@ it('leaves non-script children and other props untouched', () => {
 
   expect(lastRenderedProps.title).toBe('my title')
   expect(React.Children.toArray(lastRenderedProps.children)).toHaveLength(1)
+})
+
+it('drops a script src that was already server-rendered', () => {
+  givenServerRenderedHead(
+    '<script data-react-helmet="true" src="https://example.com/a.js"></script>'
+  )
+
+  const Helmet = loadHelmet()
+
+  // This is the hydration case: the component that declared the script
+  // mounts on the client, but the browser already ran the server-rendered
+  // tag, so forwarding it to react-helmet would make it execute twice.
+  render(<Helmet script={[{ src: 'https://example.com/a.js' }]} />)
+
+  expect(renderedScriptSrcs()).toEqual([])
+})
+
+it('drops a server-rendered script src declared as a JSX child', () => {
+  givenServerRenderedHead(
+    '<script data-react-helmet="true" src="https://example.com/a.js"></script>'
+  )
+
+  const Helmet = loadHelmet()
+
+  render(
+    <Helmet>
+      <script src="https://example.com/a.js" />
+    </Helmet>
+  )
+
+  expect(renderedChildScriptSrcs()).toEqual([])
+})
+
+it('makes react-helmet ignore the adopted tags so they are never removed', () => {
+  givenServerRenderedHead(
+    '<script data-react-helmet="true" src="https://example.com/a.js"></script>'
+  )
+
+  loadHelmet()
+
+  // Without `data-react-helmet`, react-helmet no longer recognizes the tag
+  // as its own, so it won't remove it during its first DOM sync -- the tag
+  // stays exactly where the server put it.
+  expect(document.head.querySelectorAll('script[src]')).toHaveLength(1)
+  expect(
+    document.head.querySelectorAll('script[src][data-react-helmet]')
+  ).toHaveLength(0)
+})
+
+it('only adopts server-rendered scripts that have a src', () => {
+  givenServerRenderedHead(
+    '<script data-react-helmet="true">window.a = 1</script>'
+  )
+
+  const Helmet = loadHelmet()
+
+  render(<Helmet script={[{ src: 'https://example.com/a.js' }]} />)
+
+  expect(renderedScriptSrcs()).toEqual(['https://example.com/a.js'])
+})
+
+it('does not adopt scripts that react-helmet did not render', () => {
+  givenServerRenderedHead('<script src="https://example.com/a.js"></script>')
+
+  const Helmet = loadHelmet()
+
+  // A script the page put in the head by itself isn't react-helmet's to
+  // manage, so react-helmet won't remove/re-add it and there's nothing to
+  // de-duplicate against.
+  render(<Helmet script={[{ src: 'https://example.com/a.js' }]} />)
+
+  expect(renderedScriptSrcs()).toEqual(['https://example.com/a.js'])
+})
+
+it('still forwards scripts that were not server-rendered', () => {
+  givenServerRenderedHead(
+    '<script data-react-helmet="true" src="https://example.com/a.js"></script>'
+  )
+
+  const Helmet = loadHelmet()
+
+  render(
+    <Helmet
+      script={[
+        { src: 'https://example.com/a.js' },
+        { src: 'https://example.com/b.js' },
+      ]}
+    />
+  )
+
+  expect(renderedScriptSrcs()).toEqual(['https://example.com/b.js'])
 })
 
 it('starts each fresh module instance with an empty registry', () => {
