@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- De-duplicate identical `<script src>` tags declared via `Helmet` on the client, so multiple independently-mounted component instances that request the same external script (e.g. reCAPTCHA) no longer trigger repeated network requests for it. SSR output is left untouched.
+- Adopt the `<script src>` tags `Helmet` already rendered server-side, so hydration can no longer remove and re-insert them. A re-inserted `<script>` is always executed again, which made external scripts run twice on part of the page loads -- for reCAPTCHA that meant a second widget being registered, each one downloading and executing its own copy of Google's ~340 KiB loader and polling the main thread for the rest of the page's life.
+
 ## [8.136.4] - 2026-09-10 [YANKED]
 
 ## [8.136.3] - 2026-09-09
