@@ -10,9 +10,6 @@
         "serverOnly": true
       },
       {
-        "path": "npm:regenerator-runtime@0.11.1/runtime.js"
-      },
-      {
         "global": "PropTypes",
         "import": "prop-types",
         "path": "npm:prop-types@15.7.2/prop-types.js"
@@ -96,9 +93,6 @@
       {
         "path": "npm:bluebird@3.5.1/js/browser/bluebird.min.js",
         "serverOnly": true
-      },
-      {
-        "path": "npm:regenerator-runtime@0.11.1/runtime.js"
       },
       {
         "global": "PropTypes",
