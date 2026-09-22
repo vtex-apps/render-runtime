@@ -33,6 +33,7 @@
     "react-apollo": "^3.1.2",
     "react-helmet": "^5.2.0",
     "react-json-view": "^1.19.1",
+    "regenerator-runtime": "0.11.1",
     "route-parser": "^0.0.5",
     "use-media": "^1.4.0"
   },
@@ -78,7 +79,6 @@
     "react-hot-loader": "^4.3.12",
     "react-intl": "^3.9.1",
     "react-no-ssr": "^1.1.0",
-    "regenerator-runtime": "^0.13.1",
     "ts-jest": "^24.0.1",
     "typescript": "3.9.7"
   },

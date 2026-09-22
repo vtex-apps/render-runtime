@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Load the minified regenerator runtime in production by bundling it into the `index` entrypoint, avoiding the extra client entrypoint that duplicated the `common` chunk in v8.136.4
+
 ## [8.136.4] - 2026-09-10 [YANKED]
 
 ## [8.136.3] - 2026-09-09
