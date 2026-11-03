@@ -21,6 +21,6 @@ spec:
   system: store-framework
   lifecycle: stable
   owner: te-0013
-  type: frontend-ui
+  type: frontend
   dependsOn: []
   subcomponentOf: store-framework
