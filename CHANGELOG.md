@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Escape a literal `+`, `&` and `#` in query string values written by `setQuery` and `navigate`, so a search term with those characters is kept after a filter is applied
+
 ## [8.136.4] - 2026-09-10 [YANKED]
 
 ## [8.136.3] - 2026-09-09
