@@ -1,7 +1,7 @@
 import { canUseDOM } from 'exenv'
 import { History, LocationDescriptorObject } from 'history'
 import queryString from 'query-string'
-import { difference, is, isEmpty, keys, startsWith } from 'ramda'
+import { difference, is, isEmpty, keys, mapObjIndexed, startsWith } from 'ramda'
 import RouteParser from 'route-parser'
 
 import { isEnabled } from './flags'
@@ -115,8 +115,19 @@ export function queryStringToMap(query: string): Record<string, any> {
   return queryString.parse(query)
 }
 
+// The query string is written unencoded, so a literal `+`, `&` or `#` inside a
+// value would be read back as a space, a param separator or the URL fragment.
+const escapeReserved = (value: unknown): unknown =>
+  Array.isArray(value)
+    ? value.map(escapeReserved)
+    : typeof value === 'string'
+    ? value.replace(/[+&#]/g, encodeURIComponent)
+    : value
+
 export function mapToQueryString(query: Record<string, any> = {}): string {
-  return queryString.stringify(query, { encode: false })
+  return queryString.stringify(mapObjIndexed(escapeReserved, query), {
+    encode: false,
+  })
 }
 
 export function getPageParams(path: string, routePath: string) {
